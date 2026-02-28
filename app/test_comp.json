@@ -1,0 +1,30 @@
+{
+    "\/gw\/email\/comprovante\/f244a9b3-51cd-4879-8fef-3b464690619e": {
+        "status": 404,
+        "raw": "{\"statusCode\":404,\"message\":\"Cannot GET \/email\/comprovante\/f244a9b3-51cd-4879-8fef-3b464690619e\",\"er"
+    },
+    "\/gw\/email\/f244a9b3-51cd-4879-8fef-3b464690619e\/comprovante": {
+        "status": 404,
+        "raw": "{\"statusCode\":404,\"message\":\"Cannot GET \/email\/f244a9b3-51cd-4879-8fef-3b464690619e\/comprovante\",\"er"
+    },
+    "\/gw\/email\/f244a9b3-51cd-4879-8fef-3b464690619e\/pdf": {
+        "status": 404,
+        "raw": "{\"statusCode\":404,\"message\":\"Cannot GET \/email\/f244a9b3-51cd-4879-8fef-3b464690619e\/pdf\",\"error\":\"No"
+    },
+    "\/gw\/comprovante\/f244a9b3-51cd-4879-8fef-3b464690619e": {
+        "status": 404,
+        "raw": "{\"statusCode\":404,\"message\":\"Cannot GET \/comprovante\/f244a9b3-51cd-4879-8fef-3b464690619e\",\"error\":\""
+    },
+    "\/gw\/comprovante\/email\/f244a9b3-51cd-4879-8fef-3b464690619e": {
+        "status": 404,
+        "raw": "{\"statusCode\":404,\"message\":\"Cannot GET \/comprovante\/email\/f244a9b3-51cd-4879-8fef-3b464690619e\",\"er"
+    },
+    "\/gw\/email\/receipt\/f244a9b3-51cd-4879-8fef-3b464690619e": {
+        "status": 404,
+        "raw": "{\"statusCode\":404,\"message\":\"Cannot GET \/email\/receipt\/f244a9b3-51cd-4879-8fef-3b464690619e\",\"error\""
+    },
+    "\/gw\/email\/certidao\/f244a9b3-51cd-4879-8fef-3b464690619e": {
+        "status": 404,
+        "raw": "{\"statusCode\":404,\"message\":\"Cannot GET \/email\/certidao\/f244a9b3-51cd-4879-8fef-3b464690619e\",\"error"
+    }
+}

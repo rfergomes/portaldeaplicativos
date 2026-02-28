@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'token_depto_id',
     ];
 
     /**
@@ -47,6 +48,23 @@ class User extends Authenticatable
     public function perfis()
     {
         return $this->belongsToMany(Perfil::class, 'usuario_perfil');
+    }
+
+    public function temPermissao(string $chave): bool
+    {
+        return $this->perfis()->whereHas('permissoes', function ($query) use ($chave) {
+            $query->where('chave', $chave);
+        })->exists();
+    }
+
+    public function temPerfil(string $nome): bool
+    {
+        return $this->perfis()->where('nome', $nome)->exists();
+    }
+
+    public function tokenDepto()
+    {
+        return $this->belongsTo(TokenDepto::class);
     }
 }
 

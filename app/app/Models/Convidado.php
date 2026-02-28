@@ -13,6 +13,8 @@ class Convidado extends Model
         'convite_id',
         'nome',
         'documento',
+        'empresa',
+        'valor',
         'presente',
     ];
 

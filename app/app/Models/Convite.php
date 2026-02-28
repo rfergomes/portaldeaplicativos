@@ -11,6 +11,9 @@ class Convite extends Model
 
     protected $fillable = [
         'evento_id',
+        'nome_responsavel',
+        'placa',
+        'empresa',
         'lote_id',
         'tipo',
         'valor',

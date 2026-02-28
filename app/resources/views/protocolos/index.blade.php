@@ -1,98 +1,170 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Protocolos Web</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    <style>
-        body { margin:0; font-family:Figtree, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:#e5e7eb; }
-        .layout { min-height:100vh; display:flex; flex-direction:column; }
-        header { background:#111827; color:#f9fafb; padding:0.75rem 2.25rem; display:flex; align-items:center; justify-content:space-between; }
-        .title { font-size:1.05rem; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; }
-        main { flex:1; padding:1.5rem 2.25rem 2.5rem; }
-        .breadcrumb { font-size:0.8rem; color:#9ca3af; margin-bottom:0.75rem; }
-        .panel { border-radius:0.9rem; background:#f9fafb; box-shadow:0 16px 30px rgba(15,23,42,0.18); padding:1.25rem 1.5rem; }
-        .panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.9rem; }
-        .panel-title { font-size:1rem; font-weight:600; color:#111827; }
-        .panel-subtitle { font-size:0.8rem; color:#6b7280; }
-        table { width:100%; border-collapse:collapse; font-size:0.85rem; margin-top:0.8rem; }
-        th, td { padding:0.6rem 0.5rem; text-align:left; }
-        th { font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; color:#9ca3af; border-bottom:1px solid #e5e7eb; }
-        tbody tr:nth-child(odd) { background:#f9fafb; }
-        tbody tr:nth-child(even) { background:#eef2ff; }
-        .badge { border-radius:999px; padding:0.15rem 0.6rem; font-size:0.7rem; font-weight:500; }
-        .badge-status-enviado { background:#dbeafe; color:#1d4ed8; }
-        .badge-status-pendente { background:#fef9c3; color:#854d0e; }
-        .badge-status-falha { background:#fee2e2; color:#b91c1c; }
-        .badge-status-concluido { background:#dcfce7; color:#166534; }
-        .btn-primary { background:linear-gradient(135deg,#2563eb,#1d4ed8); border:none; color:#f9fafb; border-radius:0.7rem; padding:0.55rem 1.3rem; font-size:0.8rem; font-weight:600; cursor:pointer; box-shadow:0 12px 22px rgba(37,99,235,0.4); }
-        .btn-primary:hover { filter:brightness(1.04); }
-        .btn-outline { border-radius:0.7rem; border:1px solid #d1d5db; padding:0.45rem 1.1rem; font-size:0.8rem; background:#ffffff; color:#374151; cursor:pointer; }
-        .btn-outline:hover { background:#f3f4f6; }
-        .empty-row { text-align:center; padding:1.25rem 0.5rem; color:#9ca3af; font-size:0.85rem; }
-        .status-pill { display:inline-flex; align-items:center; gap:0.25rem; }
-    </style>
-</head>
-<body>
-<div class="layout">
-    <header>
-        <div class="title">PROTOCOLO WEB</div>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="btn-outline">Sair</button>
-        </form>
-    </header>
+@extends('layouts.app')
 
-    <main>
-        <div class="breadcrumb">/ Protocolo Web</div>
+@section('title', 'Gestão de Protocolos')
 
-        <section class="panel">
-            <div class="panel-header">
-                <div>
-                    <div class="panel-title">Protocolos enviados</div>
-                    <div class="panel-subtitle">Rastreamento de envios com valor jurídico.</div>
+@section('content')
+    <div class="container-fluid">
+        <div class="card card-outline card-primary shadow-sm">
+            <div class="card-header border-0 py-3 d-flex align-items-center flex-wrap">
+                <h3 class="card-title fw-bold m-0">Protocolos Enviados</h3>
+                <div class="card-tools ms-auto">
+                    <a href="{{ route('protocolos.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                        <i class="fa-solid fa-plus me-1"></i> Novo Protocolo
+                    </a>
                 </div>
-                <a href="{{ route('protocolos.create') }}" class="btn-primary" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">Novo Protocolo</a>
             </div>
 
-            <table>
-                <thead>
-                <tr>
-                    <th style="width:32%;">Assunto</th>
-                    <th>Empresa</th>
-                    <th>Status</th>
-                    <th>Criado em</th>
-                    <th>Atualizado em</th>
-                </tr>
-                </thead>
-                <tbody>
-                @forelse($protocolos as $protocolo)
-                    <tr>
-                        <td>{{ $protocolo->assunto }}</td>
-                        <td>{{ $protocolo->empresa?->razao_social ?? '-' }}</td>
-                        <td>
-                            <span class="status-pill">
-                                @php($status = $protocolo->status)
-                                <span class="badge badge-status-{{ $status }}">
-                                    {{ ucfirst($status) }}
-                                </span>
-                            </span>
-                        </td>
-                        <td>{{ $protocolo->created_at?->format('d/m/Y H:i') }}</td>
-                        <td>{{ $protocolo->updated_at?->format('d/m/Y H:i') }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="empty-row">Nenhum protocolo cadastrado até o momento.</td>
-                    </tr>
-                @endforelse
-                </tbody>
-            </table>
-        </section>
-    </main>
-</div>
-</body>
-</html>
+            <!-- Filtros -->
+            <div class="card-body border-bottom bg-light pb-2 pt-3">
+                <form action="{{ route('protocolos.index') }}" method="GET" class="row gx-2 gy-2 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted mb-1">Pesquisar</label>
+                        <div class="input-group input-group-sm mb-0">
+                            <span class="input-group-text bg-white border-end-0"><i
+                                    class="fa-solid fa-search text-muted"></i></span>
+                            <input type="text" name="termo" class="form-control border-start-0 ps-0"
+                                placeholder="Assunto, empresa, contato..." value="{{ request('termo', $termo ?? '') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted mb-1">Mês</label>
+                        <select name="mes" class="form-select form-select-sm">
+                            <option value="">Todos</option>
+                            @foreach(range(1, 12) as $m)
+                                <option value="{{ $m }}" {{ request('mes', $mes) == $m ? 'selected' : '' }}>
+                                    {{ \Carbon\Carbon::create()->month($m)->locale('pt_BR')->translatedFormat('F') }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted mb-1">Ano</label>
+                        <select name="ano" class="form-select form-select-sm">
+                            <option value="">Todos</option>
+                            @php $anoAtual = date('Y'); @endphp
+                            @foreach(range($anoAtual - 2, $anoAtual + 1) as $a)
+                                <option value="{{ $a }}" {{ request('ano', $ano) == $a ? 'selected' : '' }}>
+                                    {{ $a }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted mb-1">Status do Envio</label>
+                        <select name="status_envio" class="form-select form-select-sm">
+                            <option value="">Todos</option>
+                            <option value="concluido" {{ request('status_envio') == 'concluido' ? 'selected' : '' }}>Recepção
+                                Concluída</option>
+                            <option value="enviado" {{ request('status_envio') == 'enviado' ? 'selected' : '' }}>Enviado
+                            </option>
+                            <option value="falha" {{ request('status_envio') == 'falha' ? 'selected' : '' }}>Falha</option>
+                            <option value="pendente" {{ request('status_envio') == 'pendente' ? 'selected' : '' }}>Pendente
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm flex-grow-1 shadow-sm">
+                            <i class="fa-solid fa-filter me-1"></i> Filtrar
+                        </button>
+                        <a href="{{ route('protocolos.index') }}" class="btn btn-light border btn-sm shadow-sm"
+                            title="Limpar Filtros">
+                            <i class="fa-solid fa-eraser text-muted"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
 
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted small text-uppercase">
+                            <tr>
+                                <th class="ps-4" style="width:80px;">ID</th>
+                                <th>Tipo</th>
+                                <th>Assunto / Referência</th>
+                                <th>Empresa</th>
+                                <th>Destinatários</th>
+                                <th>Status</th>
+                                <th>Enviado Por</th>
+                                <th>Data</th>
+                                <th class="text-end pe-4">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($protocolos as $protocolo)
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="badge text-bg-light border shadow-sm px-2">#{{ $protocolo->id }}</span>
+                                    </td>
+                                    <td>
+                                        @if($protocolo->tipo)
+                                            <span class="badge text-bg-{{ $protocolo->tipo->cor }} rounded-pill shadow-sm px-2">
+                                                <i class="{{ $protocolo->tipo->icone }} me-1"></i>{{ $protocolo->tipo->nome }}
+                                            </span>
+                                        @else
+                                            <span class="badge text-bg-secondary rounded-pill shadow-sm px-2">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ $protocolo->assunto }}</div>
+                                        @if($protocolo->referencia_documento)
+                                            <small class="text-muted">{{ $protocolo->referencia_documento }}</small>
+                                        @endif
+                                    </td>
+                                    <td>{{ $protocolo->empresa?->razao_social ?? '—' }}</td>
+                                    <td>
+                                        <span class="badge text-bg-info text-white rounded-pill shadow-sm px-2">
+                                            <i class="fa-solid fa-users me-1"></i>{{ $protocolo->destinatarios->count() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @php
+                                            $cores = [
+                                                'enviado' => 'primary',
+                                                'pendente' => 'warning',
+                                                'falha' => 'danger',
+                                                'concluido' => 'success',
+                                            ];
+                                            $cor = $cores[$protocolo->status] ?? 'secondary';
+                                        @endphp
+                                        <span class="badge text-bg-{{ $cor }} rounded-pill shadow-sm px-2">
+                                            {{ ucfirst($protocolo->status) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ $protocolo->usuario?->name ?? '—' }}</small>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ $protocolo->created_at?->format('d/m/Y H:i') }}</small>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{{ route('protocolos.show', $protocolo) }}"
+                                            class="btn btn-light btn-sm border-0 rounded-circle shadow-sm"
+                                            title="Ver Detalhes e Timeline">
+                                            <i class="fa-solid fa-eye text-primary"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted py-5">
+                                        <div class="mb-2"><i class="fa-solid fa-inbox fa-3x opacity-25"></i></div>
+                                        Nenhum protocolo encontrado.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @if($protocolos->hasPages())
+                <div class="card-footer py-2 bg-white">
+                    {{ $protocolos->links() }}
+                </div>
+            @endif
+            <div class="card-footer bg-white text-muted small py-3 border-top">
+                <i class="fa-solid fa-circle-info me-1"></i> Rastreamento de envios com valor jurídico via AR-Online.
+            </div>
+        </div>
+    </div>
+@endsection

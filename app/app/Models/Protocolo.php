@@ -12,17 +12,30 @@ class Protocolo extends Model
     use Auditable;
 
     protected $fillable = [
+        'tipo_protocolo_id',
+        'user_id',
         'empresa_id',
         'assunto',
         'corpo',
         'canal',
         'status',
+        'referencia_documento',
         'agendado_para',
     ];
 
     protected $casts = [
         'agendado_para' => 'datetime',
     ];
+
+    public function tipo()
+    {
+        return $this->belongsTo(TipoProtocolo::class, 'tipo_protocolo_id');
+    }
+
+    public function usuario()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
+    }
 
     public function empresa()
     {

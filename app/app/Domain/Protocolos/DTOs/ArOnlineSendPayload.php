@@ -11,8 +11,7 @@ class ArOnlineSendPayload
         public ?string $emailTo = null,
         public ?array $attachments = null,
         public ?string $customId = null,
-        public ?array $sms = null,
-        public ?array $whatsapp = null,
+        // public ?array $whatsapp = null, // Disabled due to API bug
         public ?array $voz = null,
         public ?array $carta = null,
         public ?array $validation = null,
@@ -36,13 +35,9 @@ class ArOnlineSendPayload
             $payload['attachments'] = $this->attachments;
         }
 
-        if ($this->sms) {
-            $payload['sms'] = $this->sms;
-        }
-
-        if ($this->whatsapp) {
-            $payload['whatsapp'] = $this->whatsapp;
-        }
+        // if ($this->whatsapp) {
+        //     $payload['whatsapp'] = $this->whatsapp;
+        // }
 
         if ($this->voz) {
             $payload['voz'] = $this->voz;

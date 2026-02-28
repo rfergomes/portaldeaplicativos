@@ -21,6 +21,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\Gate::define('administrar_usuarios', function ($user) {
+            return $user->temPermissao('administrar_usuarios');
+        });
     }
 }

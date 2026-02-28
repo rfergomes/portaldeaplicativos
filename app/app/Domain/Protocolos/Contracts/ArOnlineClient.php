@@ -6,6 +6,8 @@ use App\Domain\Protocolos\DTOs\ArOnlineSendPayload;
 
 interface ArOnlineClient
 {
+    public function setToken(?string $token): self;
+
     public function send(ArOnlineSendPayload $payload): string;
 
     public function getEmailStatus(string $idEmail): array;

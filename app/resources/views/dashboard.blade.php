@@ -1,72 +1,152 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard - Portal de Aplicativos</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+@extends('layouts.app')
+
+@section('title', 'Dashboard - Portal de Aplicativos')
+
+@push('styles')
     <style>
-        body { margin: 0; font-family: Figtree, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f3f4f6; }
-        .page { min-height: 100vh; display: flex; flex-direction: column; }
-        header { background: #111827; color: #f9fafb; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
-        .title { font-size: 1.1rem; font-weight: 600; }
-        .content { flex: 1; padding: 1.75rem 2rem; }
-        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .card { border-radius: 0.75rem; padding: 1.1rem 1.25rem; color: #ffffff; display: flex; flex-direction: column; gap: 0.25rem; box-shadow: 0 14px 28px rgba(15, 23, 42, 0.24); }
-        .card-blue { background: linear-gradient(135deg, #1d4ed8, #2563eb); }
-        .card-green { background: linear-gradient(135deg, #16a34a, #22c55e); }
-        .card-cyan { background: linear-gradient(135deg, #0891b2, #06b6d4); }
-        .card-yellow { background: linear-gradient(135deg, #d97706, #f59e0b); }
-        .card-label { font-size: 0.85rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.05em; }
-        .card-value { font-size: 1.4rem; font-weight: 700; }
-        .section-title { font-size: 1rem; font-weight: 600; color: #111827; margin-bottom: 0.75rem; }
-        .placeholder { border-radius: 0.75rem; background: #ffffff; padding: 1.25rem 1.5rem; box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08); font-size: 0.9rem; color: #4b5563; }
-        .logout-form { margin: 0; }
-        .btn-logout { background: transparent; border-radius: 9999px; border: 1px solid rgba(249,250,251,0.35); color: #e5e7eb; padding: 0.35rem 0.9rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; }
-        .btn-logout:hover { background: rgba(15,23,42,0.6); }
+        .small-box .small-box-icon {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            z-index: 0;
+            font-size: 70px;
+            color: rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s linear;
+        }
+
+        .small-box:hover .small-box-icon {
+            transform: scale(1.1);
+        }
+
+        .small-box .inner {
+            z-index: 10;
+            position: relative;
+        }
     </style>
-</head>
-<body>
-<div class="page">
-    <header>
-        <div class="title">Portal de Aplicativos Sindicais</div>
-        <form method="POST" action="{{ route('logout') }}" class="logout-form">
-            @csrf
-            <button type="submit" class="btn-logout">Sair</button>
-        </form>
-    </header>
+@endpush
 
-    <main class="content">
-        <section class="cards">
-            <article class="card card-blue">
-                <span class="card-label">Eventos</span>
-                <span class="card-value">0</span>
-            </article>
-            <article class="card card-green">
-                <span class="card-label">Convites</span>
-                <span class="card-value">0</span>
-            </article>
-            <article class="card card-cyan">
-                <span class="card-label">Convidados</span>
-                <span class="card-value">0</span>
-            </article>
-            <article class="card card-yellow">
-                <span class="card-label">Arrecadado</span>
-                <span class="card-value">R$ 0,00</span>
-            </article>
-        </section>
-
-        <section>
-            <h2 class="section-title">Bem-vindo ao painel</h2>
-            <div class="placeholder">
-                Esta é a área inicial do Portal. A partir daqui serão acessados os módulos de
-                <strong>Eventos / Convites</strong>, <strong>Protocolo Web</strong> e demais aplicativos
-                definidos no plano.
+@section('content')
+    <!-- Small boxes (Stat box) -->
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box text-bg-primary shadow-sm h-100">
+                <div class="inner">
+                    <h3>{{ $totalEventos ?? 0 }}</h3>
+                    <p>Total de Eventos</p>
+                </div>
+                <div class="small-box-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <a href="{{ route('eventos.index') }}"
+                    class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-100-hover">
+                    Mais informações <i class="fa-solid fa-circle-arrow-right"></i>
+                </a>
             </div>
-        </section>
-    </main>
-</div>
-</body>
-</html>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box text-bg-success shadow-sm h-100">
+                <div class="inner">
+                    <h3>{{ $totalConvites ?? 0 }}</h3>
+                    <p>Convites Emitidos</p>
+                </div>
+                <div class="small-box-icon">
+                    <i class="fa-solid fa-ticket text-white-50"></i>
+                </div>
+                <a href="{{ route('eventos.index') }}"
+                    class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-100-hover">
+                    Mais informações <i class="fa-solid fa-circle-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box text-bg-warning shadow-sm h-100">
+                <div class="inner">
+                    <h3>{{ $totalConvidados ?? 0 }}</h3>
+                    <p>Total Convidados</p>
+                </div>
+                <div class="small-box-icon">
+                    <i class="fa-solid fa-user-group text-dark-50"></i>
+                </div>
+                <a href="{{ route('eventos.index') }}"
+                    class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-100-hover">
+                    Mais informações <i class="fa-solid fa-circle-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box text-bg-danger shadow-sm h-100">
+                <div class="inner">
+                    <h3>R$ {{ number_format($totalArrecadado ?? 0, 2, ',', '.') }}</h3>
+                    <p>Arrecadação Geral</p>
+                </div>
+                <div class="small-box-icon">
+                    <i class="fa-solid fa-hand-holding-dollar text-white-50"></i>
+                </div>
+                <a href="{{ route('eventos.index') }}"
+                    class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-100-hover">
+                    Mais informações <i class="fa-solid fa-circle-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        <!-- ./col -->
+    </div>
+    <!-- /.row -->
 
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card card-outline card-primary shadow-sm">
+                <div class="card-header d-flex align-items-center">
+                    <h3 class="card-title m-0"><i class="fa-solid fa-list me-2"></i> Eventos Recentes</h3>
+                    <div class="card-tools ms-auto">
+                        <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Evento</th>
+                                    <th>Data</th>
+                                    <th>Convidados</th>
+                                    <th class="text-end">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($recentes ?? [] as $evento)
+                                    <tr>
+                                        <td><strong>{{ $evento->nome }}</strong></td>
+                                        <td>{{ $evento->data_inicio?->format('d/m/Y') ?? 'A definir' }}</td>
+                                        <td>{{ $evento->convidados_count ?? 0 }}</td>
+                                        <td class="text-end">
+                                            <a href="{{ route('eventos.index') }}"
+                                                class="btn btn-sm btn-outline-primary">Ver</a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">Nenhum evento recente encontrado
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{{ route('eventos.index') }}" class="small text-uppercase fw-bold text-decoration-none">Ver
+                        todos os eventos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

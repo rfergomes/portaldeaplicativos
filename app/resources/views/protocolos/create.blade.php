@@ -1,118 +1,428 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Novo Protocolo Web</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    <style>
-        body { margin:0; font-family:Figtree, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:#e5e7eb; }
-        .layout { min-height:100vh; display:flex; flex-direction:column; }
-        header { background:#111827; color:#f9fafb; padding:0.75rem 2.25rem; display:flex; align-items:center; justify-content:space-between; }
-        .title { font-size:1.05rem; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; }
-        main { flex:1; padding:1.5rem 2.25rem 2.25rem; }
-        .breadcrumb { font-size:0.8rem; color:#9ca3af; margin-bottom:0.75rem; }
-        .panel { border-radius:0.9rem; background:#f9fafb; box-shadow:0 16px 30px rgba(15,23,42,0.18); padding:1.4rem 1.6rem; max-width:960px; }
-        .panel-title { font-size:1rem; font-weight:600; color:#111827; margin-bottom:0.5rem; }
-        .panel-subtitle { font-size:0.8rem; color:#6b7280; margin-bottom:1.2rem; }
-        .grid-2 { display:grid; grid-template-columns:2fr 1fr; gap:1.25rem; }
-        .field { margin-bottom:0.75rem; }
-        .label { display:block; font-size:0.8rem; font-weight:500; color:#374151; margin-bottom:0.2rem; }
-        .input, select, textarea { width:100%; border-radius:0.5rem; border:1px solid #d1d5db; padding:0.55rem 0.7rem; font-size:0.85rem; }
-        textarea { min-height:180px; resize:vertical; }
-        .input:focus, select:focus, textarea:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 1px rgba(37,99,235,0.28); }
-        .chips { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.35rem; }
-        .chip { border-radius:999px; border:1px dashed #d1d5db; padding:0.25rem 0.5rem; font-size:0.75rem; color:#6b7280; }
-        .btn-primary { background:linear-gradient(135deg,#2563eb,#1d4ed8); border:none; color:#f9fafb; border-radius:0.7rem; padding:0.6rem 1.4rem; font-size:0.85rem; font-weight:600; cursor:pointer; box-shadow:0 12px 22px rgba(37,99,235,0.4); }
-        .btn-primary:hover { filter:brightness(1.04); }
-        .btn-outline { border-radius:0.7rem; border:1px solid #d1d5db; padding:0.5rem 1.2rem; font-size:0.8rem; background:#ffffff; color:#374151; cursor:pointer; }
-        .btn-outline:hover { background:#f3f4f6; }
-        .actions { display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1.1rem; }
-        .error-box { background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; border-radius:0.75rem; padding:0.6rem 0.8rem; font-size:0.8rem; margin-bottom:0.9rem; }
-    </style>
-</head>
-<body>
-<div class="layout">
-    <header>
-        <div class="title">PROTOCOLO WEB</div>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="btn-outline">Sair</button>
-        </form>
-    </header>
+@extends('layouts.app')
 
-    <main>
-        <div class="breadcrumb">/ Protocolo Web / Novo</div>
+@section('title', 'Novo Protocolo')
 
-        <section class="panel">
-            <div class="panel-title">Novo Protocolo</div>
-            <div class="panel-subtitle">Defina os dados da empresa, destinatários, conteúdo e anexos para envio com valor jurídico.</div>
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bs-stepper/dist/css/bs-stepper.min.css">
+@endpush
 
-            @if ($errors->any())
-                <div class="error-box">
-                    {{ $errors->first() }}
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('protocolos.store') }}" enctype="multipart/form-data">
-                @csrf
-
-                <div class="grid-2">
-                    <div>
-                        <div class="field">
-                            <label class="label" for="empresa_id">Empresa</label>
-                            <select id="empresa_id" name="empresa_id" class="input">
-                                <option value="">Selecione...</option>
-                                @foreach($empresas as $empresa)
-                                    <option value="{{ $empresa->id }}" @selected(old('empresa_id') == $empresa->id)>
-                                        {{ $empresa->razao_social }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="field">
-                            <label class="label" for="assunto">Assunto</label>
-                            <input id="assunto" name="assunto" class="input" value="{{ old('assunto') }}" required>
-                        </div>
-
-                        <div class="field">
-                            <label class="label" for="corpo">Mensagem</label>
-                            <textarea id="corpo" name="corpo" required>{{ old('corpo') }}</textarea>
-                        </div>
+@section('content')
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="card card-outline card-primary shadow-sm mb-4">
+                    <div class="card-header border-0">
+                        <h3 class="card-title fw-bold m-0"><i class="fa-solid fa-paper-plane me-2"></i>Novo Protocolo</h3>
                     </div>
+                    <div class="card-body p-0">
+                        <div class="bs-stepper" id="stepperProtocolo">
+                            <div class="bs-stepper-header" role="tablist">
+                                <!-- Step 1 -->
+                                <div class="step" data-target="#step-identificacao">
+                                    <button type="button" class="step-trigger" role="tab" aria-controls="step-identificacao"
+                                        id="step-identificacao-trigger">
+                                        <span class="bs-stepper-circle bg-primary"><i class="fa-solid fa-tag"></i></span>
+                                        <span class="bs-stepper-label">Dados Básicos</span>
+                                    </button>
+                                </div>
+                                <div class="line"></div>
+                                <!-- Step 2 -->
+                                <div class="step" data-target="#step-destinatarios">
+                                    <button type="button" class="step-trigger" role="tab" aria-controls="step-destinatarios"
+                                        id="step-destinatarios-trigger">
+                                        <span class="bs-stepper-circle bg-info"><i class="fa-solid fa-users"></i></span>
+                                        <span class="bs-stepper-label">Destinatários</span>
+                                    </button>
+                                </div>
+                                <div class="line"></div>
+                                <!-- Step 3 -->
+                                <div class="step" data-target="#step-mensagem">
+                                    <button type="button" class="step-trigger" role="tab" aria-controls="step-mensagem"
+                                        id="step-mensagem-trigger">
+                                        <span class="bs-stepper-circle bg-secondary"><i
+                                                class="fa-solid fa-align-left"></i></span>
+                                        <span class="bs-stepper-label">Mensagem & Anexos</span>
+                                    </button>
+                                </div>
+                            </div>
 
-                    <div>
-                        <div class="field">
-                            <label class="label">Destinatários</label>
-                            <input class="input" name="destinatarios[0][nome]" placeholder="Nome do destinatário" value="{{ old('destinatarios.0.nome') }}" required style="margin-bottom:0.4rem;">
-                            <input class="input" name="destinatarios[0][email]" placeholder="E-mail do destinatário" value="{{ old('destinatarios.0.email') }}" required>
-                            <div class="chips">
-                                <span class="chip">Suporte a múltiplos destinatários pode ser adicionado depois.</span>
+                            <div class="bs-stepper-content p-4 border-top">
+                                <form action="{{ route('protocolos.store') }}" method="POST" id="formProtocolo"
+                                    enctype="multipart/form-data">
+                                    @csrf
+                                    @if($errors->any())
+                                        <div class="alert alert-danger rounded-3 shadow-sm mb-4">
+                                            <ul class="mb-0">
+                                                @foreach($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
+
+                                    <!-- Passo 1: Identificação -->
+                                    <div id="step-identificacao" class="content" role="tabpanel"
+                                        aria-labelledby="step-identificacao-trigger">
+                                        <div class="row align-items-center mb-4">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold">Tipo de Protocolo</label>
+                                                <select name="tipo_protocolo_id" class="form-select" id="inputTipo"
+                                                    required>
+                                                    <option value="">— SELECIONE UM TIPO —</option>
+                                                    @foreach($tiposProtocolo as $tipo)
+                                                        <option value="{{ $tipo->id }}" {{ old('tipo_protocolo_id') == $tipo->id ? 'selected' : '' }}>
+                                                            {{ $tipo->nome }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold">Referência / Nº do Documento</label>
+                                                <input type="text" name="referencia_documento" class="form-control"
+                                                    placeholder="EX: Ofício 001/2026"
+                                                    value="{{ old('referencia_documento') }}">
+                                                <small class="text-muted">Opcional.</small>
+                                            </div>
+                                            <div class="col-md-12 mb-3">
+                                                <label class="form-label fw-bold">Empresa Relacionada</label>
+                                                <div class="d-flex gap-2">
+                                                    <select name="empresa_id" id="empresa_id"
+                                                        class="form-select select2 w-100">
+                                                        <option value="">— NENHUMA —</option>
+                                                        @foreach($empresas as $empresa)
+                                                            <option value="{{ $empresa->id }}" {{ old('empresa_id') == $empresa->id ? 'selected' : '' }}>
+                                                                {{ $empresa->razao_social }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button type="button" class="btn btn-outline-info text-nowrap"
+                                                        id="btnPuxarContatos" title="Puxar Contatos" disabled>
+                                                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                                                    </button>
+                                                </div>
+                                                <small class="text-muted">Selecione a empresa e clique no botão para puxar
+                                                    contatos registrados.</small>
+                                            </div>
+                                            <div class="col-md-12 mb-0">
+                                                <label class="form-label fw-bold">Assunto</label>
+                                                <input type="text" name="assunto"
+                                                    class="form-control @error('assunto') is-invalid @enderror"
+                                                    id="inputAssunto" placeholder="ASSUNTO DO PROTOCOLO" required
+                                                    value="{{ old('assunto') }}">
+                                                @error('assunto')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end bg-light p-3 rounded shadow-sm border mt-4">
+                                            <button type="button" class="btn btn-primary px-4 shadow-sm"
+                                                onclick="proximoPasso(1)">
+                                                Próximo Passo <i class="fa-solid fa-arrow-right ms-2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Passo 2: Destinatários -->
+                                    <div id="step-destinatarios" class="content" role="tabpanel"
+                                        aria-labelledby="step-destinatarios-trigger">
+                                        <div class="d-flex justify-content-between align-items-end mb-3">
+                                            <div>
+                                                <h5 class="fw-bold mb-1">Lista de Destinatários</h5>
+                                                <small class="text-muted">Adicione as pessoas que irão receber o
+                                                    protocolo.</small>
+                                            </div>
+                                            <button type="button"
+                                                class="btn btn-info btn-sm rounded-pill px-3 shadow-sm text-white"
+                                                onclick="adicionarDestinatario()">
+                                                <i class="fa-solid fa-user-plus me-1"></i> Adicionar Manualmente
+                                            </button>
+                                        </div>
+
+                                        <div id="listaDestinatarios" class="border rounded shadow-sm mb-4">
+                                            <!-- Destinatário 1 (padrão) -->
+                                            <div class="destinatario-row px-4 py-3 border-bottom">
+                                                <div class="row g-2 align-items-end">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label small fw-bold text-muted">NOME <span
+                                                                class="text-danger">*</span></label>
+                                                        <input type="text" name="destinatarios[0][nome]"
+                                                            class="form-control form-control-sm dt-nome"
+                                                            placeholder="NOME COMPLETO">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label small fw-bold text-muted">E-MAIL <span
+                                                                class="text-danger">*</span></label>
+                                                        <input type="email" name="destinatarios[0][email]"
+                                                            class="form-control form-control-sm dt-email"
+                                                            placeholder="email@empresa.com">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label small fw-bold text-muted">CELULAR <small
+                                                                class="text-info">(WhatsApp)</small></label>
+                                                        <input type="text" name="destinatarios[0][telefone]"
+                                                            class="form-control form-control-sm telefone-input"
+                                                            placeholder="+55 19 9.9999-9999">
+                                                    </div>
+                                                </div>
+                                                <div class="row g-2 mt-1">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label small fw-bold text-muted">CPF/CNPJ</label>
+                                                        <input type="text" name="destinatarios[0][cpf_cnpj]"
+                                                            class="form-control form-control-sm"
+                                                            placeholder="Apenas números">
+                                                    </div>
+                                                    <div class="col-md-7">
+                                                        <label class="form-label small fw-bold text-muted">ENDEREÇO</label>
+                                                        <input type="text" name="destinatarios[0][endereco][logradouro]"
+                                                            class="form-control form-control-sm"
+                                                            placeholder="Rua, Número, Bairro, CEP, Cidade-UF">
+                                                    </div>
+                                                    <div class="col-md-1 text-end"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            class="d-flex justify-content-between bg-light p-3 rounded shadow-sm border mt-4">
+                                            <button type="button" class="btn btn-secondary px-4 shadow-sm"
+                                                onclick="voltarPasso()">
+                                                <i class="fa-solid fa-arrow-left me-2"></i> Anterior
+                                            </button>
+                                            <button type="button" class="btn btn-primary px-4 shadow-sm"
+                                                onclick="proximoPasso(2)">
+                                                Próximo Passo <i class="fa-solid fa-arrow-right ms-2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Passo 3: Mensagem -->
+                                    <div id="step-mensagem" class="content" role="tabpanel"
+                                        aria-labelledby="step-mensagem-trigger">
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">Conteúdo da Mensagem <span
+                                                    class="text-danger">*</span></label>
+                                            <textarea name="corpo" id="corpoProtocolo"
+                                                class="form-control @error('corpo') is-invalid @enderror dt-corpo" rows="8"
+                                                placeholder="Escreva o conteúdo do protocolo aqui...">{{ old('corpo') }}</textarea>
+                                            <small class="text-muted mt-1 d-block mb-3">
+                                                <i class="fa-solid fa-circle-info me-1"></i> HTML é suportado no corpo do
+                                                e-mail (usará formatação rica se houver Summernote).
+                                            </small>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold"><i
+                                                    class="fa-solid fa-paperclip me-2"></i>Anexos Oficiais</label>
+                                            <input type="file" name="anexos[]" class="form-control border-secondary"
+                                                multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
+                                            <small class="text-muted">Selecione um ou mais arquivos. (Lembrando que o peso
+                                                somado não deve exceder 20MB)</small>
+                                        </div>
+
+                                        <div
+                                            class="d-flex justify-content-between bg-light p-3 rounded shadow-sm border mt-5">
+                                            <button type="button" class="btn btn-secondary px-4 shadow-sm"
+                                                onclick="voltarPasso()">
+                                                <i class="fa-solid fa-arrow-left me-2"></i> Anterior
+                                            </button>
+                                            <button type="submit" id="btnEnviarFinal"
+                                                class="btn btn-success px-5 shadow fw-bold">
+                                                <i class="fa-solid fa-paper-plane me-2"></i> Enviar Protocolo Oficial
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-
-                        <div class="field">
-                            <label class="label" for="anexos">Anexos</label>
-                            <input id="anexos" name="anexos[]" type="file" multiple class="input">
-                            <div class="chips">
-                                <span class="chip">PDF</span>
-                                <span class="chip">Imagens</span>
-                                <span class="chip">Outros formatos permitidos pela política interna</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="actions">
-                    <a href="{{ route('protocolos.index') }}" class="btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">Cancelar</a>
-                    <button type="submit" class="btn-primary">Enviar Protocolo</button>
-                </div>
-            </form>
-        </section>
-    </main>
-</div>
-</body>
-</html>
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/bs-stepper/dist/js/bs-stepper.min.js"></script>
+        <script>
+            let stepper;
+            let destinatarioIndex = 1;
 
+            document.addEventListener('DOMContentLoaded', function () {
+                stepper = new Stepper(document.querySelector('.bs-stepper'), {
+                    linear: false,
+                    animation: true
+                });
+            });
+
+            function proximoPasso(step) {
+                if (step === 1) {
+                    if (!$('#inputTipo').val() || !$('#inputAssunto').val()) {
+                        Swal.fire('Atenção', 'Preencha o Tipo e Assunto antes de avançar.', 'warning');
+                        return;
+                    }
+                }
+                stepper.next();
+            }
+
+            function voltarPasso() {
+                stepper.previous();
+            }
+
+            function adicionarDestinatario() {
+                const i = destinatarioIndex++;
+                const row = document.createElement('div');
+                row.className = 'destinatario-row border-top px-4 py-3';
+                row.innerHTML = `
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">NOME</label>
+                            <input type="text" name="destinatarios[${i}][nome]"
+                                class="form-control form-control-sm" placeholder="NOME COMPLETO" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">E-MAIL</label>
+                            <input type="email" name="destinatarios[${i}][email]"
+                                class="form-control form-control-sm" placeholder="email@empresa.com" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted">
+                                CELULAR <small class="text-info">(WhatsApp)</small>
+                            </label>
+                            <input type="text" name="destinatarios[${i}][telefone]"
+                                class="form-control form-control-sm telefone-input"
+                                placeholder="+55 19 9.9999-9999">
+                        </div>
+                    </div>
+                    <div class="row g-2 mt-1">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">CPF/CNPJ <small class="text-info">(Opcional)</small></label>
+                            <input type="text" name="destinatarios[${i}][cpf_cnpj]"
+                                class="form-control form-control-sm" placeholder="Apenas números">
+                        </div>
+                        <div class="col-md-7">
+                            <label class="form-label small fw-bold text-muted">ENDEREÇO <small class="text-info">(Para AR-Cartas no futuro)</small></label>
+                            <input type="text" name="destinatarios[${i}][endereco][logradouro]"
+                                class="form-control form-control-sm" placeholder="Rua, Número, Bairro, CEP, Cidade-UF">
+                        </div>
+                        <div class="col-md-1 text-end pt-4">
+                            <button type="button" class="btn btn-light btn-sm border-0 rounded-circle shadow-sm"
+                                onclick="this.closest('.destinatario-row').remove()" title="Remover">
+                                <i class="fa-solid fa-times text-danger"></i>
+                            </button>
+                        </div>
+                    </div>`;
+                document.getElementById('listaDestinatarios').appendChild(row);
+            }
+
+            function adicionarDestinatarioPreenchido(nome, email, telefone, documento) {
+                const i = destinatarioIndex++;
+                const row = document.createElement('div');
+                row.className = 'destinatario-row border-top px-4 py-3 bg-light';
+                row.innerHTML = `
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">NOME</label>
+                            <input type="text" name="destinatarios[${i}][nome]" value="${nome}"
+                                class="form-control form-control-sm" placeholder="NOME COMPLETO" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">E-MAIL</label>
+                            <input type="email" name="destinatarios[${i}][email]" value="${email}"
+                                class="form-control form-control-sm" placeholder="email@empresa.com" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted">
+                                CELULAR <small class="text-info">(WhatsApp)</small>
+                            </label>
+                            <input type="text" name="destinatarios[${i}][telefone]" value="${telefone || ''}"
+                                class="form-control form-control-sm telefone-input"
+                                placeholder="+55 19 9.9999-9999">
+                        </div>
+                    </div>
+                    <div class="row g-2 mt-1">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">CPF/CNPJ <small class="text-info">(Opcional)</small></label>
+                            <input type="text" name="destinatarios[${i}][cpf_cnpj]" value="${documento || ''}"
+                                class="form-control form-control-sm" placeholder="Apenas números">
+                        </div>
+                        <div class="col-md-7">
+                            <label class="form-label small fw-bold text-muted">ENDEREÇO <small class="text-info">(Para AR-Cartas no futuro)</small></label>
+                            <input type="text" name="destinatarios[${i}][endereco][logradouro]"
+                                class="form-control form-control-sm" placeholder="Rua, Número, Bairro, CEP, Cidade-UF">
+                        </div>
+                        <div class="col-md-1 text-end pt-4">
+                            <button type="button" class="btn btn-light btn-sm border-0 rounded-circle shadow-sm"
+                                onclick="this.closest('.destinatario-row').remove()" title="Remover">
+                                <i class="fa-solid fa-times text-danger"></i>
+                            </button>
+                        </div>
+                    </div>`;
+                document.getElementById('listaDestinatarios').appendChild(row);
+            }
+
+            $(document).ready(function () {
+                const empresaSelect = $('#empresa_id');
+                const btnPuxar = $('#btnPuxarContatos');
+
+                function togglePuxarBtn() {
+                    if (empresaSelect.val()) {
+                        btnPuxar.removeAttr('disabled');
+                    } else {
+                        btnPuxar.attr('disabled', 'disabled');
+                    }
+                }
+
+                // Initialize state
+                togglePuxarBtn();
+
+                // Listen for change
+                empresaSelect.on('change', togglePuxarBtn);
+
+                btnPuxar.on('click', function () {
+                    const empresaId = empresaSelect.val();
+                    if (!empresaId) return;
+
+                    btnPuxar.html('<i class="fa-solid fa-spinner fa-spin"></i>').attr('disabled', 'disabled');
+
+                    $.get('/empresas/' + empresaId + '/contatos')
+                        .done(function (data) {
+                            if (data.length === 0) {
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Sem contatos',
+                                    text: 'Esta empresa não possui contatos ativos cadastrados.',
+                                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000
+                                });
+                                return;
+                            }
+
+                            // Limpar lista atual e recriar com os puxados
+                            document.getElementById('listaDestinatarios').innerHTML = '';
+                            destinatarioIndex = 0; // reset index
+
+                            data.forEach(function (contato) {
+                                adicionarDestinatarioPreenchido(contato.nome, contato.email, contato.telefone, contato.documento);
+                            });
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: data.length + ' contatos adicionados!',
+                                toast: true, position: 'top-end', showConfirmButton: false, timer: 3000
+                            });
+                        })
+                        .fail(function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro',
+                                text: 'Falha ao buscar contatos da empresa.',
+                                toast: true, position: 'top-end', showConfirmButton: false, timer: 3000
+                            });
+                        })
+                        .always(function () {
+                            btnPuxar.html('<i class="fa-solid fa-cloud-arrow-down"></i>').removeAttr('disabled');
+                        });
+                });
+            });
+        </script>
+    @endpush
+@endsection

@@ -1,0 +1,290 @@
+{
+    "384e7182-bb1b-4c66-a20c-e133baca44f0": {
+        "email": {
+            "status": 200,
+            "body": {
+                "dateSend": "28\/02\/2026 14:41:44",
+                "dateDelivery": "28\/02\/2026 14:41:49",
+                "dateReading": null,
+                "dateAcceptance": null,
+                "error": false,
+                "description": "Entregue",
+                "failureReason": null,
+                "customID": "5",
+                "idEmail": "384e7182-bb1b-4c66-a20c-e133baca44f0"
+            }
+        },
+        "whatsapp": {
+            "status": 404,
+            "body": {
+                "message": "WhatsApp n\u00e3o encontrado"
+            }
+        },
+        "full": {
+            "status": 200,
+            "body": {
+                "codEmail": 4698279,
+                "statusFull": {
+                    "email": [
+                        {
+                            "label": "Processado",
+                            "dateTime": "28\/02\/2026 14:41:44"
+                        },
+                        {
+                            "label": "Enviado",
+                            "dateTime": "28\/02\/2026 14:41:44"
+                        },
+                        {
+                            "label": "Entregue",
+                            "dateTime": "28\/02\/2026 14:41:49"
+                        }
+                    ],
+                    "sms": [],
+                    "whatsapp": [],
+                    "voz": [],
+                    "carta": []
+                },
+                "lastStatus": {
+                    "email": {
+                        "label": "Entregue",
+                        "dateTime": "28\/02\/2026 14:41:49"
+                    },
+                    "sms": null,
+                    "whatsapp": null,
+                    "voz": null,
+                    "carta": null
+                },
+                "email": [
+                    {
+                        "subject": "TESTE AR ONLINE",
+                        "content": "Teste de envio<br>\n          <div>\n            <br>\n            <p align=center style=\"text-align:center;\">\n              <a target=\"_blank\" href=\"https:\/\/portal.ar-online.com.br\/emails\/info\/public\/384e7182-bb1b-4c66-a20c-e133baca44f0\">CONSULTE MAIS INFORMA\u00c7\u00d5ES SOBRE ESSA MENSAGEM - CLIQUE AQUI.<\/a>\n            <\/p>\n          <\/div>\n          <br>\n          <div class=\"rodape\" style=\"background-color: transparent; padding: 0px 0px; position: relative; z-index: 1; border-top: 1px solid #d4d4d4; box-shadow: 0px -2px 4px #e5e6e2; -moz-box-shadow: 0px -2px 14px #e5e6e2; -webkit-box-shadow: 0px -2px 4px #e5e6e2; font-size: 11px;\">\n            <table>\n              <tbody>\n                <tr>\n                  <td>\n                    <div class=\"col-lg-9 col-xs-12 col-sm-12\" style=\"font-size:1.0em;\">\n                      <p style=\"margin: 0\"> \n                         <b>Nota Legal: <\/b>Este e-mail foi enviado via AR-Online e se tornou um documento registrado.<\/p>\n          <p>O e-mail enviado pelo AR-Online \u00e9 protocolado e recebe um Carimbo do Tempo emitido pelo ICP-Brasil, que o torna um documento reconhecido legalmente e inviol\u00e1vel.\n          Tamb\u00e9m \u00e9 utilizado um sistema de rastreamento que registra quando o e-mail \u00e9 recebido pelos servidores e se ele foi aberto. A cada evento \u00e9 utilizado um carimbo do tempo. Todas as pessoas e empresas t\u00eam direito a um <a target=\"_blank\" href=\"https:\/\/ar-online.com.br\/\">AR-Online<\/a>, principal alternativa a uma Carta Registrada enviada pelos Correios.\n          \n                      <\/p>\n                    <\/div>\n                    <div class=\"col-lg-3 col-xs-12 col-sm-12\" id=\"background_cinza\" style=\"height:110px;\">\n                      <img height=\"90\" width=\"240\" src=\"https:\/\/portal.ar-online.com.br\/static\/img\/selo.png\">\n                    <\/div>\n                  <\/td>\n                <\/tr>\n              <\/tbody>\n            <\/table>\n          <\/div>\n          ",
+                        "idEmail": "00e2808b-5db8-4df0-b99f-ad3c57272f9d",
+                        "remetente": "ti@quimicosunificados.com.br <ti@quimicosunificados.com.br>",
+                        "destinatario": "rfergomes@live.com",
+                        "dataEnviada": "28\/02\/2026",
+                        "horaEnviada": "14:41:44",
+                        "dataEntrega": "28\/02\/2026",
+                        "horaEntrega": "14:41:49",
+                        "dataLeitura": "28\/02\/2026",
+                        "horaLeitura": "14:43:42",
+                        "idImage": "<span style=\"font-size: 7px;bottom: 5px;position: relative;\">00e2808b-5db8-4df0-b99f-ad3c57272f9d<\/span>",
+                        "dataLeituraUTC": "2026-02-28 17:43:42.092837",
+                        "detalhesEnvioEntrega": {
+                            "ocorridoEm": "28\/02\/2026 14:41:49",
+                            "carimbo": "MIIPdTADAgEAMIIPbAYJKoZIhvcNAQcCoIIPXTCCD1kCAQMxDzANBglghkgBZQMEAgEFADCCBV0GCyqGSIb3DQEJEAEEoIIFTASCBUgwggVEAgEBBgVgTAEGBjAvMAsGCWCGSAFlAwQCAQQgnm743VA3ThRzYaU3flLHkbFJzeA+Lv3TwyvwbOa5McACBCjQiyUYEzIwMjYwMjI4MTc0MTQ5Ljc3NFowBIACAfSgggEKpIIBBjCCAQIxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMSUwIwYDVQQLDBxDZXJ0aWZpY2FkbyBDYXJpbWJvIGRlIFRlbXBvMRkwFwYDVQQLDBB2aWRlb2NvbmZlcmVuY2lhMRcwFQYDVQQLDA4zMzY4MzExMTAwMDEwNzERMA8GA1UECwwIQVJTRVJQUk8xOzA5BgNVBAsMMkF1dG9yaWRhZGUgQ2VydGlmaWNhZG9yYSBkbyBTRVJQUk9BQ0YgVElNRVNUQU1QSU5HMTMwMQYDVQQDDCpTRVJWSURPUiBERSBDQVJJTUJPIERPIFRFTVBPIEFDVCBCUnkgNTAxNTGhggPWMIID0gYMKwYBBAGC3CxkBAIBBIIDwDCCA7wwggKmAgEBMIHXoIHUMIHOpIHLMIHIMQswCQYDVQQGEwJCUjEZMBcGA1UECAwQRGlzdHJpdG8gRmVkZXJhbDERMA8GA1UEBwwIQnJhc2lsaWExNzA1BgNVBAoMLkluc3RpdHV0byBOYWNpb25hbCBkZSBUZWNub2xvZ2lhIGRhIEluZm9ybWFjYW8xJzAlBgNVBAsMHkVudGlkYWRlIGRlIEF1ZGl0b3JpYSBkbyBUZW1wbzEpMCcGA1UEAwwgQXV0b3JpZGFkZSBDZXJ0aWZpY2Fkb3JhIEVBVCBTU0wCAQ2ggeEwgd6kgdswgdgxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMRkwFwYDVQQLDBB2aWRlb2NvbmZlcmVuY2lhMRcwFQYDVQQLDA4zMzY4MzExMTAwMDEwNzEVMBMGA1UECwwMQXBsaWNhY2FvIEExMREwDwYDVQQLDAhBUlNFUlBSTzE1MDMGA1UECwwsQXV0b3JpZGFkZSBDZXJ0aWZpY2Fkb3JhIGRvIFNFUlBSTyBGaW5hbCBTU0wxHzAdBgNVBAMMFkVBVDIxLklDUEJSQVNJTC5HT1YuQlIwCwYJKoZIhvcNAQELAggvWxJXWES8ujAiGA8yMDI2MDIyODE3MzYzMloYDzIwMjYwMzAxMTczNjMyWjCBpzAWBgwrBgEEAYLcLGQEAQExBgIEAPvczjAUBgwrBgEEAYLcLGQEAQIxBAICfRIwFgYMKwYBBAGC3CxkBAEDMQYCBB3NZQAwEwYMKwYBBAGC3CxkBAEEMQMCAQEwFgYMKwYBBAGC3CxkBAEFMQYCBB3NZQAwMgYMKwYBBAGC3CxkBAEHMSIEIG+iTEjD5ehNsy4ChB++bvYUuMqOTSE+H007BKqZiHa6MAsGCSqGSIb3DQEBCwOCAQEAat+LB6+2yCyxsI3MeHkGO8Tf0ef5yORT3a5D2JkW7vSljOK2R\/tkAjrRd9ls5x2kDi1f9AXi8q8Phye\/wxchDuftFMVGgxddRJNoeCme87yyUbEWWRbqXZvC0KMUwwjte\/kEPrGjmvDCH+jY6ZgKn\/3xejIPTv0eUCoR\/qxJc1dq\/PBwExs9rpaV3K4LT9HoliW\/1z8RWidmSNIihtNSXf57qFw78+BuFQm6FhGkXnkQDt64vMpzP5+tijlcVBAitpu53BrnGIiFlo8LS4QK4\/TcwXHgIh9ySwTOsNNLgxT\/uAWWLIOr0n6PC5LoLk24hZP3pg0VXN7HjMaM\/\/8MR6CCB3owggd2MIIFXqADAgECAgwU2YebEpQoXRnqV3kwDQYJKoZIhvcNAQELBQAwgZwxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMTswOQYDVQQLDDJTZXJ2aWNvIEZlZGVyYWwgZGUgUHJvY2Vzc2FtZW50byBkZSBEYWRvcyAtIFNFUlBSTzE7MDkGA1UEAwwyQXV0b3JpZGFkZSBDZXJ0aWZpY2Fkb3JhIGRvIFNFUlBST0FDRiBUSU1FU1RBTVBJTkcwHhcNMjMwMjEzMTkwMTA5WhcNMjgwMjEyMTkwMTA5WjCCAQIxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMSUwIwYDVQQLDBxDZXJ0aWZpY2FkbyBDYXJpbWJvIGRlIFRlbXBvMRkwFwYDVQQLDBB2aWRlb2NvbmZlcmVuY2lhMRcwFQYDVQQLDA4zMzY4MzExMTAwMDEwNzERMA8GA1UECwwIQVJTRVJQUk8xOzA5BgNVBAsMMkF1dG9yaWRhZGUgQ2VydGlmaWNhZG9yYSBkbyBTRVJQUk9BQ0YgVElNRVNUQU1QSU5HMTMwMQYDVQQDDCpTRVJWSURPUiBERSBDQVJJTUJPIERPIFRFTVBPIEFDVCBCUnkgNTAxNTEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDLSGxBnniQ2o+HiQXoO99uuecm7vb9PPaZsuvDPrE0FlsgEJK+cIkrX8No1WccRs\/l5hLA8UKjHNVd8KDeR1QlV3HSWAltVf2p2zl7yiOK63vY3R4Bpw6Te9Lb\/sshFtjw6zcYHqVc4SoqJPS3Sg49e2TFfqx\/OL9\/SvSxQ5le0ZkkIYFZcfSfKyFzAvXAslil6JeKbQ2s1FTQioxTNEONZoCrcss3Q16z7NNf48g5Dgh8IWVckzNtYLsjh4omUj1n+KClJdQIfTDk\/S4OqTkCinDFO4Cjg5rqOFkvsKJx\/ABuOV9n33PdjnI+0MGpZTbqIbQYNrxvMxutmKL+qzjrAgMBAAGjggJNMIICSTAfBgNVHSMEGDAWgBRVIa8iUa9dHMHvomIqVjPuUoqruzCBiAYDVR0fBIGAMH4wPKA6oDiGNmh0dHA6Ly9yZXBvc2l0b3Jpby5zZXJwcm8uZ292LmJyL2xjci9hY3NlcnByb2FjZnRzLmNybDA+oDygOoY4aHR0cDovL2NlcnRpZmljYWRvczIuc2VycHJvLmdvdi5ici9sY3IvYWNzZXJwcm9hY2Z0cy5jcmwwVgYIKwYBBQUHAQEESjBIMEYGCCsGAQUFBzAChjpodHRwOi8vcmVwb3NpdG9yaW8uc2VycHJvLmdvdi5ici9jYWRlaWFzL2Fjc2VycHJvYWNmdHMucDdiMIG6BgNVHREEgbIwga+gHAYFYEwBAwigEwQRQlJZIFRFQ05PTE9HSUEgU0GgGQYFYEwBAwOgEAQOMDQ0NDE1MjgwMDAxNTegHwYFYEwBAwKgFgQUSEVJVE9SIExJTUlSSU8gUElSRVOgOAYFYEwBAwSgLwQtMDEwNzE5ODkwODg2MDY2NzYwNzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwgRljYXJpbWJvZG90ZW1wb0BicnkuY29tLmJyMA4GA1UdDwEB\/wQEAwIGwDAWBgNVHSUBAf8EDDAKBggrBgEFBQcDCDBeBgNVHSAEVzBVMFMGB2BMAQKCLw4wSDBGBggrBgEFBQcCARY6aHR0cDovL3JlcG9zaXRvcmlvLnNlcnByby5nb3YuYnIvZG9jcy9kcGNhY3NlcnByb2FjZnRzLnBkZjANBgkqhkiG9w0BAQsFAAOCAgEAzd8WQmtec97sRB2yvOfkJ4wXenqiGS1zIZkquBnSORR+MTs2A1JHgs8X1PTsghbLvhsULwgi\/yujhxlEAkwcZOE+FfaJkIalK6j6cc0rrBcmP0MggfCnINNJjNaQ9KeeETZ0NN3HF\/SO+ytcNq6QtLcW4C2gdi9wpvnp3igwj7zv\/m0cbUrnRta5kQI1ZCVKVAeqF1MREkhHGR35zjJzJi7nD97mviiauSwINli85ImREDjumVaCJT6e3+\/4MlgOTQjmQhQmo2jOt5ybSAmKKU+phSTxpXarw+zAAloQWQcAxv+Yr4h+D+I1saelK74JlA9eKsC92I5ZsxDI7NUPrieQgpM2BdsR5FSGHtpWw2R9jZxhJnim9mu3rg2F7zYbyj98xc4nt8MQl8qtZZkr1MmtARgKLuU0ZzPgZfz5WW7C\/r35UkGBhwA6ZkHePWq8TgwTMpzUlfaT0DIq+m5dj9+KfmOQQ+dHOsehlbAklgZ87VHAdzLcnwHSeCPomVP92z\/ypN7rVxO1zD+x8AfHkQ5m9MmzyEM4LDJLGX1P6mW7Yffzu5vb01MSS3\/H8QNrfCBi56G7BdgMzHxtGgC2oCv3XdQ49TU3dD7gbuacwlMIgSAgNqbbBnHH5MFtpFo4nP8m\/1Hwn+4Q5vHUw6\/kaSa1nhgsculbG1PK1yMAZbkxggJiMIICXgIBATCBrTCBnDELMAkGA1UEBhMCQlIxEzARBgNVBAoMCklDUC1CcmFzaWwxOzA5BgNVBAsMMlNlcnZpY28gRmVkZXJhbCBkZSBQcm9jZXNzYW1lbnRvIGRlIERhZG9zIC0gU0VSUFJPMTswOQYDVQQDDDJBdXRvcmlkYWRlIENlcnRpZmljYWRvcmEgZG8gU0VSUFJPQUNGIFRJTUVTVEFNUElORwIMFNmHmxKUKF0Z6ld5MA0GCWCGSAFlAwQCAQUAoIGGMBoGCSqGSIb3DQEJAzENBgsqhkiG9w0BCRABBDAvBgkqhkiG9w0BCQQxIgQgS6QZYSeegv6Op7meIUti11F2Z5VXCsNHQ4wjEoRyuokwNwYLKoZIhvcNAQkQAi8xKDAmMCQwIgQgVsR3Rb66cn5fMshN48\/0eYu+esD8TtUaNxe+SNrE110wDQYJKoZIhvcNAQELBQAEggEAXCmm0NyBGUQmfL9o\/z0yQIBPRLB2FqkS79DusZa5ig1jKbFSo3vVdTetefnxd64menFoHYRt+Kw8JjAZ7d7IUyWawBsonsBT9v\/CzamCHlNqrwmxJFWeP4VRyeMijJ1f7kwmvIyamtQ3ZtYOK\/CkaC3TY\/R1TR2rjtqcY18WD2GyY6Brm1tvuloucBe1htKh71a0sb5HsPUKoQY9+9Bxj92t+TG77MPVEur+6GVu5QhHhTKWhXj3ldTl3h\/4nGXQmbKMOBGySpbNkpT5fogkTELfNMKH1xC6Wg8VvFvtR+DJ6YYuR5yQFv8795awx5SNCv\/B+n9iRaYZvNkUkZRF5Q==",
+                            "hashAssinado": "9e6ef8dd50374e147361a5377e52c791b149cde03e2efdd3c32bf06ce6b931c0",
+                            "trilhaAuditoria": "2026\/02\/28 14:41:45: send: ehlo mailer.aremail.com.br\r\n2026\/02\/28 14:41:45: reply: 250-DB1PEPF000509E7.mail.protection.outlook.com Hello [200.219.255.124]\r\n2026\/02\/28 14:41:45: reply: 250-SIZE 49283072\r\n2026\/02\/28 14:41:45: reply: 250-PIPELINING\r\n2026\/02\/28 14:41:45: reply: 250-DSN\r\n2026\/02\/28 14:41:45: reply: 250-ENHANCEDSTATUSCODES\r\n2026\/02\/28 14:41:45: reply: 250-STARTTLS\r\n2026\/02\/28 14:41:45: reply: 250-8BITMIME\r\n2026\/02\/28 14:41:45: reply: 250-BINARYMIME\r\n2026\/02\/28 14:41:45: reply: 250-CHUNKING\r\n2026\/02\/28 14:41:45: reply: 250 SMTPUTF8\r\n2026\/02\/28 14:41:45: reply: retcode (250); Msg: DB1PEPF000509E7.mail.protection.outlook.com Hello [200.219.255.124]\nSIZE 49283072\nPIPELINING\nDSN\nENHANCEDSTATUSCODES\nSTARTTLS\n8BITMIME\nBINARYMIME\nCHUNKING\nSMTPUTF8\n2026\/02\/28 14:41:45: reply: 220 2.0.0 SMTP server ready\r\n2026\/02\/28 14:41:45: reply: retcode (220); Msg: 2.0.0 SMTP server ready\n2026\/02\/28 14:41:46: reply: 250-DB1PEPF000509E7.mail.protection.outlook.com Hello [200.219.255.124]\r\n2026\/02\/28 14:41:46: reply: 250-SIZE 49283072\r\n2026\/02\/28 14:41:46: reply: 250-PIPELINING\r\n2026\/02\/28 14:41:46: reply: 250-DSN\r\n2026\/02\/28 14:41:46: reply: 250-ENHANCEDSTATUSCODES\r\n2026\/02\/28 14:41:46: reply: 250-8BITMIME\r\n2026\/02\/28 14:41:46: reply: 250-BINARYMIME\r\n2026\/02\/28 14:41:46: reply: 250-CHUNKING\r\n2026\/02\/28 14:41:46: reply: 250 SMTPUTF8\r\n2026\/02\/28 14:41:46: reply: retcode (250); Msg: DB1PEPF000509E7.mail.protection.outlook.com Hello [200.219.255.124]\nSIZE 49283072\nPIPELINING\nDSN\nENHANCEDSTATUSCODES\n8BITMIME\nBINARYMIME\nCHUNKING\nSMTPUTF8\n2026\/02\/28 14:41:46: reply: 250 2.1.0 Sender OK\r\n2026\/02\/28 14:41:46: reply: retcode (250); Msg: 2.1.0 Sender OK\n2026\/02\/28 14:41:46: reply: 250 2.1.5 Recipient OK\r\n2026\/02\/28 14:41:46: reply: retcode (250); Msg: 2.1.5 Recipient OK\n2026\/02\/28 14:41:46: reply: 354 Start mail input; end with <CRLF>.<CRLF>\r\n2026\/02\/28 14:41:46: reply: retcode (354); Msg: Start mail input; end with <CRLF>.<CRLF>\n2026\/02\/28 14:41:46: send: Content-Type: multipart\/mixed; boundary=\"===============6539445891839369067==\"\r\nMIME-Version: 1.0\r\nDate: Sat, 28 Feb 2026 17:41:44 -0000\r\nSubject: =?utf-8?q?TESTE_AR_ONLINE?=\r\nFrom: \"ti@quimicosunificados.com.br\" <ti@quimicosunificados.com.br>\r\nTo: rfergomes@live.com\r\nReply-To: ti@quimicosunificados.com.br\r\nMessage-ID: <177230050473.2666.16284461395782407703@aremail.com.br>\r\nX-ID-EMAIL: 00e2808b-5db8-4df0-b99f-ad3c57272f9d\r\nFeedback-ID: c3c61250-aed7-4fa1-9b7e-c2b3ae13d923:AREmail\r\nList-Unsubscribe: <mailto: unsubscribe@aremail.com.br?subject=ti@quimicosunificados.com.br 177230050473.2666.16284461395782407703>\r\nDKIM-Signature: v=1; a=rsa-sha256; c=relaxed\/simple; d=aremail.com.br;\r\n i=@aremail.com.br; q=dns\/txt; s=default; t=1772300504; h=to : from;\r\n bh=+JL7a1YcaF1m8YS6hM86YRiaUGO574U0U5Gdrvu1Rf0=;\r\n b=KFBVSsJtTIu1JK4x+Mz9JbmmABJAOEtaTRP3LPNjzpfG8vaUAjb4ICvIMthaHpsEtCs8x\r\n 51tyMwOhQ\/C1YHNnPI4tG8C4AiYlW7B59jNaKKOIGo0JrIrCKji8JqAG1nhVgb9uvlQp8oj\r\n d8TltFcvmUb2q8aQQBhAQKS0mqtOLOY=\r\n\r\n--===============6539445891839369067==\r\nContent-Type: application\/octet-stream; Name=\"protocoloWebLayout.png\"\r\nMIME-Version: 1.0\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"protocoloWebLayout.png\"\r\n\n--===============6539445891839369067==\r\nContent-Type: text\/html; charset=\"utf-8\"\r\nMIME-Version: 1.0\r\nContent-Transfer-Encoding: base64\r\n\r\nVGVzdGUgZGUgZW52aW88YnI+CiAgICAgICAgICA8ZGl2PgogICAgICAgICAgICA8YnI+CiAgICAg\r\nICAgICAgIDxwIGFsaWduPWNlbnRlciBzdHlsZT0idGV4dC1hbGlnbjpjZW50ZXI7Ij4KICAgICAg\r\nICAgICAgICA8YSB0YXJnZXQ9Il9ibGFuayIgaHJlZj0iaHR0cHM6Ly9wb3J0YWwuYXItb25saW5l\r\nLmNvbS5ici9lbWFpbHMvaW5mby9wdWJsaWMvMzg0ZTcxODItYmIxYi00YzY2LWEyMGMtZTEzM2Jh\r\nY2E0NGYwP2VtYWlsPWV5SjBiMnRsYmlJNkltWmxZbU5tTm1GakxUazNPRFF0TkRJNE5pMWlaamxt\r\nTFdSbU1qSmtaREkxWldZek5DSjkiPkNPTlNVTFRFIE1BSVMgSU5GT1JNQcOHw5VFUyBTT0JSRSBF\r\nU1NBIE1FTlNBR0VNIC0gQ0xJUVVFIEFRVUkuPC9hPgogICAgICAgICAgICA8L3A+CiAgICAgICAg\r\nICA8L2Rpdj4KICAgICAgICAgIDxicj48dGFibGU+CiAgICAgICAgPHRyPgogICAgICAgICAgICA8\r\ndGQ+CiAgICAgICAgICAgICAgICA8ZGl2PgogICAgICAgICAgICAgICAgICAgIDxkaXYgc3R5bGU9\r\nImZvbnQtc2l6ZToxLjBlbTsiPgogICAgICAgICAgICAgICAgICAgICAgICA8cCBzdHlsZT0ibWFy\r\nZ2luOiAwIj4gPGI+Tm90YSBMZWdhbDogPC9iPkVzdGUgZS1tYWlsIGZvaSBlbnZpYWRvIHZpYSBB\r\nUi1PbmxpbmUgZSBzZSB0b3Jub3UgdW0gZG9jdW1lbnRvIHJlZ2lzdHJhZG8uPC9wPgogICAgICAg\r\nICAgICAgICAgICAgICAgICA8cD5PIGUtbWFpbCBlbnZpYWRvIHBlbG8gQVItT25saW5lIMOpIHBy\r\nb3RvY29sYWRvIGUgcmVjZWJlIHVtIENhcmltYm8gZG8gVGVtcG8gZW1pdGlkbyBwZWxvIElDUC1C\r\ncmFzaWwsIHF1ZSBvIHRvcm5hIHVtIGRvY3VtZW50byByZWNvbmhlY2lkbyBsZWdhbG1lbnRlIGUg\r\naW52aW9sw6F2ZWwuIFRhbWLDqW0gw6kgdXRpbGl6YWRvIHVtIHNpc3RlbWEgZGUgcmFzdHJlYW1l\r\nbnRvIHF1ZSByZWdpc3RyYSBxdWFuZG8gbyBlLW1haWwgw6kgcmVjZWJpZG8gcGVsb3Mgc2Vydmlk\r\nb3JlcyBlIHNlIGVsZSBmb2kgYWJlcnRvLiBBIGNhZGEgZXZlbnRvIMOpIHV0aWxpemFkbyB1bSBj\r\nYXJpbWJvIGRvIHRlbXBvIGNvbXByb3ZhbmRvIHRhbWLDqW0gdG9kYSBhIGNyb25vbG9naWEgZG8g\r\ncHJvY2VkaW1lbnRvIGVsZXRyw7RuaWNvLiBUb2RhcyBhcyBwZXNzb2FzIGUgZW1wcmVzYXMgdMOq\r\nbSBkaXJlaXRvIGEgdW0gPGEgdGFyZ2V0PSJfYmxhbmsiIGhyZWY9Imh0dHBzOi8vd3d3LmFyLW9u\r\nbGluZS5jb20uYnIvIj5BUi1PbmxpbmU8L2E+LCBwcmluY2lwYWwgYWx0ZXJuYXRpdmEgYSB1bWEg\r\nQ2FydGEgUmVnaXN0cmFkYSBlbnZpYWRhIHBlbG9zIENvcnJlaW9zLjwvcD4KICAgICAgICAgICAg\r\nICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICA8L3RkPgog\r\nICAgICAgICAgICA8dGQ+CiAgICAgICAgICAgICAgICA8ZGl2IGlkPSJiYWNrZ3JvdW5kX2Npbnph\r\nIiBzdHlsZT0iaGVpZ2h0OjExMHB4OyI+CiAgICAgICAgICAgICAgICAgICAgPGltZyBoZWlnaHQ9\r\nIjkwIiB3aWR0aD0iMjQwIiBhbHQ9IlNlbG8gQVItT25saW5lIiBzcmM9Imh0dHBzOi8vYXBpLmFy\r\nZW1haWwuY29tLmJyL3YxL2VtYWlscy9zdGFtcC8wMGUyODA4Yi01ZGI4LTRkZjAtYjk5Zi1hZDNj\r\nNTcyNzJmOWQiIC8+CiAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPC90ZD4KICAg\r\nICAgICA8L3RyPgogICAgPC90YWJsZT4=\r\n\r\n--===============6539445891839369067==--\r\n.\r\n2026\/02\/28 14:41:49: reply: 250 2.6.0 <177230050473.2666.16284461395782407703@aremail.com.br> [InternalId=69376606747482, Hostname=SJ0PR06MB8974.namprd06.prod.outlook.com] 74284 bytes in 0.408, 177.528 KB\/sec Queued mail for delivery -> 250 2.1.5\r\n2026\/02\/28 14:41:49: reply: retcode (250); Msg: 2.6.0 <177230050473.2666.16284461395782407703@aremail.com.br> [InternalId=69376606747482, Hostname=SJ0PR06MB8974.namprd06.prod.outlook.com] 74284 bytes in 0.408, 177.528 KB\/sec Queued mail for delivery -> 250 2.1.5\n2026\/02\/28 14:41:49: send: quit\r\n2026\/02\/28 14:41:49: reply: 221 2.0.0 Service closing transmission channel\r\n2026\/02\/28 14:41:49: reply: retcode (221); Msg: 2.0.0 Service closing transmission channel",
+                            "emitidoPor": "Bry Tecnologia"
+                        },
+                        "detalhesLeitura": {
+                            "ocorridoEm": "28\/02\/2026 14:43:42",
+                            "ipLeitura": "187.8.81.34",
+                            "trilhaLeitura": {
+                                "date_view": "2026-02-28 17:43:42.092837",
+                                "ip_user": "187.8.81.34",
+                                "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/145.0.0.0 Safari\/537.36 Edg\/145.0.0.0 OneOutlook\/1.2026.210.300"
+                            },
+                            "carimbo": "MIIPdTADAgEAMIIPbAYJKoZIhvcNAQcCoIIPXTCCD1kCAQMxDzANBglghkgBZQMEAgEFADCCBV0GCyqGSIb3DQEJEAEEoIIFTASCBUgwggVEAgEBBgVgTAEGBjAvMAsGCWCGSAFlAwQCAQQghFzvWZKrMHjJn94lz0eaDjKBLiOowtVcojy\/BF7yNgACBCjQjREYEzIwMjYwMjI4MTc0MzQyLjM1NFowBIACAfSgggEKpIIBBjCCAQIxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMSUwIwYDVQQLDBxDZXJ0aWZpY2FkbyBDYXJpbWJvIGRlIFRlbXBvMRkwFwYDVQQLDBB2aWRlb2NvbmZlcmVuY2lhMRcwFQYDVQQLDA4zMzY4MzExMTAwMDEwNzERMA8GA1UECwwIQVJTRVJQUk8xOzA5BgNVBAsMMkF1dG9yaWRhZGUgQ2VydGlmaWNhZG9yYSBkbyBTRVJQUk9BQ0YgVElNRVNUQU1QSU5HMTMwMQYDVQQDDCpTRVJWSURPUiBERSBDQVJJTUJPIERPIFRFTVBPIEFDVCBCUnkgNTAxNTGhggPWMIID0gYMKwYBBAGC3CxkBAIBBIIDwDCCA7wwggKmAgEBMIHXoIHUMIHOpIHLMIHIMQswCQYDVQQGEwJCUjEZMBcGA1UECAwQRGlzdHJpdG8gRmVkZXJhbDERMA8GA1UEBwwIQnJhc2lsaWExNzA1BgNVBAoMLkluc3RpdHV0byBOYWNpb25hbCBkZSBUZWNub2xvZ2lhIGRhIEluZm9ybWFjYW8xJzAlBgNVBAsMHkVudGlkYWRlIGRlIEF1ZGl0b3JpYSBkbyBUZW1wbzEpMCcGA1UEAwwgQXV0b3JpZGFkZSBDZXJ0aWZpY2Fkb3JhIEVBVCBTU0wCAQ2ggeEwgd6kgdswgdgxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMRkwFwYDVQQLDBB2aWRlb2NvbmZlcmVuY2lhMRcwFQYDVQQLDA4zMzY4MzExMTAwMDEwNzEVMBMGA1UECwwMQXBsaWNhY2FvIEExMREwDwYDVQQLDAhBUlNFUlBSTzE1MDMGA1UECwwsQXV0b3JpZGFkZSBDZXJ0aWZpY2Fkb3JhIGRvIFNFUlBSTyBGaW5hbCBTU0wxHzAdBgNVBAMMFkVBVDIxLklDUEJSQVNJTC5HT1YuQlIwCwYJKoZIhvcNAQELAggvWxJXWES8ujAiGA8yMDI2MDIyODE3MzYzMloYDzIwMjYwMzAxMTczNjMyWjCBpzAWBgwrBgEEAYLcLGQEAQExBgIEAPvczjAUBgwrBgEEAYLcLGQEAQIxBAICfRIwFgYMKwYBBAGC3CxkBAEDMQYCBB3NZQAwEwYMKwYBBAGC3CxkBAEEMQMCAQEwFgYMKwYBBAGC3CxkBAEFMQYCBB3NZQAwMgYMKwYBBAGC3CxkBAEHMSIEIG+iTEjD5ehNsy4ChB++bvYUuMqOTSE+H007BKqZiHa6MAsGCSqGSIb3DQEBCwOCAQEAat+LB6+2yCyxsI3MeHkGO8Tf0ef5yORT3a5D2JkW7vSljOK2R\/tkAjrRd9ls5x2kDi1f9AXi8q8Phye\/wxchDuftFMVGgxddRJNoeCme87yyUbEWWRbqXZvC0KMUwwjte\/kEPrGjmvDCH+jY6ZgKn\/3xejIPTv0eUCoR\/qxJc1dq\/PBwExs9rpaV3K4LT9HoliW\/1z8RWidmSNIihtNSXf57qFw78+BuFQm6FhGkXnkQDt64vMpzP5+tijlcVBAitpu53BrnGIiFlo8LS4QK4\/TcwXHgIh9ySwTOsNNLgxT\/uAWWLIOr0n6PC5LoLk24hZP3pg0VXN7HjMaM\/\/8MR6CCB3owggd2MIIFXqADAgECAgwU2YebEpQoXRnqV3kwDQYJKoZIhvcNAQELBQAwgZwxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMTswOQYDVQQLDDJTZXJ2aWNvIEZlZGVyYWwgZGUgUHJvY2Vzc2FtZW50byBkZSBEYWRvcyAtIFNFUlBSTzE7MDkGA1UEAwwyQXV0b3JpZGFkZSBDZXJ0aWZpY2Fkb3JhIGRvIFNFUlBST0FDRiBUSU1FU1RBTVBJTkcwHhcNMjMwMjEzMTkwMTA5WhcNMjgwMjEyMTkwMTA5WjCCAQIxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMSUwIwYDVQQLDBxDZXJ0aWZpY2FkbyBDYXJpbWJvIGRlIFRlbXBvMRkwFwYDVQQLDBB2aWRlb2NvbmZlcmVuY2lhMRcwFQYDVQQLDA4zMzY4MzExMTAwMDEwNzERMA8GA1UECwwIQVJTRVJQUk8xOzA5BgNVBAsMMkF1dG9yaWRhZGUgQ2VydGlmaWNhZG9yYSBkbyBTRVJQUk9BQ0YgVElNRVNUQU1QSU5HMTMwMQYDVQQDDCpTRVJWSURPUiBERSBDQVJJTUJPIERPIFRFTVBPIEFDVCBCUnkgNTAxNTEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDLSGxBnniQ2o+HiQXoO99uuecm7vb9PPaZsuvDPrE0FlsgEJK+cIkrX8No1WccRs\/l5hLA8UKjHNVd8KDeR1QlV3HSWAltVf2p2zl7yiOK63vY3R4Bpw6Te9Lb\/sshFtjw6zcYHqVc4SoqJPS3Sg49e2TFfqx\/OL9\/SvSxQ5le0ZkkIYFZcfSfKyFzAvXAslil6JeKbQ2s1FTQioxTNEONZoCrcss3Q16z7NNf48g5Dgh8IWVckzNtYLsjh4omUj1n+KClJdQIfTDk\/S4OqTkCinDFO4Cjg5rqOFkvsKJx\/ABuOV9n33PdjnI+0MGpZTbqIbQYNrxvMxutmKL+qzjrAgMBAAGjggJNMIICSTAfBgNVHSMEGDAWgBRVIa8iUa9dHMHvomIqVjPuUoqruzCBiAYDVR0fBIGAMH4wPKA6oDiGNmh0dHA6Ly9yZXBvc2l0b3Jpby5zZXJwcm8uZ292LmJyL2xjci9hY3NlcnByb2FjZnRzLmNybDA+oDygOoY4aHR0cDovL2NlcnRpZmljYWRvczIuc2VycHJvLmdvdi5ici9sY3IvYWNzZXJwcm9hY2Z0cy5jcmwwVgYIKwYBBQUHAQEESjBIMEYGCCsGAQUFBzAChjpodHRwOi8vcmVwb3NpdG9yaW8uc2VycHJvLmdvdi5ici9jYWRlaWFzL2Fjc2VycHJvYWNmdHMucDdiMIG6BgNVHREEgbIwga+gHAYFYEwBAwigEwQRQlJZIFRFQ05PTE9HSUEgU0GgGQYFYEwBAwOgEAQOMDQ0NDE1MjgwMDAxNTegHwYFYEwBAwKgFgQUSEVJVE9SIExJTUlSSU8gUElSRVOgOAYFYEwBAwSgLwQtMDEwNzE5ODkwODg2MDY2NzYwNzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwgRljYXJpbWJvZG90ZW1wb0BicnkuY29tLmJyMA4GA1UdDwEB\/wQEAwIGwDAWBgNVHSUBAf8EDDAKBggrBgEFBQcDCDBeBgNVHSAEVzBVMFMGB2BMAQKCLw4wSDBGBggrBgEFBQcCARY6aHR0cDovL3JlcG9zaXRvcmlvLnNlcnByby5nb3YuYnIvZG9jcy9kcGNhY3NlcnByb2FjZnRzLnBkZjANBgkqhkiG9w0BAQsFAAOCAgEAzd8WQmtec97sRB2yvOfkJ4wXenqiGS1zIZkquBnSORR+MTs2A1JHgs8X1PTsghbLvhsULwgi\/yujhxlEAkwcZOE+FfaJkIalK6j6cc0rrBcmP0MggfCnINNJjNaQ9KeeETZ0NN3HF\/SO+ytcNq6QtLcW4C2gdi9wpvnp3igwj7zv\/m0cbUrnRta5kQI1ZCVKVAeqF1MREkhHGR35zjJzJi7nD97mviiauSwINli85ImREDjumVaCJT6e3+\/4MlgOTQjmQhQmo2jOt5ybSAmKKU+phSTxpXarw+zAAloQWQcAxv+Yr4h+D+I1saelK74JlA9eKsC92I5ZsxDI7NUPrieQgpM2BdsR5FSGHtpWw2R9jZxhJnim9mu3rg2F7zYbyj98xc4nt8MQl8qtZZkr1MmtARgKLuU0ZzPgZfz5WW7C\/r35UkGBhwA6ZkHePWq8TgwTMpzUlfaT0DIq+m5dj9+KfmOQQ+dHOsehlbAklgZ87VHAdzLcnwHSeCPomVP92z\/ypN7rVxO1zD+x8AfHkQ5m9MmzyEM4LDJLGX1P6mW7Yffzu5vb01MSS3\/H8QNrfCBi56G7BdgMzHxtGgC2oCv3XdQ49TU3dD7gbuacwlMIgSAgNqbbBnHH5MFtpFo4nP8m\/1Hwn+4Q5vHUw6\/kaSa1nhgsculbG1PK1yMAZbkxggJiMIICXgIBATCBrTCBnDELMAkGA1UEBhMCQlIxEzARBgNVBAoMCklDUC1CcmFzaWwxOzA5BgNVBAsMMlNlcnZpY28gRmVkZXJhbCBkZSBQcm9jZXNzYW1lbnRvIGRlIERhZG9zIC0gU0VSUFJPMTswOQYDVQQDDDJBdXRvcmlkYWRlIENlcnRpZmljYWRvcmEgZG8gU0VSUFJPQUNGIFRJTUVTVEFNUElORwIMFNmHmxKUKF0Z6ld5MA0GCWCGSAFlAwQCAQUAoIGGMBoGCSqGSIb3DQEJAzENBgsqhkiG9w0BCRABBDAvBgkqhkiG9w0BCQQxIgQgSh7GUqFj+RC9H3+y1PWoji+yYtb+6Ew\/gxUbY36fLMEwNwYLKoZIhvcNAQkQAi8xKDAmMCQwIgQgVsR3Rb66cn5fMshN48\/0eYu+esD8TtUaNxe+SNrE110wDQYJKoZIhvcNAQELBQAEggEAACbcfJigMPZG2rDnkCB9VnaGfjjr6kMVjNBDTv+sr74DDWRs+3i8JQqsLvj+zVNxOadBV7EMoSMrXnC5d1uqnScTF8+nuWyey7iYmtJi57NOa1oWUvaGKo8g5sE5T3oDRk0Ac3av+CpoRzP0j9yy9AJOtcVWnfVUhunn9gm28C+Ofxsne0aiTY3CrJCFRK\/MYO+shjdLRS66\/LyDo\/H7zyTD7dVBOWHzyAmWNGwvbKztf4+6WEmnGsDFQlNWldGHdA7V3N3q8wC1hbaeUb8kEZWFp\/GjmVhi9hrySSfxtVPA3s2EwMHKe9tPACXaf9+DF0PaS4\/KPb4S7urnB846aQ=="
+                        },
+                        "attachments": [
+                            {
+                                "downloadLink": "undefined\/cHJvdG9jb2xvV2ViTGF5b3V0LnBuZw==\/550a8cef-1346-4a34-91ba-53589c8e852b",
+                                "originalFilename": "protocoloWebLayout.png"
+                            }
+                        ],
+                        "emailResultSendStatus": "sucesso",
+                        "emailRastreio": {
+                            "ip": "",
+                            "city": "",
+                            "state": "",
+                            "country": "",
+                            "position": []
+                        },
+                        "emailRastreioProvider": {
+                            "ip": "",
+                            "city": "",
+                            "state": "",
+                            "country": "",
+                            "position": []
+                        },
+                        "email_error": null,
+                        "dateClickEmailTrack": [],
+                        "dataClickProviderTrackEmail": []
+                    }
+                ],
+                "sms": [
+                    {
+                        "detalhesEnvioEntregaSMS": [],
+                        "detalhesLeituraSMS": [],
+                        "numberSMS": null,
+                        "messageSMS": null,
+                        "statusSMSDescription": null,
+                        "messageWhatsApp": null,
+                        "sms_error": null,
+                        "SMSRastreioProvider": null
+                    }
+                ],
+                "whatsapp": [
+                    {
+                        "dataProviderWhatsApp": [],
+                        "numberWhatsapp": null,
+                        "hasErrorWhatsapp": false,
+                        "statusWhatsapp": ""
+                    }
+                ],
+                "voz": [
+                    {
+                        "status": null,
+                        "number": null,
+                        "linkAtendimento": null
+                    }
+                ],
+                "carta": []
+            }
+        }
+    },
+    "66777da0-57ce-4e17-a3f3-b6eab17df547": {
+        "email": {
+            "status": 200,
+            "body": {
+                "dateSend": "28\/02\/2026 14:41:38",
+                "dateDelivery": "28\/02\/2026 14:41:42",
+                "dateReading": null,
+                "dateAcceptance": null,
+                "error": false,
+                "description": "Entregue",
+                "failureReason": null,
+                "customID": "5",
+                "idEmail": "66777da0-57ce-4e17-a3f3-b6eab17df547"
+            }
+        },
+        "whatsapp": {
+            "status": 404,
+            "body": {
+                "message": "WhatsApp n\u00e3o encontrado"
+            }
+        },
+        "full": {
+            "status": 200,
+            "body": {
+                "codEmail": 4698278,
+                "statusFull": {
+                    "email": [
+                        {
+                            "label": "Processado",
+                            "dateTime": "28\/02\/2026 14:41:38"
+                        },
+                        {
+                            "label": "Enviado",
+                            "dateTime": "28\/02\/2026 14:41:38"
+                        },
+                        {
+                            "label": "Entregue",
+                            "dateTime": "28\/02\/2026 14:41:42"
+                        }
+                    ],
+                    "sms": [],
+                    "whatsapp": [],
+                    "voz": [],
+                    "carta": []
+                },
+                "lastStatus": {
+                    "email": {
+                        "label": "Entregue",
+                        "dateTime": "28\/02\/2026 14:41:42"
+                    },
+                    "sms": null,
+                    "whatsapp": null,
+                    "voz": null,
+                    "carta": null
+                },
+                "email": [
+                    {
+                        "subject": "TESTE AR ONLINE",
+                        "content": "Teste de envio<br>\n          <div>\n            <br>\n            <p align=center style=\"text-align:center;\">\n              <a target=\"_blank\" href=\"https:\/\/portal.ar-online.com.br\/emails\/info\/public\/66777da0-57ce-4e17-a3f3-b6eab17df547\">CONSULTE MAIS INFORMA\u00c7\u00d5ES SOBRE ESSA MENSAGEM - CLIQUE AQUI.<\/a>\n            <\/p>\n          <\/div>\n          <br>\n          <div class=\"rodape\" style=\"background-color: transparent; padding: 0px 0px; position: relative; z-index: 1; border-top: 1px solid #d4d4d4; box-shadow: 0px -2px 4px #e5e6e2; -moz-box-shadow: 0px -2px 14px #e5e6e2; -webkit-box-shadow: 0px -2px 4px #e5e6e2; font-size: 11px;\">\n            <table>\n              <tbody>\n                <tr>\n                  <td>\n                    <div class=\"col-lg-9 col-xs-12 col-sm-12\" style=\"font-size:1.0em;\">\n                      <p style=\"margin: 0\"> \n                         <b>Nota Legal: <\/b>Este e-mail foi enviado via AR-Online e se tornou um documento registrado.<\/p>\n          <p>O e-mail enviado pelo AR-Online \u00e9 protocolado e recebe um Carimbo do Tempo emitido pelo ICP-Brasil, que o torna um documento reconhecido legalmente e inviol\u00e1vel.\n          Tamb\u00e9m \u00e9 utilizado um sistema de rastreamento que registra quando o e-mail \u00e9 recebido pelos servidores e se ele foi aberto. A cada evento \u00e9 utilizado um carimbo do tempo. Todas as pessoas e empresas t\u00eam direito a um <a target=\"_blank\" href=\"https:\/\/ar-online.com.br\/\">AR-Online<\/a>, principal alternativa a uma Carta Registrada enviada pelos Correios.\n          \n                      <\/p>\n                    <\/div>\n                    <div class=\"col-lg-3 col-xs-12 col-sm-12\" id=\"background_cinza\" style=\"height:110px;\">\n                      <img height=\"90\" width=\"240\" src=\"https:\/\/portal.ar-online.com.br\/static\/img\/selo.png\">\n                    <\/div>\n                  <\/td>\n                <\/tr>\n              <\/tbody>\n            <\/table>\n          <\/div>\n          ",
+                        "idEmail": "264a2532-5add-47f1-95a3-dc71baefcce0",
+                        "remetente": "ti@quimicosunificados.com.br <ti@quimicosunificados.com.br>",
+                        "destinatario": "rfergomes@gmail.com",
+                        "dataEnviada": "28\/02\/2026",
+                        "horaEnviada": "14:41:38",
+                        "dataEntrega": "28\/02\/2026",
+                        "horaEntrega": "14:41:42",
+                        "dataLeitura": "28\/02\/2026",
+                        "horaLeitura": "14:42:10",
+                        "idImage": "<span style=\"font-size: 7px;bottom: 5px;position: relative;\">264a2532-5add-47f1-95a3-dc71baefcce0<\/span>",
+                        "dataLeituraUTC": "2026-02-28 17:42:10.848779",
+                        "detalhesEnvioEntrega": {
+                            "ocorridoEm": "28\/02\/2026 14:41:42",
+                            "carimbo": "MIIPdzADAgEAMIIPbgYJKoZIhvcNAQcCoIIPXzCCD1sCAQMxDzANBglghkgBZQMEAgEFADCCBV0GCyqGSIb3DQEJEAEEoIIFTASCBUgwggVEAgEBBgVgTAEGBjAvMAsGCWCGSAFlAwQCAQQgZnouU7Yn+Qa6H1Nm5L9xl+C8ODj1PNEg2ICJ8ZG\/pTwCBCjqyhMYEjIwMjYwMjI4MTc0MTQyLjQ4WjAEgAIB9KCCAQqkggEGMIIBAjELMAkGA1UEBhMCQlIxEzARBgNVBAoMCklDUC1CcmFzaWwxJTAjBgNVBAsMHENlcnRpZmljYWRvIENhcmltYm8gZGUgVGVtcG8xGTAXBgNVBAsMEHZpZGVvY29uZmVyZW5jaWExFzAVBgNVBAsMDjMzNjgzMTExMDAwMTA3MREwDwYDVQQLDAhBUlNFUlBSTzE7MDkGA1UECwwyQXV0b3JpZGFkZSBDZXJ0aWZpY2Fkb3JhIGRvIFNFUlBST0FDRiBUSU1FU1RBTVBJTkcxMzAxBgNVBAMMKlNFUlZJRE9SIERFIENBUklNQk8gRE8gVEVNUE8gQUNUIEJSeSA1MDExMKGCA9cwggPTBgwrBgEEAYLcLGQEAgEEggPBMIIDvTCCAqcCAQEwgdeggdQwgc6kgcswgcgxCzAJBgNVBAYTAkJSMRkwFwYDVQQIDBBEaXN0cml0byBGZWRlcmFsMREwDwYDVQQHDAhCcmFzaWxpYTE3MDUGA1UECgwuSW5zdGl0dXRvIE5hY2lvbmFsIGRlIFRlY25vbG9naWEgZGEgSW5mb3JtYWNhbzEnMCUGA1UECwweRW50aWRhZGUgZGUgQXVkaXRvcmlhIGRvIFRlbXBvMSkwJwYDVQQDDCBBdXRvcmlkYWRlIENlcnRpZmljYWRvcmEgRUFUIFNTTAIBDKCB4TCB3qSB2zCB2DELMAkGA1UEBhMCQlIxEzARBgNVBAoMCklDUC1CcmFzaWwxGTAXBgNVBAsMEHZpZGVvY29uZmVyZW5jaWExFzAVBgNVBAsMDjMzNjgzMTExMDAwMTA3MRUwEwYDVQQLDAxBcGxpY2FjYW8gQTExETAPBgNVBAsMCEFSU0VSUFJPMTUwMwYDVQQLDCxBdXRvcmlkYWRlIENlcnRpZmljYWRvcmEgZG8gU0VSUFJPIEZpbmFsIFNTTDEfMB0GA1UEAwwWRUFUMjIuSUNQQlJBU0lMLkdPVi5CUjALBgkqhkiG9w0BAQsCCQC\/c6qeWJOVHjAiGA8yMDI2MDIyODE3MzYwMFoYDzIwMjYwMzAxMTczNjAwWjCBpzAWBgwrBgEEAYLcLGQEAQExBgIEAP\/l7DAUBgwrBgEEAYLcLGQEAQIxBAICfhswFgYMKwYBBAGC3CxkBAEDMQYCBB3NZQAwEwYMKwYBBAGC3CxkBAEEMQMCAQEwFgYMKwYBBAGC3CxkBAEFMQYCBB3NZQAwMgYMKwYBBAGC3CxkBAEHMSIEIFj+utoppjqIGTQ45VcrBVJ3aeOS4wK0rFJEQ\/w2ccQyMAsGCSqGSIb3DQEBCwOCAQEAGpPOsGHaeAJyEs0Al6kapOU+PQCeFmwHwMd0G1HbUynktLcrloHvu8w\/UGyCA7b+qCvtPZmB4ioNGlbOFuk4usqOpm4wDvgPgw0ez6MLPH5TBsuAQYEZE+NOH1DEkU7Y7SbAiX\/VF5i+WLtgXUpsQNjEf8fA41KeVKXNnfD8YbKJ49QaqBpVK7i44ciJSI3\/lHMBto8ojS8i\/EV3AmaltAGtCDIdnOaDAr2IzcOp3SQOvV4kJuzs8y\/O2bBPdj9h7PgqCaSHiCGe2L5rDnVA4uWC8Ygo+s2M2+xW\/ZPWxh4rpxSyZpIPp6pGIbFFNkH+92pQpqEo\/+7nhnDcfz\/526CCB3swggd3MIIFX6ADAgECAg0ApG2b6dt7BcW7Cg8tMA0GCSqGSIb3DQEBCwUAMIGcMQswCQYDVQQGEwJCUjETMBEGA1UECgwKSUNQLUJyYXNpbDE7MDkGA1UECwwyU2VydmljbyBGZWRlcmFsIGRlIFByb2Nlc3NhbWVudG8gZGUgRGFkb3MgLSBTRVJQUk8xOzA5BgNVBAMMMkF1dG9yaWRhZGUgQ2VydGlmaWNhZG9yYSBkbyBTRVJQUk9BQ0YgVElNRVNUQU1QSU5HMB4XDTIzMDIyNDIwMjY0OFoXDTI4MDIyMzIwMjY0OFowggECMQswCQYDVQQGEwJCUjETMBEGA1UECgwKSUNQLUJyYXNpbDElMCMGA1UECwwcQ2VydGlmaWNhZG8gQ2FyaW1ibyBkZSBUZW1wbzEZMBcGA1UECwwQdmlkZW9jb25mZXJlbmNpYTEXMBUGA1UECwwOMzM2ODMxMTEwMDAxMDcxETAPBgNVBAsMCEFSU0VSUFJPMTswOQYDVQQLDDJBdXRvcmlkYWRlIENlcnRpZmljYWRvcmEgZG8gU0VSUFJPQUNGIFRJTUVTVEFNUElORzEzMDEGA1UEAwwqU0VSVklET1IgREUgQ0FSSU1CTyBETyBURU1QTyBBQ1QgQlJ5IDUwMTEwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuwrXpYUDbcabhd\/0zC6a4CGpm0wZghxIuiz16CeKZzZpH9tYY0TJyqQddETHWjcCYlNLBejZCrfvD7tluBSr5\/daxNMwOfi02BkYve+SLx+NE22QVvT9dawC5iz+Azzu8dXvMYDMdMpE8uLRqjZdtSM+KZGrzZnR2UKxV3\/q\/wAlVS86O179pGELDgAZ1bihKj+gXV1GEWKqJ3HXHlNNcx\/5fGkJx6RWE3A1TsjaeSd+7siqd+tSNscevDSU3IF8GCEnmvUO9exEf2IVy1yW6\/fCULlsGjty6HivKI7TGeVErNkMbF2q7MWVyuc6S8AxuqGh49T63CkLVk0L2j573wIDAQABo4ICTTCCAkkwHwYDVR0jBBgwFoAUVSGvIlGvXRzB76JiKlYz7lKKq7swgYgGA1UdHwSBgDB+MDygOqA4hjZodHRwOi8vcmVwb3NpdG9yaW8uc2VycHJvLmdvdi5ici9sY3IvYWNzZXJwcm9hY2Z0cy5jcmwwPqA8oDqGOGh0dHA6Ly9jZXJ0aWZpY2Fkb3MyLnNlcnByby5nb3YuYnIvbGNyL2Fjc2VycHJvYWNmdHMuY3JsMFYGCCsGAQUFBwEBBEowSDBGBggrBgEFBQcwAoY6aHR0cDovL3JlcG9zaXRvcmlvLnNlcnByby5nb3YuYnIvY2FkZWlhcy9hY3NlcnByb2FjZnRzLnA3YjCBugYDVR0RBIGyMIGvoBwGBWBMAQMIoBMEEUJSWSBURUNOT0xPR0lBIFNBoBkGBWBMAQMDoBAEDjA0NDQxNTI4MDAwMTU3oB8GBWBMAQMCoBYEFEhFSVRPUiBMSU1JUklPIFBJUkVToDgGBWBMAQMEoC8ELTAxMDcxOTg5MDg4NjA2Njc2MDcwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMIEZY2FyaW1ib2RvdGVtcG9AYnJ5LmNvbS5icjAOBgNVHQ8BAf8EBAMCBsAwFgYDVR0lAQH\/BAwwCgYIKwYBBQUHAwgwXgYDVR0gBFcwVTBTBgdgTAECgi8OMEgwRgYIKwYBBQUHAgEWOmh0dHA6Ly9yZXBvc2l0b3Jpby5zZXJwcm8uZ292LmJyL2RvY3MvZHBjYWNzZXJwcm9hY2Z0cy5wZGYwDQYJKoZIhvcNAQELBQADggIBALf5wm6U6\/FP+5acsEmPC6P5eJBINRi3btfV7t9DuarkC4fEtRZU3bZLkDcbsU1BtSrVJBexJMW2mfXYQKEJVboQ8QBBlg3Z6mvOavRv\/kvGrnXcbbCqDkgBRe4paoY9kgY3zupOnclAJNE6giI8zVUqEsbxn3vEv+HU4m9n78AZOafoxXYcWdWtWWWSK9omvU61qHF8YSy3Uwqs8KJz07LNPee4eFiAwckdfx2lCNspziQdBVBC17G6Lt0kRtR0hsB82kfYCHt1dtzjskAyiLz0dKDD8+9FrHpWRZtxLSY\/9N0fqXfZbVGIW7Vr9VYHL\/t95zzCSQLjctjkhX5UoooL8IivjZqzrii1GCrKKSRaAmfJoUFPSDxNGxFn3rWwegCerQAljYKssf060eMJoDtnXecAtfJL6VSoGVElRtNV3nwPxzu7TIuneIG89zBWNwtaNy560oOClbl06ZhHPaY9uzH+SCZwXXlN7EFUHJp6boxmz8NQTfuat560UCOnFuHSrUwYClu2mhvTHK2d62aWwC0RmTFOvDnq2QLQOSDyi8K+TL1SNkzGBdJ8UtcTmuGO\/IciX3D07i335y3fFO495P8QuUMzPcb\/kajbbBKhQMNrj6+\/a3SQ4qoCDjDPHt+7kOBRqgFwBZK+iJ96g\/BHSH23PZeivNv7fPJtwQjnMYICYzCCAl8CAQEwga4wgZwxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMTswOQYDVQQLDDJTZXJ2aWNvIEZlZGVyYWwgZGUgUHJvY2Vzc2FtZW50byBkZSBEYWRvcyAtIFNFUlBSTzE7MDkGA1UEAwwyQXV0b3JpZGFkZSBDZXJ0aWZpY2Fkb3JhIGRvIFNFUlBST0FDRiBUSU1FU1RBTVBJTkcCDQCkbZvp23sFxbsKDy0wDQYJYIZIAWUDBAIBBQCggYYwGgYJKoZIhvcNAQkDMQ0GCyqGSIb3DQEJEAEEMC8GCSqGSIb3DQEJBDEiBCAmcx7weAweUqE8BjGlcs8tfTy\/4xOwbLsxvzLAALY4NTA3BgsqhkiG9w0BCRACLzEoMCYwJDAiBCB3S9hAv7nwUjHG68S8bKNKzA\/nz6BdZCxMIvW5eQxgAjANBgkqhkiG9w0BAQsFAASCAQB88jqt\/+XnPD\/H8ae+o2aGCGpfJa3qz0dzVEoqPgYJs+sdvxRlTk8J\/Jxp+Jdcc\/pHMIds2bKCqFdSDGReklOXwlMQHSYNshF0pZlHTn1vPA3FxRc6e\/hLwdLKK6w5\/H5uUgs3Eg7ycVIElhetIJpeam5YtvyM+jcfpcwRXw7Bv0\/Aw7LXHkceqqxzBpCftUKbd7kbn+B7XPtuWpJO5PMiZh8b3FOUVvJZXSMCP7mj4diwXFsAR6psNsc+PfsArxdqa6hIml+qjIwLO2Hzlv2qZJCq6C3iDDCgH91zk9wFpLupIfNxHLFAzMgcchj7RpgGa34X0Bmef3SUnIGYFMe9",
+                            "hashAssinado": "667a2e53b627f906ba1f5366e4bf7197e0bc3838f53cd120d88089f191bfa53c",
+                            "trilhaAuditoria": "2026\/02\/28 14:41:39: send: ehlo mailer.aremail.com.br\r\n2026\/02\/28 14:41:39: reply: 250-mx.google.com at your service, [200.219.255.163]\r\n2026\/02\/28 14:41:39: reply: 250-SIZE 157286400\r\n2026\/02\/28 14:41:39: reply: 250-8BITMIME\r\n2026\/02\/28 14:41:39: reply: 250-STARTTLS\r\n2026\/02\/28 14:41:39: reply: 250-ENHANCEDSTATUSCODES\r\n2026\/02\/28 14:41:39: reply: 250-PIPELINING\r\n2026\/02\/28 14:41:39: reply: 250-CHUNKING\r\n2026\/02\/28 14:41:39: reply: 250 SMTPUTF8\r\n2026\/02\/28 14:41:39: reply: retcode (250); Msg: mx.google.com at your service, [200.219.255.163]\nSIZE 157286400\n8BITMIME\nSTARTTLS\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8\n2026\/02\/28 14:41:39: reply: 220 2.0.0 Ready to start TLS\r\n2026\/02\/28 14:41:39: reply: retcode (220); Msg: 2.0.0 Ready to start TLS\n2026\/02\/28 14:41:39: reply: 250-mx.google.com at your service, [200.219.255.163]\r\n2026\/02\/28 14:41:39: reply: 250-SIZE 157286400\r\n2026\/02\/28 14:41:39: reply: 250-8BITMIME\r\n2026\/02\/28 14:41:39: reply: 250-ENHANCEDSTATUSCODES\r\n2026\/02\/28 14:41:39: reply: 250-PIPELINING\r\n2026\/02\/28 14:41:39: reply: 250-CHUNKING\r\n2026\/02\/28 14:41:39: reply: 250 SMTPUTF8\r\n2026\/02\/28 14:41:39: reply: retcode (250); Msg: mx.google.com at your service, [200.219.255.163]\nSIZE 157286400\n8BITMIME\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8\n2026\/02\/28 14:41:40: reply: 250 2.1.0 OK ada2fe7eead31-5ff1ebe720bsi1923405137.193 - gsmtp\r\n2026\/02\/28 14:41:40: reply: retcode (250); Msg: 2.1.0 OK ada2fe7eead31-5ff1ebe720bsi1923405137.193 - gsmtp\n2026\/02\/28 14:41:40: reply: 250 2.1.5 OK ada2fe7eead31-5ff1ebe720bsi1923405137.193 - gsmtp\r\n2026\/02\/28 14:41:40: reply: retcode (250); Msg: 2.1.5 OK ada2fe7eead31-5ff1ebe720bsi1923405137.193 - gsmtp\n2026\/02\/28 14:41:40: reply: 354 Go ahead ada2fe7eead31-5ff1ebe720bsi1923405137.193 - gsmtp\r\n2026\/02\/28 14:41:40: reply: retcode (354); Msg: Go ahead ada2fe7eead31-5ff1ebe720bsi1923405137.193 - gsmtp\n2026\/02\/28 14:41:40: send: Content-Type: multipart\/mixed; boundary=\"===============7125393682150586858==\"\r\nMIME-Version: 1.0\r\nDate: Sat, 28 Feb 2026 17:41:38 -0000\r\nSubject: =?utf-8?q?TESTE_AR_ONLINE?=\r\nFrom: \"ti@quimicosunificados.com.br\" <ti@quimicosunificados.com.br>\r\nTo: rfergomes@gmail.com\r\nReply-To: ti@quimicosunificados.com.br\r\nMessage-ID: <177230049848.1251.13089233846748538018@aremail.com.br>\r\nX-ID-EMAIL: 264a2532-5add-47f1-95a3-dc71baefcce0\r\nFeedback-ID: c3c61250-aed7-4fa1-9b7e-c2b3ae13d923:AREmail\r\nList-Unsubscribe: <mailto: unsubscribe@aremail.com.br?subject=ti@quimicosunificados.com.br 177230049848.1251.13089233846748538018>\r\nDKIM-Signature: v=1; a=rsa-sha256; c=relaxed\/simple; d=aremail.com.br;\r\n i=@aremail.com.br; q=dns\/txt; s=default; t=1772300498; h=to : from;\r\n bh=\/9twC\/0uL\/3DnJFFaXxXKxW5k9ZQ\/nVZpqQR\/k2h7f8=;\r\n b=iQVFuHR9yg8JGv2ZNI\/FDOND4GxJLjCA2+z7fWzwpLVYy\/It3d9WeDTN4JiKRh4F74Xkr\r\n mEVFzRKK6+oEwZVpfUwhLQ1XMe6JIphRPoVZnA3YDn1PrBYg5r\/MFVzQLeFBhqgXEZEAWsP\r\n 7bd6VRxH4ZaZWk\/T3OSySHBUkwtBZYg=\r\n\r\n--===============7125393682150586858==\r\nContent-Type: application\/octet-stream; Name=\"protocoloWebLayout.png\"\r\nMIME-Version: 1.0\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"protocoloWebLayout.png\"\r\n\n--===============7125393682150586858==\r\nContent-Type: text\/html; charset=\"utf-8\"\r\nMIME-Version: 1.0\r\nContent-Transfer-Encoding: base64\r\n\r\nVGVzdGUgZGUgZW52aW88YnI+CiAgICAgICAgICA8ZGl2PgogICAgICAgICAgICA8YnI+CiAgICAg\r\nICAgICAgIDxwIGFsaWduPWNlbnRlciBzdHlsZT0idGV4dC1hbGlnbjpjZW50ZXI7Ij4KICAgICAg\r\nICAgICAgICA8YSB0YXJnZXQ9Il9ibGFuayIgaHJlZj0iaHR0cHM6Ly9wb3J0YWwuYXItb25saW5l\r\nLmNvbS5ici9lbWFpbHMvaW5mby9wdWJsaWMvNjY3NzdkYTAtNTdjZS00ZTE3LWEzZjMtYjZlYWIx\r\nN2RmNTQ3P2VtYWlsPWV5SjBiMnRsYmlJNkltVXlZVEpqWVdFMkxUQXhaalV0TkdJME1pMWhOelpt\r\nTFRBek5qQm1NV1pqTUdJMk9TSjkiPkNPTlNVTFRFIE1BSVMgSU5GT1JNQcOHw5VFUyBTT0JSRSBF\r\nU1NBIE1FTlNBR0VNIC0gQ0xJUVVFIEFRVUkuPC9hPgogICAgICAgICAgICA8L3A+CiAgICAgICAg\r\nICA8L2Rpdj4KICAgICAgICAgIDxicj48dGFibGU+CiAgICAgICAgPHRyPgogICAgICAgICAgICA8\r\ndGQ+CiAgICAgICAgICAgICAgICA8ZGl2PgogICAgICAgICAgICAgICAgICAgIDxkaXYgc3R5bGU9\r\nImZvbnQtc2l6ZToxLjBlbTsiPgogICAgICAgICAgICAgICAgICAgICAgICA8cCBzdHlsZT0ibWFy\r\nZ2luOiAwIj4gPGI+Tm90YSBMZWdhbDogPC9iPkVzdGUgZS1tYWlsIGZvaSBlbnZpYWRvIHZpYSBB\r\nUi1PbmxpbmUgZSBzZSB0b3Jub3UgdW0gZG9jdW1lbnRvIHJlZ2lzdHJhZG8uPC9wPgogICAgICAg\r\nICAgICAgICAgICAgICAgICA8cD5PIGUtbWFpbCBlbnZpYWRvIHBlbG8gQVItT25saW5lIMOpIHBy\r\nb3RvY29sYWRvIGUgcmVjZWJlIHVtIENhcmltYm8gZG8gVGVtcG8gZW1pdGlkbyBwZWxvIElDUC1C\r\ncmFzaWwsIHF1ZSBvIHRvcm5hIHVtIGRvY3VtZW50byByZWNvbmhlY2lkbyBsZWdhbG1lbnRlIGUg\r\naW52aW9sw6F2ZWwuIFRhbWLDqW0gw6kgdXRpbGl6YWRvIHVtIHNpc3RlbWEgZGUgcmFzdHJlYW1l\r\nbnRvIHF1ZSByZWdpc3RyYSBxdWFuZG8gbyBlLW1haWwgw6kgcmVjZWJpZG8gcGVsb3Mgc2Vydmlk\r\nb3JlcyBlIHNlIGVsZSBmb2kgYWJlcnRvLiBBIGNhZGEgZXZlbnRvIMOpIHV0aWxpemFkbyB1bSBj\r\nYXJpbWJvIGRvIHRlbXBvIGNvbXByb3ZhbmRvIHRhbWLDqW0gdG9kYSBhIGNyb25vbG9naWEgZG8g\r\ncHJvY2VkaW1lbnRvIGVsZXRyw7RuaWNvLiBUb2RhcyBhcyBwZXNzb2FzIGUgZW1wcmVzYXMgdMOq\r\nbSBkaXJlaXRvIGEgdW0gPGEgdGFyZ2V0PSJfYmxhbmsiIGhyZWY9Imh0dHBzOi8vd3d3LmFyLW9u\r\nbGluZS5jb20uYnIvIj5BUi1PbmxpbmU8L2E+LCBwcmluY2lwYWwgYWx0ZXJuYXRpdmEgYSB1bWEg\r\nQ2FydGEgUmVnaXN0cmFkYSBlbnZpYWRhIHBlbG9zIENvcnJlaW9zLjwvcD4KICAgICAgICAgICAg\r\nICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICA8L3RkPgog\r\nICAgICAgICAgICA8dGQ+CiAgICAgICAgICAgICAgICA8ZGl2IGlkPSJiYWNrZ3JvdW5kX2Npbnph\r\nIiBzdHlsZT0iaGVpZ2h0OjExMHB4OyI+CiAgICAgICAgICAgICAgICAgICAgPGltZyBoZWlnaHQ9\r\nIjkwIiB3aWR0aD0iMjQwIiBhbHQ9IlNlbG8gQVItT25saW5lIiBzcmM9Imh0dHBzOi8vYXBpLmFy\r\nZW1haWwuY29tLmJyL3YxL2VtYWlscy9zdGFtcC8yNjRhMjUzMi01YWRkLTQ3ZjEtOTVhMy1kYzcx\r\nYmFlZmNjZTAiIC8+CiAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPC90ZD4KICAg\r\nICAgICA8L3RyPgogICAgPC90YWJsZT4=\r\n\r\n--===============7125393682150586858==--\r\n.\r\n2026\/02\/28 14:41:42: reply: 250 2.0.0 OK  1772300502 ada2fe7eead31-5ff1ebe720bsi1923405137.193 - gsmtp\r\n2026\/02\/28 14:41:42: reply: retcode (250); Msg: 2.0.0 OK  1772300502 ada2fe7eead31-5ff1ebe720bsi1923405137.193 - gsmtp\n2026\/02\/28 14:41:42: send: quit\r\n2026\/02\/28 14:41:42: reply: 221 2.0.0 closing connection ada2fe7eead31-5ff1ebe720bsi1923405137.193 - gsmtp\r\n2026\/02\/28 14:41:42: reply: retcode (221); Msg: 2.0.0 closing connection ada2fe7eead31-5ff1ebe720bsi1923405137.193 - gsmtp",
+                            "emitidoPor": "Bry Tecnologia"
+                        },
+                        "detalhesLeitura": {
+                            "ocorridoEm": "28\/02\/2026 14:42:10",
+                            "ipLeitura": "66.102.8.100",
+                            "trilhaLeitura": {
+                                "date_view": "2026-02-28 17:42:10.848779",
+                                "ip_user": "66.102.8.100",
+                                "user_agent": "Mozilla\/5.0 (Windows NT 5.1; rv:11.0) Gecko Firefox\/11.0 (via ggpht.com GoogleImageProxy)"
+                            },
+                            "carimbo": "MIIPdTADAgEAMIIPbAYJKoZIhvcNAQcCoIIPXTCCD1kCAQMxDzANBglghkgBZQMEAgEFADCCBV0GCyqGSIb3DQEJEAEEoIIFTASCBUgwggVEAgEBBgVgTAEGBjAvMAsGCWCGSAFlAwQCAQQgGyQT6zmuI0OeYe\/QVxcpNMz1fOWvGb5cWVNPF7XZVukCBCjQi5AYEzIwMjYwMjI4MTc0MjExLjYzNVowBIACAfSgggEKpIIBBjCCAQIxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMSUwIwYDVQQLDBxDZXJ0aWZpY2FkbyBDYXJpbWJvIGRlIFRlbXBvMRkwFwYDVQQLDBB2aWRlb2NvbmZlcmVuY2lhMRcwFQYDVQQLDA4zMzY4MzExMTAwMDEwNzERMA8GA1UECwwIQVJTRVJQUk8xOzA5BgNVBAsMMkF1dG9yaWRhZGUgQ2VydGlmaWNhZG9yYSBkbyBTRVJQUk9BQ0YgVElNRVNUQU1QSU5HMTMwMQYDVQQDDCpTRVJWSURPUiBERSBDQVJJTUJPIERPIFRFTVBPIEFDVCBCUnkgNTAxNTGhggPWMIID0gYMKwYBBAGC3CxkBAIBBIIDwDCCA7wwggKmAgEBMIHXoIHUMIHOpIHLMIHIMQswCQYDVQQGEwJCUjEZMBcGA1UECAwQRGlzdHJpdG8gRmVkZXJhbDERMA8GA1UEBwwIQnJhc2lsaWExNzA1BgNVBAoMLkluc3RpdHV0byBOYWNpb25hbCBkZSBUZWNub2xvZ2lhIGRhIEluZm9ybWFjYW8xJzAlBgNVBAsMHkVudGlkYWRlIGRlIEF1ZGl0b3JpYSBkbyBUZW1wbzEpMCcGA1UEAwwgQXV0b3JpZGFkZSBDZXJ0aWZpY2Fkb3JhIEVBVCBTU0wCAQ2ggeEwgd6kgdswgdgxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMRkwFwYDVQQLDBB2aWRlb2NvbmZlcmVuY2lhMRcwFQYDVQQLDA4zMzY4MzExMTAwMDEwNzEVMBMGA1UECwwMQXBsaWNhY2FvIEExMREwDwYDVQQLDAhBUlNFUlBSTzE1MDMGA1UECwwsQXV0b3JpZGFkZSBDZXJ0aWZpY2Fkb3JhIGRvIFNFUlBSTyBGaW5hbCBTU0wxHzAdBgNVBAMMFkVBVDIxLklDUEJSQVNJTC5HT1YuQlIwCwYJKoZIhvcNAQELAggvWxJXWES8ujAiGA8yMDI2MDIyODE3MzYzMloYDzIwMjYwMzAxMTczNjMyWjCBpzAWBgwrBgEEAYLcLGQEAQExBgIEAPvczjAUBgwrBgEEAYLcLGQEAQIxBAICfRIwFgYMKwYBBAGC3CxkBAEDMQYCBB3NZQAwEwYMKwYBBAGC3CxkBAEEMQMCAQEwFgYMKwYBBAGC3CxkBAEFMQYCBB3NZQAwMgYMKwYBBAGC3CxkBAEHMSIEIG+iTEjD5ehNsy4ChB++bvYUuMqOTSE+H007BKqZiHa6MAsGCSqGSIb3DQEBCwOCAQEAat+LB6+2yCyxsI3MeHkGO8Tf0ef5yORT3a5D2JkW7vSljOK2R\/tkAjrRd9ls5x2kDi1f9AXi8q8Phye\/wxchDuftFMVGgxddRJNoeCme87yyUbEWWRbqXZvC0KMUwwjte\/kEPrGjmvDCH+jY6ZgKn\/3xejIPTv0eUCoR\/qxJc1dq\/PBwExs9rpaV3K4LT9HoliW\/1z8RWidmSNIihtNSXf57qFw78+BuFQm6FhGkXnkQDt64vMpzP5+tijlcVBAitpu53BrnGIiFlo8LS4QK4\/TcwXHgIh9ySwTOsNNLgxT\/uAWWLIOr0n6PC5LoLk24hZP3pg0VXN7HjMaM\/\/8MR6CCB3owggd2MIIFXqADAgECAgwU2YebEpQoXRnqV3kwDQYJKoZIhvcNAQELBQAwgZwxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMTswOQYDVQQLDDJTZXJ2aWNvIEZlZGVyYWwgZGUgUHJvY2Vzc2FtZW50byBkZSBEYWRvcyAtIFNFUlBSTzE7MDkGA1UEAwwyQXV0b3JpZGFkZSBDZXJ0aWZpY2Fkb3JhIGRvIFNFUlBST0FDRiBUSU1FU1RBTVBJTkcwHhcNMjMwMjEzMTkwMTA5WhcNMjgwMjEyMTkwMTA5WjCCAQIxCzAJBgNVBAYTAkJSMRMwEQYDVQQKDApJQ1AtQnJhc2lsMSUwIwYDVQQLDBxDZXJ0aWZpY2FkbyBDYXJpbWJvIGRlIFRlbXBvMRkwFwYDVQQLDBB2aWRlb2NvbmZlcmVuY2lhMRcwFQYDVQQLDA4zMzY4MzExMTAwMDEwNzERMA8GA1UECwwIQVJTRVJQUk8xOzA5BgNVBAsMMkF1dG9yaWRhZGUgQ2VydGlmaWNhZG9yYSBkbyBTRVJQUk9BQ0YgVElNRVNUQU1QSU5HMTMwMQYDVQQDDCpTRVJWSURPUiBERSBDQVJJTUJPIERPIFRFTVBPIEFDVCBCUnkgNTAxNTEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDLSGxBnniQ2o+HiQXoO99uuecm7vb9PPaZsuvDPrE0FlsgEJK+cIkrX8No1WccRs\/l5hLA8UKjHNVd8KDeR1QlV3HSWAltVf2p2zl7yiOK63vY3R4Bpw6Te9Lb\/sshFtjw6zcYHqVc4SoqJPS3Sg49e2TFfqx\/OL9\/SvSxQ5le0ZkkIYFZcfSfKyFzAvXAslil6JeKbQ2s1FTQioxTNEONZoCrcss3Q16z7NNf48g5Dgh8IWVckzNtYLsjh4omUj1n+KClJdQIfTDk\/S4OqTkCinDFO4Cjg5rqOFkvsKJx\/ABuOV9n33PdjnI+0MGpZTbqIbQYNrxvMxutmKL+qzjrAgMBAAGjggJNMIICSTAfBgNVHSMEGDAWgBRVIa8iUa9dHMHvomIqVjPuUoqruzCBiAYDVR0fBIGAMH4wPKA6oDiGNmh0dHA6Ly9yZXBvc2l0b3Jpby5zZXJwcm8uZ292LmJyL2xjci9hY3NlcnByb2FjZnRzLmNybDA+oDygOoY4aHR0cDovL2NlcnRpZmljYWRvczIuc2VycHJvLmdvdi5ici9sY3IvYWNzZXJwcm9hY2Z0cy5jcmwwVgYIKwYBBQUHAQEESjBIMEYGCCsGAQUFBzAChjpodHRwOi8vcmVwb3NpdG9yaW8uc2VycHJvLmdvdi5ici9jYWRlaWFzL2Fjc2VycHJvYWNmdHMucDdiMIG6BgNVHREEgbIwga+gHAYFYEwBAwigEwQRQlJZIFRFQ05PTE9HSUEgU0GgGQYFYEwBAwOgEAQOMDQ0NDE1MjgwMDAxNTegHwYFYEwBAwKgFgQUSEVJVE9SIExJTUlSSU8gUElSRVOgOAYFYEwBAwSgLwQtMDEwNzE5ODkwODg2MDY2NzYwNzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwgRljYXJpbWJvZG90ZW1wb0BicnkuY29tLmJyMA4GA1UdDwEB\/wQEAwIGwDAWBgNVHSUBAf8EDDAKBggrBgEFBQcDCDBeBgNVHSAEVzBVMFMGB2BMAQKCLw4wSDBGBggrBgEFBQcCARY6aHR0cDovL3JlcG9zaXRvcmlvLnNlcnByby5nb3YuYnIvZG9jcy9kcGNhY3NlcnByb2FjZnRzLnBkZjANBgkqhkiG9w0BAQsFAAOCAgEAzd8WQmtec97sRB2yvOfkJ4wXenqiGS1zIZkquBnSORR+MTs2A1JHgs8X1PTsghbLvhsULwgi\/yujhxlEAkwcZOE+FfaJkIalK6j6cc0rrBcmP0MggfCnINNJjNaQ9KeeETZ0NN3HF\/SO+ytcNq6QtLcW4C2gdi9wpvnp3igwj7zv\/m0cbUrnRta5kQI1ZCVKVAeqF1MREkhHGR35zjJzJi7nD97mviiauSwINli85ImREDjumVaCJT6e3+\/4MlgOTQjmQhQmo2jOt5ybSAmKKU+phSTxpXarw+zAAloQWQcAxv+Yr4h+D+I1saelK74JlA9eKsC92I5ZsxDI7NUPrieQgpM2BdsR5FSGHtpWw2R9jZxhJnim9mu3rg2F7zYbyj98xc4nt8MQl8qtZZkr1MmtARgKLuU0ZzPgZfz5WW7C\/r35UkGBhwA6ZkHePWq8TgwTMpzUlfaT0DIq+m5dj9+KfmOQQ+dHOsehlbAklgZ87VHAdzLcnwHSeCPomVP92z\/ypN7rVxO1zD+x8AfHkQ5m9MmzyEM4LDJLGX1P6mW7Yffzu5vb01MSS3\/H8QNrfCBi56G7BdgMzHxtGgC2oCv3XdQ49TU3dD7gbuacwlMIgSAgNqbbBnHH5MFtpFo4nP8m\/1Hwn+4Q5vHUw6\/kaSa1nhgsculbG1PK1yMAZbkxggJiMIICXgIBATCBrTCBnDELMAkGA1UEBhMCQlIxEzARBgNVBAoMCklDUC1CcmFzaWwxOzA5BgNVBAsMMlNlcnZpY28gRmVkZXJhbCBkZSBQcm9jZXNzYW1lbnRvIGRlIERhZG9zIC0gU0VSUFJPMTswOQYDVQQDDDJBdXRvcmlkYWRlIENlcnRpZmljYWRvcmEgZG8gU0VSUFJPQUNGIFRJTUVTVEFNUElORwIMFNmHmxKUKF0Z6ld5MA0GCWCGSAFlAwQCAQUAoIGGMBoGCSqGSIb3DQEJAzENBgsqhkiG9w0BCRABBDAvBgkqhkiG9w0BCQQxIgQgJjhQXKYXIiDn4Ug2Rk4KoyBftiHZJXduL9+vP\/C4EgkwNwYLKoZIhvcNAQkQAi8xKDAmMCQwIgQgVsR3Rb66cn5fMshN48\/0eYu+esD8TtUaNxe+SNrE110wDQYJKoZIhvcNAQELBQAEggEAsWMvbpwYVCLP\/xlWr9WceSdkjtytn3uVYSY5EyefDe8xu\/Q8FpFxuvS0YQI1OAz9lX4SdlALvFw1rzdtC15xlzj+Xm\/l6nSLD2Zn7FManbLYO\/MwZDszuQYge2CbS7ElulybFRWi18rF2eXAwvSdRzd85ZblWGMv5QqQJclpv2fonEPmGU4uxY8nY0d9tuIhBXwyZxKvFouGjGTzMy9zzp8rwVy17dPw+Jq\/IroqAzArgcORyplftEjjhezsYdyzo7M9T\/lxv98aYNuKfekKFvnfcQmuADWG+9tK9UALttJLQqYAIGodinir\/DP0U97zlYsGJky2Zy6Uf5FQdcALBQ=="
+                        },
+                        "attachments": [
+                            {
+                                "downloadLink": "undefined\/cHJvdG9jb2xvV2ViTGF5b3V0LnBuZw==\/e3c808a8-eb53-4047-8e1e-9369d6595b79",
+                                "originalFilename": "protocoloWebLayout.png"
+                            }
+                        ],
+                        "emailResultSendStatus": "sucesso",
+                        "emailRastreio": {
+                            "ip": "",
+                            "city": "",
+                            "state": "",
+                            "country": "",
+                            "position": []
+                        },
+                        "emailRastreioProvider": {
+                            "ip": "",
+                            "city": "",
+                            "state": "",
+                            "country": "",
+                            "position": []
+                        },
+                        "email_error": null,
+                        "dateClickEmailTrack": [],
+                        "dataClickProviderTrackEmail": []
+                    }
+                ],
+                "sms": [
+                    {
+                        "detalhesEnvioEntregaSMS": [],
+                        "detalhesLeituraSMS": [],
+                        "numberSMS": null,
+                        "messageSMS": null,
+                        "statusSMSDescription": null,
+                        "messageWhatsApp": null,
+                        "sms_error": null,
+                        "SMSRastreioProvider": null
+                    }
+                ],
+                "whatsapp": [
+                    {
+                        "dataProviderWhatsApp": [],
+                        "numberWhatsapp": null,
+                        "hasErrorWhatsapp": false,
+                        "statusWhatsapp": ""
+                    }
+                ],
+                "voz": [
+                    {
+                        "status": null,
+                        "number": null,
+                        "linkAtendimento": null
+                    }
+                ],
+                "carta": []
+            }
+        }
+    }
+}

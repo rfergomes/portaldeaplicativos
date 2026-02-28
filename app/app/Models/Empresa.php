@@ -12,9 +12,12 @@ class Empresa extends Model
     use Auditable;
 
     protected $fillable = [
+        'regiao_id',
         'razao_social',
         'nome_fantasia',
+        'nome_curto',
         'cnpj',
+        'empresa_erp',
         'inscricao_estadual',
         'email',
         'telefone',
@@ -23,6 +26,11 @@ class Empresa extends Model
         'categoria',
         'ativo',
     ];
+
+    public function regiao()
+    {
+        return $this->belongsTo(Regiao::class);
+    }
 
     public function clientes()
     {
