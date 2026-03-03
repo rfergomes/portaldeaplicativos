@@ -5,233 +5,273 @@
     <meta charset="UTF-8">
     <title>Guia de Pré-Reserva</title>
     <style>
+        @page {
+            margin: 0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Helvetica', 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            font-size: 12px;
+            background-color: #fff;
             color: #333;
         }
 
-        .container {
-            width: 100%;
-            padding: 20px;
+        .page {
+            width: 210mm;
+            height: 297mm;
+            padding: 3mm 10mm;
             box-sizing: border-box;
-        }
-
-        .guia {
-            width: 100%;
-            border: 1px solid #999;
-            padding: 15px;
             position: relative;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-            background: #fff;
         }
 
-        .guia:nth-child(even) {
-            margin-top: 40px;
-            /* Espaçamento para o corte no meio da A4 */
+        .guia-wrapper {
+            height: 110mm;
+            width: 100%;
+            border: 2px solid #1a237e;
+            border-radius: 6px;
+            padding: 4mm 8mm;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
         }
 
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #d32f2f;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
+            border-bottom: 2px solid #1a237e;
+            padding-bottom: 2mm;
+            margin-bottom: 3mm;
+        }
+
+        .logo-container {
+            float: left;
+            width: 40%;
         }
 
         .logo {
-            width: 150px;
+            max-width: 100%;
+            max-height: 18mm;
         }
 
-        .titulo-guia {
+        .title-container {
+            float: right;
+            width: 58%;
             text-align: right;
+        }
+
+        .main-title {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #1a237e;
+            margin: 0;
+        }
+
+        .sub-title {
+            font-size: 10pt;
             color: #d32f2f;
-            font-size: 18px;
             font-weight: bold;
-            text-transform: uppercase;
+            margin: 1mm 0 0 0;
         }
 
-        .subtitulo {
-            text-align: right;
-            color: #d32f2f;
-            font-size: 14px;
-            font-weight: bold;
+        .info-section {
+            margin-bottom: 2mm;
         }
 
-        .secao {
-            background: #777;
-            color: #fff;
-            padding: 3px 10px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin: 10px 0 5px 0;
-        }
-
-        .row {
-            display: table;
+        .field-row {
+            margin-bottom: 2mm;
             width: 100%;
-            margin-bottom: 5px;
         }
 
-        .col {
-            display: table-cell;
-            vertical-align: top;
-        }
-
-        .field-label {
-            background: #ddd;
-            padding: 3px 8px;
+        .label {
+            font-size: 7.5pt;
             font-weight: bold;
-            display: inline-block;
-            min-width: 80px;
-        }
-
-        .field-value {
-            padding: 3px 8px;
-            border-bottom: 1px solid #ddd;
-            display: inline-block;
-            flex-grow: 1;
-        }
-
-        .info-box {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-top: 5px;
-            font-size: 11px;
-            line-height: 1.4;
-        }
-
-        .qr-section {
-            display: table-cell;
-            width: 300px;
-            vertical-align: middle;
-            text-align: center;
-            border-left: 1px dashed #ccc;
-            padding-left: 10px;
-        }
-
-        .qr-box {
-            display: inline-block;
-            text-align: left;
-        }
-
-        .footer-note {
-            font-size: 10px;
             color: #666;
-            margin-top: 10px;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 0.5mm;
         }
 
-        .page-break {
-            page-break-after: always;
+        .value {
+            font-size: 10pt;
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+            padding: 0.5mm 0;
+            display: block;
+            min-height: 1em;
+        }
+
+        .col-2 {
+            width: 48%;
+            float: left;
+        }
+
+        .col-2-right {
+            width: 48%;
+            float: right;
+        }
+
+        .alert-box {
+            background-color: #f9f9f9;
+            border-left: 3px solid #1a237e;
+            padding: 2mm 3mm;
+            margin-top: 2mm;
+        }
+
+        .alert-title {
+            font-size: 8.5pt;
+            font-weight: bold;
+            color: #1a237e;
+            margin-bottom: 0.5mm;
+        }
+
+        .alert-content {
+            font-size: 8pt;
+            line-height: 1.1;
+        }
+
+        .deadline-text {
+            font-size: 10pt;
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 2mm;
+            left: 8mm;
+            right: 8mm;
+            text-align: center;
+            font-size: 7pt;
+            color: #999;
+            border-top: 1px solid #eee;
+        }
+
+        .cutting-line {
+            width: 100%;
+            border-top: 1px dashed #000;
+            margin: 4mm 0;
+            text-align: center;
+            height: 1px;
+            position: relative;
+        }
+
+        .cutting-label {
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            margin-left: -20mm;
+            width: 40mm;
+            background: #fff;
+            font-size: 6.5pt;
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
+    @php
+        $logoPath = public_path('img/logo.jpg');
+        // Para DomPDF offline em alguns ambientes, base64 é mais seguro
+        if (file_exists($logoPath)) {
+            $logoData = base64_encode(file_get_contents($logoPath));
+            $logoSrc = 'data:image/jpeg;base64,' . $logoData;
+        } else {
+            $logoSrc = '';
+        }
+    @endphp
+
     @for($i = 0; $i < $quantidade; $i++)
-        <div class="container">
-            <div class="guia">
-                <table style="width: 100%;">
-                    <tr>
-                        <td style="width: 200px;">
-                            <img src="https://www.quimicosunificados.com.br/wp-content/uploads/2019/11/logo-quimicos-unificados.png"
-                                class="logo" alt="Sindicato Químicos Unificados">
-                        </td>
-                        <td style="text-align: right;">
-                            <div class="titulo-guia">PRÉ RESERVA - COLÔNIA DE FÉRIAS</div>
-                            <div class="subtitulo">{{ $colonia->nome }}</div>
-                        </td>
-                    </tr>
-                </table>
+        @if($i % 2 == 0)
+            <div class="page">
+        @endif
 
-                <div class="row" style="margin-top: 10px;">
-                    <div class="col" style="width: 70%;">
-                        <span class="field-label">NOME</span>
-                        <span class="field-value"
-                            style="width: 80%; display: inline-block; border-bottom: 1px solid #333;">&nbsp;</span>
+            <div class="guia-wrapper">
+                <div class="header clearfix">
+                    <div class="logo-container">
+                        @if($logoSrc)
+                            <img src="{{ $logoSrc }}" class="logo">
+                        @else
+                            <div style="font-weight: bold; color: #1a237e;">Sindicato Químicos Unificados</div>
+                        @endif
                     </div>
-                    <div class="col" style="width: 30%;">
-                        <span class="field-label">DATA DO SORTEIO</span>
-                        <span
-                            class="field-value">{{ $periodo->data_sorteio ? $periodo->data_sorteio->format('d/m/Y') : '' }}</span>
+                    <div class="title-container">
+                        <h1 class="main-title">PRÉ-RESERVA</h1>
+                        <div class="sub-title">{{ $colonia->nome }}</div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col" style="width: 50%;">
-                        <span class="field-label">PERÍODO</span>
-                        <span class="field-value">{{ $periodo->descricao }}</span>
+                <div class="info-section">
+                    <div class="field-row">
+                        <span class="label">Pendente de Sorteio / Beneficiário</span>
+                        <span class="value" style="border-bottom: 2px solid #333;">&nbsp;</span>
                     </div>
-                    <div class="col" style="width: 50%;">
-                        <span class="field-label">DATA</span>
-                        <span class="field-value">DE {{ $periodo->data_inicial->format('d/m/Y') }} À
-                            {{ $periodo->data_final->format('d/m/Y') }}</span>
+
+                    <div class="clearfix" style="margin-top: 3mm;">
+                        <div class="col-2">
+                            <span class="label">Data do Sorteio</span>
+                            <span
+                                class="value">{{ $periodo->data_sorteio ? $periodo->data_sorteio->format('d/m/Y') : '____/____/________' }}</span>
+                        </div>
+                        <div class="col-2-right">
+                            <span class="label">Período de Estadia</span>
+                            <span class="value">{{ $periodo->data_inicial->format('d/m/Y') }} à
+                                {{ $periodo->data_final->format('d/m/Y') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="field-row" style="margin-top: 3mm;">
+                        <span class="label">Identificação da Semana / Bloco</span>
+                        <span class="value">{{ $periodo->descricao }}</span>
                     </div>
                 </div>
 
-                <div class="secao">DATAS LIMITES PARA PAGAMENTO</div>
-                <div class="info-box">
-                    <p>☛ Para confirmar o interesse da reserva, deverá efetuar o pagamento até:
-                        <strong>{{ $periodo->data_limite_pagamento ? $periodo->data_limite_pagamento->format('d/m/Y') . ' (' . $periodo->data_limite_pagamento->locale('pt_BR')->dayName . ')' : '____/____/________' }}</strong>
-                    </p>
+                <div class="alert-box">
+                    <div class="alert-title">Confirmação e Pagamento</div>
+                    <div class="alert-content">
+                        Para garantir sua reserva, o pagamento integral deve ser realizado impreterivelmente até:<br>
+                        <span class="deadline-text">
+                            {{ $periodo->data_limite_pagamento ? $periodo->data_limite_pagamento->format('d/m/Y') . ' (' . $periodo->data_limite_pagamento->locale('pt_BR')->dayName . ')' : '____/____/________' }}
+                        </span>
+                    </div>
                 </div>
 
-                <div class="secao">EM CASO DE DESISTÊNCIA</div>
-                <div class="info-box">
-                    <p>☛ Desistência até <strong>5 dias antecipados</strong>, terá um <strong>crédito de 100%</strong> do
-                        valor pago.</p>
-                    <p>☛ Desistência até <strong>4 dias antecipados ou menos</strong>, terá um <strong>crédito de
-                            50%</strong> do valor pago.</p>
-                    <p>☛ <strong>Caso não informe a desistência antecipadamente, não haverá devolução do valor.</strong></p>
+                <div class="alert-box" style="border-left-color: #d32f2f; margin-top: 1.5mm;">
+                    <div class="alert-title" style="color: #d32f2f;">Regras de Desistência</div>
+                    <div class="alert-content">
+                        • Até 5 dias de antecedência: 100% de crédito.<br>
+                        • 4 dias ou menos: 50% de crédito.<br>
+                        • <strong>Sem aviso prévio: não haverá devolução.</strong>
+                    </div>
                 </div>
 
-                <div class="secao">ATENDIMENTO / RESERVAS / FORMAS DE PAGAMENTO</div>
-                <table style="width: 100%;">
-                    <tr>
-                        <td style="vertical-align: top; padding-right: 15px;">
-                            <p style="text-align: justify; margin-top: 0;">
-                                Todas as informações referente a reserva, instrução de pagamento, inclusive documentação a
-                                ser apresentada, deverá ser encaminhada pelo nosso canal do WhatsApp:
-                            </p>
-                        </td>
-                        <td style="width: 250px; border-left: 1px dashed #ccc; padding-left: 15px;">
-                            <div style="display: table;">
-                                <div style="display: table-cell; vertical-align: middle;">
-                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://wa.me/5519974055662"
-                                        alt="QR WhatsApp">
-                                </div>
-                                <div style="display: table-cell; vertical-align: middle; padding-left: 10px;">
-                                    <strong>Nosso canal de WhatsApp</strong><br>
-                                    <span style="color: #25D366; font-size: 10px;">https://wa.me/coloniadeferias</span><br>
-                                    <strong>+55 19 97405-5662</strong>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
+                <div class="clearfix" style="margin-top: 2.5mm;">
+                    <div style="font-size: 7.5pt; color: #555; line-height: 1.2;">
+                        <strong>WhatsApp: +55 19 97405-5662</strong> — Envie comprovante e documentos aqui.
+                    </div>
+                </div>
 
-                <div class="footer-note" style="border-top: 1px dotted #ccc; text-align: center; padding-top: 5px;">
-                    GeraLista V2.0 - Sindicato Químicos Unificados
+                <div class="footer">
+                    Portal de Aplicativos - {{ date('d/m/Y H:i') }}
                 </div>
             </div>
 
             @if(($i + 1) % 2 != 0 && ($i + 1) < $quantidade)
-                {{-- Linha de corte se houver mais uma guia na mesma página --}}
-                <div style="border-top: 1px dashed #000; margin: 10px 0; position: relative;">
-                    <span
-                        style="position: absolute; top: -8px; left: 50%; background: #fff; padding: 0 10px; font-size: 10px;">CORTE
-                        AQUI</span>
+                <div class="cutting-line">
+                    <div class="cutting-label">TESOURA / CORTE AQUI</div>
                 </div>
             @endif
-        </div>
 
-        @if(($i + 1) % 2 == 0 && ($i + 1) < $quantidade)
-            <div class="page-break"></div>
-        @endif
+            @if(($i + 1) % 2 == 0 || ($i + 1) == $quantidade)
+                </div> <!-- End page -->
+                @if(($i + 1) < $quantidade)
+                    <div style="page-break-after: always;"></div>
+                @endif
+            @endif
     @endfor
 </body>
 
