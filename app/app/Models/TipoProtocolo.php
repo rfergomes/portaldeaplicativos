@@ -16,6 +16,8 @@ class TipoProtocolo extends Model
         'icone',
         'cor',
         'ativo',
+        'assunto',
+        'mensagem',
     ];
 
     protected $casts = [

@@ -207,7 +207,8 @@
                                                 placeholder="Escreva o conteúdo do protocolo aqui...">{{ old('corpo') }}</textarea>
                                             <small class="text-muted mt-1 d-block mb-3">
                                                 <i class="fa-solid fa-circle-info me-1"></i> HTML é suportado no corpo do
-                                                e-mail (usará formatação rica se houver Summernote).
+                                                e-mail. Variáveis disponíveis: <code>{nome_contato}</code>,
+                                                <code>{empresa}</code>, <code>{whatsapp}</code>, <code>{email}</code>.
                                             </small>
                                         </div>
 
@@ -246,11 +247,52 @@
         <script>
             let stepper;
             let destinatarioIndex = 1;
+            const tiposProtocolo = @json($tiposProtocolo->keyBy('id'));
 
             document.addEventListener('DOMContentLoaded', function () {
                 stepper = new Stepper(document.querySelector('.bs-stepper'), {
                     linear: false,
                     animation: true
+                });
+
+                // Auto-fill assunto e mensagem baseado no tipo
+                $('#inputTipo').on('change', function () {
+                    let tipoId = $(this).val();
+                    if (tipoId && tiposProtocolo[tipoId]) {
+                        let tipo = tiposProtocolo[tipoId];
+
+                        // Atualiza Assunto
+                        if (tipo.assunto) {
+                            $('#inputAssunto').val(tipo.assunto);
+                        }
+
+                        // Atualiza Corpo apenas se o corpo estiver vazio ou se o usuário confirmar
+                        if (tipo.mensagem) {
+                            let corpoAtual = $('#corpoProtocolo').val().trim();
+                            if (corpoAtual === '') {
+                                $('#corpoProtocolo').val(tipo.mensagem);
+                                if (typeof $('#corpoProtocolo').summernote === 'function') {
+                                    $('#corpoProtocolo').summernote('code', tipo.mensagem);
+                                }
+                            } else {
+                                Swal.fire({
+                                    title: 'Substituir mensagem atual?',
+                                    text: "O tipo selecionado possui uma mensagem padrão. Deseja substituir a mensagem que você já digitou?",
+                                    icon: 'question',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Sim, substituir',
+                                    cancelButtonText: 'Não, manter atual'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $('#corpoProtocolo').val(tipo.mensagem);
+                                        if (typeof $('#corpoProtocolo').summernote === 'function') {
+                                            $('#corpoProtocolo').summernote('code', tipo.mensagem);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
                 });
             });
 
@@ -273,44 +315,44 @@
                 const row = document.createElement('div');
                 row.className = 'destinatario-row border-top px-4 py-3';
                 row.innerHTML = `
-                    <div class="row g-2 align-items-end">
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">NOME</label>
-                            <input type="text" name="destinatarios[${i}][nome]"
-                                class="form-control form-control-sm" placeholder="NOME COMPLETO" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">E-MAIL</label>
-                            <input type="email" name="destinatarios[${i}][email]"
-                                class="form-control form-control-sm" placeholder="email@empresa.com" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold text-muted">
-                                CELULAR <small class="text-info">(WhatsApp)</small>
-                            </label>
-                            <input type="text" name="destinatarios[${i}][telefone]"
-                                class="form-control form-control-sm telefone-input"
-                                placeholder="+55 19 9.9999-9999">
-                        </div>
-                    </div>
-                    <div class="row g-2 mt-1">
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">CPF/CNPJ <small class="text-info">(Opcional)</small></label>
-                            <input type="text" name="destinatarios[${i}][cpf_cnpj]"
-                                class="form-control form-control-sm" placeholder="Apenas números">
-                        </div>
-                        <div class="col-md-7">
-                            <label class="form-label small fw-bold text-muted">ENDEREÇO <small class="text-info">(Para AR-Cartas no futuro)</small></label>
-                            <input type="text" name="destinatarios[${i}][endereco][logradouro]"
-                                class="form-control form-control-sm" placeholder="Rua, Número, Bairro, CEP, Cidade-UF">
-                        </div>
-                        <div class="col-md-1 text-end pt-4">
-                            <button type="button" class="btn btn-light btn-sm border-0 rounded-circle shadow-sm"
-                                onclick="this.closest('.destinatario-row').remove()" title="Remover">
-                                <i class="fa-solid fa-times text-danger"></i>
-                            </button>
-                        </div>
-                    </div>`;
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-muted">NOME</label>
+                                    <input type="text" name="destinatarios[${i}][nome]"
+                                        class="form-control form-control-sm" placeholder="NOME COMPLETO" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-muted">E-MAIL</label>
+                                    <input type="email" name="destinatarios[${i}][email]"
+                                        class="form-control form-control-sm" placeholder="email@empresa.com" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold text-muted">
+                                        CELULAR <small class="text-info">(WhatsApp)</small>
+                                    </label>
+                                    <input type="text" name="destinatarios[${i}][telefone]"
+                                        class="form-control form-control-sm telefone-input"
+                                        placeholder="+55 19 9.9999-9999">
+                                </div>
+                            </div>
+                            <div class="row g-2 mt-1">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-muted">CPF/CNPJ <small class="text-info">(Opcional)</small></label>
+                                    <input type="text" name="destinatarios[${i}][cpf_cnpj]"
+                                        class="form-control form-control-sm" placeholder="Apenas números">
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="form-label small fw-bold text-muted">ENDEREÇO <small class="text-info">(Para AR-Cartas no futuro)</small></label>
+                                    <input type="text" name="destinatarios[${i}][endereco][logradouro]"
+                                        class="form-control form-control-sm" placeholder="Rua, Número, Bairro, CEP, Cidade-UF">
+                                </div>
+                                <div class="col-md-1 text-end pt-4">
+                                    <button type="button" class="btn btn-light btn-sm border-0 rounded-circle shadow-sm"
+                                        onclick="this.closest('.destinatario-row').remove()" title="Remover">
+                                        <i class="fa-solid fa-times text-danger"></i>
+                                    </button>
+                                </div>
+                            </div>`;
                 document.getElementById('listaDestinatarios').appendChild(row);
             }
 
@@ -319,44 +361,44 @@
                 const row = document.createElement('div');
                 row.className = 'destinatario-row border-top px-4 py-3 bg-light';
                 row.innerHTML = `
-                    <div class="row g-2 align-items-end">
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">NOME</label>
-                            <input type="text" name="destinatarios[${i}][nome]" value="${nome}"
-                                class="form-control form-control-sm" placeholder="NOME COMPLETO" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">E-MAIL</label>
-                            <input type="email" name="destinatarios[${i}][email]" value="${email}"
-                                class="form-control form-control-sm" placeholder="email@empresa.com" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold text-muted">
-                                CELULAR <small class="text-info">(WhatsApp)</small>
-                            </label>
-                            <input type="text" name="destinatarios[${i}][telefone]" value="${telefone || ''}"
-                                class="form-control form-control-sm telefone-input"
-                                placeholder="+55 19 9.9999-9999">
-                        </div>
-                    </div>
-                    <div class="row g-2 mt-1">
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">CPF/CNPJ <small class="text-info">(Opcional)</small></label>
-                            <input type="text" name="destinatarios[${i}][cpf_cnpj]" value="${documento || ''}"
-                                class="form-control form-control-sm" placeholder="Apenas números">
-                        </div>
-                        <div class="col-md-7">
-                            <label class="form-label small fw-bold text-muted">ENDEREÇO <small class="text-info">(Para AR-Cartas no futuro)</small></label>
-                            <input type="text" name="destinatarios[${i}][endereco][logradouro]"
-                                class="form-control form-control-sm" placeholder="Rua, Número, Bairro, CEP, Cidade-UF">
-                        </div>
-                        <div class="col-md-1 text-end pt-4">
-                            <button type="button" class="btn btn-light btn-sm border-0 rounded-circle shadow-sm"
-                                onclick="this.closest('.destinatario-row').remove()" title="Remover">
-                                <i class="fa-solid fa-times text-danger"></i>
-                            </button>
-                        </div>
-                    </div>`;
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-muted">NOME</label>
+                                    <input type="text" name="destinatarios[${i}][nome]" value="${nome}"
+                                        class="form-control form-control-sm" placeholder="NOME COMPLETO" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-muted">E-MAIL</label>
+                                    <input type="email" name="destinatarios[${i}][email]" value="${email}"
+                                        class="form-control form-control-sm" placeholder="email@empresa.com" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold text-muted">
+                                        CELULAR <small class="text-info">(WhatsApp)</small>
+                                    </label>
+                                    <input type="text" name="destinatarios[${i}][telefone]" value="${telefone || ''}"
+                                        class="form-control form-control-sm telefone-input"
+                                        placeholder="+55 19 9.9999-9999">
+                                </div>
+                            </div>
+                            <div class="row g-2 mt-1">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-muted">CPF/CNPJ <small class="text-info">(Opcional)</small></label>
+                                    <input type="text" name="destinatarios[${i}][cpf_cnpj]" value="${documento || ''}"
+                                        class="form-control form-control-sm" placeholder="Apenas números">
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="form-label small fw-bold text-muted">ENDEREÇO <small class="text-info">(Para AR-Cartas no futuro)</small></label>
+                                    <input type="text" name="destinatarios[${i}][endereco][logradouro]"
+                                        class="form-control form-control-sm" placeholder="Rua, Número, Bairro, CEP, Cidade-UF">
+                                </div>
+                                <div class="col-md-1 text-end pt-4">
+                                    <button type="button" class="btn btn-light btn-sm border-0 rounded-circle shadow-sm"
+                                        onclick="this.closest('.destinatario-row').remove()" title="Remover">
+                                        <i class="fa-solid fa-times text-danger"></i>
+                                    </button>
+                                </div>
+                            </div>`;
                 document.getElementById('listaDestinatarios').appendChild(row);
             }
 

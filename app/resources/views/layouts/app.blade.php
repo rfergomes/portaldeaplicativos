@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Portal de Aplicativos') | AdminLTE 4</title>
 
     <!-- Google Font: Source Sans Pro -->
@@ -219,6 +220,43 @@
                                 </a>
                             </li>
                         @endif
+
+                        <li class="nav-header">AGENDA COLÔNIA</li>
+                        <li class="nav-item">
+                            <a href="{{ route('agenda.reservas.index') }}"
+                                class="nav-link {{ request()->routeIs('agenda.reservas.*') ? 'active' : '' }}">
+                                <i class="nav-icon fa-solid fa-calendar-check"></i>
+                                <p>Painel de Reservas</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('agenda.periodos.index') }}"
+                                class="nav-link {{ request()->routeIs('agenda.periodos.*') ? 'active' : '' }}">
+                                <i class="nav-icon fa-solid fa-clock"></i>
+                                <p>Períodos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('agenda.colonias.index') }}"
+                                class="nav-link {{ request()->routeIs('agenda.colonias.*') ? 'active' : '' }}">
+                                <i class="nav-icon fa-solid fa-umbrella-beach"></i>
+                                <p>Cadastrar Colônias</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('agenda.inscricoes.index') }}"
+                                class="nav-link {{ request()->routeIs('agenda.inscricoes.*') ? 'active' : '' }}">
+                                <i class="nav-icon fa-solid fa-ticket"></i>
+                                <p>Inscrições / Sorteio</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('agenda.historico.index') }}"
+                                class="nav-link {{ request()->routeIs('agenda.historico.*') ? 'active' : '' }}">
+                                <i class="nav-icon fa-solid fa-clock-rotate-left text-danger"></i>
+                                <p>Histórico de Exclusões</p>
+                            </a>
+                        </li>
 
                         <li class="nav-header">CADASTRO</li>
                         <li class="nav-item">

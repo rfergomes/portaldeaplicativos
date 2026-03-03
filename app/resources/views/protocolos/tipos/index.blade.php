@@ -23,6 +23,7 @@
                                 <th class="ps-4" style="width: 80px;">ID</th>
                                 <th>Nome</th>
                                 <th>Ícone</th>
+                                <th>Assunto Padrão</th>
                                 <th>Cor (Badge)</th>
                                 <th class="text-end pe-4">Ações</th>
                             </tr>
@@ -43,6 +44,12 @@
                                             <i class="{{ $tipo->icone }} fs-5 me-2 text-{{ $tipo->cor }}"></i>
                                         @endif
                                         <code>{{ $tipo->icone }}</code>
+                                    </td>
+                                    <td>
+                                        <span class="d-inline-block text-truncate text-muted small" style="max-width: 150px;"
+                                            title="{{ $tipo->assunto }}">
+                                            {{ $tipo->assunto ?? '-' }}
+                                        </span>
                                     </td>
                                     <td>
                                         <span class="badge bg-{{ $tipo->cor }}">{{ $tipo->cor }}</span>
@@ -66,7 +73,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-5 mt-4 mb-4">
+                                    <td colspan="6" class="text-center text-muted py-5 mt-4 mb-4">
                                         <div class="mb-2"><i class="fa-solid fa-tags fa-3x opacity-25"></i></div>
                                         Nenhum tipo de protocolo encontrado.
                                     </td>
@@ -101,6 +108,21 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">Ícone (FontAwesome Class)</label>
                             <input type="text" name="icone" class="form-control" placeholder="EX: fa-solid fa-file">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Assunto Padrão</label>
+                            <input type="text" name="assunto" class="form-control"
+                                placeholder="EX: COMUNICADO DA DIRETORIA">
+                            <small class="text-muted">Se preenchido, será carregado automaticamente no novo
+                                protocolo.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mensagem Padrão</label>
+                            <textarea name="mensagem" class="form-control" rows="4"
+                                placeholder="Escreva o conteúdo..."></textarea>
+                            <small class="text-muted d-block mt-1">Variáveis que podem ser usadas aqui:
+                                <code>{nome_contato}</code>, <code>{empresa}</code>, <code>{whatsapp}</code>,
+                                <code>{email}</code></small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Cor Tema (Bootstrap)</label>
@@ -145,6 +167,18 @@
                             <input type="text" name="icone" id="edit_icone" class="form-control">
                         </div>
                         <div class="mb-3">
+                            <label class="form-label fw-bold">Assunto Padrão</label>
+                            <input type="text" name="assunto" id="edit_assunto" class="form-control"
+                                placeholder="EX: COMUNICADO DA DIRETORIA">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mensagem Padrão</label>
+                            <textarea name="mensagem" id="edit_mensagem" class="form-control" rows="4"></textarea>
+                            <small class="text-muted d-block mt-1">Variáveis que podem ser usadas aqui:
+                                <code>{nome_contato}</code>, <code>{empresa}</code>, <code>{whatsapp}</code>,
+                                <code>{email}</code></small>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label fw-bold">Cor Tema (Bootstrap)</label>
                             <select name="cor" id="edit_cor" class="form-select">
                                 <option value="primary">Primary (Azul)</option>
@@ -171,6 +205,8 @@
             function editTipo(tipo) {
                 document.getElementById('edit_nome').value = tipo.nome;
                 document.getElementById('edit_icone').value = tipo.icone || '';
+                document.getElementById('edit_assunto').value = tipo.assunto || '';
+                document.getElementById('edit_mensagem').value = tipo.mensagem || '';
                 document.getElementById('edit_cor').value = tipo.cor || 'primary';
                 document.getElementById('formEditarTipo').action = `/protocolos/tipos/${tipo.id}`;
                 new bootstrap.Modal(document.getElementById('modalEditarTipo')).show();

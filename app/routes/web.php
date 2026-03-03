@@ -61,10 +61,39 @@ Route::middleware('auth')->group(function () {
     Route::delete('/protocolos/tipos/{tipo}', [\App\Http\Controllers\Protocolos\TipoProtocoloController::class, 'destroy'])->name('protocolos.tipos.destroy');
 
     // Protocolos e AR-Online
-    Route::get('/protocolos/{protocolo}/sync-status', [ProtocoloController::class, 'syncStatus'])->name('protocolos.syncStatus');
+    Route::patch('/protocolos/{protocolo}/finalizar', [ProtocoloController::class, 'finalizar'])->name('protocolos.finalizar');
     Route::get('/protocolos/{protocolo}/comprovante/{envio}', [ProtocoloController::class, 'baixarComprovante'])->name('protocolos.comprovante');
-    Route::get('/protocolos/{protocolo}/laudo/{envio}', [ProtocoloController::class, 'baixarLaudo'])->name('protocolos.laudo');
-    Route::resource('protocolos', ProtocoloController::class)->only(['index', 'create', 'store', 'show']);
+    Route::get('/protocolos/{protocolo}/laudo/{envio}', [ProtocoloController::class, 'baixarLaudoPericial'])->name('protocolos.laudo');
+    Route::get('/protocolos/{protocolo}/sync', [ProtocoloController::class, 'syncStatus'])->name('protocolos.syncStatus');
+    Route::resource('/protocolos', ProtocoloController::class);
+
+    // AGENDA COLONIA
+    Route::prefix('agenda')->name('agenda.')->group(function () {
+        // Colônias e Acomodações
+        Route::resource('colonias', \App\Http\Controllers\Agenda\ColoniaController::class);
+        Route::resource('colonias.acomodacoes', \App\Http\Controllers\Agenda\ColoniaAcomodacaoController::class)->shallow();
+
+        // Períodos e Sorteios
+        Route::post('periodos/gerar', [\App\Http\Controllers\Agenda\AgendaPeriodoController::class, 'gerarSemanas'])->name('periodos.gerar');
+        Route::resource('periodos', \App\Http\Controllers\Agenda\AgendaPeriodoController::class);
+
+        // Hóspedes
+        Route::resource('hospedes', \App\Http\Controllers\Agenda\AgendaHospedeController::class);
+
+        // Reservas e App (Visão de Planilha será feita no index de reservas)
+        Route::post('reservas/{reserva}/promover', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'promoverVaga'])->name('reservas.promover');
+        Route::post('reservas/{reserva}/excluir', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'excluirComMotivo'])->name('reservas.excluir');
+        Route::resource('reservas', \App\Http\Controllers\Agenda\AgendaReservaController::class);
+
+        // Histórico de Exclusões de Reservas
+        Route::get('historico', [\App\Http\Controllers\Agenda\AgendaHistoricoController::class, 'index'])->name('historico.index');
+
+        // Inscrições / Gerenciador de Sorteio (módulo opcional)
+        Route::get('inscricoes/pdf/guia', [\App\Http\Controllers\Agenda\AgendaImpressaoController::class, 'gerarGuiaPreReserva'])->name('inscricoes.pdf.guia');
+        Route::get('inscricoes/pdf/lista', [\App\Http\Controllers\Agenda\AgendaImpressaoController::class, 'gerarListaInscritos'])->name('inscricoes.pdf.lista');
+        Route::resource('inscricoes', \App\Http\Controllers\Agenda\AgendaInscricaoController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+    });
 
     // Endpoint AJAX para buscar contatos da empresa
     Route::get('/empresas/{empresa}/contatos', function (\App\Models\Empresa $empresa) {

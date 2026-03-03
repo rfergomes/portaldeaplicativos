@@ -21,12 +21,16 @@ class TipoProtocoloController extends Controller
             'nome' => ['required', 'string', 'max:100', 'unique:tipo_protocolos,nome'],
             'icone' => ['nullable', 'string', 'max:100'],
             'cor' => ['nullable', 'string', 'max:50'],
+            'assunto' => ['nullable', 'string', 'max:255'],
+            'mensagem' => ['nullable', 'string'],
         ]);
 
         TipoProtocolo::create([
             'nome' => strtoupper($data['nome']),
             'icone' => $data['icone'] ?? 'fa-solid fa-file',
             'cor' => $data['cor'] ?? 'primary',
+            'assunto' => isset($data['assunto']) ? strtoupper($data['assunto']) : null,
+            'mensagem' => $data['mensagem'] ?? null,
         ]);
 
         return redirect()->route('protocolos.tipos.index')
@@ -39,12 +43,16 @@ class TipoProtocoloController extends Controller
             'nome' => ['required', 'string', 'max:100', 'unique:tipo_protocolos,nome,' . $tipo->id],
             'icone' => ['nullable', 'string', 'max:100'],
             'cor' => ['nullable', 'string', 'max:50'],
+            'assunto' => ['nullable', 'string', 'max:255'],
+            'mensagem' => ['nullable', 'string'],
         ]);
 
         $tipo->update([
             'nome' => strtoupper($data['nome']),
             'icone' => $data['icone'] ?? $tipo->icone,
             'cor' => $data['cor'] ?? $tipo->cor,
+            'assunto' => isset($data['assunto']) ? strtoupper($data['assunto']) : $tipo->assunto,
+            'mensagem' => $data['mensagem'] ?? $tipo->mensagem,
         ]);
 
         return redirect()->route('protocolos.tipos.index')

@@ -8,21 +8,21 @@
             <!-- COLUNA ESQUERDA: Cabeçalho do Protocolo -->
             <div class="col-lg-4">
                 <div class="card card-outline card-primary shadow-sm mb-4">
-                    <div class="card-header border-0 d-flex justify-content-between align-items-center">
+                    <div class="card-header border-0 d-flex align-items-center">
                         <h6 class="card-title fw-bold m-0">
                             <i class="fa-solid fa-file-contract me-2"></i>Protocolo #{{ $protocolo->id }}
                         </h6>
-                        <div class="card-tools d-flex gap-2">
+                        <div class="card-tools ms-auto d-flex gap-2">
                             <form action="{{ route('protocolos.syncStatus', $protocolo) }}" method="GET" class="m-0 p-0">
-                                <button type="submit" class="btn btn-outline-primary btn-sm rounded-circle shadow-sm"
-                                    style="width: 32px; height: 32px; padding: 0;" title="Atualizar Status">
-                                    <i class="fa-solid fa-rotate"></i>
+                                <button type="submit" class="btn btn-outline-primary btn-sm  shadow-sm"
+                                    style="width: 96px; height: 32px; padding: 0;" title="Atualizar Status">
+                                    <i class="fa-solid fa-rotate"></i> Atualizar
                                 </button>
                             </form>
                             <a href="{{ route('protocolos.index') }}"
-                                class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-                                style="width: 32px; height: 32px; padding: 0;" title="Voltar para Listagem">
-                                <i class="fa-solid fa-arrow-left"></i>
+                                class="btn btn-outline-secondary btn-sm shadow-sm d-flex align-items-center justify-content-center"
+                                style="width: 96px; height: 32px; padding: 0;" title="Voltar para Listagem">
+                                <i class="fa-solid fa-arrow-left"></i>&nbsp;Voltar
                             </a>
                         </div>
                     </div>
@@ -124,7 +124,7 @@
                                                             <div class="position-relative mb-3" style="padding-left: 1.5rem;">
                                                                 <!-- Bolinha na linha do tempo -->
                                                                 <div class="position-absolute start-0 translate-middle-x" style="width:14px;height:14px;border-radius:50%;top:4px;left:-1px;
-                                                                                                                                                                                                                                                                                                                       background:{{ match ($envio->status) {
+                                                                                                                                                                                                                                                                                                                                                       background:{{ match ($envio->status) {
                                                 'enviado' => '#0d6efd',
                                                 'entregue' => '#0dcaf0',
                                                 'lido' => '#198754',

@@ -72,10 +72,23 @@ class ProtocoloDispatcher
                 }
             }
 
+            $assuntoMsg = $protocolo->assunto;
+            $corpoMsg = $protocolo->corpo;
+
+            $replaceVars = [
+                '{nome_contato}' => $destinatario->nome,
+                '{empresa}' => $protocolo->empresa ? $protocolo->empresa->razao_social : '',
+                '{whatsapp}' => $destinatario->telefone ?? '',
+                '{email}' => $destinatario->email,
+            ];
+
+            $assuntoMsg = strtr($assuntoMsg, $replaceVars);
+            $corpoMsg = strtr($corpoMsg, $replaceVars);
+
             $payload = new ArOnlineSendPayload(
                 nameTo: $destinatario->nome,
-                subject: $protocolo->assunto,
-                contentHtml: $protocolo->corpo,
+                subject: $assuntoMsg,
+                contentHtml: $corpoMsg,
                 emailTo: $destinatario->email,
                 attachments: $attachmentsPayload,
                 customId: (string) $protocolo->id,
