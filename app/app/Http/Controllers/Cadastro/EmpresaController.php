@@ -13,8 +13,12 @@ class EmpresaController extends Controller
     {
         $search = $request->get('search');
         $regiao_id = $request->get('regiao_id');
+        $ver_inativos = $request->has('ver_inativos');
 
-        $empresas = Empresa::with('regiao')
+        $empresas = Empresa::with('regiao')->withCount('clientes')
+            ->when(!$ver_inativos, function ($query) {
+                return $query->where('ativo', true);
+            })
             ->when($search, function ($query, $search) {
                 return $query->where('razao_social', 'like', "%{$search}%")
                     ->orWhere('nome_fantasia', 'like', "%{$search}%")
@@ -29,7 +33,7 @@ class EmpresaController extends Controller
 
         $regioes = \App\Models\Regiao::where('ativo', true)->orderBy('nome')->get();
 
-        return view('empresas.index', compact('empresas', 'search', 'regioes', 'regiao_id'));
+        return view('empresas.index', compact('empresas', 'search', 'regioes', 'regiao_id', 'ver_inativos'));
     }
 
     public function store(Request $request)

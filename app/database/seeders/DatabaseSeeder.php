@@ -55,9 +55,18 @@ class DatabaseSeeder extends Seeder
         $users = [
             [
                 'username' => 'admin',
-                'name' => 'Administrador de Teste',
+                'name' => 'Administrador',
                 'email' => 'admin@portal.com',
                 'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'force_password_change' => false,
+                'perfil' => 'Administrador'
+            ],
+            [
+                'username' => 'admin_deploy',
+                'name' => 'Administrador Deploy',
+                'email' => 'admin@poertal.com',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'force_password_change' => false,
                 'perfil' => 'Administrador'
             ],
             [
@@ -80,14 +89,15 @@ class DatabaseSeeder extends Seeder
             $perfilNome = $userData['perfil'];
             unset($userData['perfil']);
 
-            $user = \App\Models\User::firstOrCreate(
+            $user = \App\Models\User::updateOrCreate(
                 ['email' => $userData['email']],
                 $userData
             );
 
             $perfil = \App\Models\Perfil::where('nome', $perfilNome)->first();
-            if ($perfil && !$user->perfis()->where('perfil_id', $perfil->id)->exists()) {
-                $user->perfis()->attach($perfil->id);
+            if ($perfil) {
+                // Sincronizar perfis (garante que tenha apenas o definido no seeder)
+                $user->perfis()->sync([$perfil->id]);
             }
         }
     }

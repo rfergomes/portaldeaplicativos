@@ -11,6 +11,14 @@ class Empresa extends Model
     use HasFactory;
     use Auditable;
 
+    protected static function booted()
+    {
+        static::deleting(function ($empresa) {
+            // Exclui recursivamente todos os clientes vinculados à empresa
+            $empresa->clientes()->delete();
+        });
+    }
+
     protected $fillable = [
         'regiao_id',
         'razao_social',

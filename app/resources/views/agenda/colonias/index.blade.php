@@ -6,10 +6,10 @@
     <div class="row">
         <div class="col-12">
             <div class="card card-outline card-primary shadow-sm mb-4">
-                <div class="card-header border-0 d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title fw-bold m-0"><i class="fa-solid fa-umbrella-beach me-2"></i>Colônias Cadastradas
                     </h3>
-                    <div class="card-tools">
+                    <div class="ms-auto">
                         <button class="btn btn-primary btn-sm rounded-pill shadow-sm" data-bs-toggle="modal"
                             data-bs-target="#modalNovaColonia">
                             <i class="fa-solid fa-plus me-1"></i> Nova Colônia

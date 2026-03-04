@@ -8,7 +8,10 @@ use App\Models\TokenDepto;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use App\Mail\NewUserWelcome;
 
 class UserController extends Controller
 {
@@ -30,26 +33,34 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
             'token_depto_id' => ['nullable', 'exists:token_deptos,id'],
             'perfis' => ['nullable', 'array'],
             'perfis.*' => ['exists:perfis,id']
         ]);
 
+        $temporaryPassword = Str::random(8);
+
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'username' => strtolower(explode('@', $data['email'])[0]), // Default username
-            'password' => Hash::make($data['password']),
+            'username' => strtolower(explode('@', $data['email'])[0]),
+            'password' => Hash::make($temporaryPassword),
             'token_depto_id' => $data['token_depto_id'] ?? null,
+            'force_password_change' => true,
         ]);
 
         if (!empty($data['perfis'])) {
             $user->perfis()->sync($data['perfis']);
         }
 
+        try {
+            Mail::to($user->email)->send(new NewUserWelcome($user, $temporaryPassword));
+        } catch (\Exception $e) {
+            \Log::error('Erro ao enviar e-mail de boas-vindas: ' . $e->getMessage());
+        }
+
         return redirect()->route('users.index')
-            ->with('success', 'Usuário criado com sucesso.');
+            ->with('success', 'Usuário criado com sucesso. Uma senha temporária foi enviada por e-mail.');
     }
 
     public function edit(User $user)

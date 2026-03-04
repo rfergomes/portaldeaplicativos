@@ -12,10 +12,11 @@ class RegiaoController extends Controller
     {
         $search = $request->get('search');
 
-        $regioes = Regiao::when($search, function ($query, $search) {
-            return $query->where('nome', 'like', "%{$search}%")
-                ->orWhere('area_adm', 'like', "%{$search}%");
-        })
+        $regioes = Regiao::withCount('empresas')
+            ->when($search, function ($query, $search) {
+                return $query->where('nome', 'like', "%{$search}%")
+                    ->orWhere('area_adm', 'like', "%{$search}%");
+            })
             ->orderBy('nome')
             ->paginate(15);
 

@@ -6,10 +6,9 @@
     <div class="row">
         <div class="col-12">
             <div class="card card-outline card-warning shadow-sm mb-4">
-                <div class="card-header border-0 d-flex justify-content-between align-items-center">
-                    <h3 class="card-title fw-bold m-0"><i class="fa-solid fa-clock me-2"></i>Períodos (Semanas) de Sorteio
-                    </h3>
-                    <div class="card-tools d-flex gap-2">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title fw-bold m-0"><i class="fa-solid fa-clock me-2"></i>Períodos (Semanas) de Sorteio</h3>
+                    <div class="ms-auto d-flex gap-2">
                         <button class="btn btn-primary btn-sm rounded-pill shadow-sm" data-bs-toggle="modal"
                             data-bs-target="#modalGerarMes">
                             <i class="fa-solid fa-calendar-days me-1"></i> Gerar Semanas do Mês

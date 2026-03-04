@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'token_depto_id',
+        'force_password_change',
     ];
 
     /**

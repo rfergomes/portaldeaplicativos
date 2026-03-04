@@ -27,17 +27,11 @@
                                 @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Senha</label>
-                                <input type="password" name="password"
-                                    class="form-control @error('password') is-invalid @enderror" required minlength="8">
-                                @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Confirmar Senha</label>
-                                <input type="password" name="password_confirmation" class="form-control" required
-                                    minlength="8">
+                            <div class="col-12">
+                                <div class="alert alert-info border-0 shadow-sm small py-2">
+                                    <i class="fa-solid fa-circle-info me-2"></i>
+                                    A senha será gerada automaticamente e enviada para o e-mail do usuário. Ele deverá alterá-la no primeiro acesso.
+                                </div>
                             </div>
 
                             <div class="col-12 mt-4">

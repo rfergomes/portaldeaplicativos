@@ -28,7 +28,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="input-group input-group-sm">
                             <input type="text" name="search" class="form-control rounded-start-pill px-3"
                                 placeholder="Buscar por razão, cnpj, erp..." value="{{ $search }}">
@@ -37,10 +37,17 @@
                             </button>
                         </div>
                     </div>
+                    <div class="col-md-2 d-flex align-items-center">
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" name="ver_inativos" id="ver_inativos" 
+                                value="1" {{ $ver_inativos ? 'checked' : '' }} onchange="this.form.submit()">
+                            <label class="form-check-label small fw-bold" for="ver_inativos">Exibir Inativas</label>
+                        </div>
+                    </div>
                     <div class="col-md-2 text-end">
-                        <a href="{{ route('empresas.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill w-100"
+                        <a href="{{ route('empresas.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill w-60"
                             title="Limpar Filtros">
-                            <i class="fa-solid fa-rotate-left me-1"></i> Limpar
+                            <i class="fa-solid fa-rotate-left me-1"></i> Limpar Filtros
                         </a>
                     </div>
                 </form>
@@ -56,6 +63,7 @@
                                 <th>Região</th>
                                 <th>Razão Social / Nome Fantasia</th>
                                 <th>Cidade/UF</th>
+                                <th>Contatos</th>
                                 <th>Telefone/Email</th>
                                 <th class="text-end pe-4">Ações</th>
                             </tr>
@@ -76,13 +84,24 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-dark">{{ $empresa->razao_social }}</div>
+                                        <div class="fw-bold text-dark">
+                                            {{ $empresa->razao_social }}
+                                            @if(!$empresa->ativo)
+                                                <span class="badge text-bg-danger rounded-pill x-small ms-1" style="font-size: 0.6rem;">INATIVA</span>
+                                            @endif
+                                        </div>
                                         <small class="text-muted small">
                                             {{ $empresa->nome_curto ? $empresa->nome_curto . ' | ' : '' }}
                                             {{ $empresa->nome_fantasia ?? '-' }}
                                         </small>
                                     </td>
                                     <td>{{ $empresa->cidade ?? '-' }}/{{ $empresa->estado ?? '-' }}</td>
+                                    <td>
+                                        <span class="badge text-bg-info rounded-pill shadow-sm px-2">
+                                            <i class="fa-solid fa-users me-1"></i>
+                                            {{ $empresa->clientes_count }}
+                                        </span>
+                                    </td>
                                     <td>
                                         <div class="small"><i
                                                 class="fa-solid fa-phone me-1 text-muted"></i>{{ $empresa->telefone ?? '-' }}
