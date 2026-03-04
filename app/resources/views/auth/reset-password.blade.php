@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - Portal de Aplicativos</title>
+    <title>Definir Nova Senha - Portal de Aplicativos</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
     <style>
@@ -57,8 +57,8 @@
         .subtitle {
             font-size: 0.9rem;
             color: #6b7280;
-            text-align: center;
             margin-bottom: 1.75rem;
+            text-align: center;
         }
 
         .label {
@@ -86,50 +86,8 @@
             background: #ffffff;
         }
 
-        .error-text {
-            font-size: 0.8rem;
-            color: #b91c1c;
-            margin-top: 0.35rem;
-        }
-
         .field {
             margin-bottom: 1.25rem;
-        }
-
-        .actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
-            color: #4b5563;
-        }
-
-        .checkbox {
-            width: 1rem;
-            height: 1rem;
-            border-radius: 0.25rem;
-            border: 1px solid #9ca3af;
-        }
-
-        .forgot-password {
-            font-size: 0.85rem;
-            color: #2563eb;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.12s;
-        }
-
-        .forgot-password:hover {
-            color: #1d4ed8;
-            text-decoration: underline;
         }
 
         .btn-primary {
@@ -157,11 +115,14 @@
             transform: translateY(-1px);
         }
 
-        .footer {
-            margin-top: 2rem;
+        .alert-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            border-radius: 0.75rem;
+            padding: 0.75rem 0.9rem;
             font-size: 0.85rem;
-            color: #9ca3af;
-            text-align: center;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
@@ -174,51 +135,43 @@
             </div>
 
             <div style="margin-bottom: 1.5rem;">
-                <div class="title">Portal de Aplicativos</div>
-                <div class="subtitle">Acesse com suas credenciais de usuário.</div>
+                <div class="title">Nova Senha</div>
+                <div class="subtitle">Crie uma nova senha de acesso para sua conta.</div>
             </div>
 
             @if ($errors->any())
-                <div
-                    style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:0.75rem;padding:0.75rem 0.9rem;font-size:0.85rem;margin-bottom:1rem;">
+                <div class="alert-error">
                     {{ $errors->first() }}
                 </div>
             @endif
 
-            <form method="POST" action="{{ url('/login') }}">
+            <form method="POST" action="{{ route('password.update') }}">
                 @csrf
+
+                <input type="hidden" name="token" value="{{ $token }}">
 
                 <div class="field">
                     <label class="label" for="email">E-mail</label>
-                    <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
+                    <input id="email" name="email" type="email" value="{{ $email ?? old('email') }}" required autofocus
                         autocomplete="email" class="input">
                 </div>
 
                 <div class="field">
-                    <label class="label" for="password">Senha</label>
-                    <input id="password" name="password" type="password" required autocomplete="current-password"
+                    <label class="label" for="password">Nova Senha</label>
+                    <input id="password" name="password" type="password" required autocomplete="new-password"
                         class="input">
                 </div>
 
-                <div class="actions">
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="remember" class="checkbox">
-                        <span>Lembrar sessão</span>
-                    </label>
-
-                    <a href="{{ route('password.request') }}" class="forgot-password">
-                        Esqueci minha senha
-                    </a>
+                <div class="field">
+                    <label class="label" for="password_confirmation">Confirmar Senha</label>
+                    <input id="password_confirmation" name="password_confirmation" type="password" required
+                        autocomplete="new-password" class="input">
                 </div>
 
                 <button type="submit" class="btn-primary">
-                    <span>Entrar</span>
+                    <span>Redefinir Senha</span>
                 </button>
             </form>
-
-            <div class="footer">
-                © {{ date('Y') }} Portal de Aplicativos - TI Químicos Unificados
-            </div>
         </div>
     </div>
 </body>
