@@ -1,66 +1,78 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Portal de Aplicativos - Sindicato Químicos Unificados
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema de gestão administrativa e de lazer, integrando controle de reservas para colônias de férias, gestão de usuários e protocolos.
 
-## About Laravel
+## 🚀 Tecnologias Utilizadas
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Backend:** Laravel 11.x (PHP 8.2+)
+- **Frontend:** Blade, CSS Vanilla, JavaScript (Vite)
+- **Banco de Dados:** MySQL / MariaDB
+- **PDF:** DomPDF (`barryvdh/laravel-dompdf`)
+- **Automação:** GitHub Actions
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Instalação Local (Desenvolvimento)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Para rodar o projeto localmente (ex: XAMPP), siga os passos:
 
-## Learning Laravel
+1. **Clonar o Repositório:**
+   ```bash
+   git clone <url-do-repositorio>
+   cd portaldeaplicativos/app
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2. **Instalar Dependências:**
+   ```bash
+   composer install
+   npm install && npm run build
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+3. **Configuração do Ambiente:**
+   - Copie o arquivo `.env.example` para `.env`
+   - Configure as credenciais do banco de dados (DB_DATABASE, DB_USERNAME, DB_PASSWORD)
+   - Gere a chave da aplicação:
+     ```bash
+     php artisan key:generate
+     ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+4. **Migrações e Dados:**
+   ```bash
+   php artisan migrate
+   ```
 
-## Laravel Sponsors
+5. **Executar Servidor:**
+   ```bash
+   php artisan serve
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 🌐 Deploy (VPS)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+O projeto está configurado para **Deploy Automático** via GitHub Actions sempre que houver um `push` na branch `master`.
 
-## Contributing
+### Configurações da VPS:
+- **IP do Servidor:** `191.252.205.40`
+- **Usuário:** `root`
+- **Script de Deploy:** `/var/www/deploy.sh`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Fluxo de CI/CD:
+O arquivo de workflow encontra-se em `.github/workflows/main.yml`. Ele utiliza as seguintes **Secrets** do GitHub:
+- `SSH_PRIVATE_KEY`: Chave privada para acesso ao servidor.
 
-## Code of Conduct
+Para realizar o deploy manualmente, acesse o servidor via SSH e execute o script:
+```bash
+ssh root@191.252.205.40
+/var/www/deploy.sh
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 📁 Estrutura de Módulos Recentes
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Agenda Colônia:** Gestão de períodos e reservas.
+- **Módulo de Impressos:** Geração de Guias de Pré-Reserva (2 por folha A4) e Lista de Inscritos em PDF.
+- **Histórico de Exclusões:** Auditoria de reservas removidas com registro de motivo.
 
-## License
+## 📄 Licença
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Este projeto é de uso exclusivo do **Sindicato Químicos Unificados**.
