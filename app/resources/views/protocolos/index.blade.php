@@ -15,7 +15,7 @@
             </div>
 
             <!-- Filtros -->
-            <div class="card-body border-bottom bg-light pb-2 pt-3">
+            <div class="card-body border-bottom pb-2 pt-3">
                 <form action="{{ route('protocolos.index') }}" method="GET" class="row gx-2 gy-2 align-items-end">
                     <div class="col-md-3">
                         <label class="form-label small fw-bold text-muted mb-1">Pesquisar</label>
@@ -77,7 +77,7 @@
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light text-muted small text-uppercase">
+                        <thead class="text-muted small text-uppercase">
                             <tr>
                                 <th class="ps-4" style="width:80px;">ID</th>
                                 <th>Tipo</th>
@@ -106,7 +106,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-dark">{{ $protocolo->assunto }}</div>
+                                        <div class="fw-bold">{{ $protocolo->assunto }}</div>
                                         @if($protocolo->referencia_documento)
                                             <small class="text-muted">{{ $protocolo->referencia_documento }}</small>
                                         @endif
@@ -158,11 +158,11 @@
                 </div>
             </div>
             @if($protocolos->hasPages())
-                <div class="card-footer py-2 bg-white">
+                <div class="card-footer py-2">
                     {{ $protocolos->links() }}
                 </div>
             @endif
-            <div class="card-footer bg-white text-muted small py-3 border-top">
+            <div class="card-footer text-muted small py-3 border-top">
                 <i class="fa-solid fa-circle-info me-1"></i> Rastreamento de envios com valor jurídico via AR-Online.
             </div>
         </div>

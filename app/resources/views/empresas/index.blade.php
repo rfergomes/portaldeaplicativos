@@ -15,7 +15,7 @@
                 </div>
             </div>
 
-            <div class="card-body border-top bg-light py-2">
+            <div class="card-body border-top py-2">
                 <form action="{{ route('empresas.index') }}" method="GET" class="row g-2 align-items-center">
                     <div class="col-md-4">
                         <select name="regiao_id" class="form-select form-select-sm rounded-pill px-3"
@@ -56,7 +56,7 @@
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light text-muted small text-uppercase">
+                        <thead class="text-muted small text-uppercase">
                             <tr>
                                 <th class="ps-4" style="width: 80px;">ID</th>
                                 <th>ERP / CNPJ</th>
@@ -75,7 +75,7 @@
                                         <span class="badge text-bg-light border shadow-sm px-2">#{{ $empresa->id }}</span>
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-dark">{{ $empresa->empresa_erp ?? '-' }}</div>
+                                        <div class="fw-bold">{{ $empresa->empresa_erp ?? '-' }}</div>
                                         <small class="text-muted">{{ $empresa->cnpj }}</small>
                                     </td>
                                     <td>
@@ -84,7 +84,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-dark">
+                                        <div class="fw-bold">
                                             {{ $empresa->razao_social }}
                                             @if(!$empresa->ativo)
                                                 <span class="badge text-bg-danger rounded-pill x-small ms-1" style="font-size: 0.6rem;">INATIVA</span>
@@ -145,11 +145,11 @@
                 </div>
             </div>
             @if($empresas->hasPages())
-                <div class="card-footer py-2 bg-white">
+                <div class="card-footer py-2">
                     {{ $empresas->links() }}
                 </div>
             @endif
-            <div class="card-footer bg-white text-muted small py-3 border-top">
+            <div class="card-footer text-muted small py-3 border-top">
                 <i class="fa-solid fa-circle-info me-1"></i> Gerencie o cadastro de empresas e seus contatos vinculados.
             </div>
         </div>

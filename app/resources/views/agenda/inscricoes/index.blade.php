@@ -32,7 +32,7 @@
         {{-- CABEÇALHO --}}
         <div class="d-flex align-items-center justify-content-between mb-3">
             <div>
-                <h4 class="fw-bold text-dark mb-0"><i class="fa-solid fa-ticket text-primary me-2"></i>Inscrições / Sorteio
+                <h4 class="fw-bold mb-0"><i class="fa-solid fa-ticket text-primary me-2"></i>Inscrições / Sorteio
                 </h4>
                 <p class="text-muted small mb-0">Módulo opcional — registre os candidatos e marque os sorteados para
                     pré-reserva automática.</p>
@@ -90,9 +90,9 @@
                     </div>
                     <div class="d-flex gap-2 align-items-center flex-wrap">
                         <span class="badge bg-secondary rounded-pill px-3 d-flex align-items-center gap-1">Total: {{ $inscricoes->count() }}</span>
-                        <span class="badge bg-warning text-dark rounded-pill px-3 d-flex align-items-center gap-1">Pendentes: {{ $inscricoes->where('status', 'pendente')->count() }}</span>
+                        <span class="badge bg-warning rounded-pill px-3 d-flex align-items-center gap-1">Pendentes: {{ $inscricoes->where('status', 'pendente')->count() }}</span>
                         <span class="badge bg-success rounded-pill px-3 d-flex align-items-center gap-1">Sorteados: {{ $inscricoes->where('status', 'sorteado')->count() }}</span>
-                        <span class="badge bg-info text-dark rounded-pill px-3 d-flex align-items-center gap-1">Espera: {{ $inscricoes->where('status', 'espera')->count() }}</span>
+                        <span class="badge bg-info rounded-pill px-3 d-flex align-items-center gap-1">Espera: {{ $inscricoes->where('status', 'espera')->count() }}</span>
                         <button class="btn btn-outline-primary btn-sm rounded-pill shadow-sm" data-bs-toggle="modal"
                             data-bs-target="#modalImpressao">
                             <i class="fa-solid fa-print me-1"></i>Impressões
@@ -117,7 +117,7 @@
                     @else
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
+                            <thead>
                                     <tr>
                                         <th class="ps-3" style="width:40px">#</th>
                                         <th>Candidato</th>
@@ -140,9 +140,9 @@
                                             };
                                             $badgeClass = match ($insc->status) {
                                                 'sorteado' => 'bg-success',
-                                                'espera' => 'bg-warning text-dark',
+                                                'espera' => 'bg-warning',
                                                 'cancelado' => 'bg-secondary',
-                                                default => 'bg-light text-dark border',
+                                                default => 'badge-outline border',
                                             };
                                         @endphp
                                         <tr class="{{ $rowClass }}">
@@ -277,7 +277,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa-solid fa-save me-1"></i> Registrar Inscrição
@@ -334,7 +334,7 @@
                             <textarea name="observacao" id="obsResultado" class="form-control" rows="2"></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-warning fw-bold">
                             <i class="fa-solid fa-check me-1"></i> Confirmar Resultado
@@ -356,7 +356,7 @@
                 <div class="modal-body">
                     <div class="list-group">
                         {{-- Guia de Pré-Reserva --}}
-                        <div class="list-group-item border-0 bg-light rounded mb-3 p-3">
+                        <div class="list-group-item border-0 rounded mb-3 p-3">
                             <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-file-invoice me-2"></i>Guias de Pré-Reserva (2 por folha)</h6>
                             <form action="{{ route('agenda.inscricoes.pdf.guia') }}" method="GET" target="_blank">
                                 <input type="hidden" name="colonia_id" value="{{ $coloniaSelecionada }}">
@@ -379,7 +379,7 @@
                         </div>
 
                         {{-- Lista de Inscritos --}}
-                        <div class="list-group-item border-0 bg-light rounded p-3">
+                        <div class="list-group-item border-0 rounded p-3">
                             <h6 class="fw-bold text-success mb-3"><i class="fa-solid fa-list-ol me-2"></i>Lista de Inscritos para Sorteio</h6>
                             <form action="{{ route('agenda.inscricoes.pdf.lista') }}" method="GET" target="_blank">
                                 <input type="hidden" name="colonia_id" value="{{ $coloniaSelecionada }}">

@@ -81,7 +81,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm border-0">
-                <div class="card-body bg-light rounded">
+                <div class="card-body rounded">
                     <form action="{{ route('agenda.reservas.index') }}" method="GET" class="row g-3 align-items-end">
                         <div class="col-md-4">
                             <label class="form-label fw-bold text-primary"><i class="fa-solid fa-umbrella-beach me-1"></i>
@@ -130,7 +130,7 @@
         <div class="row mb-4">
             <div class="col-md-7">
                 <div
-                    class="d-flex flex-column justify-content-center h-100 p-3 bg-white rounded shadow-sm border border-primary border-opacity-25">
+                    class="d-flex flex-column justify-content-center h-100 p-3 rounded shadow-sm border border-primary border-opacity-25">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h4 class="fw-bold mb-0 text-primary">{{ $coloniaModel->nome }}</h4>
                         <div>
@@ -155,8 +155,8 @@
 
             <div class="col-md-5">
                 <div class="card shadow-sm border-0 h-100 border-start border-4 border-info">
-                    <div class="card-header bg-light py-2">
-                        <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-chart-pie me-2"></i>Resumo da Semana</h6>
+                    <div class="card-header py-2">
+                        <h6 class="mb-0 fw-bold"><i class="fa-solid fa-chart-pie me-2"></i>Resumo da Semana</h6>
                     </div>
                     <div class="card-body p-2" style="font-size: 0.9rem;">
                         <div class="row text-center mb-2">
@@ -172,7 +172,7 @@
                         </div>
                         <div class="row text-center border-top pt-2">
                             <div class="col"><span
-                                    class="text-dark fw-bold d-block fs-6">{{ collect($estatisticas ?? [])->get('total', 0) }}</span>
+                                    class="fw-bold d-block fs-6">{{ collect($estatisticas ?? [])->get('total', 0) }}</span>
                                 Total</div>
                             <div class="col border-start"><span
                                     class="text-warning fw-bold d-block fs-6">{{ collect($estatisticas ?? [])->get('espera', 0) }}</span>
@@ -236,14 +236,14 @@
                             <div class="w-25 border-end pe-2" style="max-width: 80px;">
                                 <span class="text-muted d-block"
                                     style="font-size: 0.7rem; line-height: 1;">{{ $aco->tipo ?? 'Unidade' }}</span>
-                                <strong class="fs-6 text-dark">{{ $aco->identificador }}</strong>
+                                <strong class="fs-6">{{ $aco->identificador }}</strong>
                             </div>
                             <div class="w-75 ps-2">
                                 @if($reserva)
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             @if($reserva->hospede)
-                                                <h6 class="mb-0 fw-bold text-dark fs-6">{{ $reserva->hospede->nome }}</h6>
+                                                <h6 class="mb-0 fw-bold fs-6">{{ $reserva->hospede->nome }}</h6>
                                                 <div class="text-muted" style="font-size: 0.75rem;">
                                                     <span class="me-2"><i
                                                             class="fa-solid fa-phone text-secondary me-1"></i>{{ $reserva->hospede->telefone ?? '--' }}</span>
@@ -308,7 +308,7 @@
                     <i class="fa-solid fa-user-clock me-2"></i> Fila de Espera (Suplentes)
                 </h5>
 
-                <div class="bg-light p-3 rounded border" id="zonaFilaEspera">
+                <div class="p-3 rounded border" id="zonaFilaEspera">
                     @forelse($filaEspera as $index => $espera)
                         <div class="card card-espera shadow-sm mb-2" draggable="true" data-espera-id="{{ $espera->id }}"
                             data-nome="{{ $espera->hospede->nome ?? 'Suplente' }}"
@@ -318,7 +318,7 @@
                                     <span class="badge rounded-circle bg-warning text-dark me-3"
                                         style="width: 25px; height: 25px; display: flex; align-items: center; justify-content: center;">{{ $index + 1 }}</span>
                                     <div>
-                                        <strong class="d-block text-dark">{{ $espera->hospede->nome ?? 'Desconhecido' }}</strong>
+                                        <strong class="d-block">{{ $espera->hospede->nome ?? 'Desconhecido' }}</strong>
                                         <div class="text-muted" style="font-size: 0.75rem;">
                                             <span class="me-2"><i
                                                     class="fa-solid fa-phone text-secondary me-1"></i>{{ $espera->hospede->telefone ?? '--' }}</span>
@@ -372,9 +372,9 @@
             </div>
         </div>
     @else
-        <div class="text-center py-5 mt-4 text-muted bg-white rounded shadow-sm border">
+        <div class="text-center py-5 mt-4 text-muted rounded shadow-sm border">
             <i class="fa-solid fa-clipboard-list fa-4x mb-3 text-primary opacity-25"></i>
-            <h4 class="fw-bold text-dark">Planilha de Controle de Vagas</h4>
+            <h4 class="fw-bold">Planilha de Controle de Vagas</h4>
             <p class="mb-0">Selecione o período e a colônia acima para começar a gerenciar as acomodações.</p>
         </div>
     @endif
@@ -403,7 +403,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="modal-footer bg-light">
+                        <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                             <button type="submit" class="btn btn-success fw-bold"><i class="fa-solid fa-check me-1"></i>
                                 Confirmar</button>
@@ -507,7 +507,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="modal-footer bg-light">
+                        <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
                             <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check me-1"></i> Confirmar
                                 Alocação</button>
@@ -597,7 +597,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-footer bg-light">
+                        <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
                             <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save me-1"></i> Salvar
                                 Alterações</button>
@@ -631,10 +631,10 @@
                 Swal.fire({
                     title: 'Motivo da Exclusão',
                     html: `
-                                <p class="text-muted small mb-3">Informe o motivo para excluir esta reserva. Este registro ficará salvo no histórico.</p>
-                                <textarea id="motivoExclusao" rows="3" style="width:calc(100% - 4px);box-sizing:border-box;resize:vertical;border:1px solid #d9d9d9;border-radius:6px;padding:10px 12px;font-size:0.9rem;display:block;"
-                                    placeholder="Ex: Desistência do hóspede, reagendamento, cancelamento, bloqueio..."></textarea>
-                            `,
+                                        <p class="text-muted small mb-3">Informe o motivo para excluir esta reserva. Este registro ficará salvo no histórico.</p>
+                                        <textarea id="motivoExclusao" rows="3" style="width:calc(100% - 4px);box-sizing:border-box;resize:vertical;border:1px solid #d9d9d9;border-radius:6px;padding:10px 12px;font-size:0.9rem;display:block;"
+                                            placeholder="Ex: Desistência do hóspede, reagendamento, cancelamento, bloqueio..."></textarea>
+                                    `,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#dc3545',

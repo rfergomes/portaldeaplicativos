@@ -55,7 +55,7 @@
     </div>
 
     <div class="card shadow-sm mb-4">
-        <div class="card-header border-0 bg-white d-flex align-items-center">
+        <div class="card-header border-0 d-flex align-items-center">
             <h3 class="card-title m-0"><i class="fa-solid fa-list me-2"></i> Lista de Convites</h3>
             <div class="card-tools ms-auto">
                 <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
@@ -88,7 +88,7 @@
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th style="width: 25%">Nome Responsável</th>
                             <th style="width: 15%">Placa</th>
@@ -355,19 +355,19 @@
                         data.forEach(g => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
-                                                <td>${g.nome}</td>
-                                                <td>${g.documento || '-'}</td>
-                                                <td>${g.empresa || '-'}</td>
-                                                <td>R$ ${parseFloat(g.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                                                <td class="text-end">
-                                                    <button class="btn btn-xs btn-outline-info btn-edit-guest">
-                                                        <i class="fa-solid fa-pen"></i>
-                                                    </button>
-                                                    <button class="btn btn-xs btn-outline-danger" onclick="deleteGuest(${g.id})">
-                                                        <i class="fa-solid fa-trash-can"></i>
-                                                    </button>
-                                                </td>
-                                            `;
+                                                        <td>${g.nome}</td>
+                                                        <td>${g.documento || '-'}</td>
+                                                        <td>${g.empresa || '-'}</td>
+                                                        <td>R$ ${parseFloat(g.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                                                        <td class="text-end">
+                                                            <button class="btn btn-xs btn-outline-info btn-edit-guest">
+                                                                <i class="fa-solid fa-pen"></i>
+                                                            </button>
+                                                            <button class="btn btn-xs btn-outline-danger" onclick="deleteGuest(${g.id})">
+                                                                <i class="fa-solid fa-trash-can"></i>
+                                                            </button>
+                                                        </td>
+                                                    `;
 
                             // Anexa evento de clique ao botão de editar de forma segura
                             row.querySelector('.btn-edit-guest').addEventListener('click', () => editGuest(g));
@@ -418,16 +418,16 @@
                 Swal.fire({
                     title: 'Editar Convidado',
                     html: `
-                                                <input id="swalName" class="swal2-input" placeholder="Nome" value="${guest.nome}">
-                                                <input id="swalDoc" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="CPF" value="${guest.documento || ''}">
-                                                <select id="swalEmp" class="swal2-select" style="max-width: 90%; margin: 10px auto; display: flex;">
-                                                    <option value="">Nenhuma / Outra</option>
-                                                    @foreach($empresas as $emp)
-                                                        <option value="{{ $emp->nome_curto ?? $emp->razao_social }}" ${guest.empresa === '{{ $emp->nome_curto ?? $emp->razao_social }}' ? 'selected' : ''}>{{ $emp->nome_curto ?? $emp->razao_social }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <input id="swalVal" type="number" step="0.01" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="Valor" value="${guest.valor}">
-                                            `,
+                                                        <input id="swalName" class="swal2-input" placeholder="Nome" value="${guest.nome}">
+                                                        <input id="swalDoc" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="CPF" value="${guest.documento || ''}">
+                                                        <select id="swalEmp" class="swal2-select" style="max-width: 90%; margin: 10px auto; display: flex;">
+                                                            <option value="">Nenhuma / Outra</option>
+                                                            @foreach($empresas as $emp)
+                                                                <option value="{{ $emp->nome_curto ?? $emp->razao_social }}" ${guest.empresa === '{{ $emp->nome_curto ?? $emp->razao_social }}' ? 'selected' : ''}>{{ $emp->nome_curto ?? $emp->razao_social }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <input id="swalVal" type="number" step="0.01" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="Valor" value="${guest.valor}">
+                                                    `,
                     focusConfirm: false,
                     showCancelButton: true,
                     confirmButtonText: 'Salvar',

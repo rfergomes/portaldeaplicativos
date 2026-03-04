@@ -18,7 +18,7 @@
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light text-muted small text-uppercase">
+                        <thead class="text-muted small text-uppercase">
                             <tr>
                                 <th class="ps-4" style="width: 80px;">ID</th>
                                 <th>Nome / Cargo</th>
@@ -33,7 +33,7 @@
                                         <span class="badge text-bg-light border shadow-sm px-2">#{{ $tipo->id }}</span>
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-dark">{{ $tipo->nome }}</div>
+                                        <div class="fw-bold">{{ $tipo->nome }}</div>
                                     </td>
                                     <td>
                                         <span class="text-muted">{{ $tipo->descricao ?? '-' }}</span>
@@ -67,7 +67,7 @@
                     </table>
                 </div>
             </div>
-            <div class="card-footer bg-white text-muted small py-3 border-top">
+            <div class="card-footer text-muted small py-3 border-top">
                 <i class="fa-solid fa-circle-info me-1"></i> Gerencie os tipos de cargos para classificar contatos de
                 empresas.
             </div>

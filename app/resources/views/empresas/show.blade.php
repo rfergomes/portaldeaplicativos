@@ -54,7 +54,7 @@
                                 class="fa-solid fa-location-dot me-2 text-muted"></i>{{ $empresa->cidade ?? '-' }}/{{ $empresa->estado ?? '-' }}
                         </div>
                     </div>
-                    <div class="card-footer bg-white text-muted small py-2 border-top border-0">
+                    <div class="card-footer text-muted small py-2 border-top border-0">
                         <i class="fa-solid fa-circle-info me-1"></i> Dados cadastrados no ERP.
                     </div>
                 </div>
@@ -87,7 +87,7 @@
                                     @forelse($empresa->clientes as $contato)
                                         <tr>
                                             <td class="ps-4">
-                                                <div class="fw-bold text-dark">{{ $contato->nome }}</div>
+                                                <div class="fw-bold">{{ $contato->nome }}</div>
                                                 <small class="text-muted small">ID: {{ $contato->id }}</small>
                                             </td>
                                             <td>
@@ -132,7 +132,7 @@
                             </table>
                         </div>
                     </div>
-                    <div class="card-footer bg-white text-muted small py-3 border-top">
+                    <div class="card-footer text-muted small py-3 border-top">
                         <i class="fa-solid fa-circle-info me-1"></i> Pessoas de contato vinculadas a esta empresa.
                     </div>
                 </div>

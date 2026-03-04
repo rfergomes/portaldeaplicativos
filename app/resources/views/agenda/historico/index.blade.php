@@ -38,7 +38,8 @@
                             <option value="">-- Todas --</option>
                             @foreach($colonias as $col)
                                 <option value="{{ $col->id }}" {{ request('colonia_id') == $col->id ? 'selected' : '' }}>
-                                    {{ $col->nome }}</option>
+                                    {{ $col->nome }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -100,7 +101,7 @@
                 @else
                     <div class="table-responsive">
                         <table class="table table-hover table-striped align-middle mb-0">
-                            <thead class="table-dark">
+                            <thead>
                                 <tr>
                                     <th class="ps-3" style="width:55px">#</th>
                                     <th>Hóspede / Bloqueio</th>
@@ -119,7 +120,7 @@
                                         $badgeStatus = match ($h->status_reserva) {
                                             'confirmado' => 'bg-success',
                                             'reservado' => 'bg-primary',
-                                            'fila_espera' => 'bg-warning text-dark',
+                                            'fila_espera' => 'bg-warning',
                                             'bloqueado' => 'bg-danger',
                                             default => 'bg-secondary',
                                         };
@@ -161,7 +162,7 @@
                                         </td>
                                         <td>
                                             @if($h->acomodacao_identificador)
-                                                <span class="badge bg-info text-dark">{{ $h->acomodacao_identificador }}</span>
+                                                <span class="badge bg-info">{{ $h->acomodacao_identificador }}</span>
                                                 @if($h->acomodacao_tipo)
                                                     <span class="text-muted small d-block">{{ $h->acomodacao_tipo }}</span>
                                                 @endif
@@ -173,7 +174,7 @@
                                             <span class="badge {{ $badgeStatus }} rounded-pill">{{ $statusLabel }}</span>
                                         </td>
                                         <td style="max-width: 280px;">
-                                            <span class="text-dark" style="font-size:0.88rem;">{{ $h->motivo }}</span>
+                                            <span style="font-size:0.88rem;">{{ $h->motivo }}</span>
                                         </td>
                                         <td class="text-center small">
                                             <span class="d-block fw-bold">{{ $h->excluido_por_nome ?? '—' }}</span>

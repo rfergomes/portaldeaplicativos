@@ -39,13 +39,13 @@
                         @if($protocolo->referencia_documento)
                             <div class="mb-3">
                                 <small class="text-muted text-uppercase fw-bold d-block mb-1">Referência</small>
-                                <span class="fw-bold text-dark">{{ $protocolo->referencia_documento }}</span>
+                                <span class="fw-bold">{{ $protocolo->referencia_documento }}</span>
                             </div>
                         @endif
 
                         <div class="mb-3">
                             <small class="text-muted text-uppercase fw-bold d-block mb-1">Assunto</small>
-                            <span class="fw-bold text-dark">{{ $protocolo->assunto }}</span>
+                            <span class="fw-bold">{{ $protocolo->assunto }}</span>
                         </div>
 
                         @if($protocolo->empresa)
@@ -102,7 +102,7 @@
                                         <i class="fa-solid fa-user"></i>
                                     </div>
                                     <div>
-                                        <div class="fw-bold text-dark">{{ $destinatario->nome }}</div>
+                                        <div class="fw-bold">{{ $destinatario->nome }}</div>
                                         <small class="text-muted">
                                             <i class="fa-solid fa-envelope me-1"></i>{{ $destinatario->email }}
                                             @if($destinatario->isCelularValido())
@@ -124,7 +124,7 @@
                                                             <div class="position-relative mb-3" style="padding-left: 1.5rem;">
                                                                 <!-- Bolinha na linha do tempo -->
                                                                 <div class="position-absolute start-0 translate-middle-x" style="width:14px;height:14px;border-radius:50%;top:4px;left:-1px;
-                                                                                                                                                                                                                                                                                                                                                       background:{{ match ($envio->status) {
+                                                                                                                                                                                                                                                                                                                                                                                       background:{{ match ($envio->status) {
                                                 'enviado' => '#0d6efd',
                                                 'entregue' => '#0dcaf0',
                                                 'lido' => '#198754',
@@ -140,7 +140,7 @@
                                                                 </div>
 
                                                                 <!-- Conteúdo do evento -->
-                                                                <div class="card border-0 shadow-sm position-relative" style="background:#f8f9fa;">
+                                                                <div class="card border-0 shadow-sm position-relative">
                                                                     <div class="card-body py-2 px-3">
                                                                         <div class="d-flex justify-content-between align-items-start flex-wrap gap-1">
                                                                             <div>

@@ -24,7 +24,7 @@
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover table-striped align-middle mb-0">
-                                <thead class="table-light">
+                                <thead>
                                     <tr>
                                         <th>Nome do Perfil</th>
                                         <th>Descrição</th>
@@ -38,8 +38,7 @@
                                             <td class="fw-bold text-primary">{{ $perfil->nome }}</td>
                                             <td>{{ $perfil->descricao ?? '-' }}</td>
                                             <td class="text-center">
-                                                <span
-                                                    class="badge bg-info text-dark rounded-pill">{{ $perfil->permissoes_count }}</span>
+                                                <span class="badge bg-info rounded-pill">{{ $perfil->permissoes_count }}</span>
                                             </td>
                                             <td class="text-center">
                                                 <a href="{{ route('perfis.edit', $perfil) }}"

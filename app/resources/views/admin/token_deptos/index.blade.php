@@ -46,7 +46,7 @@
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light text-muted small text-uppercase">
+                        <thead class="text-muted small text-uppercase">
                             <tr>
                                 <th class="ps-4" style="width: 80px;">ID</th>
                                 <th>Departamento</th>
@@ -60,17 +60,16 @@
                             @forelse($tokens as $t)
                                 <tr>
                                     <td class="ps-4">
-                                        <span class="badge text-bg-light border shadow-sm px-2">#{{ $t->id }}</span>
+                                        <span class="badge border shadow-sm px-2">#{{ $t->id }}</span>
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-dark">{{ $t->departamento }}</div>
+                                        <div class="fw-bold">{{ $t->departamento }}</div>
                                     </td>
                                     <td>
                                         <div class="text-muted"><i class="fa-solid fa-at me-1"></i>{{ $t->email }}</div>
                                     </td>
                                     <td>
-                                        <div
-                                            class="font-monospace text-muted small bg-light px-2 py-1 rounded border d-inline-block">
+                                        <div class="font-monospace text-muted small px-2 py-1 rounded border d-inline-block">
                                             {{ Str::limit($t->token, 15, '***') }}
                                         </div>
                                     </td>
@@ -112,7 +111,7 @@
                     </table>
                 </div>
             </div>
-            <div class="card-footer bg-white text-muted small py-3 border-top">
+            <div class="card-footer text-muted small py-3 border-top">
                 <i class="fa-solid fa-circle-info me-1"></i> Os tokens cadastrados aqui poderão ser vinculados a usuários
                 específicos no formulário de edição de usuários.
             </div>
@@ -135,7 +134,7 @@
                             aria-label="Close"></button>
                     </div>
 
-                    <div class="modal-body bg-light">
+                    <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label fw-bold small text-muted text-uppercase">Nome do Departamento / Setor
                                 <span class="text-danger">*</span></label>

@@ -17,7 +17,7 @@
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light text-muted small text-uppercase">
+                        <thead class="text-muted small text-uppercase">
                             <tr>
                                 <th class="ps-4" style="width: 80px;">ID</th>
                                 <th>Nome da Região</th>
@@ -33,7 +33,7 @@
                                         <span class="badge text-bg-light border shadow-sm px-2">#{{ $regiao->id }}</span>
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-dark">{{ $regiao->nome }}</div>
+                                        <div class="fw-bold">{{ $regiao->nome }}</div>
                                     </td>
                                     <td>
                                         <span class="badge text-bg-secondary rounded-pill shadow-sm px-2">
@@ -76,11 +76,11 @@
                 </div>
             </div>
             @if($regioes->hasPages())
-                <div class="card-footer py-2 bg-white">
+                <div class="card-footer py-2">
                     {{ $regioes->links() }}
                 </div>
             @endif
-            <div class="card-footer bg-white text-muted small py-3 border-top">
+            <div class="card-footer text-muted small py-3 border-top">
                 <i class="fa-solid fa-circle-info me-1"></i> Segmentação geográfica compatível com o sistema legado ERP.
             </div>
         </div>

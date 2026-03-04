@@ -16,7 +16,7 @@
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover table-striped align-middle mb-0">
-                                <thead class="table-light">
+                                <thead>
                                     <tr>
                                         <th>Nome</th>
                                         <th>E-mail</th>
@@ -74,7 +74,7 @@
                         </div>
                     </div>
                     @if ($users->hasPages())
-                        <div class="card-footer bg-white border-top">
+                        <div class="card-footer border-top">
                             {{ $users->links() }}
                         </div>
                     @endif

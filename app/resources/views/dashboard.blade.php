@@ -70,7 +70,7 @@
                     <p>Total Convidados</p>
                 </div>
                 <div class="small-box-icon">
-                    <i class="fa-solid fa-user-group text-dark-50"></i>
+                    <i class="fa-solid fa-user-group"></i>
                 </div>
                 <a href="{{ route('eventos.index') }}"
                     class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-100-hover">
@@ -113,7 +113,7 @@
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
+                            <thead>
                                 <tr>
                                     <th>Evento</th>
                                     <th>Data</th>
