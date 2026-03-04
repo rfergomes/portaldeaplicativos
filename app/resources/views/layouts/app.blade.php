@@ -160,6 +160,7 @@
                     <!-- User Menu -->
                     <li class="nav-item dropdown user-menu">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-user-circle me-1"></i>
                             <span class="d-none d-md-inline">{{ Auth::user()->nickname ?: Auth::user()->name }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
@@ -340,6 +341,18 @@
                                 </li>
                             @endif
                         @endif
+                        <li class="nav-header">CONTA</li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link text-danger"
+                                onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();">
+                                <i class="nav-icon fa-solid fa-right-from-bracket"></i>
+                                <p>Sair do Sistema</p>
+                            </a>
+                            <form id="logout-form-sidebar" method="POST" action="{{ route('logout') }}"
+                                style="display: none;">
+                                @csrf
+                            </form>
+                        </li>
                     </ul>
                 </nav>
             </div>
