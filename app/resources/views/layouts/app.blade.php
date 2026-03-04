@@ -168,6 +168,11 @@
                                 <p>
                                     {{ Auth::user()->nickname ?: Auth::user()->name }}
                                     <small>Membro desde {{ Auth::user()->created_at->format('M. Y') }}</small>
+                                    @if(Auth::user()->last_login_at)
+                                        <small class="d-block text-white-50 mt-1">
+                                            Último acesso: {{ Auth::user()->last_login_at->format('d/m/Y H:i') }}
+                                        </small>
+                                    @endif
                                 </p>
                             </li>
                             <li class="user-footer">

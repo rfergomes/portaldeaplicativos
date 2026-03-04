@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'token_depto_id',
         'force_password_change',
+        'last_login_at',
     ];
 
     /**
@@ -45,6 +46,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'last_login_at' => 'datetime',
     ];
 
     public function perfis()

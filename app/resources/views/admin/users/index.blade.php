@@ -22,6 +22,7 @@
                                         <th>E-mail</th>
                                         <th>Perfis</th>
                                         <th>Token AR-Online</th>
+                                        <th>Último Acesso</th>
                                         <th class="text-center">Ações</th>
                                     </tr>
                                 </thead>
@@ -45,6 +46,16 @@
                                                             class="fa-solid fa-xmark me-1"></i>Pendente</span>
                                                 @endif
                                             </td>
+                                            <td>
+                                                @if($user->last_login_at)
+                                                    <span class="text-muted small">
+                                                        <i class="fa-solid fa-clock me-1"></i>
+                                                        {{ $user->last_login_at->format('d/m/Y H:i') }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-muted small">Nunca</span>
+                                                @endif
+                                            </td>
                                             <td class="text-center">
                                                 <a href="{{ route('users.edit', $user) }}"
                                                     class="btn btn-sm btn-outline-primary rounded-circle" title="Editar">
@@ -64,7 +75,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="text-center text-muted py-4">
+                                            <td colspan="6" class="text-center text-muted py-4">
                                                 Nenhum usuário encontrado.
                                             </td>
                                         </tr>
