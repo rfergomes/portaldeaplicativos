@@ -66,12 +66,11 @@
                                                 <i class="fa-solid fa-pen"></i>
                                             </button>
                                             <form action="{{ route('agenda.periodos.destroy', $per->id) }}" method="POST"
-                                                class="d-inline-block"
-                                                onsubmit="return confirm('Tem certeza que deseja excluir este período? Vagas associadas a ele também serão impactadas.')">
+                                                id="delete-form-{{ $per->id }}" class="d-inline-block">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle"
-                                                    title="Excluir">
+                                                <button type="button" class="btn btn-sm btn-outline-danger rounded-circle"
+                                                    title="Excluir" onclick="confirmDelete('delete-form-{{ $per->id }}', 'Tem certeza que deseja excluir este período? Vagas associadas a ele também serão impactadas.')">
                                                     <i class="fa-solid fa-trash"></i>
                                                 </button>
                                             </form>

@@ -56,12 +56,12 @@
                                                 <i class="fa-solid fa-pen"></i>
                                             </button>
                                             <form action="{{ route('agenda.colonias.destroy', $col->id) }}" method="POST"
-                                                class="d-inline-block"
-                                                onsubmit="return confirm('Tem certeza que deseja excluir esta colônia? Todos os dados vinculados podem ser afetados.')">
+                                                id="delete-form-{{ $col->id }}" class="d-inline-block">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle"
-                                                    title="Excluir">
+                                                <button type="button" class="btn btn-sm btn-outline-danger rounded-circle"
+                                                    title="Excluir"
+                                                    onclick="confirmDelete('delete-form-{{ $col->id }}', 'Tem certeza que deseja excluir esta colônia? Todos os dados vinculados podem ser afetados.')">
                                                     <i class="fa-solid fa-trash"></i>
                                                 </button>
                                             </form>

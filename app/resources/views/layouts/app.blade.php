@@ -464,6 +464,25 @@
                 }
             });
         });
+
+        // Função global para confirmação de exclusão com SweetAlert2
+        function confirmDelete(formId, message = 'Tem certeza que deseja excluir este registro?') {
+            Swal.fire({
+                title: 'Confirmação',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, excluir!',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(formId).submit();
+                }
+            });
+        }
     </script>
 
     @stack('scripts')

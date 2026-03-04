@@ -60,12 +60,12 @@
                                                 <i class="fa-solid fa-pen"></i>
                                             </button>
                                             <form action="{{ route('agenda.acomodacoes.destroy', $aco->id) }}" method="POST"
-                                                class="d-inline-block"
-                                                onsubmit="return confirm('Tem certeza que deseja excluir esta acomodação?')">
+                                                id="delete-form-{{ $aco->id }}" class="d-inline-block">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle"
-                                                    title="Excluir">
+                                                <button type="button" class="btn btn-sm btn-outline-danger rounded-circle"
+                                                    title="Excluir"
+                                                    onclick="confirmDelete('delete-form-{{ $aco->id }}', 'Tem certeza que deseja excluir esta acomodação?')">
                                                     <i class="fa-solid fa-trash"></i>
                                                 </button>
                                             </form>

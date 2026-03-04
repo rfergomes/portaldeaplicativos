@@ -49,11 +49,12 @@
                                                 </a>
                                                 @if($perfil->nome !== 'Administrador')
                                                     <form action="{{ route('perfis.destroy', $perfil) }}" method="POST"
-                                                        class="d-inline" onsubmit="return confirm('Excluir este perfil?');">
+                                                        id="delete-form-{{ $perfil->id }}" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle"
-                                                            title="Excluir">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-circle"
+                                                            title="Excluir"
+                                                            onclick="confirmDelete('delete-form-{{ $perfil->id }}', 'Tem certeza que deseja excluir este perfil?')">
                                                             <i class="fa-solid fa-trash"></i>
                                                         </button>
                                                     </form>

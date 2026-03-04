@@ -193,11 +193,12 @@
                                                         <i class="fa-solid fa-trophy"></i>
                                                     </button>
                                                     <form action="{{ route('agenda.inscricoes.destroy', $insc->id) }}" method="POST"
-                                                        onsubmit="return confirm('Remover esta inscrição?')" class="mb-0">
+                                                        id="delete-form-{{ $insc->id }}" class="mb-0">
                                                         @csrf @method('DELETE')
                                                         <input type="hidden" name="colonia_id" value="{{ $coloniaSelecionada }}">
                                                         <input type="hidden" name="periodo_id" value="{{ $periodoSelecionado }}">
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover Inscrição">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" title="Remover Inscrição"
+                                                            onclick="confirmDelete('delete-form-{{ $insc->id }}', 'Remover esta inscrição?')">
                                                             <i class="fa-solid fa-trash-can"></i>
                                                         </button>
                                                     </form>

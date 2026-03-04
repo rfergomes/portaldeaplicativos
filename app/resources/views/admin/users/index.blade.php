@@ -51,12 +51,12 @@
                                                     <i class="fa-solid fa-pen"></i>
                                                 </a>
                                                 <form action="{{ route('users.destroy', $user) }}" method="POST"
-                                                    class="d-inline"
-                                                    onsubmit="return confirm('Tem certeza que deseja excluir este usuário?');">
+                                                    id="delete-form-{{ $user->id }}" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle"
-                                                        title="Excluir" {{ auth()->id() === $user->id ? 'disabled' : '' }}>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-circle"
+                                                        title="Excluir" {{ auth()->id() === $user->id ? 'disabled' : '' }}
+                                                        onclick="confirmDelete('delete-form-{{ $user->id }}', 'Tem certeza que deseja excluir este usuário?')">
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
                                                 </form>
