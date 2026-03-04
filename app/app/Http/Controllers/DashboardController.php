@@ -18,7 +18,9 @@ class DashboardController extends Controller
         $now = Carbon::now();
 
         // Totais (KPIs)
-        $totalUsuarios = User::count();
+        $totalEventosMes = Evento::whereMonth('data_inicio', $now->month)
+            ->whereYear('data_inicio', $now->year)
+            ->count();
         $totalEmpresas = Empresa::count();
         $totalProtocolosMes = Protocolo::whereMonth('created_at', $now->month)
             ->whereYear('created_at', $now->year)
@@ -68,7 +70,7 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboard', compact(
-            'totalUsuarios',
+            'totalEventosMes',
             'totalEmpresas',
             'totalProtocolosMes',
             'reservasPendentes',

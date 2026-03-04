@@ -64,21 +64,19 @@
 @section('content')
     <!-- KPI Row -->
     <div class="row g-3 mb-4">
-        @can('usuarios.visualizar')
-            <div class="col-lg-3 col-6">
-                <div class="small-box bg-primary text-white shadow-sm border-0">
-                    <div class="inner">
-                        <h3 class="metric-value">{{ $totalUsuarios }}</h3>
-                        <p class="metric-label">Usuários Ativos</p>
-                    </div>
-                    <div class="small-box-icon"><i class="fa-solid fa-users"></i></div>
-                    <a href="{{ route('users.index') }}"
-                        class="small-box-footer link-light text-decoration-none d-block text-center">
-                        Gerenciar <i class="fa-solid fa-arrow-right ms-1"></i>
-                    </a>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-primary text-white shadow-sm border-0">
+                <div class="inner">
+                    <h3 class="metric-value">{{ $totalEventosMes }}</h3>
+                    <p class="metric-label">Eventos no Mês</p>
                 </div>
+                <div class="small-box-icon"><i class="fa-solid fa-calendar-star"></i></div>
+                <a href="{{ route('eventos.index') }}"
+                    class="small-box-footer link-light text-decoration-none d-block text-center">
+                    Ver Eventos <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
             </div>
-        @endcan
+        </div>
 
         <div class="col-lg-3 col-6">
             <div class="small-box bg-success text-white shadow-sm border-0">
