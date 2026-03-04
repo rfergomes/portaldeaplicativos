@@ -390,7 +390,8 @@
 
         <!-- Main Footer -->
         <footer class="app-footer text-center">
-            <strong>Copyright &copy; 2024-2026 &nbsp;<a href="#" class="text-decoration-none">TI Químicos
+            <strong>Copyright &copy; 2024-{{ date('Y') }} &nbsp;<a href="#" class="text-decoration-none">Portal de Aplicativos - TI
+                    Químicos
                     Unificados</a>.</strong> All rights reserved.
         </footer>
     </div>
