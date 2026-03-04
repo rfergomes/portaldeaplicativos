@@ -151,7 +151,7 @@
 
             <div style="margin-bottom: 1.5rem;">
                 <div class="title">Portal de Aplicativos</div>
-                <div class="subtitle">Acesse com suas credenciais de usuário sindical.</div>
+                <div class="subtitle">Acesse com suas credenciais de usuário.</div>
             </div>
 
             @if ($errors->any())
