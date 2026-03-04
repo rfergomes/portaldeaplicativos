@@ -7,11 +7,11 @@
         .small-box .small-box-icon {
             position: absolute;
             right: 15px;
-            top: 15px;
+            top: 5px;
             z-index: 0;
-            font-size: 70px;
-            color: rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s linear;
+            font-size: 60px;
+            color: rgba(0, 0, 0, 0.12);
+            transition: transform 0.3s ease;
         }
 
         .small-box:hover .small-box-icon {
@@ -21,132 +21,282 @@
         .small-box .inner {
             z-index: 10;
             position: relative;
+            padding: 10px 15px;
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+
+        .metric-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 400;
+            margin-bottom: 5px;
+        }
+
+        .small-box-footer {
+            font-size: 0.85rem;
+            padding: 3px 0;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 0.375rem 0.375rem;
+        }
+
+        .small-box-footer:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .alert-card {
+            border-left: 4px solid #dc3545;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
         }
     </style>
 @endpush
 
 @section('content')
-    <!-- Small boxes (Stat box) -->
-    <div class="row">
-        <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box text-bg-primary shadow-sm h-100">
-                <div class="inner">
-                    <h3>{{ $totalEventos ?? 0 }}</h3>
-                    <p>Total de Eventos</p>
+    <!-- KPI Row -->
+    <div class="row g-3 mb-4">
+        @can('usuarios.visualizar')
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-primary text-white shadow-sm border-0">
+                    <div class="inner">
+                        <h3 class="metric-value">{{ $totalUsuarios }}</h3>
+                        <p class="metric-label">Usuários Ativos</p>
+                    </div>
+                    <div class="small-box-icon"><i class="fa-solid fa-users"></i></div>
+                    <a href="{{ route('users.index') }}"
+                        class="small-box-footer link-light text-decoration-none d-block text-center">
+                        Gerenciar <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
                 </div>
-                <div class="small-box-icon">
-                    <i class="fa-solid fa-calendar-check"></i>
-                </div>
-                <a href="{{ route('eventos.index') }}"
-                    class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-100-hover">
-                    Mais informações <i class="fa-solid fa-circle-arrow-right"></i>
-                </a>
             </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box text-bg-success shadow-sm h-100">
-                <div class="inner">
-                    <h3>{{ $totalConvites ?? 0 }}</h3>
-                    <p>Convites Emitidos</p>
-                </div>
-                <div class="small-box-icon">
-                    <i class="fa-solid fa-ticket text-white-50"></i>
-                </div>
-                <a href="{{ route('eventos.index') }}"
-                    class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-100-hover">
-                    Mais informações <i class="fa-solid fa-circle-arrow-right"></i>
-                </a>
-            </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box text-bg-warning shadow-sm h-100">
-                <div class="inner">
-                    <h3>{{ $totalConvidados ?? 0 }}</h3>
-                    <p>Total Convidados</p>
-                </div>
-                <div class="small-box-icon">
-                    <i class="fa-solid fa-user-group"></i>
-                </div>
-                <a href="{{ route('eventos.index') }}"
-                    class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-100-hover">
-                    Mais informações <i class="fa-solid fa-circle-arrow-right"></i>
-                </a>
-            </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box text-bg-danger shadow-sm h-100">
-                <div class="inner">
-                    <h3>R$ {{ number_format($totalArrecadado ?? 0, 2, ',', '.') }}</h3>
-                    <p>Arrecadação Geral</p>
-                </div>
-                <div class="small-box-icon">
-                    <i class="fa-solid fa-hand-holding-dollar text-white-50"></i>
-                </div>
-                <a href="{{ route('eventos.index') }}"
-                    class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-100-hover">
-                    Mais informações <i class="fa-solid fa-circle-arrow-right"></i>
-                </a>
-            </div>
-        </div>
-        <!-- ./col -->
-    </div>
-    <!-- /.row -->
+        @endcan
 
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card card-outline card-primary shadow-sm">
-                <div class="card-header d-flex align-items-center">
-                    <h3 class="card-title m-0"><i class="fa-solid fa-list me-2"></i> Eventos Recentes</h3>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-success text-white shadow-sm border-0">
+                <div class="inner">
+                    <h3 class="metric-value">{{ $totalEmpresas }}</h3>
+                    <p class="metric-label">Empresas Cadastradas</p>
+                </div>
+                <div class="small-box-icon"><i class="fa-solid fa-building"></i></div>
+                <a href="{{ url('/empresas') }}"
+                    class="small-box-footer link-light text-decoration-none d-block text-center">
+                    Ver Empresas <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning text-dark shadow-sm border-0">
+                <div class="inner">
+                    <h3 class="metric-value">{{ $totalProtocolosMes }}</h3>
+                    <p class="metric-label">Protocolos no Mês</p>
+                </div>
+                <div class="small-box-icon"><i class="fa-solid fa-file-invoice"></i></div>
+                <a href="{{ route('protocolos.index') }}"
+                    class="small-box-footer link-dark text-decoration-none d-block text-center">
+                    Ver Protocolos <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-danger text-white shadow-sm border-0">
+                <div class="inner">
+                    <h3 class="metric-value">{{ $reservasPendentes }}</h3>
+                    <p class="metric-label">Reservas Pendentes</p>
+                </div>
+                <div class="small-box-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <a href="{{ route('agenda.reservas.index') }}"
+                    class="small-box-footer link-light text-decoration-none d-block text-center">
+                    Ver Reservas <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row g-4">
+        <!-- Chart Column -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 py-3 d-flex align-items-center">
+                    <h5 class="card-title mb-0 fw-bold text-dark">Fluxo de Protocolos (6 Meses)</h5>
                     <div class="card-tools ms-auto">
-                        <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
-                            <i class="fa-solid fa-minus"></i>
-                        </button>
+                        <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse"><i
+                                class="fa-solid fa-minus"></i></button>
+                        <button type="button" class="btn btn-tool" data-lte-toggle="card-remove"><i
+                                class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="protocolChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts/Info Column -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 py-3 d-flex align-items-center">
+                    <h5 class="card-title mb-0 fw-bold text-danger">Pagamentos Vencidos</h5>
+                    <div class="card-tools ms-auto">
+                        <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse"><i
+                                class="fa-solid fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        @forelse($alertasVencidos as $reserva)
+                            <div
+                                class="list-group-item border-0 border-start border-4 border-danger mb-2 mx-2 rounded shadow-sm">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 fw-bold">{{ $reserva->hospede->nome ?? 'Hóspede' }}</h6>
+                                    <small class="text-danger fw-bold">Vencido!</small>
+                                </div>
+                                <p class="mb-1 small text-muted">{{ $reserva->colonia->nome }}
+                                    ({{ $reserva->acomodacao->identificador ?? 'S/A' }})</p>
+                                <small>Limite: {{ $reserva->periodo->data_limite_pagamento->format('d/m/Y') }}</small>
+                            </div>
+                        @empty
+                            <div class="p-4 text-center text-muted">
+                                <i class="fa-solid fa-check-circle fa-2x mb-2 text-success"></i>
+                                <p class="mb-0 small">Nenhum pagamento vencido no momento.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lower Row: Charts & Tables -->
+    <div class="row g-4 mt-2">
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 py-3 d-flex align-items-center">
+                    <h5 class="card-title mb-0 fw-bold text-dark">Reservas por Colônia</h5>
+                    <div class="card-tools ms-auto">
+                        <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse"><i
+                                class="fa-solid fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="card-body overflow-hidden">
+                    <div class="chart-container">
+                        <canvas id="reservationDonutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 py-3 d-flex align-items-center">
+                    <h5 class="card-title mb-0 fw-bold text-dark">Protocolos Recentes</h5>
+                    <div class="card-tools ms-auto">
+                        <a href="{{ route('protocolos.index') }}" class="btn btn-sm btn-outline-primary me-2">Ver Todos</a>
+                        <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse"><i
+                                class="fa-solid fa-minus"></i></button>
                     </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead>
+                            <thead class="bg-light">
                                 <tr>
-                                    <th>Evento</th>
-                                    <th>Data</th>
-                                    <th>Convidados</th>
-                                    <th class="text-end">Ações</th>
+                                    <th class="border-0 px-4">Assunto</th>
+                                    <th class="border-0">Empresa</th>
+                                    <th class="border-0">Status</th>
+                                    <th class="border-0 text-end px-4">Data</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($recentes ?? [] as $evento)
+                                @foreach($protocolosRecentes as $prot)
                                     <tr>
-                                        <td><strong>{{ $evento->nome }}</strong></td>
-                                        <td>{{ $evento->data_inicio?->format('d/m/Y') ?? 'A definir' }}</td>
-                                        <td>{{ $evento->convidados_count ?? 0 }}</td>
-                                        <td class="text-end">
-                                            <a href="{{ route('eventos.index') }}"
-                                                class="btn btn-sm btn-outline-primary">Ver</a>
+                                        <td class="px-4"><strong>{{ Str::limit($prot->assunto, 30) }}</strong></td>
+                                        <td>{{ $prot->empresa->nome_curto ?? '—' }}</td>
+                                        <td>
+                                            <span
+                                                class="badge {{ $prot->status == 'concluido' ? 'bg-success' : 'bg-warning' }}">
+                                                {{ ucfirst($prot->status) }}
+                                            </span>
                                         </td>
+                                        <td class="text-end px-4 small">{{ $prot->created_at->format('d/m/Y') }}</td>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center py-4 text-muted">Nenhum evento recente encontrado
-                                        </td>
-                                    </tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
-                </div>
-                <div class="card-footer text-center">
-                    <a href="{{ route('eventos.index') }}" class="small text-uppercase fw-bold text-decoration-none">Ver
-                        todos os eventos</a>
                 </div>
             </div>
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Config Gráfico de Protocolos
+            const protCtx = document.getElementById('protocolChart').getContext('2d');
+            new Chart(protCtx, {
+                type: 'line',
+                data: {
+                    labels: {!! json_encode($protocolosGrafico->pluck('mes_ano')) !!},
+                    datasets: [{
+                        label: 'Protocolos Enviados',
+                        data: {!! json_encode($protocolosGrafico->pluck('total')) !!},
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#2563eb'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Config Gráfico de Reservas
+            const resCtx = document.getElementById('reservationDonutChart').getContext('2d');
+            new Chart(resCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: {!! json_encode($reservasPorColonia->pluck('nome')) !!},
+                    datasets: [{
+                        data: {!! json_encode($reservasPorColonia->pluck('total')) !!},
+                        backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#6366f1'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                    },
+                    cutout: '70%'
+                }
+            });
+        });
+    </script>
+@endpush

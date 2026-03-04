@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\AgendaReserva;
+use App\Models\Empresa;
+use App\Models\Evento;
+use App\Models\Protocolo;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+class DashboardController extends Controller
+{
+    public function index()
+    {
+        $now = Carbon::now();
+
+        // Totais (KPIs)
+        $totalUsuarios = User::count();
+        $totalEmpresas = Empresa::count();
+        $totalProtocolosMes = Protocolo::whereMonth('created_at', $now->month)
+            ->whereYear('created_at', $now->year)
+            ->count();
+
+        // Reservas Pendentes (Aguardando confirmação ou pagamento próximo do vencimento)
+        $reservasPendentes = AgendaReserva::where('status', 'reservado')
+            ->whereHas('periodo', function ($query) use ($now) {
+                $query->where('data_limite_pagamento', '>=', $now->copy()->subDays(2));
+            })->count();
+
+        // Dados para Gráfico de Protocolos (Últimos 6 meses)
+        $protocolosGrafico = Protocolo::select(
+            DB::raw('count(id) as total'),
+            DB::raw("DATE_FORMAT(created_at, '%m/%Y') as mes_ano"),
+            DB::raw('MAX(created_at) as max_date')
+        )
+            ->groupBy('mes_ano')
+            ->orderBy('max_date', 'asc')
+            ->limit(6)
+            ->get();
+
+        // Dados para Gráfico de Reservas por Colônia
+        $reservasPorColonia = AgendaReserva::select('colonias.nome', DB::raw('count(agenda_reservas.id) as total'))
+            ->join('colonias', 'agenda_reservas.colonia_id', '=', 'colonias.id')
+            ->groupBy('colonias.nome')
+            ->get();
+
+        // Alertas: Reservas com pagamento vencido
+        $alertasVencidos = AgendaReserva::with(['hospede', 'periodo', 'colonia'])
+            ->where('status', 'reservado')
+            ->whereHas('periodo', function ($query) use ($now) {
+                $query->where('data_limite_pagamento', '<', $now);
+            })
+            ->limit(5)
+            ->get();
+
+        // Tabelas Informativas
+        $protocolosRecentes = Protocolo::with('empresa')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        $eventosFuturos = Evento::where('data_inicio', '>=', $now)
+            ->orderBy('data_inicio', 'asc')
+            ->limit(5)
+            ->get();
+
+        return view('dashboard', compact(
+            'totalUsuarios',
+            'totalEmpresas',
+            'totalProtocolosMes',
+            'reservasPendentes',
+            'protocolosGrafico',
+            'reservasPorColonia',
+            'alertasVencidos',
+            'protocolosRecentes',
+            'eventosFuturos'
+        ));
+    }
+}
