@@ -160,17 +160,18 @@
                     <!-- User Menu -->
                     <li class="nav-item dropdown user-menu">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <span class="d-none d-md-inline">{{ Auth::user()->name }}</span>
+                            <span class="d-none d-md-inline">{{ Auth::user()->nickname ?: Auth::user()->name }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                             <li class="user-header bg-primary">
                                 <p>
-                                    {{ Auth::user()->name }}
+                                    {{ Auth::user()->nickname ?: Auth::user()->name }}
                                     <small>Membro desde {{ Auth::user()->created_at->format('M. Y') }}</small>
                                 </p>
                             </li>
                             <li class="user-footer">
-                                <a href="{{ route('profile.index') }}" class="btn btn-default btn-flat float-start">Meu Perfil</a>
+                                <a href="{{ route('profile.index') }}" class="btn btn-default btn-flat float-start">Meu
+                                    Perfil</a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit" class="btn btn-default btn-flat float-end">Sair</button>

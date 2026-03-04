@@ -32,6 +32,7 @@ class UserController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'nickname' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'token_depto_id' => ['nullable', 'exists:token_deptos,id'],
             'perfis' => ['nullable', 'array'],
@@ -42,6 +43,7 @@ class UserController extends Controller
 
         $user = User::create([
             'name' => $data['name'],
+            'nickname' => $data['nickname'] ?? null,
             'email' => $data['email'],
             'username' => strtolower(explode('@', $data['email'])[0]),
             'password' => Hash::make($temporaryPassword),
@@ -74,6 +76,7 @@ class UserController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'nickname' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'token_depto_id' => ['nullable', 'exists:token_deptos,id'],
@@ -83,6 +86,7 @@ class UserController extends Controller
 
         $updateData = [
             'name' => $data['name'],
+            'nickname' => $data['nickname'] ?? null,
             'email' => $data['email'],
             'token_depto_id' => $data['token_depto_id'] ?? null,
         ];

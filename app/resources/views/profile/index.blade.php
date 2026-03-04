@@ -16,10 +16,20 @@
                         @method('PUT')
                         <div class="card-body">
                             <div class="mb-3">
-                                <label class="form-label fw-bold small">Nome</label>
+                                <label class="form-label fw-bold small">Nome Completo</label>
                                 <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                                     value="{{ old('name', $user->name) }}" required>
                                 @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Como deseja ser chamado (Apelido)</label>
+                                <input type="text" name="nickname"
+                                    class="form-control @error('nickname') is-invalid @enderror"
+                                    value="{{ old('nickname', $user->nickname) }}" placeholder="Ex: Rodrigo">
+                                @error('nickname')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                <small class="text-muted">Se preenchido, este nome aparecerá no cabeçalho do
+                                    sistema.</small>
                             </div>
 
                             <div class="mb-3">

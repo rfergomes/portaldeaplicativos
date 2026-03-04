@@ -16,14 +16,22 @@
                     @method('PUT')
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold">Nome Completo</label>
                                 <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                                     value="{{ old('name', $user->name) }}" required>
                                 @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Apelido</label>
+                                <input type="text" name="nickname"
+                                    class="form-control @error('nickname') is-invalid @enderror"
+                                    value="{{ old('nickname', $user->nickname) }}" placeholder="Ex: Rodrigo">
+                                @error('nickname')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+
+                            <div class="col-md-5">
                                 <label class="form-label fw-bold">E-mail</label>
                                 <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
                                     value="{{ old('email', $user->email) }}" required>
