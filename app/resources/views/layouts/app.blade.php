@@ -229,122 +229,161 @@
                             </li>
                         @endif
 
+                        <!-- Agenda Colônia -->
                         @if(auth()->user()->temPermissao('reservas.visualizar') || auth()->user()->temPermissao('colonias.visualizar'))
-                            <li class="nav-header">AGENDA COLÔNIA</li>
-                            @if(auth()->user()->temPermissao('reservas.visualizar'))
-                                <li class="nav-item">
-                                    <a href="{{ route('agenda.reservas.index') }}"
-                                        class="nav-link {{ request()->routeIs('agenda.reservas.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-calendar-check"></i>
-                                        <p>Painel de Reservas</p>
-                                    </a>
-                                </li>
-                            @endif
-                            @if(auth()->user()->temPermissao('periodos.visualizar'))
-                                <li class="nav-item">
-                                    <a href="{{ route('agenda.periodos.index') }}"
-                                        class="nav-link {{ request()->routeIs('agenda.periodos.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-clock"></i>
-                                        <p>Períodos</p>
-                                    </a>
-                                </li>
-                            @endif
-                            @if(auth()->user()->temPermissao('colonias.visualizar'))
-                                <li class="nav-item">
-                                    <a href="{{ route('agenda.colonias.index') }}"
-                                        class="nav-link {{ request()->routeIs('agenda.colonias.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-umbrella-beach"></i>
-                                        <p>Cadastrar Colônias</p>
-                                    </a>
-                                </li>
-                            @endif
-                            @if(auth()->user()->temPermissao('inscricoes.visualizar'))
-                                <li class="nav-item">
-                                    <a href="{{ route('agenda.inscricoes.index') }}"
-                                        class="nav-link {{ request()->routeIs('agenda.inscricoes.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-ticket"></i>
-                                        <p>Inscrições / Sorteio</p>
-                                    </a>
-                                </li>
-                            @endif
-                            @if(auth()->user()->temPermissao('hospedes.visualizar'))
-                                <li class="nav-item">
-                                    <a href="{{ route('agenda.historico.index') }}"
-                                        class="nav-link {{ request()->routeIs('agenda.historico.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-clock-rotate-left text-danger"></i>
-                                        <p>Histórico de Exclusões</p>
-                                    </a>
-                                </li>
-                            @endif
+                            <li class="nav-item {{ request()->routeIs('agenda.*') ? 'menu-open' : '' }}">
+                                <a href="#" class="nav-link {{ request()->routeIs('agenda.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fa-solid fa-hotel"></i>
+                                    <p>
+                                        Agenda Colônia
+                                        <i class="nav-arrow fa-solid fa-chevron-right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    @if(auth()->user()->temPermissao('reservas.visualizar'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('agenda.reservas.index') }}"
+                                                class="nav-link {{ request()->routeIs('agenda.reservas.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-calendar-check"></i>
+                                                <p>Painel de Reservas</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('periodos.visualizar'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('agenda.periodos.index') }}"
+                                                class="nav-link {{ request()->routeIs('agenda.periodos.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-clock"></i>
+                                                <p>Períodos</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('colonias.visualizar'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('agenda.colonias.index') }}"
+                                                class="nav-link {{ request()->routeIs('agenda.colonias.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-umbrella-beach"></i>
+                                                <p>Cadastrar Colônias</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('inscricoes.visualizar'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('agenda.inscricoes.index') }}"
+                                                class="nav-link {{ request()->routeIs('agenda.inscricoes.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-ticket"></i>
+                                                <p>Inscrições / Sorteio</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('hospedes.visualizar'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('agenda.historico.index') }}"
+                                                class="nav-link {{ request()->routeIs('agenda.historico.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-trash-can text-danger"></i>
+                                                <p>Exclusões</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                </ul>
+                            </li>
                         @endif
 
+                        <!-- Cadastro -->
                         @if(auth()->user()->temPermissao('empresas.visualizar') || auth()->user()->temPermissao('regioes.visualizar'))
-                            <li class="nav-header">CADASTRO</li>
-                            @if(auth()->user()->temPermissao('empresas.visualizar'))
-                                <li class="nav-item">
-                                    <a href="{{ route('empresas.index') }}"
-                                        class="nav-link {{ request()->routeIs('empresas.*') || request()->routeIs('clientes.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-building"></i>
-                                        <p>Empresas / Contatos</p>
-                                    </a>
-                                </li>
-                            @endif
-                            @if(auth()->user()->temPermissao('tipos_clientes.visualizar'))
-                                <li class="nav-item">
-                                    <a href="{{ route('tipos_clientes.index') }}"
-                                        class="nav-link {{ request()->routeIs('tipos_clientes.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-id-badge"></i>
-                                        <p>Tipos de Contatos</p>
-                                    </a>
-                                </li>
-                            @endif
-                            @if(auth()->user()->temPermissao('regioes.visualizar'))
-                                <li class="nav-item">
-                                    <a href="{{ route('regioes.index') }}"
-                                        class="nav-link {{ request()->routeIs('regioes.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-map-location-dot"></i>
-                                        <p>Regiões</p>
-                                    </a>
-                                </li>
-                            @endif
+                            @php
+                                $isCadastroActive = request()->routeIs('empresas.*') || request()->routeIs('clientes.*') || request()->routeIs('tipos_clientes.*') || request()->routeIs('regioes.*');
+                            @endphp
+                            <li class="nav-item {{ $isCadastroActive ? 'menu-open' : '' }}">
+                                <a href="#" class="nav-link {{ $isCadastroActive ? 'active' : '' }}">
+                                    <i class="nav-icon fa-solid fa-folder-plus"></i>
+                                    <p>
+                                        Cadastro
+                                        <i class="nav-arrow fa-solid fa-chevron-right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    @if(auth()->user()->temPermissao('empresas.visualizar'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('empresas.index') }}"
+                                                class="nav-link {{ request()->routeIs('empresas.*') || request()->routeIs('clientes.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-building"></i>
+                                                <p>Empresas / Contatos</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('tipos_clientes.visualizar'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('tipos_clientes.index') }}"
+                                                class="nav-link {{ request()->routeIs('tipos_clientes.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-id-badge"></i>
+                                                <p>Tipos de Contatos</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('regioes.visualizar'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('regioes.index') }}"
+                                                class="nav-link {{ request()->routeIs('regioes.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-map-location-dot"></i>
+                                                <p>Regiões</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                </ul>
+                            </li>
                         @endif
 
+                        <!-- Administração -->
                         @if(auth()->user()->temPermissao('usuarios.visualizar') || auth()->user()->temPermissao('administrar_usuarios'))
-                            <li class="nav-header">ADMINISTRAÇÃO</li>
-                            @if(auth()->user()->temPermissao('usuarios.visualizar'))
-                                <li class="nav-item">
-                                    <a href="{{ route('users.index') }}"
-                                        class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-users"></i>
-                                        <p>Gestão de Usuários</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('perfis.index') }}"
-                                        class="nav-link {{ request()->routeIs('perfis.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-user-lock"></i>
-                                        <p>Perfis e Acessos</p>
-                                    </a>
-                                </li>
-                            @endif
-                            @if(auth()->user()->temPermissao('protocolos_tipos.visualizar'))
-                                <li class="nav-item">
-                                    <a href="{{ route('protocolos.tipos.index') }}"
-                                        class="nav-link {{ request()->routeIs('protocolos.tipos.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-tags"></i>
-                                        <p>Tipos de Protocolo</p>
-                                    </a>
-                                </li>
-                            @endif
-                            @if(auth()->user()->temPermissao('administrar_usuarios'))
-                                <li class="nav-item">
-                                    <a href="{{ route('token-deptos.index') }}"
-                                        class="nav-link {{ request()->routeIs('token-deptos.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-key"></i>
-                                        <p>Tokens AR-Online</p>
-                                    </a>
-                                </li>
-                            @endif
+                            @php
+                                $isAdminActive = request()->routeIs('users.*') || request()->routeIs('perfis.*') || request()->routeIs('protocolos.tipos.*') || request()->routeIs('token-deptos.*');
+                            @endphp
+                            <li class="nav-item {{ $isAdminActive ? 'menu-open' : '' }}">
+                                <a href="#" class="nav-link {{ $isAdminActive ? 'active' : '' }}">
+                                    <i class="nav-icon fa-solid fa-gears"></i>
+                                    <p>
+                                        Administração
+                                        <i class="nav-arrow fa-solid fa-chevron-right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    @if(auth()->user()->temPermissao('usuarios.visualizar'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('users.index') }}"
+                                                class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-users"></i>
+                                                <p>Usuários</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('perfis.index') }}"
+                                                class="nav-link {{ request()->routeIs('perfis.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-user-lock"></i>
+                                                <p>Perfis e Acessos</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('protocolos_tipos.visualizar'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('protocolos.tipos.index') }}"
+                                                class="nav-link {{ request()->routeIs('protocolos.tipos.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-tags"></i>
+                                                <p>Tipos de Protocolo</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('administrar_usuarios'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('token-deptos.index') }}"
+                                                class="nav-link {{ request()->routeIs('token-deptos.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-key"></i>
+                                                <p>Tokens AR-Online</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                </ul>
+                            </li>
                         @endif
                         <li class="nav-header">CONTA</li>
                         <li class="nav-item">
@@ -390,7 +429,8 @@
 
         <!-- Main Footer -->
         <footer class="app-footer text-center">
-            <strong>Copyright &copy; 2024-{{ date('Y') }} &nbsp;<a href="#" class="text-decoration-none">Portal de Aplicativos - TI
+            <strong>Copyright &copy; 2024-{{ date('Y') }} &nbsp;<a href="#" class="text-decoration-none">Portal de
+                    Aplicativos - TI
                     Químicos
                     Unificados</a>.</strong> All rights reserved.
         </footer>
