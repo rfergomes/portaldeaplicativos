@@ -84,7 +84,7 @@
             <div class="small-box text-bg-danger shadow-sm h-100">
                 <div class="inner">
                     <h3>R$ {{ number_format($totalArrecadado ?? 0, 2, ',', '.') }}</h3>
-                    <p>Arrecadação Geral -Total</p>
+                    <p>Arrecadação Geral</p>
                 </div>
                 <div class="small-box-icon">
                     <i class="fa-solid fa-hand-holding-dollar text-white-50"></i>
