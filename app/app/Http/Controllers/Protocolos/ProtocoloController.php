@@ -65,7 +65,40 @@ class ProtocoloController extends Controller
 
         $protocolos = $query->orderByDesc('created_at')->paginate(20)->withQueryString();
 
-        return view('protocolos.index', compact('protocolos', 'mes', 'ano', 'status', 'termo'));
+        // Calcular Métricas para os Cards (respeitando filtros de mês/ano, mas não de status)
+        $metricsQuery = Protocolo::query();
+        if ($mes)
+            $metricsQuery->whereMonth('created_at', $mes);
+        if ($ano)
+            $metricsQuery->whereYear('created_at', $ano);
+        if ($termo) {
+            $metricsQuery->where(function ($q) use ($termo) {
+                $q->where('referencia_documento', 'like', "%{$termo}%")
+                    ->orWhere('assunto', 'like', "%{$termo}%");
+            });
+        }
+
+        $metrics = $metricsQuery->select('status', DB::raw('count(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
+
+        $totalGeral = array_sum($metrics);
+        $totalConcluidos = $metrics['concluido'] ?? 0;
+        $totalEnviados = $metrics['enviado'] ?? 0;
+        $totalFalhas = $metrics['falha'] ?? 0;
+
+        return view('protocolos.index', compact(
+            'protocolos',
+            'mes',
+            'ano',
+            'status',
+            'termo',
+            'totalGeral',
+            'totalConcluidos',
+            'totalEnviados',
+            'totalFalhas'
+        ));
     }
 
     public function create(): View

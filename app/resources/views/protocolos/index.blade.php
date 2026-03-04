@@ -4,9 +4,65 @@
 
 @section('content')
     <div class="container-fluid">
+        <!-- Métricas -->
+        <div class="row mb-4">
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body d-flex align-items-center p-3">
+                        <div class="flex-shrink-0 bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                            <i class="fa-solid fa-file-invoice fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted small fw-bold mb-0">Total Protocolos</p>
+                            <h4 class="fw-bold mb-0">{{ number_format($totalGeral, 0, ',', '.') }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body d-flex align-items-center p-3">
+                        <div class="flex-shrink-0 bg-success bg-opacity-10 p-3 rounded-3 me-3">
+                            <i class="fa-solid fa-check-double fa-2x text-success"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted small fw-bold mb-0">Recepcionados</p>
+                            <h4 class="fw-bold mb-0">{{ number_format($totalConcluidos, 0, ',', '.') }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body d-flex align-items-center p-3">
+                        <div class="flex-shrink-0 bg-info bg-opacity-10 p-3 rounded-3 me-3">
+                            <i class="fa-solid fa-paper-plane fa-2x text-info"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted small fw-bold mb-0">Enviados</p>
+                            <h4 class="fw-bold mb-0">{{ number_format($totalEnviados, 0, ',', '.') }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body d-flex align-items-center p-3">
+                        <div class="flex-shrink-0 bg-danger bg-opacity-10 p-3 rounded-3 me-3">
+                            <i class="fa-solid fa-triangle-exclamation fa-2x text-danger"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted small fw-bold mb-0">Com Falhas</p>
+                            <h4 class="fw-bold mb-0">{{ number_format($totalFalhas, 0, ',', '.') }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card card-outline card-primary shadow-sm">
             <div class="card-header border-0 py-3 d-flex align-items-center flex-wrap">
-                <h3 class="card-title fw-bold m-0">Protocolos Enviados</h3>
+                <h3 class="card-title fw-bold m-0">Gestão de Protocolos</h3>
                 <div class="card-tools ms-auto">
                     <a href="{{ route('protocolos.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
                         <i class="fa-solid fa-plus me-1"></i> Novo Protocolo
