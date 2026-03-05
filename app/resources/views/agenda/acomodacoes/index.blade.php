@@ -7,7 +7,7 @@
         <div class="col-12">
             <div class="card card-outline card-info shadow-sm mb-4">
                 <div class="card-header border-0 d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center flex-grow-1">
                         <a href="{{ route('agenda.colonias.index') }}"
                             class="btn btn-outline-secondary btn-sm rounded-circle me-3" title="Voltar para Colônias">
                             <i class="fa-solid fa-arrow-left"></i>

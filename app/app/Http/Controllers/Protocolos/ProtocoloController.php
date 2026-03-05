@@ -307,7 +307,7 @@ class ProtocoloController extends Controller
         ]);
     }
 
-    public function baixarLaudo(Protocolo $protocolo, \App\Models\ProtocoloEnvio $envio)
+    public function baixarLaudoPericial(Protocolo $protocolo, \App\Models\ProtocoloEnvio $envio)
     {
         if (!$envio->id_email_externo) {
             return back()->with('error', 'Este envio ainda não possui ID externo para consulta.');

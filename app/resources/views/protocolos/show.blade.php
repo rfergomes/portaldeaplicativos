@@ -13,10 +13,13 @@
                             <i class="fa-solid fa-file-contract me-2"></i>Protocolo #{{ $protocolo->id }}
                         </h6>
                         <div class="card-tools ms-auto d-flex gap-2">
-                            <form action="{{ route('protocolos.syncStatus', $protocolo) }}" method="GET" class="m-0 p-0">
-                                <button type="submit" class="btn btn-outline-primary btn-sm  shadow-sm"
-                                    style="width: 96px; height: 32px; padding: 0;" title="Atualizar Status">
-                                    <i class="fa-solid fa-rotate"></i> Atualizar
+                            <form action="{{ route('protocolos.syncStatus', $protocolo) }}" method="GET" class="m-0 p-0"
+                                id="formSync">
+                                <button type="submit" class="btn btn-outline-primary btn-sm shadow-sm"
+                                    style="width: 96px; height: 32px; padding: 0;" title="Atualizar Status" id="btnSync">
+                                    <span id="syncText"><i class="fa-solid fa-rotate"></i> Atualizar</span>
+                                    <span id="syncSpinner" class="d-none"><i
+                                            class="fa-solid fa-spinner fa-spin"></i>...</span>
                                 </button>
                             </form>
                             <a href="{{ route('protocolos.index') }}"
@@ -124,7 +127,7 @@
                                                             <div class="position-relative mb-3" style="padding-left: 1.5rem;">
                                                                 <!-- Bolinha na linha do tempo -->
                                                                 <div class="position-absolute start-0 translate-middle-x" style="width:14px;height:14px;border-radius:50%;top:4px;left:-1px;
-                                                                                                                                                                                                                                                                                                                                                                                       background:{{ match ($envio->status) {
+                                                                                                                                                                                                                                                                                                                                                                                                                       background:{{ match ($envio->status) {
                                                 'enviado' => '#0d6efd',
                                                 'entregue' => '#0dcaf0',
                                                 'lido' => '#198754',
@@ -193,6 +196,7 @@
                                                                         @if($envio->id_email_externo && !in_array($envio->status, ['falha', 'queued']))
                                                                             <div class="d-flex gap-2 mt-2">
                                                                                 <a href="{{ route('protocolos.comprovante', [$protocolo, $envio]) }}"
+                                                                                    target="_blank"
                                                                                     class="btn btn-light btn-sm border rounded-pill px-2 shadow-sm"
                                                                                     title="Baixar Comprovante PDF">
                                                                                     <i class="fa-solid fa-file-pdf text-danger me-1"></i>
@@ -207,6 +211,7 @@
                                                                                 </a>
                                                                                 @if($envio->status === 'lido' || $envio->status === 'entregue')
                                                                                     <a href="{{ route('protocolos.laudo', [$protocolo, $envio]) }}"
+                                                                                        target="_blank"
                                                                                         class="btn btn-light btn-sm border rounded-pill px-2 shadow-sm"
                                                                                         title="Baixar Laudo Pericial PDF">
                                                                                         <i class="fa-solid fa-scale-balanced text-warning me-1"></i>
