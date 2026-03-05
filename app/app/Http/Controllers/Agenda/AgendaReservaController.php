@@ -37,7 +37,6 @@ class AgendaReservaController extends Controller
             $colonia = \App\Models\Colonia::with([
                 'acomodacoes' => function ($q) {
                     $q->where('ativo', true)
-                        ->orderBy('tipo')
                         ->orderByRaw('CAST(identificador AS UNSIGNED) ASC')
                         ->orderBy('identificador');
                 }

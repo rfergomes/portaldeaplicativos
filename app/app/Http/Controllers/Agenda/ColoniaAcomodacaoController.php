@@ -10,7 +10,6 @@ class ColoniaAcomodacaoController extends Controller
     public function index(\App\Models\Colonia $colonia)
     {
         $acomodacoes = $colonia->acomodacoes()
-            ->orderBy('tipo')
             ->orderByRaw('CAST(identificador AS UNSIGNED) ASC')
             ->orderBy('identificador')
             ->get();
