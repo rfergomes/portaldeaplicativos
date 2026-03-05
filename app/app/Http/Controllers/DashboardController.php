@@ -32,16 +32,21 @@ class DashboardController extends Controller
                 $query->where('data_limite_pagamento', '>=', $now->copy()->subDays(2));
             })->count();
 
-        // Dados para Gráfico de Protocolos (Últimos 6 meses)
-        $protocolosGrafico = Protocolo::select(
-            DB::raw('count(id) as total'),
-            DB::raw("DATE_FORMAT(created_at, '%m/%Y') as mes_ano"),
-            DB::raw('MAX(created_at) as max_date')
-        )
-            ->groupBy('mes_ano')
-            ->orderBy('max_date', 'asc')
-            ->limit(6)
-            ->get();
+        // Dados para Gráfico de Protocolos (Últimos 6 meses preenchidos)
+        $protocolosGrafico = collect();
+        for ($i = 5; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $mesAno = $date->format('m/Y');
+
+            $total = Protocolo::whereMonth('created_at', $date->month)
+                ->whereYear('created_at', $date->year)
+                ->count();
+
+            $protocolosGrafico->push((object) [
+                'total' => $total,
+                'mes_ano' => $mesAno
+            ]);
+        }
 
         // Dados para Gráfico de Reservas por Colônia
         $reservasPorColonia = AgendaReserva::select('colonias.nome', DB::raw('count(agenda_reservas.id) as total'))

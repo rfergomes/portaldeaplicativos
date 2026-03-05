@@ -91,9 +91,9 @@
                 <div class="card card-outline card-info shadow-sm">
                     <div class="card-header border-0">
                         <h6 class="card-title fw-bold m-0">
-                            <i class="fa-solid fa-timeline me-2"></i>Timeline de Envios por Destinatário
+                            <i class="fa-solid fa-timeline me-2"></i>Timeline de Envios
                         </h6>
-                        <small class="text-muted">{{ $protocolo->destinatarios->count() }} destinatário(s)</small>
+                        <small class="text-muted float-end"><i class="fa-solid fa-users me-1"></i>{{ $protocolo->destinatarios->count() }} destinatário(s)</small>
                     </div>
                     <div class="card-body">
                         @forelse($protocolo->destinatarios as $destinatario)

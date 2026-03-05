@@ -133,7 +133,7 @@
         <script>
             function editarAcomodacao(aco) {
                 document.getElementById('modalTitleAcomodacao').innerHTML = '<i class="fa-solid fa-pen me-2"></i>Editar Acomodação #' + aco.identificador;
-                document.getElementById('formAcomodacao').action = '/agenda/colonias.acomodacoes/' + aco.id;
+                document.getElementById('formAcomodacao').action = '/agenda/acomodacoes/' + aco.id;
                 document.getElementById('methodAcomodacao').value = 'PUT';
 
                 document.getElementById('tipoAcomodacao').value = aco.tipo || '';

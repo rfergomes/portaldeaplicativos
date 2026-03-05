@@ -147,7 +147,7 @@
         <div class="col-lg-4">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-white border-0 py-3 d-flex align-items-center">
-                    <h5 class="card-title mb-0 fw-bold text-danger">Pagamentos Vencidos</h5>
+                    <h5 class="card-title mb-0 fw-bold text-danger">Limites de Acertos Vencidos</h5>
                     <div class="card-tools ms-auto">
                         <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse"><i
                                 class="fa-solid fa-minus"></i></button>
@@ -169,7 +169,7 @@
                         @empty
                             <div class="p-4 text-center text-muted">
                                 <i class="fa-solid fa-check-circle fa-2x mb-2 text-success"></i>
-                                <p class="mb-0 small">Nenhum pagamento vencido no momento.</p>
+                                <p class="mb-0 small">Nenhum limite de acerto vencido no momento.</p>
                             </div>
                         @endforelse
                     </div>
@@ -190,9 +190,16 @@
                     </div>
                 </div>
                 <div class="card-body overflow-hidden">
-                    <div class="chart-container">
-                        <canvas id="reservationDonutChart"></canvas>
-                    </div>
+                    @if($reservasPorColonia->count() > 0)
+                        <div class="chart-container">
+                            <canvas id="reservationDonutChart"></canvas>
+                        </div>
+                    @else
+                        <div class="p-5 text-center text-muted">
+                            <i class="fa-solid fa-chart-pie fa-3x mb-3 opacity-25"></i>
+                            <p class="mb-0">Aguardando dados de reservas para gerar o gráfico.</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
