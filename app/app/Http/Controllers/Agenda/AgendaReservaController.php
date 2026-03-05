@@ -36,7 +36,10 @@ class AgendaReservaController extends Controller
         if ($periodoSelecionado && $coloniaSelecionada) {
             $colonia = \App\Models\Colonia::with([
                 'acomodacoes' => function ($q) {
-                    $q->where('ativo', true)->orderBy('tipo')->orderBy('identificador');
+                    $q->where('ativo', true)
+                        ->orderBy('tipo')
+                        ->orderByRaw('CAST(identificador AS UNSIGNED) ASC')
+                        ->orderBy('identificador');
                 }
             ])->findOrFail($coloniaSelecionada);
 

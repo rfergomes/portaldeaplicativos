@@ -9,7 +9,11 @@ class ColoniaAcomodacaoController extends Controller
 {
     public function index(\App\Models\Colonia $colonia)
     {
-        $acomodacoes = $colonia->acomodacoes()->orderBy('tipo')->orderBy('identificador')->get();
+        $acomodacoes = $colonia->acomodacoes()
+            ->orderBy('tipo')
+            ->orderByRaw('CAST(identificador AS UNSIGNED) ASC')
+            ->orderBy('identificador')
+            ->get();
         return view('agenda.acomodacoes.index', compact('colonia', 'acomodacoes'));
     }
 
