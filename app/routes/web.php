@@ -108,6 +108,10 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
         // Inscrições / Gerenciador de Sorteio (módulo opcional)
         Route::get('inscricoes/pdf/guia', [\App\Http\Controllers\Agenda\AgendaImpressaoController::class, 'gerarGuiaPreReserva'])->name('inscricoes.pdf.guia')->middleware('can:inscricoes.visualizar');
         Route::get('inscricoes/pdf/lista', [\App\Http\Controllers\Agenda\AgendaImpressaoController::class, 'gerarListaInscritos'])->name('inscricoes.pdf.lista')->middleware('can:inscricoes.visualizar');
+
+        // Relatórios do Painel de Reservas (Planilha)
+        Route::get('reservas/pdf/acomodacoes', [\App\Http\Controllers\Agenda\AgendaImpressaoController::class, 'gerarListaReservas'])->name('reservas.pdf.acomodacoes')->middleware('can:reservas.visualizar');
+        Route::get('reservas/pdf/espera', [\App\Http\Controllers\Agenda\AgendaImpressaoController::class, 'gerarListaEspera'])->name('reservas.pdf.espera')->middleware('can:reservas.visualizar');
         Route::resource('inscricoes', \App\Http\Controllers\Agenda\AgendaInscricaoController::class)
             ->only(['index', 'store', 'update', 'destroy'])->middleware('can:inscricoes.visualizar');
     });

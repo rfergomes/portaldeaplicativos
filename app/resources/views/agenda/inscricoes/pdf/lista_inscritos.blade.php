@@ -87,8 +87,7 @@
 
 <body>
     <div class="header clearfix">
-        <img src="https://www.quimicosunificados.com.br/wp-content/uploads/2019/11/logo-quimicos-unificados.png"
-            class="logo" alt="Logo">
+        <img src="{{ public_path('img/logo.jpg') }}" class="logo" alt="Logo">
         <div class="info-header">
             <strong>{{ $colonia->nome }}</strong><br>
             {{ $periodo->descricao }} (De {{ $periodo->data_inicial->format('d/m/Y') }} à

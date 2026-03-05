@@ -59,7 +59,7 @@ class DashboardController extends Controller
             ->get();
 
         // Tabelas Informativas
-        $protocolosRecentes = Protocolo::with('empresa')
+        $protocolosRecentes = Protocolo::with(['empresa', 'tipo'])
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();

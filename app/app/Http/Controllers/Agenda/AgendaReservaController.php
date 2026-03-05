@@ -11,7 +11,7 @@ class AgendaReservaController extends Controller
     public function index(Request $request)
     {
         // 1. Carregar Períodos e Colônias para os Filtros
-        $periodos = \App\Models\AgendaPeriodo::orderBy('data_inicial', 'desc')->get();
+        $periodos = \App\Models\AgendaPeriodo::where('ativo', true)->orderBy('data_inicial', 'desc')->get();
         $colonias = \App\Models\Colonia::where('ativo', true)->orderBy('nome')->get();
 
         $periodoSelecionado = $request->get('periodo_id');
@@ -24,8 +24,9 @@ class AgendaReservaController extends Controller
         // Calcular Estatísticas
         $estatisticas = [
             'total' => 0,
-            'agendado' => 0,
+            'reservado' => 0,
             'confirmado' => 0,
+            'pago' => 0,
             'bloqueado' => 0,
             'livre' => 0,
             'espera' => 0,
@@ -57,15 +58,17 @@ class AgendaReservaController extends Controller
             $estatisticas['espera'] = $filaEspera->count();
 
             foreach ($reservas as $res) {
-                if ($res->status == 'confirmado') {
+                if ($res->status == 'pago') {
+                    $estatisticas['pago']++;
+                } elseif ($res->status == 'confirmado') {
                     $estatisticas['confirmado']++;
                 } elseif ($res->status == 'reservado') {
-                    $estatisticas['agendado']++;
+                    $estatisticas['reservado']++;
                 } else {
                     $estatisticas['bloqueado']++;
                 }
             }
-            $estatisticas['livre'] = $estatisticas['total'] - ($estatisticas['confirmado'] + $estatisticas['agendado'] + $estatisticas['bloqueado']);
+            $estatisticas['livre'] = $estatisticas['total'] - ($estatisticas['pago'] + $estatisticas['confirmado'] + $estatisticas['reservado'] + $estatisticas['bloqueado']);
         }
 
         // 3. Trazer Empresas para o dropdown de adição na planilha
@@ -117,6 +120,14 @@ class AgendaReservaController extends Controller
 
         $ordemFila = null;
         $status = $validated['status'];
+
+        // Se houver nota de bloqueio, o status deve ser obrigatoriamente bloqueado
+        if (!empty($validated['bloqueio_nota'])) {
+            $status = 'bloqueado';
+        } elseif ($status === 'bloqueado') {
+            // Se for hóspede mas selecionou bloqueado por erro, volta para reservado
+            $status = 'reservado';
+        }
 
         if (empty($validated['colonia_acomodacao_id'])) {
             $ultimaOrdem = \App\Models\AgendaReserva::where('agenda_periodo_id', $validated['agenda_periodo_id'])
@@ -174,10 +185,17 @@ class AgendaReservaController extends Controller
             }
         }
 
+        $status = $validated['status'];
+        if (!empty($validated['bloqueio_nota'])) {
+            $status = 'bloqueado';
+        } elseif ($status === 'bloqueado') {
+            $status = 'reservado';
+        }
+
         $reserva->update([
             'agenda_hospede_id' => $hospedeId,
             'bloqueio_nota' => $validated['bloqueio_nota'] ?? null,
-            'status' => $validated['status'],
+            'status' => $status,
         ]);
 
         return redirect()->route('agenda.reservas.index', [

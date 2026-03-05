@@ -47,12 +47,26 @@
         }
 
         /* Azul clarinho */
-        .status-confirmado {
+        .status-pago {
             border-left-color: #198754 !important;
             background-color: #e8f8f5;
         }
 
-        /* Verde clarinho */
+        .status-confirmado {
+            border-left-color: #001f3f !important;
+            background-color: #e7f1ff;
+        }
+
+        .status-reservado {
+            border-left-color: #0dcaf0 !important;
+            background-color: #e3f2fd;
+        }
+
+        .status-livre {
+            border-left-color: #dee2e6 !important;
+            background-color: #fbfbfb;
+        }
+
         .status-bloqueado {
             border-left-color: #dc3545 !important;
             background-color: #f8e8e8;
@@ -134,9 +148,36 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h4 class="fw-bold mb-0 text-primary">{{ $coloniaModel->nome }}</h4>
                         <div>
-                            <button class="btn btn-sm btn-outline-secondary me-1" onclick="window.print()">
-                                <i class="fa-solid fa-print"></i> PDF/Imprimir
-                            </button>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle me-1" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-print me-1"></i> PDF / Relatórios
+                                </button>
+                                <ul class="dropdown-menu shadow-sm">
+                                    <li>
+                                        <a class="dropdown-item py-2"
+                                            href="{{ route('agenda.reservas.pdf.acomodacoes', ['colonia_id' => $coloniaSelecionada, 'periodo_id' => $periodoSelecionado]) }}"
+                                            target="_blank">
+                                            <i class="fa-solid fa-file-pdf text-danger me-2"></i> Lista de Reservas
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2"
+                                            href="{{ route('agenda.reservas.pdf.espera', ['colonia_id' => $coloniaSelecionada, 'periodo_id' => $periodoSelecionado]) }}"
+                                            target="_blank">
+                                            <i class="fa-solid fa-file-pdf text-warning me-2"></i> Lista de Espera
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="javascript:void(0)" onclick="window.print()">
+                                            <i class="fa-solid fa-desktop text-primary me-2"></i> Imprimir Tela (Navegador)
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                             <button class="btn btn-sm btn-success shadow-sm" data-bs-toggle="modal"
                                 data-bs-target="#modalNovaReserva">
                                 <i class="fa-solid fa-plus"></i> Adicionar
@@ -161,25 +202,28 @@
                     <div class="card-body p-2" style="font-size: 0.9rem;">
                         <div class="row text-center mb-2">
                             <div class="col"><span
-                                    class="text-primary fw-bold d-block fs-5">{{ collect($estatisticas ?? [])->get('agendado', 0) }}</span>
-                                Agendado</div>
-                            <div class="col border-start"><span
-                                    class="text-success fw-bold d-block fs-5">{{ collect($estatisticas ?? [])->get('confirmado', 0) }}</span>
+                                    class="text-info fw-bold d-block fs-5">{{ collect($estatisticas ?? [])->get('reservado', 0) }}</span>
+                                Reservado</div>
+                            <div class="col border-start"><span class="fw-bold d-block fs-5"
+                                    style="color: #001f3f;">{{ collect($estatisticas ?? [])->get('confirmado', 0) }}</span>
                                 Confirmado</div>
+                            <div class="col border-start"><span
+                                    class="text-success fw-bold d-block fs-5">{{ collect($estatisticas ?? [])->get('pago', 0) }}</span>
+                                Pago</div>
                             <div class="col border-start"><span
                                     class="text-muted fw-bold d-block fs-5">{{ collect($estatisticas ?? [])->get('livre', 0) }}</span>
                                 Livre</div>
                         </div>
                         <div class="row text-center border-top pt-2">
                             <div class="col"><span
-                                    class="fw-bold d-block fs-6">{{ collect($estatisticas ?? [])->get('total', 0) }}</span>
-                                Total</div>
+                                    class="text-danger fw-bold d-block fs-6">{{ collect($estatisticas ?? [])->get('bloqueado', 0) }}</span>
+                                Bloqueios</div>
                             <div class="col border-start"><span
                                     class="text-warning fw-bold d-block fs-6">{{ collect($estatisticas ?? [])->get('espera', 0) }}</span>
                                 Fila Espera</div>
                             <div class="col border-start"><span
-                                    class="text-danger fw-bold d-block fs-6">{{ collect($estatisticas ?? [])->get('bloqueado', 0) }}</span>
-                                Bloqueios</div>
+                                    class="fw-bold d-block fs-6">{{ collect($estatisticas ?? [])->get('total', 0) }}</span>
+                                Total</div>
                         </div>
                     </div>
                 </div>
@@ -192,7 +236,7 @@
             <!-- LADO ESQUERDO: ACOMODAÃâ€¡Ãâ€¢ES -->
             <div class="coluna-acomodacoes">
                 <h5 class="fw-bold text-primary border-bottom border-primary pb-2 mb-3">
-                    <i class="fa-solid fa-house-chimney me-2"></i> Lista de Acomodações (Ganhadores)
+                    <i class="fa-solid fa-house-chimney me-2"></i> Lista de Reservas
                 </h5>
 
                 @if($acomodacoes->isEmpty() && request('colonia_id'))
@@ -215,19 +259,24 @@
                         $statusText = '';
 
                         if ($reserva) {
-                            if ($reserva->status == 'confirmado') {
+                            if ($reserva->status == 'pago') {
+                                $statusClass = 'status-pago';
+                                $statusText = '<span class="badge bg-success">Pago</span>';
+                            } elseif ($reserva->status == 'confirmado') {
                                 $statusClass = 'status-confirmado';
-                                $statusText = '<span class="badge bg-success">Confirmado Pagto.</span>';
-                            } elseif ($reserva->bloqueio_nota && stripos($reserva->bloqueio_nota, 'osasco') !== false) {
-                                $statusClass = 'status-osasco';
-                                $statusText = '<span class="badge" style="background-color: #6f42c1;">Cota Osasco</span>';
-                            } elseif ($reserva->bloqueio_nota) {
-                                $statusClass = 'status-bloqueado';
-                                $statusText = '<span class="badge bg-danger"><i class="fa-solid fa-lock me-1"></i>Bloqueado</span>';
+                                $statusText = '<span class="badge" style="background-color: #001f3f; color: #fff;">Confirmado</span>';
+                            } elseif ($reserva->status == 'bloqueado') {
+                                $statusClass = stripos($reserva->bloqueio_nota, 'osasco') !== false ? 'status-osasco' : 'status-bloqueado';
+                                $statusText = stripos($reserva->bloqueio_nota, 'osasco') !== false
+                                    ? '<span class="badge" style="background-color: #6f42c1;">Cota Osasco</span>'
+                                    : '<span class="badge bg-danger"><i class="fa-solid fa-lock me-1"></i>Bloqueado</span>';
                             } else {
                                 $statusClass = 'status-reservado';
-                                $statusText = '<span class="badge bg-primary">Pré-Reservado (Aguard. Pagto)</span>';
+                                $statusText = '<span class="badge bg-info text-dark">Reservado</span>';
                             }
+                        } else {
+                            $statusClass = 'status-livre';
+                            $statusText = '<span class="badge bg-light text-muted border">Livre</span>';
                         }
                     @endphp
 
@@ -439,9 +488,10 @@
                                 <div class="col-md-6 mb-3" id="blocoStatus">
                                     <label class="form-label fw-bold">Situação Inicial *</label>
                                     <select name="status" id="statusReserva" class="form-select border-primary bg-light">
-                                        <option value="reservado">Agendado</option>
-                                        <option value="confirmado">Pago / Confirmado</option>
-                                        <option value="bloqueado" class="d-none" id="optBloqueado">Bloqueado</option>
+                                        <option value="reservado">Reservado</option>
+                                        <option value="confirmado">Confirmado</option>
+                                        <option value="pago">Pago</option>
+                                        <option value="bloqueado" hidden>Bloqueado</option>
                                     </select>
                                 </div>
                             </div>
@@ -546,10 +596,11 @@
                                 <div class="col-md-6 mb-3" id="blocoStatusEdit">
                                     <label class="form-label fw-bold">Situação *</label>
                                     <select name="status" id="statusReservaEdit" class="form-select border-primary bg-light">
-                                        <option value="reservado">Agendado</option>
-                                        <option value="confirmado">Pago / Confirmado</option>
-                                        <option value="fila_espera">Na Fila de Espera</option>
-                                        <option value="bloqueado" class="d-none" id="optBloqueadoEdit">Bloqueado</option>
+                                        <option value="reservado">Reservado</option>
+                                        <option value="confirmado">Confirmado</option>
+                                        <option value="pago">Pago</option>
+                                        <option value="bloqueado" hidden>Bloqueado</option>
+                                        <option value="fila_espera" hidden>Fila de Espera</option>
                                     </select>
                                 </div>
                             </div>
@@ -631,10 +682,10 @@
                 Swal.fire({
                     title: 'Motivo da Exclusão',
                     html: `
-                                        <p class="text-muted small mb-3">Informe o motivo para excluir esta reserva. Este registro ficará salvo no histórico.</p>
-                                        <textarea id="motivoExclusao" rows="3" style="width:calc(100% - 4px);box-sizing:border-box;resize:vertical;border:1px solid #d9d9d9;border-radius:6px;padding:10px 12px;font-size:0.9rem;display:block;"
-                                            placeholder="Ex: Desistência do hóspede, reagendamento, cancelamento, bloqueio..."></textarea>
-                                    `,
+                                                                                                                    <p class="text-muted small mb-3">Informe o motivo para excluir esta reserva. Este registro ficará salvo no histórico.</p>
+                                                                                                                    <textarea id="motivoExclusao" rows="3" style="width:calc(100% - 4px);box-sizing:border-box;resize:vertical;border:1px solid #d9d9d9;border-radius:6px;padding:10px 12px;font-size:0.9rem;display:block;"
+                                                                                                                        placeholder="Ex: Desistência do hóspede, reagendamento, cancelamento, bloqueio..."></textarea>
+                                                                                                                `,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#dc3545',
@@ -750,7 +801,7 @@
                 if (tipo === 'bloqueio') {
                     document.getElementById('blocoHospede').classList.add('d-none');
                     document.getElementById('blocoBloqueio').classList.remove('d-none');
-                    blocoStatus.classList.add('d-none');
+                    if (blocoStatus) blocoStatus.style.display = 'none';
                     statusSelect.value = 'bloqueado';
                     document.querySelector('input[name="nome_hospede"]').required = false;
                 } else {
@@ -758,7 +809,7 @@
                     document.getElementById('blocoBloqueio').classList.add('d-none');
                     document.querySelector('input[name="bloqueio_nota"]').value = '';
 
-                    blocoStatus.classList.remove('d-none');
+                    if (blocoStatus) blocoStatus.style.display = 'block';
                     if (statusSelect.value === 'bloqueado') statusSelect.value = 'reservado';
                     document.querySelector('input[name="nome_hospede"]').required = true;
                 }
@@ -816,7 +867,7 @@
                 if (tipo === 'bloqueio') {
                     document.getElementById('blocoHospedeEdit').classList.add('d-none');
                     document.getElementById('blocoBloqueioEdit').classList.remove('d-none');
-                    blocoStatus.classList.add('d-none');
+                    if (blocoStatus) blocoStatus.style.display = 'none';
                     statusSelect.value = 'bloqueado';
                     document.getElementById('edit_nome').required = false;
                 } else {
@@ -824,8 +875,10 @@
                     document.getElementById('blocoBloqueioEdit').classList.add('d-none');
                     document.getElementById('edit_bloqueio').value = '';
 
-                    blocoStatus.classList.remove('d-none');
-                    if (statusSelect.value === 'bloqueado') statusSelect.value = 'reservado';
+                    if (blocoStatus) blocoStatus.style.display = 'block';
+                    if (statusSelect.value === 'bloqueado' || statusSelect.value === 'fila_espera') {
+                        statusSelect.value = 'reservado';
+                    }
                     document.getElementById('edit_nome').required = true;
                 }
             }

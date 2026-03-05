@@ -56,4 +56,59 @@ class AgendaImpressaoController extends Controller
 
         return $pdf->stream("lista_inscritos_{$colonia->nome}_{$periodo->descricao}.pdf");
     }
+
+    /**
+     * Gera o PDF da Lista de Acomodações (Ganhadores) do Painel de Reservas.
+     */
+    public function gerarListaReservas(Request $request)
+    {
+        $request->validate([
+            'colonia_id' => 'required|exists:colonias,id',
+            'periodo_id' => 'required|exists:agenda_periodos,id',
+        ]);
+
+        $colonia = Colonia::with([
+            'acomodacoes' => fn($q) => $q->where('ativo', true)->orderBy('tipo')->orderBy('identificador')
+        ])->findOrFail($request->colonia_id);
+
+        $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
+
+        $reservas = \App\Models\AgendaReserva::with(['hospede.empresa'])
+            ->where('colonia_id', $request->colonia_id)
+            ->where('agenda_periodo_id', $request->periodo_id)
+            ->whereNotNull('colonia_acomodacao_id')
+            ->get()
+            ->keyBy('colonia_acomodacao_id');
+
+        $pdf = Pdf::loadView('agenda.reservas.pdf.lista_acomodacoes', compact('colonia', 'periodo', 'reservas'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream("lista_reservas_{$colonia->nome}_{$periodo->descricao}.pdf");
+    }
+
+    /**
+     * Gera o PDF da Lista de Espera (Suplentes) do Painel de Reservas.
+     */
+    public function gerarListaEspera(Request $request)
+    {
+        $request->validate([
+            'colonia_id' => 'required|exists:colonias,id',
+            'periodo_id' => 'required|exists:agenda_periodos,id',
+        ]);
+
+        $colonia = Colonia::findOrFail($request->colonia_id);
+        $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
+
+        $filaEspera = \App\Models\AgendaReserva::with(['hospede.empresa'])
+            ->where('colonia_id', $request->colonia_id)
+            ->where('agenda_periodo_id', $request->periodo_id)
+            ->whereNull('colonia_acomodacao_id')
+            ->orderBy('ordem_fila')
+            ->get();
+
+        $pdf = Pdf::loadView('agenda.reservas.pdf.lista_espera', compact('colonia', 'periodo', 'filaEspera'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream("lista_espera_{$colonia->nome}_{$periodo->descricao}.pdf");
+    }
 }

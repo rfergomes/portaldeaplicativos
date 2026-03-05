@@ -212,7 +212,7 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="border-0 px-4">Assunto</th>
+                                    <th class="border-0 px-4">Tipo</th>
                                     <th class="border-0">Empresa</th>
                                     <th class="border-0">Status</th>
                                     <th class="border-0 text-end px-4">Data</th>
@@ -221,7 +221,15 @@
                             <tbody>
                                 @foreach($protocolosRecentes as $prot)
                                     <tr>
-                                        <td class="px-4"><strong>{{ Str::limit($prot->assunto, 30) }}</strong></td>
+                                        <td class="px-4">
+                                            @if($prot->tipo)
+                                                <span class="badge text-bg-{{ $prot->tipo->cor }} rounded-pill shadow-sm px-2">
+                                                    <i class="{{ $prot->tipo->icone }} me-1"></i>{{ $prot->tipo->nome }}
+                                                </span>
+                                            @else
+                                                <span class="badge text-bg-secondary rounded-pill shadow-sm px-2">—</span>
+                                            @endif
+                                        </td>
                                         <td>{{ $prot->empresa->nome_curto ?? '—' }}</td>
                                         <td>
                                             <span
