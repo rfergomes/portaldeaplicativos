@@ -174,34 +174,13 @@
 </head>
 
 <body>
-    @php
-        $logoPath = public_path('img/logo.jpg');
-        $logoSrc = '';
-        if (file_exists($logoPath)) {
-            try {
-                $logoData = base64_encode(file_get_contents($logoPath));
-                $logoSrc = 'data:image/jpeg;base64,' . $logoData;
-            } catch (\Throwable $e) {
-                $logoSrc = '';
-            }
-        }
-    @endphp
-
-    @for($i = 0; $i < $quantidade; $i++)
-        @if($i % 2 == 0)
-            <div class="page">
-        @endif
-
             <div class="guia-wrapper">
                 <div class="header clearfix">
-                    <div class="logo-container">
-                        @if($logoSrc)
-                            <img src="{{ $logoSrc }}" class="logo">
-                        @else
-                            <div style="font-weight: bold; color: #1a237e;">Sindicato Químicos Unificados</div>
-                        @endif
+                    <div style="float: left; width: 50%;">
+                        <div style="font-weight: bold; color: #1a237e; font-size: 12pt;">QUÍMICOS UNIFICADOS</div>
+                        <div style="font-size: 7pt; color: #666;">Portal de Aplicativos</div>
                     </div>
-                    <div class="title-container">
+                    <div class="title-container" style="width: 48%;">
                         <h1 class="main-title">PRÉ-RESERVA</h1>
                         <div class="sub-title">{{ $colonia->nome }}</div>
                     </div>
