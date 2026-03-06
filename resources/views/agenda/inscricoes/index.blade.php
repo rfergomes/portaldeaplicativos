@@ -148,7 +148,7 @@
                                         <tr class="{{ $rowClass }}">
                                             <td class="ps-3 fw-bold text-muted">{{ $i + 1 }}</td>
                                             <td>
-                                                <strong class="d-block">{{ $insc->hospede->nome ?? '—' }}</strong>
+                                                <strong class="d-block">{{ $insc->hospede?->nome ?? '—' }}</strong>
                                                 @if($insc->reserva_id)
                                                     <span class="badge bg-primary rounded-pill" style="font-size:0.7rem;">
                                                         <i class="fa-solid fa-link me-1"></i>Pré-Reserva Gerada
@@ -157,7 +157,7 @@
                                             </td>
                                             <td style="font-size:0.8rem;">
                                                 <div><i
-                                                        class="fa-solid fa-phone text-secondary me-1"></i>{{ $insc->hospede->telefone ?? '—' }}
+                                                        class="fa-solid fa-phone text-secondary me-1"></i>{{ $insc->hospede?->telefone ?? '—' }}
                                                 </div>
                                                 @if($insc->hospede?->email)
                                                     <div><i
