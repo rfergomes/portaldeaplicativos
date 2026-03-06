@@ -174,6 +174,11 @@
 </head>
 
 <body>
+    @for($i = 0; $i < $quantidade; $i++)
+        @if($i % 2 == 0)
+            <div class="page">
+        @endif
+
             <div class="guia-wrapper">
                 <div class="header clearfix">
                     <div style="float: left; width: 50%;">
