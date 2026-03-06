@@ -18,55 +18,64 @@ class AgendaInscricaoController extends Controller
      */
     public function index(Request $request)
     {
-        $colonias = Colonia::where('ativo', true)->orderBy('nome')->get();
-        $periodos = AgendaPeriodo::where('ativo', true)->orderBy('data_inicial', 'desc')->get();
-        $empresas = Empresa::orderBy('razao_social')->get();
+        try {
+            $colonias = Colonia::where('ativo', true)->orderBy('nome')->get();
+            $periodos = AgendaPeriodo::where('ativo', true)->orderBy('data_inicial', 'desc')->get();
+            $empresas = Empresa::orderBy('razao_social')->get();
 
-        $coloniaSelecionada = $request->get('colonia_id');
-        $periodoSelecionado = $request->get('periodo_id');
+            $coloniaSelecionada = $request->get('colonia_id');
+            $periodoSelecionado = $request->get('periodo_id');
 
-        $inscricoes = collect();
-        $acomodacoesLivres = collect();
-        $colonia = null;
-        $periodo = null;
+            $inscricoes = collect();
+            $acomodacoesLivres = collect();
+            $colonia = null;
+            $periodo = null;
 
-        if ($coloniaSelecionada && $periodoSelecionado) {
-            $colonia = Colonia::with([
-                'acomodacoes' => function ($q) {
-                    $q->where('ativo', true)->orderBy('tipo')->orderBy('identificador');
-                }
-            ])->findOrFail($coloniaSelecionada);
+            if ($coloniaSelecionada && $periodoSelecionado) {
+                $colonia = Colonia::with([
+                    'acomodacoes' => function ($q) {
+                        $q->where('ativo', true)->orderBy('tipo')->orderBy('identificador');
+                    }
+                ])->findOrFail($coloniaSelecionada);
 
-            $periodo = AgendaPeriodo::findOrFail($periodoSelecionado);
+                $periodo = AgendaPeriodo::findOrFail($periodoSelecionado);
 
-            $inscricoes = AgendaInscricao::with(['hospede.empresa', 'acomodacao', 'reserva'])
-                ->where('colonia_id', $coloniaSelecionada)
-                ->where('agenda_periodo_id', $periodoSelecionado)
-                ->orderBy('status')
-                ->orderBy('ordem_espera')
-                ->orderBy('created_at')
-                ->get();
+                $inscricoes = AgendaInscricao::with(['hospede.empresa', 'acomodacao', 'reserva'])
+                    ->where('colonia_id', $coloniaSelecionada)
+                    ->where('agenda_periodo_id', $periodoSelecionado)
+                    ->orderBy('status')
+                    ->orderBy('ordem_espera')
+                    ->orderBy('created_at')
+                    ->get();
 
-            // Carregar acomodações que ainda não têm reserva para o dropdown do sorteio
-            $reservasExistentes = AgendaReserva::where('agenda_periodo_id', $periodoSelecionado)
-                ->where('colonia_id', $coloniaSelecionada)
-                ->whereNotNull('colonia_acomodacao_id')
-                ->pluck('colonia_acomodacao_id');
+                // Carregar acomodações que ainda não têm reserva para o dropdown do sorteio
+                $reservasExistentes = AgendaReserva::where('agenda_periodo_id', $periodoSelecionado)
+                    ->where('colonia_id', $coloniaSelecionada)
+                    ->whereNotNull('colonia_acomodacao_id')
+                    ->pluck('colonia_acomodacao_id');
 
-            $acomodacoesLivres = $colonia->acomodacoes->whereNotIn('id', $reservasExistentes)->values();
+                $acomodacoesLivres = $colonia->acomodacoes->whereNotIn('id', $reservasExistentes)->values();
+            }
+
+            return view('agenda.inscricoes.index', compact(
+                'colonias',
+                'periodos',
+                'empresas',
+                'coloniaSelecionada',
+                'periodoSelecionado',
+                'inscricoes',
+                'acomodacoesLivres',
+                'colonia',
+                'periodo'
+            ));
+        } catch (\Throwable $e) {
+            \Log::error("ERRO INDEX INSCRICOES: " . $e->getMessage(), [
+                'arquivo' => $e->getFile(),
+                'linha' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->view('errors.500', ['exception' => $e], 500);
         }
-
-        return view('agenda.inscricoes.index', compact(
-            'colonias',
-            'periodos',
-            'empresas',
-            'coloniaSelecionada',
-            'periodoSelecionado',
-            'inscricoes',
-            'acomodacoesLivres',
-            'colonia',
-            'periodo'
-        ));
     }
 
     /**
