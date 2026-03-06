@@ -23,19 +23,23 @@ class AgendaImpressaoController extends Controller
         ]);
 
         try {
-            ini_set('memory_limit', '256M');
-            set_time_limit(60);
+            ini_set('memory_limit', '512M');
+            set_time_limit(120);
             $colonia = Colonia::findOrFail($request->colonia_id);
             $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
-            $quantidade = $request->quantidade ?? 2; // Default 2 guias (1 folha)
+            $quantidade = $request->quantidade ?? 2;
 
             $pdf = Pdf::loadView('agenda.inscricoes.pdf.guia_pre_reserva', compact('colonia', 'periodo', 'quantidade'))
                 ->setPaper('a4', 'portrait');
 
             return $pdf->stream("guia_pre_reserva_{$colonia->nome}_{$periodo->descricao}.pdf");
-        } catch (\Exception $e) {
-            \Log::error("Erro PDF Guia: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return response()->json(['error' => 'Erro ao gerar PDF: ' . $e->getMessage()], 500);
+        } catch (\Throwable $e) {
+            \Log::error("ERRO FATAL PDF Guia: " . $e->getMessage(), [
+                'arquivo' => $e->getFile(),
+                'linha' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Erro fatal no servidor: ' . $e->getMessage()], 500);
         }
     }
 
@@ -50,8 +54,8 @@ class AgendaImpressaoController extends Controller
         ]);
 
         try {
-            ini_set('memory_limit', '256M');
-            set_time_limit(60);
+            ini_set('memory_limit', '512M');
+            set_time_limit(120);
             $colonia = Colonia::findOrFail($request->colonia_id);
             $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
 
@@ -65,9 +69,13 @@ class AgendaImpressaoController extends Controller
                 ->setPaper('a4', 'portrait');
 
             return $pdf->stream("lista_inscritos_{$colonia->nome}_{$periodo->descricao}.pdf");
-        } catch (\Exception $e) {
-            \Log::error("Erro PDF Lista Inscritos: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return response()->json(['error' => 'Erro ao gerar PDF: ' . $e->getMessage()], 500);
+        } catch (\Throwable $e) {
+            \Log::error("ERRO FATAL PDF Lista Inscritos: " . $e->getMessage(), [
+                'arquivo' => $e->getFile(),
+                'linha' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Erro fatal no servidor: ' . $e->getMessage()], 500);
         }
     }
 
@@ -82,8 +90,8 @@ class AgendaImpressaoController extends Controller
         ]);
 
         try {
-            ini_set('memory_limit', '256M');
-            set_time_limit(60);
+            ini_set('memory_limit', '512M');
+            set_time_limit(120);
 
             $colonia = Colonia::with([
                 'acomodacoes' => function ($q) {
@@ -104,9 +112,13 @@ class AgendaImpressaoController extends Controller
                 ->setPaper('a4', 'portrait');
 
             return $pdf->stream("lista_reservas_{$colonia->nome}_{$periodo->descricao}.pdf");
-        } catch (\Exception $e) {
-            \Log::error("Erro PDF Reservas: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return response()->json(['error' => 'Erro ao gerar PDF: ' . $e->getMessage()], 500);
+        } catch (\Throwable $e) {
+            \Log::error("ERRO FATAL PDF Reservas: " . $e->getMessage(), [
+                'arquivo' => $e->getFile(),
+                'linha' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Erro fatal no servidor: ' . $e->getMessage()], 500);
         }
     }
 
@@ -121,8 +133,8 @@ class AgendaImpressaoController extends Controller
         ]);
 
         try {
-            ini_set('memory_limit', '256M');
-            set_time_limit(60);
+            ini_set('memory_limit', '512M');
+            set_time_limit(120);
             $colonia = Colonia::findOrFail($request->colonia_id);
             $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
 
@@ -137,9 +149,13 @@ class AgendaImpressaoController extends Controller
                 ->setPaper('a4', 'portrait');
 
             return $pdf->stream("lista_espera_{$colonia->nome}_{$periodo->descricao}.pdf");
-        } catch (\Exception $e) {
-            \Log::error("Erro PDF Espera: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return response()->json(['error' => 'Erro ao gerar PDF: ' . $e->getMessage()], 500);
+        } catch (\Throwable $e) {
+            \Log::error("ERRO FATAL PDF Espera: " . $e->getMessage(), [
+                'arquivo' => $e->getFile(),
+                'linha' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Erro fatal no servidor: ' . $e->getMessage()], 500);
         }
     }
 }
