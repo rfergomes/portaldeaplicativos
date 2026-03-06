@@ -87,25 +87,11 @@
 
 <body>
     <div class="header clearfix">
-        @php
-            $logoPath = public_path('img/logo.jpg');
-            $logoSrc = '';
-            if (file_exists($logoPath)) {
-                try {
-                    $logoData = base64_encode(file_get_contents($logoPath));
-                    $logoSrc = 'data:image/jpeg;base64,' . $logoData;
-                } catch (\Exception $e) {
-                    $logoSrc = '';
-                }
-            }
-        @endphp
-
-        @if($logoSrc)
-            <img src="{{ $logoSrc }}" class="logo" alt="Logo">
-        @else
-            <div style="float: left; width: 120px; font-weight: bold;">Sindicato Químicos</div>
-        @endif
-        <div class="info-header">
+        <div style="float: left; width: 50%;">
+            <div style="font-weight: bold; color: #1a237e; font-size: 14pt;">SINDICATO QUÍMICOS UNIFICADOS</div>
+            <div style="font-size: 8pt; color: #666;">Portal de Aplicativos</div>
+        </div>
+        <div class="info-header" style="float: right; width: 48%; text-align: right;">
             <strong>{{ $colonia->nome }}</strong><br>
             {{ $periodo->descricao }} (De {{ $periodo->data_inicial->format('d/m/Y') }} à
             {{ $periodo->data_final->format('d/m/Y') }})

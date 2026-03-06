@@ -97,8 +97,11 @@
 
 <body>
     <div class="header clearfix">
-        <img src="{{ public_path('img/logo.jpg') }}" class="logo" alt="Logo">
-        <div class="info-header">
+        <div style="float: left; width: 50%;">
+            <div style="font-weight: bold; color: #1a237e; font-size: 14pt;">SINDICATO QUÍMICOS UNIFICADOS</div>
+            <div style="font-size: 8pt; color: #666;">Portal de Aplicativos</div>
+        </div>
+        <div class="info-header" style="float: right; width: 48%; text-align: right;">
             <strong>{{ $colonia->nome }}</strong><br>
             Período: {{ $periodo->descricao }}<br>
             De {{ $periodo->data_inicial->format('d/m/Y') }} a {{ $periodo->data_final->format('d/m/Y') }}
