@@ -23,6 +23,8 @@ class AgendaImpressaoController extends Controller
         ]);
 
         try {
+            ini_set('memory_limit', '256M');
+            set_time_limit(60);
             $colonia = Colonia::findOrFail($request->colonia_id);
             $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
             $quantidade = $request->quantidade ?? 2; // Default 2 guias (1 folha)
@@ -48,6 +50,8 @@ class AgendaImpressaoController extends Controller
         ]);
 
         try {
+            ini_set('memory_limit', '256M');
+            set_time_limit(60);
             $colonia = Colonia::findOrFail($request->colonia_id);
             $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
 
@@ -117,6 +121,8 @@ class AgendaImpressaoController extends Controller
         ]);
 
         try {
+            ini_set('memory_limit', '256M');
+            set_time_limit(60);
             $colonia = Colonia::findOrFail($request->colonia_id);
             $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
 
