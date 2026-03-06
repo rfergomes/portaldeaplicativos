@@ -158,4 +158,52 @@ class AgendaImpressaoController extends Controller
             return response()->json(['error' => 'Erro fatal no servidor: ' . $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Rota de diagnóstico para verificar requisitos do DomPDF no ambiente.
+     */
+    public function debug(Request $request)
+    {
+        $results = [
+            'php_version' => PHP_VERSION,
+            'extensions' => [
+                'mbstring' => extension_loaded('mbstring'),
+                'gd' => extension_loaded('gd'),
+                'dom' => extension_loaded('dom'),
+                'xml' => extension_loaded('xml'),
+                'curl' => extension_loaded('curl'),
+            ],
+            'directories' => [
+                'storage_fonts' => [
+                    'path' => storage_path('fonts'),
+                    'exists' => file_exists(storage_path('fonts')),
+                    'writable' => is_writable(storage_path('fonts')),
+                ],
+                'storage_logs' => [
+                    'path' => storage_path('logs'),
+                    'writable' => is_writable(storage_path('logs')),
+                ],
+            ],
+            'memory_limit' => ini_get('memory_limit'),
+        ];
+
+        return response()->json($results);
+    }
+
+    /**
+     * Teste de geração de PDF ultra simples (sem CSS ou imagens).
+     */
+    public function testeSimples()
+    {
+        try {
+            $pdf = Pdf::loadHTML('<h1>Teste de PDF</h1><p>Se você está vendo isso, o DomPDF está funcionando.</p>');
+            return $pdf->stream('teste_simples.pdf');
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
+        }
+    }
 }
