@@ -10,8 +10,8 @@ return new class extends Migration {
         Schema::create('agenda_inscricoes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('colonia_id')->constrained('colonias')->cascadeOnDelete();
-            $table->foreignId('periodo_id')->constrained('agenda_periodos')->cascadeOnDelete();
-            $table->foreignId('hospede_id')->nullable()->constrained('agenda_hospedes')->nullOnDelete();
+            $table->foreignId('agenda_periodo_id')->constrained('agenda_periodos')->cascadeOnDelete();
+            $table->foreignId('agenda_hospede_id')->nullable()->constrained('agenda_hospedes')->nullOnDelete();
 
             // Status do resultado do sorteio
             $table->enum('status', ['pendente', 'sorteado', 'espera', 'cancelado'])->default('pendente');
