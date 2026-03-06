@@ -85,9 +85,9 @@
                                 </td>
                                 <td>{{ optional($evento->data_inicio)->format('d/m/Y H:i') ?? '-' }}</td>
                                 <td>{{ $evento->local ?? '-' }}</td>
-                                <td class="text-center">{{ $evento->convites()->count() }}</td>
-                                <td class="text-center">{{ $evento->convidados()->count() }}</td>
-                                <td>R$ {{ number_format($evento->vendas()->sum('valor_venda'), 2, ',', '.') }}</td>
+                                <td class="text-center">{{ $evento->convites->count() }}</td>
+                                <td class="text-center">{{ $evento->convidados->count() }}</td>
+                                <td>R$ {{ number_format($evento->convidados->sum('valor'), 2, ',', '.') }}</td>
                                 <td class="text-end">
                                     <div class="btn-group">
                                         <a href="{{ route('eventos.show', $evento) }}" class="btn btn-sm btn-outline-primary"
@@ -98,6 +98,20 @@
                                             class="btn btn-outline-secondary btn-sm" title="Relatório">
                                             <i class="fa-solid fa-file-pdf"></i>
                                         </a>
+                                        @if(auth()->user()->temPermissao('criar_eventos'))
+                                            <button type="button"
+                                                class="btn btn-sm {{ $evento->encerrado ? 'btn-outline-success' : 'btn-outline-warning' }}"
+                                                onclick="toggleEventStatus({{ $evento->id }}, '{{ $evento->nome }}', {{ $evento->encerrado ? 'true' : 'false' }})"
+                                                title="{{ $evento->encerrado ? 'Reabrir Evento' : 'Encerrar Evento' }}">
+                                                <i class="fa-solid {{ $evento->encerrado ? 'fa-unlock' : 'fa-lock' }}"></i>
+                                            </button>
+                                            <form id="toggle-status-{{ $evento->id }}"
+                                                action="{{ route('eventos.toggleStatus', $evento) }}" method="POST"
+                                                style="display: none;">
+                                                @csrf
+                                                @method('PATCH')
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -159,4 +173,28 @@
             </div>
         </div>
     @endif
+
+    @push('scripts')
+        <script>
+            function toggleEventStatus(id, nome, encerrado) {
+                const acao = encerrado ? 'REABRIR' : 'ENCERRAR';
+                const msg = encerrado ? 'O evento voltará a aparecer na lista de eventos abertos.' : 'O evento será movido para a lista de eventos encerrados.';
+                
+                Swal.fire({
+                    title: `Deseja ${acao} o evento?`,
+                    text: `${nome}: ${msg}`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: encerrado ? '#28a745' : '#ffc107',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: `Sim, ${acao.toLowerCase()}!`,
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById(`toggle-status-${id}`).submit();
+                    }
+                });
+            }
+        </script>
+    @endpush
 @endsection

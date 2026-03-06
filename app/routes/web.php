@@ -54,6 +54,7 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::get('/eventos', [EventController::class, 'index'])->name('eventos.index')->middleware('can:eventos.visualizar');
     Route::post('/eventos', [EventController::class, 'store'])->name('eventos.store')->middleware('can:eventos.criar');
     Route::get('/eventos/{evento}', [EventController::class, 'show'])->name('eventos.show')->middleware('can:eventos.visualizar');
+    Route::patch('/eventos/{evento}/status', [EventController::class, 'toggleStatus'])->name('eventos.toggleStatus')->middleware('can:eventos.criar');
     Route::get('/eventos/{evento}/relatorio', [EventController::class, 'report'])->name('eventos.report')->middleware('can:eventos.relatorio');
     Route::get('/eventos/convidados/{convite}', [App\Http\Controllers\Eventos\InvitationController::class, 'getConvidados'])->name('convites.getConvidados');
     Route::post('/eventos/{evento}/convites', [App\Http\Controllers\Eventos\InvitationController::class, 'store'])->name('convites.store');
@@ -62,6 +63,11 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::post('/convites/{convite}/convidados', [App\Http\Controllers\Eventos\InvitationController::class, 'storeConvidado'])->name('convidados.store');
     Route::delete('/convidados/{convidado}', [App\Http\Controllers\Eventos\InvitationController::class, 'destroyConvidado'])->name('convidados.destroy');
     Route::put('/convidados/{convidado}', [App\Http\Controllers\Eventos\InvitationController::class, 'updateConvidado'])->name('convidados.update');
+
+    // Lotes de Convite
+    Route::post('/eventos/{evento}/lotes', [App\Http\Controllers\Eventos\BatchController::class, 'store'])->name('lotes.store');
+    Route::put('/lotes/{lote}', [App\Http\Controllers\Eventos\BatchController::class, 'update'])->name('lotes.update');
+    Route::delete('/lotes/{lote}', [App\Http\Controllers\Eventos\BatchController::class, 'destroy'])->name('lotes.destroy');
 
     // Cadastro de Empresas e Contatos (Clientes)
     Route::resource('empresas', App\Http\Controllers\Cadastro\EmpresaController::class)->middleware('can:empresas.visualizar');

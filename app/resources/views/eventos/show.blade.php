@@ -62,6 +62,10 @@
                     data-bs-target="#modalNovoConvite">
                     <i class="fa-solid fa-plus me-1"></i> Novo Convite
                 </button>
+                <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#modalGerenciarLotes">
+                    <i class="fa-solid fa-layer-group me-1"></i> Lotes
+                </button>
                 <div class="btn-group">
                     <button type="button" class="btn btn-outline-danger btn-sm dropdown-toggle" data-bs-toggle="dropdown">
                         <i class="fa-solid fa-file-pdf me-1"></i> Relatórios
@@ -90,9 +94,10 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th style="width: 25%">Nome Responsável</th>
-                            <th style="width: 15%">Placa</th>
-                            <th style="width: 20%">Empresa</th>
+                            <th style="width: 20%">Nome Responsável</th>
+                            <th style="width: 10%">Placa</th>
+                            <th style="width: 15%">Empresa</th>
+                            <th style="width: 15%">Lote</th>
                             <th style="width: 15%">Valor Total</th>
                             <th style="width: 15%" class="text-center">Convidados</th>
                             <th style="width: 10%" class="text-end">Ações</th>
@@ -104,6 +109,14 @@
                                 <td><strong>{{ $convite->nome_responsavel }}</strong></td>
                                 <td><span class="badge bg-light text-dark border">{{ $convite->placa ?? '-' }}</span></td>
                                 <td>{{ $convite->empresa ?? '-' }}</td>
+                                <td>
+                                    @if($convite->lote)
+                                        <span
+                                            class="badge bg-info-subtle text-info border border-info-subtle">{{ $convite->lote->nome }}</span>
+                                    @else
+                                        <span class="text-muted small">-</span>
+                                    @endif
+                                </td>
                                 <td>R$ {{ number_format($convite->convidados->sum('valor'), 2, ',', '.') }}</td>
                                 <td class="text-center">
                                     <span class="badge bg-primary rounded-pill px-3 py-2 cursor-pointer invite-popover"
@@ -181,15 +194,27 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Tipo de Valor</label>
-                            <select name="tipo" class="form-select">
-                                <option value="inteira">Inteira (R$
-                                    {{ number_format($evento->valor_inteira, 2, ',', '.') }})
-                                </option>
-                                <option value="meia">Meia (R$ {{ number_format($evento->valor_meia, 2, ',', '.') }})
-                                </option>
-                            </select>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Tipo de Valor</label>
+                                <select name="tipo" class="form-select">
+                                    <option value="inteira">Inteira (R$
+                                        {{ number_format($evento->valor_inteira, 2, ',', '.') }})
+                                    </option>
+                                    <option value="meia">Meia (R$ {{ number_format($evento->valor_meia, 2, ',', '.') }})
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Lote</label>
+                                <select name="lote_id" class="form-select">
+                                    <option value="">Nenhum</option>
+                                    @foreach($evento->lotes as $lote)
+                                        <option value="{{ $lote->id }}">{{ $lote->nome }} (Disp:
+                                            {{ $lote->quantidade_disponivel }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -236,15 +261,26 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Tipo de Valor</label>
-                            <select name="tipo" id="editInviteTipo" class="form-select">
-                                <option value="inteira">Inteira (R$
-                                    {{ number_format($evento->valor_inteira, 2, ',', '.') }})
-                                </option>
-                                <option value="meia">Meia (R$ {{ number_format($evento->valor_meia, 2, ',', '.') }})
-                                </option>
-                            </select>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Tipo de Valor</label>
+                                <select name="tipo" id="editInviteTipo" class="form-select">
+                                    <option value="inteira">Inteira (R$
+                                        {{ number_format($evento->valor_inteira, 2, ',', '.') }})
+                                    </option>
+                                    <option value="meia">Meia (R$ {{ number_format($evento->valor_meia, 2, ',', '.') }})
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Lote</label>
+                                <select name="lote_id" id="editInviteLote" class="form-select">
+                                    <option value="">Nenhum</option>
+                                    @foreach($evento->lotes as $lote)
+                                        <option value="{{ $lote->id }}">{{ $lote->nome }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -256,7 +292,85 @@
         </div>
     </div>
 
-    <!-- Modal Gerenciar Convidados -->
+    <!-- Modal Gerenciar Lotes -->
+    <div class="modal fade" id="modalGerenciarLotes" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title"><i class="fa-solid fa-layer-group me-2"></i> Gerenciar Lotes de Convite</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card mb-4 border shadow-none">
+                        <div class="card-body bg-light-subtle">
+                            <h6 class="mb-3 fw-bold">Novo Lote</h6>
+                            <form action="{{ route('lotes.store', $evento) }}" method="POST">
+                                @csrf
+                                <div class="row g-2">
+                                    <div class="col-md-7">
+                                        <input type="text" name="nome" class="form-control form-control-sm" placeholder="Ex: 1º Lote, VIP, etc." required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="number" name="quantidade_total" class="form-control form-control-sm" placeholder="Qtd. Total" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th class="text-center">Total</th>
+                                    <th class="text-center">Disponível</th>
+                                    <th class="text-center">Progresso</th>
+                                    <th class="text-end">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($evento->lotes as $lote)
+                                    @php
+                                        $porcentagem = $lote->quantidade_total > 0 ? ($lote->quantidade_total - $lote->quantidade_disponivel) / $lote->quantidade_total * 100 : 0;
+                                        $corFila = $porcentagem > 90 ? 'danger' : ($porcentagem > 70 ? 'warning' : 'success');
+                                    @endphp
+                                    <tr>
+                                        <td class="fw-bold">{{ $lote->nome }}</td>
+                                        <td class="text-center">{{ $lote->quantidade_total }}</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-{{ $corFila }}">{{ $lote->quantidade_disponivel }}</span>
+                                        </td>
+                                        <td style="width: 150px">
+                                            <div class="progress progress-xxs mt-2">
+                                                <div class="progress-bar bg-{{ $corFila }}" role="progressbar" style="width: {{ $porcentagem }}%"></div>
+                                            </div>
+                                            <small class="text-muted">{{ number_format($porcentagem, 0) }}%</small>
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-xs btn-outline-info" onclick="editLote({{ json_encode($lote) }})">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+                                            <form action="{{ route('lotes.destroy', $lote) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-xs btn-outline-danger" onclick="return confirm('Excluir este lote?')">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="modalConvidados" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -355,19 +469,19 @@
                         data.forEach(g => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
-                                                        <td>${g.nome}</td>
-                                                        <td>${g.documento || '-'}</td>
-                                                        <td>${g.empresa || '-'}</td>
-                                                        <td>R$ ${parseFloat(g.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                                                        <td class="text-end">
-                                                            <button class="btn btn-xs btn-outline-info btn-edit-guest">
-                                                                <i class="fa-solid fa-pen"></i>
-                                                            </button>
-                                                            <button class="btn btn-xs btn-outline-danger" onclick="deleteGuest(${g.id})">
-                                                                <i class="fa-solid fa-trash-can"></i>
-                                                            </button>
-                                                        </td>
-                                                    `;
+                                                                <td>${g.nome}</td>
+                                                                <td>${g.documento || '-'}</td>
+                                                                <td>${g.empresa || '-'}</td>
+                                                                <td>R$ ${parseFloat(g.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                                                                <td class="text-end">
+                                                                    <button class="btn btn-xs btn-outline-info btn-edit-guest">
+                                                                        <i class="fa-solid fa-pen"></i>
+                                                                    </button>
+                                                                    <button class="btn btn-xs btn-outline-danger" onclick="deleteGuest(${g.id})">
+                                                                        <i class="fa-solid fa-trash-can"></i>
+                                                                    </button>
+                                                                </td>
+                                                            `;
 
                             // Anexa evento de clique ao botão de editar de forma segura
                             row.querySelector('.btn-edit-guest').addEventListener('click', () => editGuest(g));
@@ -386,8 +500,67 @@
                 document.getElementById('editInvitePlaca').value = invite.placa;
                 document.getElementById('editInviteEmpresa').value = invite.empresa;
                 document.getElementById('editInviteTipo').value = invite.tipo;
+                document.getElementById('editInviteLote').value = invite.lote_id || '';
                 document.getElementById('formEditarConvite').action = `/convites/${invite.id}`;
                 new bootstrap.Modal(document.getElementById('modalEditarConvite')).show();
+            }
+
+            function editLote(lote) {
+                Swal.fire({
+                    title: 'Editar Lote',
+                    html: `
+                        <div class="mb-3 text-start">
+                            <label class="form-label small fw-bold">Nome do Lote</label>
+                            <input id="swalLoteNome" class="form-control" placeholder="Nome" value="${lote.nome}">
+                        </div>
+                        <div class="mb-3 text-start">
+                            <label class="form-label small fw-bold">Quantidade Total</label>
+                            <input id="swalLoteQtd" type="number" class="form-control" placeholder="Quantidade" value="${lote.quantidade_total}">
+                        </div>
+                    `,
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: 'Salvar',
+                    preConfirm: () => {
+                        return {
+                            nome: document.getElementById('swalLoteNome').value,
+                            quantidade_total: document.getElementById('swalLoteQtd').value
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `/lotes/${lote.id}`;
+                        
+                        const methodField = document.createElement('input');
+                        methodField.type = 'hidden';
+                        methodField.name = '_method';
+                        methodField.value = 'PUT';
+                        form.appendChild(methodField);
+
+                        const csrfField = document.createElement('input');
+                        csrfField.type = 'hidden';
+                        csrfField.name = '_token';
+                        csrfField.value = '{{ csrf_token() }}';
+                        form.appendChild(csrfField);
+
+                        const nomeField = document.createElement('input');
+                        nomeField.type = 'hidden';
+                        nomeField.name = 'nome';
+                        nomeField.value = result.value.nome;
+                        form.appendChild(nomeField);
+
+                        const qtdField = document.createElement('input');
+                        qtdField.type = 'hidden';
+                        qtdField.name = 'quantidade_total';
+                        qtdField.value = result.value.quantidade_total;
+                        form.appendChild(qtdField);
+
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
             }
 
             function addGuest() {
@@ -418,16 +591,16 @@
                 Swal.fire({
                     title: 'Editar Convidado',
                     html: `
-                                                        <input id="swalName" class="swal2-input" placeholder="Nome" value="${guest.nome}">
-                                                        <input id="swalDoc" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="CPF" value="${guest.documento || ''}">
-                                                        <select id="swalEmp" class="swal2-select" style="max-width: 90%; margin: 10px auto; display: flex;">
-                                                            <option value="">Nenhuma / Outra</option>
-                                                            @foreach($empresas as $emp)
-                                                                <option value="{{ $emp->nome_curto ?? $emp->razao_social }}" ${guest.empresa === '{{ $emp->nome_curto ?? $emp->razao_social }}' ? 'selected' : ''}>{{ $emp->nome_curto ?? $emp->razao_social }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                        <input id="swalVal" type="number" step="0.01" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="Valor" value="${guest.valor}">
-                                                    `,
+                                                                <input id="swalName" class="swal2-input" placeholder="Nome" value="${guest.nome}">
+                                                                <input id="swalDoc" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="CPF" value="${guest.documento || ''}">
+                                                                <select id="swalEmp" class="swal2-select" style="max-width: 90%; margin: 10px auto; display: flex;">
+                                                                    <option value="">Nenhuma / Outra</option>
+                                                                    @foreach($empresas as $emp)
+                                                                        <option value="{{ $emp->nome_curto ?? $emp->razao_social }}" ${guest.empresa === '{{ $emp->nome_curto ?? $emp->razao_social }}' ? 'selected' : ''}>{{ $emp->nome_curto ?? $emp->razao_social }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                                <input id="swalVal" type="number" step="0.01" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="Valor" value="${guest.valor}">
+                                                            `,
                     focusConfirm: false,
                     showCancelButton: true,
                     confirmButtonText: 'Salvar',

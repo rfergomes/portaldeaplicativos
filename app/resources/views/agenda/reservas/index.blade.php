@@ -481,7 +481,7 @@
                                     <label class="form-label fw-bold">Tipo de Alocação</label>
                                     <select class="form-select border-primary bg-light" id="tipoAlocacao"
                                         onchange="toggleAlocacaoForms()">
-                                        <option value="hospede">Hóspede (Sorteado)</option>
+                                        <option value="hospede">Hóspede</option>
                                         <option value="bloqueio">Bloqueio / Cota Fixa</option>
                                     </select>
                                 </div>
@@ -545,7 +545,7 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Destino da Vaga</label>
                                 <select name="colonia_acomodacao_id" id="selectAcomodacao" class="form-select">
-                                    <option value="">-> FILA DE ESPERA <-< /option>
+                                    <option value="">-> ACOMODAÇÃO <-</option>
                                             <optgroup label="Acomodações Disponíveis">
                                                 @foreach($acomodacoes as $aco)
                                                     @if(!isset($reservas[$aco->id]))
