@@ -54,7 +54,7 @@
         <div class="card-header d-flex align-items-center">
             <h3 class="card-title m-0">Lista de Eventos</h3>
             <div class="card-tools ms-auto">
-                @if(auth()->user()->temPermissao('criar_eventos'))
+                @if(auth()->user()->temPermissao('criar_eventos') || auth()->user()->temPermissao('eventos.criar'))
                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                         data-bs-target="#novoEventoModal">
                         <i class="fa-solid fa-plus me-1"></i> Novo Evento
@@ -95,16 +95,17 @@
                                             <i class="fa-solid fa-eye me-1"></i> Ver
                                         </a>
 
-                                        @if(auth()->user()->temPermissao('criar_eventos'))
-                                                                    <button type="button" class="btn btn-sm btn-outline-info" onclick="editEvento({{ json_encode([
-                                                'id' => $evento->id,
-                                                'nome' => $evento->nome,
-                                                'data' => $evento->data_inicio ? $evento->data_inicio->format('Y-m-d\TH:i') : '',
-                                                'local' => $evento->local,
-                                                'valor_inteira' => $evento->valor_inteira
-                                            ]) }})" title="Editar Evento">
-                                                                        <i class="fa-solid fa-edit"></i>
-                                                                    </button>
+                                        @if(auth()->user()->temPermissao('criar_eventos') || auth()->user()->temPermissao('eventos.editar') || auth()->user()->temPermissao('eventos.criar'))
+                                            <button type="button" class="btn btn-sm btn-outline-info"
+                                                onclick="editEvento({{ json_encode([
+                                                    'id' => $evento->id,
+                                                    'nome' => $evento->nome,
+                                                    'data' => $evento->data_inicio ? $evento->data_inicio->format('Y-m-d\TH:i') : '',
+                                                    'local' => $evento->local,
+                                                    'valor_inteira' => $evento->valor_inteira
+                                                ]) }})" title="Editar Evento">
+                                                <i class="fa-solid fa-edit"></i>
+                                            </button>
                                         @endif
 
                                         <div class="btn-group">
@@ -130,7 +131,7 @@
                                             </ul>
                                         </div>
 
-                                        @if(auth()->user()->temPermissao('criar_eventos'))
+                                        @if(auth()->user()->temPermissao('criar_eventos') || auth()->user()->temPermissao('eventos.criar') || auth()->user()->temPermissao('eventos.editar'))
                                             <button type="button"
                                                 class="btn btn-sm {{ $evento->encerrado ? 'btn-outline-success' : 'btn-outline-warning' }}"
                                                 onclick="toggleEventStatus({{ $evento->id }}, '{{ $evento->nome }}', {{ $evento->encerrado ? 'true' : 'false' }})"
