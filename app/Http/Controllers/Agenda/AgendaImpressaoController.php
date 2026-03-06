@@ -8,6 +8,7 @@ use App\Models\AgendaPeriodo;
 use App\Models\Colonia;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AgendaImpressaoController extends Controller
 {
@@ -32,7 +33,9 @@ class AgendaImpressaoController extends Controller
             $pdf = Pdf::loadView('agenda.inscricoes.pdf.guia_pre_reserva', compact('colonia', 'periodo', 'quantidade'))
                 ->setPaper('a4', 'portrait');
 
-            $fileName = str_replace(['/', '\\'], '-', "guia_pre_reserva_{$colonia->nome}_{$periodo->descricao}.pdf");
+            $safeColonia = Str::slug($colonia->nome);
+            $safePeriodo = Str::slug($periodo->descricao);
+            $fileName = "guia_pre_reserva_{$safeColonia}_{$safePeriodo}.pdf";
             return $pdf->stream($fileName);
         } catch (\Throwable $e) {
             \Log::error("ERRO FATAL PDF Guia: " . $e->getMessage(), [
@@ -69,7 +72,9 @@ class AgendaImpressaoController extends Controller
             $pdf = Pdf::loadView('agenda.inscricoes.pdf.lista_inscritos', compact('colonia', 'periodo', 'inscritos'))
                 ->setPaper('a4', 'portrait');
 
-            $fileName = str_replace(['/', '\\'], '-', "lista_inscritos_{$colonia->nome}_{$periodo->descricao}.pdf");
+            $safeColonia = Str::slug($colonia->nome);
+            $safePeriodo = Str::slug($periodo->descricao);
+            $fileName = "lista_inscritos_{$safeColonia}_{$safePeriodo}.pdf";
             return $pdf->stream($fileName);
         } catch (\Throwable $e) {
             \Log::error("ERRO FATAL PDF Lista Inscritos: " . $e->getMessage(), [
@@ -113,7 +118,9 @@ class AgendaImpressaoController extends Controller
             $pdf = Pdf::loadView('agenda.reservas.pdf.lista_acomodacoes', compact('colonia', 'periodo', 'reservas'))
                 ->setPaper('a4', 'portrait');
 
-            $fileName = str_replace(['/', '\\'], '-', "lista_reservas_{$colonia->nome}_{$periodo->descricao}.pdf");
+            $safeColonia = Str::slug($colonia->nome);
+            $safePeriodo = Str::slug($periodo->descricao);
+            $fileName = "lista_reservas_{$safeColonia}_{$safePeriodo}.pdf";
             return $pdf->stream($fileName);
         } catch (\Throwable $e) {
             \Log::error("ERRO FATAL PDF Reservas: " . $e->getMessage(), [
@@ -151,7 +158,9 @@ class AgendaImpressaoController extends Controller
             $pdf = Pdf::loadView('agenda.reservas.pdf.lista_espera', compact('colonia', 'periodo', 'filaEspera'))
                 ->setPaper('a4', 'portrait');
 
-            $fileName = str_replace(['/', '\\'], '-', "lista_espera_{$colonia->nome}_{$periodo->descricao}.pdf");
+            $safeColonia = Str::slug($colonia->nome);
+            $safePeriodo = Str::slug($periodo->descricao);
+            $fileName = "lista_espera_{$safeColonia}_{$safePeriodo}.pdf";
             return $pdf->stream($fileName);
         } catch (\Throwable $e) {
             \Log::error("ERRO FATAL PDF Espera: " . $e->getMessage(), [
