@@ -57,7 +57,7 @@ class AgendaImpressaoController extends Controller
 
             $inscritos = AgendaInscricao::with(['hospede.empresa'])
                 ->where('colonia_id', $request->colonia_id)
-                ->where('periodo_id', $request->periodo_id)
+                ->where('agenda_periodo_id', $request->periodo_id)
                 ->orderBy('created_at', 'asc')
                 ->get();
 
