@@ -113,8 +113,8 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
         Route::get('historico', [\App\Http\Controllers\Agenda\AgendaHistoricoController::class, 'index'])->name('historico.index');
 
         // Inscrições / Gerenciador de Sorteio (módulo opcional)
-        Route::get('inscricoes/pdf/debug', [\App\Http\Controllers\Agenda\AgendaImpressaoController::class, 'debug'])->name('inscricoes.pdf.debug');
-        Route::get('inscricoes/pdf/teste-simples', [\App\Http\Controllers\Agenda\AgendaImpressaoController::class, 'testeSimples'])->name('inscricoes.pdf.testeSimples');
+        // Route::get('inscricoes/pdf/debug', [\App\Http\Controllers\Agenda\AgendaImpressaoController::class, 'debug'])->name('inscricoes.pdf.debug');
+        // Route::get('inscricoes/pdf/teste-simples', [\App\Http\Controllers\Agenda\AgendaImpressaoController::class, 'testeSimples'])->name('inscricoes.pdf.testeSimples');
         Route::get('inscricoes/pdf/guia', [\App\Http\Controllers\Agenda\AgendaImpressaoController::class, 'gerarGuiaPreReserva'])->name('inscricoes.pdf.guia')->middleware('can:inscricoes.visualizar');
         Route::get('inscricoes/pdf/lista', [\App\Http\Controllers\Agenda\AgendaImpressaoController::class, 'gerarListaInscritos'])->name('inscricoes.pdf.lista')->middleware('can:inscricoes.visualizar');
 
