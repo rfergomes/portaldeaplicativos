@@ -162,7 +162,7 @@
         </div>
     </div>
 
-    @if(auth()->user()->temPermissao('criar_eventos'))
+    @if(auth()->user()->temPermissao('criar_eventos') || auth()->user()->temPermissao('eventos.criar') || auth()->user()->temPermissao('eventos.editar'))
         <!-- Modal Novo Evento -->
         <div class="modal fade" id="novoEventoModal" tabindex="-1" aria-labelledby="novoEventoModalLabel" aria-hidden="true">
             <div class="modal-dialog">

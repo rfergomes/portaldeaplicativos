@@ -18,8 +18,8 @@ class AgendaInscricao extends Model
 
     protected $fillable = [
         'colonia_id',
-        'periodo_id',
-        'hospede_id',
+        'agenda_periodo_id',
+        'agenda_hospede_id',
         'status',
         'ordem_espera',
         'acomodacao_id',
@@ -34,12 +34,12 @@ class AgendaInscricao extends Model
 
     public function periodo()
     {
-        return $this->belongsTo(AgendaPeriodo::class, 'periodo_id');
+        return $this->belongsTo(AgendaPeriodo::class, 'agenda_periodo_id');
     }
 
     public function hospede()
     {
-        return $this->belongsTo(AgendaHospede::class, 'hospede_id');
+        return $this->belongsTo(AgendaHospede::class, 'agenda_hospede_id');
     }
 
     public function acomodacao()
@@ -57,12 +57,17 @@ class AgendaInscricao extends Model
      */
     public static function statusLabel(string $status): string
     {
-        return match ($status) {
-            'pendente' => 'Pendente',
-            'sorteado' => 'Sorteado',
-            'espera' => 'Lista de Espera',
-            'cancelado' => 'Cancelado',
-            default => ucfirst($status),
-        };
+        switch ($status) {
+            case 'pendente':
+                return 'Pendente';
+            case 'sorteado':
+                return 'Sorteado';
+            case 'espera':
+                return 'Lista de Espera';
+            case 'cancelado':
+                return 'Cancelado';
+            default:
+                return ucfirst($status);
+        }
     }
 }
