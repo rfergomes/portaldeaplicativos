@@ -22,14 +22,19 @@ class AgendaImpressaoController extends Controller
             'quantidade' => 'nullable|integer|min:1|max:100',
         ]);
 
-        $colonia = Colonia::findOrFail($request->colonia_id);
-        $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
-        $quantidade = $request->quantidade ?? 2; // Default 2 guias (1 folha)
+        try {
+            $colonia = Colonia::findOrFail($request->colonia_id);
+            $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
+            $quantidade = $request->quantidade ?? 2; // Default 2 guias (1 folha)
 
-        $pdf = Pdf::loadView('agenda.inscricoes.pdf.guia_pre_reserva', compact('colonia', 'periodo', 'quantidade'))
-            ->setPaper('a4', 'portrait');
+            $pdf = Pdf::loadView('agenda.inscricoes.pdf.guia_pre_reserva', compact('colonia', 'periodo', 'quantidade'))
+                ->setPaper('a4', 'portrait');
 
-        return $pdf->stream("guia_pre_reserva_{$colonia->nome}_{$periodo->descricao}.pdf");
+            return $pdf->stream("guia_pre_reserva_{$colonia->nome}_{$periodo->descricao}.pdf");
+        } catch (\Exception $e) {
+            \Log::error("Erro PDF Guia: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json(['error' => 'Erro ao gerar PDF: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -42,19 +47,24 @@ class AgendaImpressaoController extends Controller
             'periodo_id' => 'required|exists:agenda_periodos,id',
         ]);
 
-        $colonia = Colonia::findOrFail($request->colonia_id);
-        $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
+        try {
+            $colonia = Colonia::findOrFail($request->colonia_id);
+            $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
 
-        $inscritos = AgendaInscricao::with(['hospede.empresa'])
-            ->where('colonia_id', $request->colonia_id)
-            ->where('periodo_id', $request->periodo_id)
-            ->orderBy('created_at', 'asc')
-            ->get();
+            $inscritos = AgendaInscricao::with(['hospede.empresa'])
+                ->where('colonia_id', $request->colonia_id)
+                ->where('periodo_id', $request->periodo_id)
+                ->orderBy('created_at', 'asc')
+                ->get();
 
-        $pdf = Pdf::loadView('agenda.inscricoes.pdf.lista_inscritos', compact('colonia', 'periodo', 'inscritos'))
-            ->setPaper('a4', 'portrait');
+            $pdf = Pdf::loadView('agenda.inscricoes.pdf.lista_inscritos', compact('colonia', 'periodo', 'inscritos'))
+                ->setPaper('a4', 'portrait');
 
-        return $pdf->stream("lista_inscritos_{$colonia->nome}_{$periodo->descricao}.pdf");
+            return $pdf->stream("lista_inscritos_{$colonia->nome}_{$periodo->descricao}.pdf");
+        } catch (\Exception $e) {
+            \Log::error("Erro PDF Lista Inscritos: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json(['error' => 'Erro ao gerar PDF: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -67,25 +77,33 @@ class AgendaImpressaoController extends Controller
             'periodo_id' => 'required|exists:agenda_periodos,id',
         ]);
 
-        $colonia = Colonia::with([
-            'acomodacoes' => function ($q) {
-                $q->where('ativo', true)->orderBy('tipo')->orderBy('identificador');
-            }
-        ])->findOrFail($request->colonia_id);
+        try {
+            ini_set('memory_limit', '256M');
+            set_time_limit(60);
 
-        $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
+            $colonia = Colonia::with([
+                'acomodacoes' => function ($q) {
+                    $q->where('ativo', true)->orderBy('tipo')->orderBy('identificador');
+                }
+            ])->findOrFail($request->colonia_id);
 
-        $reservas = \App\Models\AgendaReserva::with(['hospede.empresa'])
-            ->where('colonia_id', $request->colonia_id)
-            ->where('agenda_periodo_id', $request->periodo_id)
-            ->whereNotNull('colonia_acomodacao_id')
-            ->get()
-            ->keyBy('colonia_acomodacao_id');
+            $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
 
-        $pdf = Pdf::loadView('agenda.reservas.pdf.lista_acomodacoes', compact('colonia', 'periodo', 'reservas'))
-            ->setPaper('a4', 'portrait');
+            $reservas = \App\Models\AgendaReserva::with(['hospede.empresa'])
+                ->where('colonia_id', $request->colonia_id)
+                ->where('agenda_periodo_id', $request->periodo_id)
+                ->whereNotNull('colonia_acomodacao_id')
+                ->get()
+                ->keyBy('colonia_acomodacao_id');
 
-        return $pdf->stream("lista_reservas_{$colonia->nome}_{$periodo->descricao}.pdf");
+            $pdf = Pdf::loadView('agenda.reservas.pdf.lista_acomodacoes', compact('colonia', 'periodo', 'reservas'))
+                ->setPaper('a4', 'portrait');
+
+            return $pdf->stream("lista_reservas_{$colonia->nome}_{$periodo->descricao}.pdf");
+        } catch (\Exception $e) {
+            \Log::error("Erro PDF Reservas: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json(['error' => 'Erro ao gerar PDF: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -98,19 +116,24 @@ class AgendaImpressaoController extends Controller
             'periodo_id' => 'required|exists:agenda_periodos,id',
         ]);
 
-        $colonia = Colonia::findOrFail($request->colonia_id);
-        $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
+        try {
+            $colonia = Colonia::findOrFail($request->colonia_id);
+            $periodo = AgendaPeriodo::findOrFail($request->periodo_id);
 
-        $filaEspera = \App\Models\AgendaReserva::with(['hospede.empresa'])
-            ->where('colonia_id', $request->colonia_id)
-            ->where('agenda_periodo_id', $request->periodo_id)
-            ->whereNull('colonia_acomodacao_id')
-            ->orderBy('ordem_fila')
-            ->get();
+            $filaEspera = \App\Models\AgendaReserva::with(['hospede.empresa'])
+                ->where('colonia_id', $request->colonia_id)
+                ->where('agenda_periodo_id', $request->periodo_id)
+                ->whereNull('colonia_acomodacao_id')
+                ->orderBy('ordem_fila')
+                ->get();
 
-        $pdf = Pdf::loadView('agenda.reservas.pdf.lista_espera', compact('colonia', 'periodo', 'filaEspera'))
-            ->setPaper('a4', 'portrait');
+            $pdf = Pdf::loadView('agenda.reservas.pdf.lista_espera', compact('colonia', 'periodo', 'filaEspera'))
+                ->setPaper('a4', 'portrait');
 
-        return $pdf->stream("lista_espera_{$colonia->nome}_{$periodo->descricao}.pdf");
+            return $pdf->stream("lista_espera_{$colonia->nome}_{$periodo->descricao}.pdf");
+        } catch (\Exception $e) {
+            \Log::error("Erro PDF Espera: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json(['error' => 'Erro ao gerar PDF: ' . $e->getMessage()], 500);
+        }
     }
 }
