@@ -176,12 +176,14 @@
 <body>
     @php
         $logoPath = public_path('img/logo.jpg');
-        // Para DomPDF offline em alguns ambientes, base64 é mais seguro
+        $logoSrc = '';
         if (file_exists($logoPath)) {
-            $logoData = base64_encode(file_get_contents($logoPath));
-            $logoSrc = 'data:image/jpeg;base64,' . $logoData;
-        } else {
-            $logoSrc = '';
+            try {
+                $logoData = base64_encode(file_get_contents($logoPath));
+                $logoSrc = 'data:image/jpeg;base64,' . $logoData;
+            } catch (\Throwable $e) {
+                $logoSrc = '';
+            }
         }
     @endphp
 

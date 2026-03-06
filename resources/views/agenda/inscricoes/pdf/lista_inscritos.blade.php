@@ -87,7 +87,24 @@
 
 <body>
     <div class="header clearfix">
-        <img src="{{ public_path('img/logo.jpg') }}" class="logo" alt="Logo">
+        @php
+            $logoPath = public_path('img/logo.jpg');
+            $logoSrc = '';
+            if (file_exists($logoPath)) {
+                try {
+                    $logoData = base64_encode(file_get_contents($logoPath));
+                    $logoSrc = 'data:image/jpeg;base64,' . $logoData;
+                } catch (\Exception $e) {
+                    $logoSrc = '';
+                }
+            }
+        @endphp
+
+        @if($logoSrc)
+            <img src="{{ $logoSrc }}" class="logo" alt="Logo">
+        @else
+            <div style="float: left; width: 120px; font-weight: bold;">Sindicato Químicos</div>
+        @endif
         <div class="info-header">
             <strong>{{ $colonia->nome }}</strong><br>
             {{ $periodo->descricao }} (De {{ $periodo->data_inicial->format('d/m/Y') }} à
