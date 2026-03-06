@@ -53,6 +53,7 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
 
     Route::get('/eventos', [EventController::class, 'index'])->name('eventos.index')->middleware('can:eventos.visualizar');
     Route::post('/eventos', [EventController::class, 'store'])->name('eventos.store')->middleware('can:eventos.criar');
+    Route::put('/eventos/{evento}', [EventController::class, 'update'])->name('eventos.update')->middleware('can:eventos.criar');
     Route::get('/eventos/{evento}', [EventController::class, 'show'])->name('eventos.show')->middleware('can:eventos.visualizar');
     Route::patch('/eventos/{evento}/status', [EventController::class, 'toggleStatus'])->name('eventos.toggleStatus')->middleware('can:eventos.criar');
     Route::get('/eventos/{evento}/relatorio', [EventController::class, 'report'])->name('eventos.report')->middleware('can:eventos.relatorio');

@@ -96,6 +96,32 @@ class EventController extends Controller
         return $pdf->stream('relatorio-' . $evento->id . '.pdf');
     }
 
+    public function edit(Evento $evento): View
+    {
+        return view('eventos.edit', compact('evento'));
+    }
+
+    public function update(Request $request, Evento $evento): RedirectResponse
+    {
+        $data = $request->validate([
+            'nome' => ['required', 'string', 'max:255'],
+            'data_inicio' => ['nullable', 'date'],
+            'local' => ['nullable', 'string', 'max:255'],
+            'valor_inteira' => ['nullable', 'numeric', 'min:0'],
+        ]);
+
+        $evento->update([
+            'nome' => $data['nome'],
+            'data_inicio' => $data['data_inicio'] ?? null,
+            'local' => $data['local'] ?? null,
+            'valor_inteira' => $data['valor_inteira'] ?? 0,
+            'valor_meia' => ($data['valor_inteira'] ?? 0) / 2,
+        ]);
+
+        return redirect()->route('eventos.index')
+            ->with('status', 'Evento atualizado com sucesso.');
+    }
+
     public function toggleStatus(Evento $evento): RedirectResponse
     {
         $evento->update([

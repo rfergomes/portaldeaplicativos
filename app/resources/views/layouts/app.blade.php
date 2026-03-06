@@ -513,14 +513,20 @@
 
         // Inicializar Select2 globalmente
         $(document).ready(function () {
-            $('.form-select').select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                language: {
-                    noResults: function () {
-                        return "Nenhum resultado encontrado";
+            $('.form-select').each(function () {
+                const $this = $(this);
+                const isInsideModal = $this.closest('.modal').length > 0;
+
+                $this.select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    dropdownParent: isInsideModal ? $this.closest('.modal') : $(document.body),
+                    language: {
+                        noResults: function () {
+                            return "Nenhum resultado encontrado";
+                        }
                     }
-                }
+                });
             });
         });
 

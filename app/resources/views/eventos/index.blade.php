@@ -94,10 +94,42 @@
                                             title="Ver Detalhes">
                                             <i class="fa-solid fa-eye me-1"></i> Ver
                                         </a>
-                                        <a href="{{ route('eventos.report', $evento) }}" target="_blank"
-                                            class="btn btn-outline-secondary btn-sm" title="Relatório">
-                                            <i class="fa-solid fa-file-pdf"></i>
-                                        </a>
+
+                                        @if(auth()->user()->temPermissao('criar_eventos'))
+                                                                    <button type="button" class="btn btn-sm btn-outline-info" onclick="editEvento({{ json_encode([
+                                                'id' => $evento->id,
+                                                'nome' => $evento->nome,
+                                                'data' => $evento->data_inicio ? $evento->data_inicio->format('Y-m-d\TH:i') : '',
+                                                'local' => $evento->local,
+                                                'valor_inteira' => $evento->valor_inteira
+                                            ]) }})" title="Editar Evento">
+                                                                        <i class="fa-solid fa-edit"></i>
+                                                                    </button>
+                                        @endif
+
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                data-bs-toggle="dropdown" title="Relatório PDF">
+                                                <i class="fa-solid fa-file-pdf"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('eventos.report', $evento) }}"
+                                                        target="_blank">
+                                                        <i class="fa-solid fa-file-invoice-dollar me-2 text-primary"></i>
+                                                        Completo
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('eventos.report', [$evento, 'sem_valor' => 1]) }}"
+                                                        target="_blank">
+                                                        <i class="fa-solid fa-file-lines me-2 text-muted"></i> Sem Valores
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
                                         @if(auth()->user()->temPermissao('criar_eventos'))
                                             <button type="button"
                                                 class="btn btn-sm {{ $evento->encerrado ? 'btn-outline-success' : 'btn-outline-warning' }}"
@@ -130,7 +162,7 @@
     </div>
 
     @if(auth()->user()->temPermissao('criar_eventos'))
-        <!-- Modal -->
+        <!-- Modal Novo Evento -->
         <div class="modal fade" id="novoEventoModal" tabindex="-1" aria-labelledby="novoEventoModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content shadow-lg border-0 rounded-3">
@@ -172,14 +204,66 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Editar Evento -->
+        <div class="modal fade" id="editEventoModal" tabindex="-1" aria-labelledby="editEventoModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content shadow-lg border-0 rounded-3">
+                    <div class="modal-header border-bottom-0">
+                        <h5 class="modal-title fw-bold" id="editEventoModalLabel">Editar Evento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="editEventoForm" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-body px-4">
+                            <div class="mb-3">
+                                <label for="edit_nome" class="form-label small fw-bold">Nome do Evento</label>
+                                <input type="text" class="form-control" id="edit_nome" name="nome" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit_data" class="form-label small fw-bold">Data</label>
+                                <input type="datetime-local" class="form-control" id="edit_data" name="data_inicio">
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit_local" class="form-label small fw-bold">Local</label>
+                                <input type="text" class="form-control" id="edit_local" name="local">
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit_valor_inteira" class="form-label small fw-bold">Valor (inteira)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="edit_valor_inteira"
+                                        name="valor_inteira">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0 px-4 pb-4">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary fw-bold">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     @endif
 
     @push('scripts')
         <script>
+            function editEvento(evento) {
+                document.getElementById('editEventoForm').action = `/eventos/${evento.id}`;
+                document.getElementById('edit_nome').value = evento.nome;
+                document.getElementById('edit_data').value = evento.data;
+                document.getElementById('edit_local').value = evento.local;
+                document.getElementById('edit_valor_inteira').value = evento.valor_inteira;
+
+                new bootstrap.Modal(document.getElementById('editEventoModal')).show();
+            }
+
             function toggleEventStatus(id, nome, encerrado) {
                 const acao = encerrado ? 'REABRIR' : 'ENCERRAR';
                 const msg = encerrado ? 'O evento voltará a aparecer na lista de eventos abertos.' : 'O evento será movido para a lista de eventos encerrados.';
-                
+
                 Swal.fire({
                     title: `Deseja ${acao} o evento?`,
                     text: `${nome}: ${msg}`,
