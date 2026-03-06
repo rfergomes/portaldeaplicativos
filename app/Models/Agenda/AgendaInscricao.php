@@ -18,8 +18,8 @@ class AgendaInscricao extends Model
 
     protected $fillable = [
         'colonia_id',
-        'agenda_periodo_id',
-        'agenda_hospede_id',
+        'periodo_id',
+        'hospede_id',
         'status',
         'ordem_espera',
         'acomodacao_id',
@@ -34,12 +34,12 @@ class AgendaInscricao extends Model
 
     public function periodo()
     {
-        return $this->belongsTo(AgendaPeriodo::class, 'agenda_periodo_id');
+        return $this->belongsTo(AgendaPeriodo::class, 'periodo_id');
     }
 
     public function hospede()
     {
-        return $this->belongsTo(AgendaHospede::class, 'agenda_hospede_id');
+        return $this->belongsTo(AgendaHospede::class, 'hospede_id');
     }
 
     public function acomodacao()

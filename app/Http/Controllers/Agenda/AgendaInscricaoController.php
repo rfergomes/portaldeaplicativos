@@ -41,7 +41,7 @@ class AgendaInscricaoController extends Controller
 
             $inscricoes = AgendaInscricao::with(['hospede.empresa', 'acomodacao', 'reserva'])
                 ->where('colonia_id', $coloniaSelecionada)
-                ->where('agenda_periodo_id', $periodoSelecionado)
+                ->where('periodo_id', $periodoSelecionado)
                 ->orderBy('status')
                 ->orderBy('ordem_espera')
                 ->orderBy('created_at')
@@ -103,8 +103,8 @@ class AgendaInscricaoController extends Controller
 
         AgendaInscricao::create([
             'colonia_id' => $request->colonia_id,
-            'agenda_periodo_id' => $request->periodo_id,
-            'agenda_hospede_id' => $hospede->id,
+            'periodo_id' => $request->periodo_id,
+            'hospede_id' => $hospede->id,
             'status' => 'pendente',
             'observacao' => $request->observacao,
         ]);
@@ -131,9 +131,9 @@ class AgendaInscricaoController extends Controller
         $status = $request->status;
 
         // Garantir resolução dos campos-chave: usar o modelo ou a query string como fallback
-        $periodoId = $inscricao->agenda_periodo_id ?? (int) $request->query('periodo_id');
+        $periodoId = $inscricao->periodo_id ?? (int) $request->query('periodo_id');
         $coloniaId = $inscricao->colonia_id ?? (int) $request->query('colonia_id');
-        $hospedeId = $inscricao->agenda_hospede_id;
+        $hospedeId = $inscricao->hospede_id;
 
         if (!$periodoId || !$coloniaId) {
             return redirect()->back()->with('error', 'Período ou Colônia não identificados. Verifique os dados da inscrição.');
@@ -181,7 +181,7 @@ class AgendaInscricaoController extends Controller
             'observacao' => $request->observacao ?? $inscricao->observacao,
             'reserva_id' => $reservaId,
             'ordem_espera' => $status === 'espera'
-                ? ($inscricao->ordem_espera ?? AgendaInscricao::where('colonia_id', $coloniaId)->where('agenda_periodo_id', $periodoId)->where('status', 'espera')->count() + 1)
+                ? ($inscricao->ordem_espera ?? AgendaInscricao::where('colonia_id', $coloniaId)->where('periodo_id', $periodoId)->where('status', 'espera')->count() + 1)
                 : null,
         ]);
 
@@ -197,7 +197,7 @@ class AgendaInscricaoController extends Controller
     public function destroy(Request $request, AgendaInscricao $inscricao)
     {
         $coloniaId = $inscricao->colonia_id ?? $request->query('colonia_id');
-        $periodoId = $inscricao->agenda_periodo_id ?? $request->query('periodo_id');
+        $periodoId = $inscricao->periodo_id ?? $request->query('periodo_id');
 
         // Remover reserva vinculada se existir
         if ($inscricao->reserva_id) {
