@@ -239,9 +239,19 @@
                                         </td>
                                         <td>{{ $prot->empresa->nome_curto ?? '—' }}</td>
                                         <td>
-                                            <span
-                                                class="badge {{ $prot->status == 'concluido' ? 'bg-success' : 'bg-warning' }}">
-                                                {{ ucfirst($prot->status) }}
+                                            @php
+                                                $statusColors = [
+                                                    'sucesso' => 'success',
+                                                    'concluido' => 'success',
+                                                    'enviado' => 'primary',
+                                                    'pendente' => 'secondary',
+                                                    'falha' => 'danger',
+                                                ];
+                                                $statusColor = $statusColors[$prot->status] ?? 'secondary';
+                                                $statusLabel = $prot->status == 'concluido' ? 'Sucesso' : ucfirst($prot->status);
+                                            @endphp
+                                            <span class="badge bg-{{ $statusColor }} rounded-pill shadow-sm px-2">
+                                                {{ $statusLabel }}
                                             </span>
                                         </td>
                                         <td class="text-end px-4 small">{{ $prot->created_at->format('d/m/Y') }}</td>
