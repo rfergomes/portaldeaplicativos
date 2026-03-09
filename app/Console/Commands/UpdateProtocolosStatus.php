@@ -136,7 +136,31 @@ class UpdateProtocolosStatus extends Command
 
                 $atualizados++;
             } catch (\Throwable $e) {
-                Log::warning("Falha ao atualizar status do envio #{$envio->id}: " . $e->getMessage());
+                $errorStr = $e->getMessage();
+                Log::warning("Falha ao atualizar status do envio #{$envio->id}: " . $errorStr);
+
+                // Extrai o JSON contido na mensagem de erro (Ex: "Erro ao consultar status completo: {"message":"Registro não encontrado"}")
+                $apiMessage = 'Falha na comunicação com a AR-Online.';
+                $jsonStart = strpos($errorStr, '{');
+                if ($jsonStart !== false) {
+                    $jsonObj = json_decode(substr($errorStr, $jsonStart), true);
+                    if ($jsonObj && isset($jsonObj['message'])) {
+                        $apiMessage = $jsonObj['message'];
+                    }
+                }
+
+                // Se a API retornar erros assertivos de inexistência, abortamos o envio como falho.
+                if (str_contains(strtolower($apiMessage), 'não encontrado') || str_contains(strtolower($apiMessage), 'inexistente') || str_contains(strtolower($apiMessage), 'falha')) {
+                    $envio->update([
+                        'status' => 'falha',
+                        'ultima_resposta' => json_encode(['error' => true, 'message' => $apiMessage], JSON_UNESCAPED_UNICODE)
+                    ]);
+
+                    if ($envio->protocolo) {
+                        $envio->protocolo->atualizarStatusGeral();
+                    }
+                }
+
                 $falhas++;
             }
         }

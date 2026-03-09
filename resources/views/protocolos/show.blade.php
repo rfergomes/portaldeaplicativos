@@ -129,7 +129,7 @@
                                                             <div class="position-relative mb-3" style="padding-left: 1.5rem;">
                                                                 <!-- Bolinha na linha do tempo -->
                                                                 <div class="position-absolute start-0 translate-middle-x" style="width:14px;height:14px;border-radius:50%;top:4px;left:-1px;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       background:{{ match ($envio->status) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       background:{{ match ($envio->status) {
                                                 'enviado' => '#0d6efd',
                                                 'entregue' => '#0dcaf0',
                                                 'lido' => '#198754',
@@ -225,9 +225,16 @@
 
                                                                         @if($envio->status === 'falha' && $envio->ultima_resposta)
                                                                             <div class="mt-1">
+                                                                                @php
+                                                                                    $respArr = json_decode($envio->ultima_resposta, true);
+                                                                                    $msgFalha = $respArr['message'] ?? $respArr['error'] ?? $envio->ultima_resposta;
+                                                                                    // Fallback pra string limpa sem json visível
+                                                                                    if (is_array($msgFalha))
+                                                                                        $msgFalha = json_encode($msgFalha);
+                                                                                @endphp
                                                                                 <small class="text-danger">
                                                                                     <i class="fa-solid fa-circle-exclamation me-1"></i>
-                                                                                    {{ Str::limit($envio->ultima_resposta, 120) }}
+                                                                                    {{ Str::limit($msgFalha, 120) }}
                                                                                 </small>
                                                                             </div>
                                                                         @endif
