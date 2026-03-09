@@ -82,7 +82,7 @@
             <div class="small-box bg-success text-white shadow-sm border-0">
                 <div class="inner">
                     <h3 class="metric-value">{{ $totalEmpresas }}</h3>
-                    <p class="metric-label">Empresas Cadastradas</p>
+                    <p class="metric-label">Empresas Ativas</p>
                 </div>
                 <div class="small-box-icon"><i class="fa-solid fa-building"></i></div>
                 <a href="{{ url('/empresas') }}"
@@ -147,7 +147,7 @@
         <div class="col-lg-4">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-white border-0 py-3 d-flex align-items-center">
-                    <h5 class="card-title mb-0 fw-bold text-danger">Limites de Acertos Vencidos</h5>
+                    <h5 class="card-title mb-0 fw-bold text-danger">Reservas Vencidas</h5>
                     <div class="card-tools ms-auto">
                         <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse"><i
                                 class="fa-solid fa-minus"></i></button>

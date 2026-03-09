@@ -24,6 +24,210 @@
         href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
 
     @stack('styles')
+    <style>
+        .user-avatar-circle {
+            width: 40px;
+            height: 40px;
+            background-color: #033c5a;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        [data-bs-theme="dark"] .user-avatar-circle {
+            background-color: #fff;
+            color: #033c5a;
+        }
+
+        .user-menu:hover .user-avatar-circle {
+            transform: scale(1.05);
+        }
+
+        .header-info-left {
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding-right: 15px;
+            margin-right: 15px;
+            text-align: left;
+            line-height: 1.2;
+        }
+
+        .header-info-left .user-profile-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        [data-bs-theme="dark"] .header-info-left .user-profile-label {
+            color: #94a3b8;
+        }
+
+        .header-info-left .user-nick {
+            font-size: 0.75rem;
+            background: #f1f5f9;
+            padding: 1px 12px;
+            border-radius: 50rem;
+            color: #334155;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        [data-bs-theme="dark"] .header-info-left .user-nick {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        .header-info-left .user-nick::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background: #22c55e;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .app-header.navbar {
+            background-color: #fff !important;
+            color: #334155 !important;
+        }
+
+        [data-bs-theme="dark"] .app-header.navbar {
+            background-color: var(--bs-body-bg) !important;
+            color: #fff !important;
+        }
+
+        .app-header .nav-link {
+            color: #4b5563 !important;
+        }
+
+        [data-bs-theme="dark"] .app-header .nav-link {
+            color: #fff !important;
+        }
+
+        .dropdown-user-premium {
+            border: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 0;
+            min-width: 260px;
+            overflow: hidden;
+        }
+
+        .dropdown-user-premium .user-header-new {
+            padding: 15px 20px;
+            background: #fff;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        [data-bs-theme="dark"] .dropdown-user-premium .user-header-new {
+            background: var(--bs-secondary-bg);
+            border-bottom-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-user-premium .user-header-new .user-avatar-lg {
+            width: 50px;
+            height: 50px;
+            background-color: #033c5a;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        [data-bs-theme="dark"] .dropdown-user-premium .user-header-new .user-avatar-lg {
+            background-color: #f8fafc;
+            color: #033c5a;
+        }
+
+        .dropdown-user-premium .user-header-new .dropdown-item-title {
+            font-size: 1rem;
+            margin: 0;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        [data-bs-theme="dark"] .dropdown-user-premium .user-header-new .dropdown-item-title {
+            color: #f8fafc;
+        }
+
+        .dropdown-user-premium .user-header-new .user-role-badge {
+            font-size: 0.7rem;
+            color: #033c5a;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 1px;
+            display: block;
+        }
+
+        [data-bs-theme="dark"] .dropdown-user-premium .user-header-new .user-role-badge {
+            color: #cbd5e1;
+            opacity: 0.8;
+        }
+
+        .dropdown-user-premium .user-header-new .user-email-text {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+
+        [data-bs-theme="dark"] .dropdown-user-premium .user-header-new .user-email-text {
+            color: #94a3b8;
+        }
+
+        .dropdown-user-premium .user-meta {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 0;
+            line-height: 1.3;
+        }
+
+        .dropdown-user-premium .user-meta i {
+            width: auto;
+            font-size: 0.7rem;
+            margin-right: 4px;
+        }
+
+        .dropdown-user-premium .dropdown-item {
+            padding: 12px 20px;
+            font-weight: 500;
+            color: #4b5563;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-user-premium .dropdown-item:hover {
+            background-color: #f8fafc;
+            color: #033c5a;
+        }
+
+        .dropdown-user-premium .dropdown-item i {
+            width: 25px;
+            font-size: 1.1rem;
+            opacity: 0.6;
+        }
+
+        .dropdown-user-premium .divider-light {
+            height: 1px;
+            background-color: #f1f5f9;
+            margin: 0;
+        }
+    </style>
 
     <script>
         // Color Mode Toggler
@@ -51,10 +255,7 @@
 
             const showActiveTheme = (theme, focus = false) => {
                 const themeSwitcher = document.querySelector("#bd-theme");
-
-                if (!themeSwitcher) {
-                    return;
-                }
+                if (!themeSwitcher) return;
 
                 const themeSwitcherText = document.querySelector("#bd-theme-text");
                 const activeThemeIcon = document.querySelector(".theme-icon-active i");
@@ -78,7 +279,6 @@
             };
 
             window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-                const storedTheme = localStorage.getItem("theme");
                 if (storedTheme !== "light" && storedTheme !== "dark") {
                     setTheme(getPreferredTheme());
                 }
@@ -86,7 +286,6 @@
 
             window.addEventListener("DOMContentLoaded", () => {
                 showActiveTheme(getPreferredTheme());
-
                 for (const toggle of document.querySelectorAll("[data-bs-theme-value]")) {
                     toggle.addEventListener("click", () => {
                         const theme = toggle.getAttribute("data-bs-theme-value");
@@ -119,6 +318,21 @@
                 <!-- End navbar links -->
 
                 <ul class="navbar-nav ms-auto">
+                    <!-- Informações de Localização e Usuário (Esquerda do sino) -->
+                    <li class="nav-item d-none d-sm-flex align-items-center">
+                        <div class="header-info-left">
+                            <div class="user-profile-label">{{ Auth::user()->perfis->first()->nome ?? 'USUÁRIO' }}</div>
+                            <div class="user-nick">{{ Auth::user()->nickname ?: Auth::user()->name }}</div>
+                        </div>
+                    </li>
+
+                    <!-- Notificações -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fa-regular fa-bell"></i>
+                        </a>
+                    </li>
+
                     <!-- Color Mode Toggler -->
                     <li class="nav-item dropdown">
                         <button class="btn btn-link nav-link dropdown-toggle d-flex align-items-center" id="bd-theme"
@@ -158,29 +372,57 @@
                     </li>
 
                     <!-- User Menu -->
-                    <li class="nav-item dropdown user-menu">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <i class="fa-solid fa-user-circle me-1"></i>
-                            <span class="d-none d-md-inline">{{ Auth::user()->nickname ?: Auth::user()->name }}</span>
+                    <li class="nav-item dropdown user-menu ms-2">
+                        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center p-0"
+                            data-bs-toggle="dropdown">
+                            <div class="user-avatar-circle">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </div>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                            <li class="user-header bg-primary">
-                                <p>
-                                    {{ Auth::user()->nickname ?: Auth::user()->name }}
-                                    <small>Membro desde {{ Auth::user()->created_at->format('M. Y') }}</small>
-                                    @if(Auth::user()->last_login_at)
-                                        <small class="d-block text-white-50 mt-1">
-                                            Último acesso: {{ Auth::user()->last_login_at->format('d/m/Y H:i') }}
-                                        </small>
-                                    @endif
-                                </p>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-user-premium shadow">
+                            <li class="user-header-new">
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar-lg">
+                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h3 class="dropdown-item-title">
+                                            {{ Auth::user()->name }}
+                                        </h3>
+                                        <div class="user-role-badge">
+                                            {{ Auth::user()->perfis->first()->nome ?? 'USUÁRIO' }}
+                                        </div>
+                                        <div class="user-email-text">{{ Auth::user()->email }}</div>
+                                        <div class="user-meta">
+                                            <div>
+                                                <i class="fa-regular fa-calendar-days"></i>
+                                                Membro desde {{ Auth::user()->created_at->format('M. Y') }}
+                                            </div>
+                                            @if(Auth::user()->last_login_at)
+                                                <div>
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    Acesso: {{ Auth::user()->last_login_at->format('d/m H:i') }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
                             </li>
-                            <li class="user-footer">
-                                <a href="{{ route('profile.index') }}" class="btn btn-default btn-flat float-start">Meu
-                                    Perfil</a>
-                                <form method="POST" action="{{ route('logout') }}">
+                            <li>
+                                <a href="{{ route('profile.index') }}" class="dropdown-item">
+                                    <i class="fa-regular fa-user me-2"></i> Meu Perfil
+                                </a>
+                            </li>
+                            <li>
+                                <div class="divider-light"></div>
+                            </li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}" id="logout-header-form">
                                     @csrf
-                                    <button type="submit" class="btn btn-default btn-flat float-end">Sair</button>
+                                    <a href="#" class="dropdown-item text-danger" style="color: #ef4444 !important;"
+                                        onclick="event.preventDefault(); document.getElementById('logout-header-form').submit();">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Sair
+                                    </a>
                                 </form>
                             </li>
                         </ul>
