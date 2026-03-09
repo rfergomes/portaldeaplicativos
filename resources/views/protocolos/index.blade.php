@@ -76,7 +76,7 @@
                     <div class="col-md-3">
                         <label class="form-label small fw-bold text-muted mb-1">Pesquisar</label>
                         <div class="input-group input-group-sm mb-0">
-                            <span class="input-group-text bg-white border-end-0"><i
+                            <span class="input-group-text border-end-0"><i
                                     class="fa-solid fa-search text-muted"></i></span>
                             <input type="text" name="termo" class="form-control border-start-0 ps-0"
                                 placeholder="Assunto, empresa, contato..." value="{{ request('termo', $termo ?? '') }}">
@@ -132,8 +132,8 @@
 
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="text-muted small text-uppercase">
+                    <table class="table table-hover align-middle mb-0 premium-table">
+                        <thead>
                             <tr>
                                 <th class="ps-4" style="width:80px;">ID</th>
                                 <th>Tipo</th>

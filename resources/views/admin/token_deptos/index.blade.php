@@ -45,8 +45,8 @@
 
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="text-muted small text-uppercase">
+                    <table class="table table-hover align-middle mb-0 premium-table">
+                        <thead>
                             <tr>
                                 <th class="ps-4" style="width: 80px;">ID</th>
                                 <th>Departamento</th>

@@ -77,7 +77,7 @@
 
             <div class="table-responsive mt-3" id="tabelaAbertos">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th>Evento</th>
                             <th>Data</th>
@@ -170,7 +170,7 @@
 
             <div class="table-responsive mt-3 d-none" id="tabelaEncerrados">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th>Evento</th>
                             <th>Data</th>
@@ -261,7 +261,7 @@
                 </table>
             </div>
         </div>
-        <div class="card-footer clearfix bg-white text-muted small py-2">
+        <div class="card-footer clearfix text-muted small py-2">
             © TI Químicos Unificados
         </div>
     </div>

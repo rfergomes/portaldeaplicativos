@@ -17,8 +17,8 @@
 
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light text-muted small text-uppercase">
+                    <table class="table table-hover align-middle mb-0 premium-table">
+                        <thead>
                             <tr>
                                 <th class="ps-4" style="width: 80px;">ID</th>
                                 <th>Nome</th>
@@ -35,7 +35,7 @@
                                         <span class="badge text-bg-light border shadow-sm px-2">#{{ $tipo->id }}</span>
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-dark"><i
+                                        <div class="fw-bold"><i
                                                 class="{{ $tipo->icone }} text-{{ $tipo->cor }} me-2"></i>{{ $tipo->nome }}
                                         </div>
                                     </td>
@@ -83,7 +83,7 @@
                     </table>
                 </div>
             </div>
-            <div class="card-footer bg-white text-muted small py-3 border-top">
+            <div class="card-footer text-muted small py-3 border-top">
                 <i class="fa-solid fa-circle-info me-1"></i> Gerencie os tipos de protocolos para classificar as
                 comunicações.
             </div>

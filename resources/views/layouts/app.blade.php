@@ -227,6 +227,27 @@
             background-color: #f1f5f9;
             margin: 0;
         }
+
+        /* Estilo Premium para Tabelas */
+        .table.premium-table thead {
+            background-color: #ffffff !important;
+            color: #334155 !important;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .table.premium-table thead th {
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.025em;
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+
+        [data-bs-theme="dark"] .table.premium-table thead {
+            background-color: #ffffff !important;
+            color: #1e293b !important;
+        }
     </style>
 
     <script>

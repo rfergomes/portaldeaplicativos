@@ -21,8 +21,8 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover table-striped align-middle mb-0">
-                            <thead class="table-light">
+                        <table class="table table-hover table-striped align-middle mb-0 premium-table">
+                            <thead>
                                 <tr>
                                     <th width="80" class="text-center">ID</th>
                                     <th>Descrição do Bloco</th>
