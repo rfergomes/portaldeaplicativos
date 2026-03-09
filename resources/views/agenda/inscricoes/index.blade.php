@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Inscrições / Sorteio - Agenda Colônias')
+@section('title', 'Inscrições - Agenda Colônias')
 
 @section('content')
     <div class="container-fluid py-3 px-4">
@@ -32,7 +32,7 @@
         {{-- CABEÇALHO --}}
         <div class="d-flex align-items-center justify-content-between mb-3">
             <div>
-                <h4 class="fw-bold mb-0"><i class="fa-solid fa-ticket text-primary me-2"></i>Inscrições / Sorteio
+                <h4 class="fw-bold mb-0"><i class="fa-solid fa-ticket text-primary me-2"></i>Inscrições
                 </h4>
                 <p class="text-muted small mb-0">Módulo opcional — registre os candidatos e marque os sorteados para
                     pré-reserva automática.</p>

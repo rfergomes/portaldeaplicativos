@@ -11,7 +11,7 @@ class AgendaReservaController extends Controller
     public function index(Request $request)
     {
         // 1. Carregar Períodos e Colônias para os Filtros
-        $periodos = \App\Models\AgendaPeriodo::where('ativo', true)->orderBy('data_inicial', 'desc')->get();
+        $periodos = \App\Models\AgendaPeriodo::where('ativo', true)->orderBy('data_inicial', 'asc')->get();
         $colonias = \App\Models\Colonia::where('ativo', true)->orderBy('nome')->get();
 
         $periodoSelecionado = $request->get('periodo_id');
