@@ -74,7 +74,7 @@ class AgendaReservaController extends Controller
         }
 
         // 3. Trazer Empresas para o dropdown de adição na planilha
-        $empresas = \App\Models\Empresa::orderBy('razao_social')->get();
+        $empresas = \App\Models\Empresa::where('ativo', true)->orderBy('razao_social')->get();
 
         return view('agenda.reservas.index', compact(
             'periodos',

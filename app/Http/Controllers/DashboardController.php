@@ -21,7 +21,7 @@ class DashboardController extends Controller
         $totalEventosMes = Evento::whereMonth('data_inicio', $now->month)
             ->whereYear('data_inicio', $now->year)
             ->count();
-        $totalEmpresas = Empresa::count();
+        $totalEmpresas = Empresa::where('ativo', true)->count();
         $totalProtocolosMes = Protocolo::whereMonth('created_at', $now->month)
             ->whereYear('created_at', $now->year)
             ->count();

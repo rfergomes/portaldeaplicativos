@@ -109,7 +109,7 @@ class ProtocoloController extends Controller
 
     public function create(): View
     {
-        $empresas = Empresa::orderBy('razao_social')->get();
+        $empresas = Empresa::where('ativo', true)->orderBy('razao_social')->get();
         $tiposProtocolo = TipoProtocolo::where('ativo', true)->orderBy('nome')->get();
 
         return view('protocolos.create', compact('empresas', 'tiposProtocolo'));

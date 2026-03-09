@@ -10,7 +10,7 @@ class AgendaHospedeController extends Controller
     public function index(Request $request)
     {
         $hospedes = \App\Models\AgendaHospede::with('empresa')->orderBy('nome')->paginate(20);
-        $empresas = \App\Models\Empresa::orderBy('razao_social')->get(['id', 'razao_social', 'nome_fantasia']);
+        $empresas = \App\Models\Empresa::where('ativo', true)->orderBy('razao_social')->get(['id', 'razao_social', 'nome_fantasia']);
 
         return view('agenda.hospedes.index', compact('hospedes', 'empresas'));
     }

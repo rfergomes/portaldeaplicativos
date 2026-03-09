@@ -60,7 +60,7 @@ class EventController extends Controller
     {
         $evento->load(['convites.convidados']);
 
-        $empresas = \App\Models\Empresa::orderBy('nome_curto')->orderBy('razao_social')->get();
+        $empresas = \App\Models\Empresa::where('ativo', true)->orderBy('nome_curto')->orderBy('razao_social')->get();
 
         // Resumo de estatísticas para o cabeçalho
         $totalConvites = $evento->convites->count();

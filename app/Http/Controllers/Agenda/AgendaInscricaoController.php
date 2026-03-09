@@ -21,7 +21,7 @@ class AgendaInscricaoController extends Controller
         try {
             $colonias = Colonia::where('ativo', true)->orderBy('nome')->get();
             $periodos = AgendaPeriodo::where('ativo', true)->orderBy('data_inicial', 'desc')->get();
-            $empresas = Empresa::orderBy('razao_social')->get();
+            $empresas = Empresa::where('ativo', true)->orderBy('razao_social')->get();
 
             $coloniaSelecionada = $request->get('colonia_id');
             $periodoSelecionado = $request->get('periodo_id');
