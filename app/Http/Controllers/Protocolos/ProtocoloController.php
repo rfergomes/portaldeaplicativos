@@ -84,7 +84,7 @@ class ProtocoloController extends Controller
             ->toArray();
 
         $totalGeral = array_sum($metrics);
-        $totalConcluidos = $metrics['concluido'] ?? 0;
+        $totalSucesso = $metrics['sucesso'] ?? 0;
         $totalEnviados = $metrics['enviado'] ?? 0;
         $totalFalhas = $metrics['falha'] ?? 0;
 
@@ -95,7 +95,7 @@ class ProtocoloController extends Controller
             'status',
             'termo',
             'totalGeral',
-            'totalConcluidos',
+            'totalSucesso',
             'totalEnviados',
             'totalFalhas'
         ));

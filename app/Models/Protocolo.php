@@ -79,26 +79,33 @@ class Protocolo extends Model
         }
 
         $statusWeights = [
-            'lido' => 50,
-            'concluido' => 50, // se aplicavel
+            'lido' => 40,
+            'concluido' => 40,
             'entregue' => 40,
             'enviado' => 30,
             'queued' => 20,
+            'pendente' => 20,
             'falha' => 10,
         ];
 
-        $bestStatus = null;
         $maxWeight = -1;
 
         foreach ($envios as $envio) {
             $peso = $statusWeights[$envio->status] ?? 0;
             if ($peso > $maxWeight) {
                 $maxWeight = $peso;
-                $bestStatus = $envio->status;
             }
         }
 
-        if ($bestStatus && $this->status !== $bestStatus) {
+        $bestStatus = match ($maxWeight) {
+            40 => 'sucesso',
+            30 => 'enviado',
+            20 => 'pendente',
+            10 => 'falha',
+            default => 'pendente',
+        };
+
+        if ($this->status !== $bestStatus) {
             $this->update(['status' => $bestStatus]);
         }
     }

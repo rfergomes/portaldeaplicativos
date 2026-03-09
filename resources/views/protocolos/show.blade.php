@@ -66,7 +66,7 @@
                         <div class="mb-0">
                             <small class="text-muted text-uppercase fw-bold d-block mb-1">Status Geral</small>
                             @php
-                                $cores = ['enviado' => 'primary', 'pendente' => 'warning', 'falha' => 'danger', 'concluido' => 'success'];
+                                $cores = ['sucesso' => 'success', 'enviado' => 'primary', 'pendente' => 'secondary', 'falha' => 'danger'];
                                 $cor = $cores[$protocolo->status] ?? 'secondary';
                             @endphp
                             <span
@@ -93,7 +93,9 @@
                         <h6 class="card-title fw-bold m-0">
                             <i class="fa-solid fa-timeline me-2"></i>Timeline de Envios
                         </h6>
-                        <small class="text-muted float-end"><i class="fa-solid fa-users me-1"></i>{{ $protocolo->destinatarios->count() }} destinatário(s)</small>
+                        <small class="text-muted float-end"><i
+                                class="fa-solid fa-users me-1"></i>{{ $protocolo->destinatarios->count() }}
+                            destinatário(s)</small>
                     </div>
                     <div class="card-body">
                         @forelse($protocolo->destinatarios as $destinatario)
@@ -127,7 +129,7 @@
                                                             <div class="position-relative mb-3" style="padding-left: 1.5rem;">
                                                                 <!-- Bolinha na linha do tempo -->
                                                                 <div class="position-absolute start-0 translate-middle-x" style="width:14px;height:14px;border-radius:50%;top:4px;left:-1px;
-                                                                                                                                                                                                                                                                                                                                                                                                                       background:{{ match ($envio->status) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       background:{{ match ($envio->status) {
                                                 'enviado' => '#0d6efd',
                                                 'entregue' => '#0dcaf0',
                                                 'lido' => '#198754',

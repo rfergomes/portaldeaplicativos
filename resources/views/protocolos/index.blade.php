@@ -26,8 +26,8 @@
                             <i class="fa-solid fa-check-double fa-2x text-success"></i>
                         </div>
                         <div>
-                            <p class="text-muted small fw-bold mb-0">Recepcionados</p>
-                            <h4 class="fw-bold mb-0">{{ number_format($totalConcluidos, 0, ',', '.') }}</h4>
+                            <p class="text-muted small fw-bold mb-0">Sucesso</p>
+                            <h4 class="fw-bold mb-0">{{ number_format($totalSucesso, 0, ',', '.') }}</h4>
                         </div>
                     </div>
                 </div>
@@ -109,13 +109,13 @@
                         <label class="form-label small fw-bold text-muted mb-1">Status do Envio</label>
                         <select name="status_envio" class="form-select form-select-sm">
                             <option value="">Todos</option>
-                            <option value="concluido" {{ request('status_envio') == 'concluido' ? 'selected' : '' }}>Recepção
-                                Concluída</option>
+                            <option value="sucesso" {{ request('status_envio') == 'sucesso' ? 'selected' : '' }}>Sucesso
+                            </option>
                             <option value="enviado" {{ request('status_envio') == 'enviado' ? 'selected' : '' }}>Enviado
                             </option>
-                            <option value="falha" {{ request('status_envio') == 'falha' ? 'selected' : '' }}>Falha</option>
                             <option value="pendente" {{ request('status_envio') == 'pendente' ? 'selected' : '' }}>Pendente
                             </option>
+                            <option value="falha" {{ request('status_envio') == 'falha' ? 'selected' : '' }}>Falha</option>
                         </select>
                     </div>
                     <div class="col-md-2 d-flex gap-2">
@@ -176,10 +176,10 @@
                                     <td>
                                         @php
                                             $cores = [
+                                                'sucesso' => 'success',
                                                 'enviado' => 'primary',
-                                                'pendente' => 'warning',
+                                                'pendente' => 'secondary',
                                                 'falha' => 'danger',
-                                                'concluido' => 'success',
                                             ];
                                             $cor = $cores[$protocolo->status] ?? 'secondary';
                                         @endphp
