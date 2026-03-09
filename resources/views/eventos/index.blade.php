@@ -63,7 +63,19 @@
             </div>
         </div>
         <div class="card-body p-0">
-            <div class="table-responsive">
+            <div class="px-3 pt-3">
+                <div class="btn-group" role="group" aria-label="Filtro de Eventos">
+                    <input type="radio" class="btn-check" name="eventoStatus" id="btnAbertos" autocomplete="off" checked
+                        onchange="toggleEventos('abertos')">
+                    <label class="btn btn-outline-success" for="btnAbertos">Abertos</label>
+
+                    <input type="radio" class="btn-check" name="eventoStatus" id="btnEncerrados" autocomplete="off"
+                        onchange="toggleEventos('encerrados')">
+                    <label class="btn btn-info text-white border-info" for="btnEncerrados">Encerrados</label>
+                </div>
+            </div>
+
+            <div class="table-responsive mt-3" id="tabelaAbertos">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
@@ -96,16 +108,108 @@
                                         </a>
 
                                         @if(auth()->user()->temPermissao('criar_eventos') || auth()->user()->temPermissao('eventos.editar') || auth()->user()->temPermissao('eventos.criar'))
-                                            <button type="button" class="btn btn-sm btn-outline-info"
-                                                onclick="editEvento({{ json_encode([
-                                                    'id' => $evento->id,
-                                                    'nome' => $evento->nome,
-                                                    'data' => $evento->data_inicio ? $evento->data_inicio->format('Y-m-d\TH:i') : '',
-                                                    'local' => $evento->local,
-                                                    'valor_inteira' => $evento->valor_inteira
-                                                ]) }})" title="Editar Evento">
-                                                <i class="fa-solid fa-edit"></i>
+                                                                    <button type="button" class="btn btn-sm btn-outline-info" onclick="editEvento({{ json_encode([
+                                                'id' => $evento->id,
+                                                'nome' => $evento->nome,
+                                                'data' => $evento->data_inicio ? $evento->data_inicio->format('Y-m-d\TH:i') : '',
+                                                'local' => $evento->local,
+                                                'valor_inteira' => $evento->valor_inteira
+                                            ]) }})" title="Editar Evento">
+                                                                        <i class="fa-solid fa-edit"></i>
+                                                                    </button>
+                                        @endif
+
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                data-bs-toggle="dropdown" title="Relatório PDF">
+                                                <i class="fa-solid fa-file-pdf"></i>
                                             </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('eventos.report', $evento) }}"
+                                                        target="_blank">
+                                                        <i class="fa-solid fa-file-invoice-dollar me-2 text-primary"></i>
+                                                        Completo
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('eventos.report', [$evento, 'sem_valor' => 1]) }}"
+                                                        target="_blank">
+                                                        <i class="fa-solid fa-file-lines me-2 text-muted"></i> Sem Valores
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        @if(auth()->user()->temPermissao('criar_eventos') || auth()->user()->temPermissao('eventos.criar') || auth()->user()->temPermissao('eventos.editar'))
+                                            <button type="button"
+                                                class="btn btn-sm {{ $evento->encerrado ? 'btn-outline-success' : 'btn-outline-warning' }}"
+                                                onclick="toggleEventStatus({{ $evento->id }}, '{{ $evento->nome }}', {{ $evento->encerrado ? 'true' : 'false' }})"
+                                                title="{{ $evento->encerrado ? 'Reabrir Evento' : 'Encerrar Evento' }}">
+                                                <i class="fa-solid {{ $evento->encerrado ? 'fa-unlock' : 'fa-lock' }}"></i>
+                                            </button>
+                                            <form id="toggle-status-{{ $evento->id }}"
+                                                action="{{ route('eventos.toggleStatus', $evento) }}" method="POST"
+                                                style="display: none;">
+                                                @csrf
+                                                @method('PATCH')
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-5">Nenhum evento encontrado</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-responsive mt-3 d-none" id="tabelaEncerrados">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Evento</th>
+                            <th>Data</th>
+                            <th>Local</th>
+                            <th class="text-center">Convites</th>
+                            <th class="text-center">Convidados</th>
+                            <th>Arrecadado</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($eventosEncerrados as $evento)
+                            <tr>
+                                <td>
+                                    <div class="fw-bold">{{ $evento->nome }}</div>
+                                    <span class="badge text-bg-secondary py-1 px-2">Encerrado</span>
+                                </td>
+                                <td>{{ optional($evento->data_inicio)->format('d/m/Y H:i') ?? '-' }}</td>
+                                <td>{{ $evento->local ?? '-' }}</td>
+                                <td class="text-center">{{ $evento->convites->count() }}</td>
+                                <td class="text-center">{{ $evento->convidados->count() }}</td>
+                                <td>R$ {{ number_format($evento->convidados->sum('valor'), 2, ',', '.') }}</td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <a href="{{ route('eventos.show', $evento) }}" class="btn btn-sm btn-outline-primary"
+                                            title="Ver Detalhes">
+                                            <i class="fa-solid fa-eye me-1"></i> Ver
+                                        </a>
+
+                                        @if(auth()->user()->temPermissao('criar_eventos') || auth()->user()->temPermissao('eventos.editar') || auth()->user()->temPermissao('eventos.criar'))
+                                                                    <button type="button" class="btn btn-sm btn-outline-info" onclick="editEvento({{ json_encode([
+                                                'id' => $evento->id,
+                                                'nome' => $evento->nome,
+                                                'data' => $evento->data_inicio ? $evento->data_inicio->format('Y-m-d\TH:i') : '',
+                                                'local' => $evento->local,
+                                                'valor_inteira' => $evento->valor_inteira
+                                            ]) }})" title="Editar Evento">
+                                                                        <i class="fa-solid fa-edit"></i>
+                                                                    </button>
                                         @endif
 
                                         <div class="btn-group">
@@ -251,6 +355,16 @@
 
     @push('scripts')
         <script>
+            function toggleEventos(tipo) {
+                if (tipo === 'abertos') {
+                    document.getElementById('tabelaAbertos').classList.remove('d-none');
+                    document.getElementById('tabelaEncerrados').classList.add('d-none');
+                } else {
+                    document.getElementById('tabelaAbertos').classList.add('d-none');
+                    document.getElementById('tabelaEncerrados').classList.remove('d-none');
+                }
+            }
+
             function editEvento(evento) {
                 document.getElementById('editEventoForm').action = `/eventos/${evento.id}`;
                 document.getElementById('edit_nome').value = evento.nome;

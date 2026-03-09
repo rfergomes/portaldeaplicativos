@@ -172,10 +172,16 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Responsável pelo Convite</label>
-                            <input type="text" name="nome_responsavel" class="form-control" placeholder="Nome Completo"
-                                required>
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label fw-bold">Responsável pelo Convite</label>
+                                <input type="text" name="nome_responsavel" class="form-control" placeholder="Nome Completo"
+                                    required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">CPF</label>
+                                <input type="text" name="documento" class="form-control" placeholder="000.000.000-00">
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -184,11 +190,11 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Empresa</label>
-                                <select name="empresa" class="form-select">
+                                <select name="empresa" class="form-select select2-tags">
                                     <option value="">Nome da Empresa</option>
                                     @foreach($empresas as $emp)
                                         <option value="{{ $emp->nome_curto ?? $emp->razao_social }}">
-                                            {{ $emp->nome_curto ?? $emp->razao_social }}
+                                            {{ $emp->nome_curto ? $emp->nome_curto . ' (' . $emp->razao_social . ')' : $emp->razao_social }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -211,7 +217,8 @@
                                     <option value="">Nenhum</option>
                                     @foreach($evento->lotes as $lote)
                                         <option value="{{ $lote->id }}">{{ $lote->nome }} (Disp:
-                                            {{ $lote->quantidade_disponivel }})</option>
+                                            {{ $lote->quantidade_disponivel }})
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -251,11 +258,11 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Empresa</label>
-                                <select name="empresa" id="editInviteEmpresa" class="form-select">
+                                <select name="empresa" id="editInviteEmpresa" class="form-select select2-tags">
                                     <option value="">Nome da Empresa</option>
                                     @foreach($empresas as $emp)
                                         <option value="{{ $emp->nome_curto ?? $emp->razao_social }}">
-                                            {{ $emp->nome_curto ?? $emp->razao_social }}
+                                            {{ $emp->nome_curto ? $emp->nome_curto . ' (' . $emp->razao_social . ')' : $emp->razao_social }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -308,13 +315,16 @@
                                 @csrf
                                 <div class="row g-2">
                                     <div class="col-md-7">
-                                        <input type="text" name="nome" class="form-control form-control-sm" placeholder="Ex: 1º Lote, VIP, etc." required>
+                                        <input type="text" name="nome" class="form-control form-control-sm"
+                                            placeholder="Ex: 1º Lote, VIP, etc." required>
                                     </div>
                                     <div class="col-md-3">
-                                        <input type="number" name="quantidade_total" class="form-control form-control-sm" placeholder="Qtd. Total" required>
+                                        <input type="number" name="quantidade_total" class="form-control form-control-sm"
+                                            placeholder="Qtd. Total" required>
                                     </div>
                                     <div class="col-md-2">
-                                        <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fa-solid fa-plus"></i></button>
+                                        <button type="submit" class="btn btn-primary btn-sm w-100"><i
+                                                class="fa-solid fa-plus"></i></button>
                                     </div>
                                 </div>
                             </form>
@@ -346,18 +356,21 @@
                                         </td>
                                         <td style="width: 150px">
                                             <div class="progress progress-xxs mt-2">
-                                                <div class="progress-bar bg-{{ $corFila }}" role="progressbar" style="width: {{ $porcentagem }}%"></div>
+                                                <div class="progress-bar bg-{{ $corFila }}" role="progressbar"
+                                                    style="width: {{ $porcentagem }}%"></div>
                                             </div>
                                             <small class="text-muted">{{ number_format($porcentagem, 0) }}%</small>
                                         </td>
                                         <td class="text-end">
-                                            <button class="btn btn-xs btn-outline-info" onclick="editLote({{ json_encode($lote) }})">
+                                            <button class="btn btn-xs btn-outline-info"
+                                                onclick="editLote({{ json_encode($lote) }})">
                                                 <i class="fa-solid fa-pen"></i>
                                             </button>
                                             <form action="{{ route('lotes.destroy', $lote) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-xs btn-outline-danger" onclick="return confirm('Excluir este lote?')">
+                                                <button type="submit" class="btn btn-xs btn-outline-danger"
+                                                    onclick="return confirm('Excluir este lote?')">
                                                     <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </form>
@@ -392,11 +405,11 @@
                                         placeholder="CPF">
                                 </div>
                                 <div class="col-md-3">
-                                    <select id="guestCompany" class="form-select form-select-sm">
+                                    <select id="guestCompany" class="form-select form-select-sm select2-tags">
                                         <option value="">Empresa</option>
                                         @foreach($empresas as $emp)
                                             <option value="{{ $emp->nome_curto ?? $emp->razao_social }}">
-                                                {{ $emp->nome_curto ?? $emp->razao_social }}
+                                                {{ $emp->nome_curto ? $emp->nome_curto . ' (' . $emp->razao_social . ')' : $emp->razao_social }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -436,234 +449,252 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    @push('scripts')
-        <script>
-            let currentInviteId = null;
+        @push('scripts')
+            <script>
+                let currentInviteId = null;
 
-            document.addEventListener('DOMContentLoaded', function () {
-                const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
-                popoverTriggerList.map(function (popoverTriggerEl) {
-                    return new bootstrap.Popover(popoverTriggerEl)
-                })
-            });
-
-            function openGuestModal(inviteId, responsavel) {
-                currentInviteId = inviteId;
-                document.getElementById('spanResponsavel').innerText = responsavel;
-                document.getElementById('tbodyConvidados').innerHTML = '<tr><td colspan="5" class="text-center py-3"><i class="fa-solid fa-spinner fa-spin me-2"></i>Carregando...</td></tr>';
-                loadGuests(inviteId);
-                new bootstrap.Modal(document.getElementById('modalConvidados')).show();
-            }
-
-            function loadGuests(inviteId) {
-                fetch(`/eventos/convidados/${inviteId}`)
-                    .then(res => {
-                        if (!res.ok) throw new Error('Erro ao carregar convidados');
-                        return res.json();
-                    })
-                    .then(data => {
-                        const tbody = document.getElementById('tbodyConvidados');
-                        tbody.innerHTML = '';
-                        data.forEach(g => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                                                <td>${g.nome}</td>
-                                                                <td>${g.documento || '-'}</td>
-                                                                <td>${g.empresa || '-'}</td>
-                                                                <td>R$ ${parseFloat(g.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                                                                <td class="text-end">
-                                                                    <button class="btn btn-xs btn-outline-info btn-edit-guest">
-                                                                        <i class="fa-solid fa-pen"></i>
-                                                                    </button>
-                                                                    <button class="btn btn-xs btn-outline-danger" onclick="deleteGuest(${g.id})">
-                                                                        <i class="fa-solid fa-trash-can"></i>
-                                                                    </button>
-                                                                </td>
-                                                            `;
-
-                            // Anexa evento de clique ao botão de editar de forma segura
-                            row.querySelector('.btn-edit-guest').addEventListener('click', () => editGuest(g));
-
-                            tbody.appendChild(row);
-                        });
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        document.getElementById('tbodyConvidados').innerHTML = '<tr><td colspan="5" class="text-center py-3 text-danger">Erro ao carregar lista.</td></tr>';
+                document.addEventListener('DOMContentLoaded', function () {
+                    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+                    popoverTriggerList.map(function (popoverTriggerEl) {
+                        return new bootstrap.Popover(popoverTriggerEl)
                     });
-            }
 
-            function editInvite(invite) {
-                document.getElementById('editInviteResponsavel').value = invite.nome_responsavel;
-                document.getElementById('editInvitePlaca').value = invite.placa;
-                document.getElementById('editInviteEmpresa').value = invite.empresa;
-                document.getElementById('editInviteTipo').value = invite.tipo;
-                document.getElementById('editInviteLote').value = invite.lote_id || '';
-                document.getElementById('formEditarConvite').action = `/convites/${invite.id}`;
-                new bootstrap.Modal(document.getElementById('modalEditarConvite')).show();
-            }
-
-            function editLote(lote) {
-                Swal.fire({
-                    title: 'Editar Lote',
-                    html: `
-                        <div class="mb-3 text-start">
-                            <label class="form-label small fw-bold">Nome do Lote</label>
-                            <input id="swalLoteNome" class="form-control" placeholder="Nome" value="${lote.nome}">
-                        </div>
-                        <div class="mb-3 text-start">
-                            <label class="form-label small fw-bold">Quantidade Total</label>
-                            <input id="swalLoteQtd" type="number" class="form-control" placeholder="Quantidade" value="${lote.quantidade_total}">
-                        </div>
-                    `,
-                    focusConfirm: false,
-                    showCancelButton: true,
-                    confirmButtonText: 'Salvar',
-                    preConfirm: () => {
-                        return {
-                            nome: document.getElementById('swalLoteNome').value,
-                            quantidade_total: document.getElementById('swalLoteQtd').value
-                        }
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = `/lotes/${lote.id}`;
-                        
-                        const methodField = document.createElement('input');
-                        methodField.type = 'hidden';
-                        methodField.name = '_method';
-                        methodField.value = 'PUT';
-                        form.appendChild(methodField);
-
-                        const csrfField = document.createElement('input');
-                        csrfField.type = 'hidden';
-                        csrfField.name = '_token';
-                        csrfField.value = '{{ csrf_token() }}';
-                        form.appendChild(csrfField);
-
-                        const nomeField = document.createElement('input');
-                        nomeField.type = 'hidden';
-                        nomeField.name = 'nome';
-                        nomeField.value = result.value.nome;
-                        form.appendChild(nomeField);
-
-                        const qtdField = document.createElement('input');
-                        qtdField.type = 'hidden';
-                        qtdField.name = 'quantidade_total';
-                        qtdField.value = result.value.quantidade_total;
-                        form.appendChild(qtdField);
-
-                        document.body.appendChild(form);
-                        form.submit();
-                    }
-                });
-            }
-
-            function addGuest() {
-                const name = document.getElementById('guestName').value;
-                if (!name) return;
-
-                fetch(`/convites/${currentInviteId}/convidados`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        nome: name,
-                        documento: document.getElementById('guestDocument').value,
-                        empresa: document.getElementById('guestCompany').value,
-                        valor: document.getElementById('guestValue').value
-                    })
-                }).then(() => {
-                    document.getElementById('guestName').value = '';
-                    document.getElementById('guestDocument').value = '';
-                    document.getElementById('guestCompany').value = '';
-                    loadGuests(currentInviteId);
-                });
-            }
-
-            function editGuest(guest) {
-                Swal.fire({
-                    title: 'Editar Convidado',
-                    html: `
-                                                                <input id="swalName" class="swal2-input" placeholder="Nome" value="${guest.nome}">
-                                                                <input id="swalDoc" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="CPF" value="${guest.documento || ''}">
-                                                                <select id="swalEmp" class="swal2-select" style="max-width: 90%; margin: 10px auto; display: flex;">
-                                                                    <option value="">Nenhuma / Outra</option>
-                                                                    @foreach($empresas as $emp)
-                                                                        <option value="{{ $emp->nome_curto ?? $emp->razao_social }}" ${guest.empresa === '{{ $emp->nome_curto ?? $emp->razao_social }}' ? 'selected' : ''}>{{ $emp->nome_curto ?? $emp->razao_social }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                                <input id="swalVal" type="number" step="0.01" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="Valor" value="${guest.valor}">
-                                                            `,
-                    focusConfirm: false,
-                    showCancelButton: true,
-                    confirmButtonText: 'Salvar',
-                    preConfirm: () => {
-                        return {
-                            nome: document.getElementById('swalName').value,
-                            documento: document.getElementById('swalDoc').value,
-                            empresa: document.getElementById('swalEmp').value,
-                            valor: document.getElementById('swalVal').value
-                        }
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch(`/convidados/${guest.id}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify(result.value)
-                        }).then(() => loadGuests(currentInviteId));
-                    }
-                });
-            }
-
-            function deleteGuest(guestId) {
-                Swal.fire({
-                    title: 'Tem certeza?',
-                    text: "Deseja excluir este convidado?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Sim, excluir!',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch(`/convidados/${guestId}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    // Initialize Select2 with tags for elements dynamically using a special class
+                    $('.select2-tags').each(function () {
+                        const $this = $(this);
+                        const isInsideModal = $this.closest('.modal').length > 0;
+                        $this.select2({
+                            theme: 'bootstrap-5',
+                            width: '100%',
+                            tags: true,
+                            dropdownParent: isInsideModal ? $this.closest('.modal') : $(document.body),
+                            language: {
+                                noResults: function () {
+                                    return "Pressione Enter para adicionar nova empresa";
+                                }
                             }
-                        }).then(() => loadGuests(currentInviteId));
-                    }
+                        });
+                    });
                 });
-            }
 
-            function confirmDeleteInvite(inviteId, nome) {
-                Swal.fire({
-                    title: 'Atenção!',
-                    text: `Deseja realmente excluir o convite de ${nome}? TODOS os convidados vinculados a este convite também serão excluídos.`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Sim, excluir tudo!',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById(`delete-invite-${inviteId}`).submit();
-                    }
-                });
-            }
-        </script>
-    @endpush
+                function openGuestModal(inviteId, responsavel) {
+                    currentInviteId = inviteId;
+                    document.getElementById('spanResponsavel').innerText = responsavel;
+                    document.getElementById('tbodyConvidados').innerHTML = '<tr><td colspan="5" class="text-center py-3"><i class="fa-solid fa-spinner fa-spin me-2"></i>Carregando...</td></tr>';
+                    loadGuests(inviteId);
+                    new bootstrap.Modal(document.getElementById('modalConvidados')).show();
+                }
+
+                function loadGuests(inviteId) {
+                    fetch(`/eventos/convidados/${inviteId}`)
+                        .then(res => {
+                            if (!res.ok) throw new Error('Erro ao carregar convidados');
+                            return res.json();
+                        })
+                        .then(data => {
+                            const tbody = document.getElementById('tbodyConvidados');
+                            tbody.innerHTML = '';
+                            data.forEach(g => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                                                                                                <td>${g.nome}</td>
+                                                                                                                <td>${g.documento || '-'}</td>
+                                                                                                                <td>${g.empresa || '-'}</td>
+                                                                                                                <td>R$ ${parseFloat(g.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                                                                                                                <td class="text-end">
+                                                                                                                    <button class="btn btn-xs btn-outline-info btn-edit-guest">
+                                                                                                                        <i class="fa-solid fa-pen"></i>
+                                                                                                                    </button>
+                                                                                                                    <button class="btn btn-xs btn-outline-danger" onclick="deleteGuest(${g.id})">
+                                                                                                                        <i class="fa-solid fa-trash-can"></i>
+                                                                                                                    </button>
+                                                                                                                </td>
+                                                                                                            `;
+
+                                // Anexa evento de clique ao botão de editar de forma segura
+                                row.querySelector('.btn-edit-guest').addEventListener('click', () => editGuest(g));
+
+                                tbody.appendChild(row);
+                            });
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            document.getElementById('tbodyConvidados').innerHTML = '<tr><td colspan="5" class="text-center py-3 text-danger">Erro ao carregar lista.</td></tr>';
+                        });
+                }
+
+                function editInvite(invite) {
+                    document.getElementById('editInviteResponsavel').value = invite.nome_responsavel;
+                    document.getElementById('editInvitePlaca').value = invite.placa;
+                    document.getElementById('editInviteEmpresa').value = invite.empresa;
+                    document.getElementById('editInviteTipo').value = invite.tipo;
+                    document.getElementById('editInviteLote').value = invite.lote_id || '';
+                    document.getElementById('formEditarConvite').action = `/convites/${invite.id}`;
+                    new bootstrap.Modal(document.getElementById('modalEditarConvite')).show();
+                }
+
+                function editLote(lote) {
+                    Swal.fire({
+                        title: 'Editar Lote',
+                        html: `
+                                                                        <div class="mb-3 text-start">
+                                                                            <label class="form-label small fw-bold">Nome do Lote</label>
+                                                                            <input id="swalLoteNome" class="form-control" placeholder="Nome" value="${lote.nome}">
+                                                                        </div>
+                                                                        <div class="mb-3 text-start">
+                                                                            <label class="form-label small fw-bold">Quantidade Total</label>
+                                                                            <input id="swalLoteQtd" type="number" class="form-control" placeholder="Quantidade" value="${lote.quantidade_total}">
+                                                                        </div>
+                                                                    `,
+                        focusConfirm: false,
+                        showCancelButton: true,
+                        confirmButtonText: 'Salvar',
+                        preConfirm: () => {
+                            return {
+                                nome: document.getElementById('swalLoteNome').value,
+                                quantidade_total: document.getElementById('swalLoteQtd').value
+                            }
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = `/lotes/${lote.id}`;
+
+                            const methodField = document.createElement('input');
+                            methodField.type = 'hidden';
+                            methodField.name = '_method';
+                            methodField.value = 'PUT';
+                            form.appendChild(methodField);
+
+                            const csrfField = document.createElement('input');
+                            csrfField.type = 'hidden';
+                            csrfField.name = '_token';
+                            csrfField.value = '{{ csrf_token() }}';
+                            form.appendChild(csrfField);
+
+                            const nomeField = document.createElement('input');
+                            nomeField.type = 'hidden';
+                            nomeField.name = 'nome';
+                            nomeField.value = result.value.nome;
+                            form.appendChild(nomeField);
+
+                            const qtdField = document.createElement('input');
+                            qtdField.type = 'hidden';
+                            qtdField.name = 'quantidade_total';
+                            qtdField.value = result.value.quantidade_total;
+                            form.appendChild(qtdField);
+
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
+                    });
+                }
+
+                function addGuest() {
+                    const name = document.getElementById('guestName').value;
+                    if (!name) return;
+
+                    fetch(`/convites/${currentInviteId}/convidados`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            nome: name,
+                            documento: document.getElementById('guestDocument').value,
+                            empresa: document.getElementById('guestCompany').value,
+                            valor: document.getElementById('guestValue').value
+                        })
+                    }).then(() => {
+                        document.getElementById('guestName').value = '';
+                        document.getElementById('guestDocument').value = '';
+                        document.getElementById('guestCompany').value = '';
+                        loadGuests(currentInviteId);
+                    });
+                }
+
+                function editGuest(guest) {
+                    Swal.fire({
+                        title: 'Editar Convidado',
+                        html: `
+                                                                                                                <input id="swalName" class="swal2-input" placeholder="Nome" value="${guest.nome}">
+                                                                                                                <input id="swalDoc" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="CPF" value="${guest.documento || ''}">
+                                                                                        <select id="swalEmp" class="swal2-select select2-tags" style="max-width: 90%; margin: 10px auto; display: flex;">
+                                                                                            <option value="">Nenhuma / Outra</option>
+                                                                                            @foreach($empresas as $emp)
+                                                                                                <option value="{{ $emp->nome_curto ?? $emp->razao_social }}" ${guest.empresa === '{{ $emp->nome_curto ?? $emp->razao_social }}' ? 'selected' : ''}>
+                                                                                                    {{ $emp->nome_curto ? $emp->nome_curto . ' (' . $emp->razao_social . ')' : $emp->razao_social }}
+                                                                                                </option>
+                                                                                            @endforeach
+                                                                                        </select>
+                                                                                        <input id="swalVal" type="number" step="0.01" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="Valor" value="${guest.valor}">
+                                                                                                            `,
+                        focusConfirm: false,
+                        showCancelButton: true,
+                        confirmButtonText: 'Salvar',
+                        preConfirm: () => {
+                            return {
+                                nome: document.getElementById('swalName').value,
+                                documento: document.getElementById('swalDoc').value,
+                                empresa: document.getElementById('swalEmp').value,
+                                valor: document.getElementById('swalVal').value
+                            }
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(`/convidados/${guest.id}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify(result.value)
+                            }).then(() => loadGuests(currentInviteId));
+                        }
+                    });
+                }
+
+                function deleteGuest(guestId) {
+                    Swal.fire({
+                        title: 'Tem certeza?',
+                        text: "Deseja excluir este convidado?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Sim, excluir!',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(`/convidados/${guestId}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                }
+                            }).then(() => loadGuests(currentInviteId));
+                        }
+                    });
+                }
+
+                function confirmDeleteInvite(inviteId, nome) {
+                    Swal.fire({
+                        title: 'Atenção!',
+                        text: `Deseja realmente excluir o convite de ${nome}? TODOS os convidados vinculados a este convite também serão excluídos.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Sim, excluir tudo!',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById(`delete-invite-${inviteId}`).submit();
+                        }
+                    });
+                }
+            </script>
+        @endpush
 @endsection

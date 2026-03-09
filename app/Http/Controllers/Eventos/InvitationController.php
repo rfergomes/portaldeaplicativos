@@ -16,6 +16,7 @@ class InvitationController extends Controller
     {
         $data = $request->validate([
             'nome_responsavel' => 'required|string|max:255',
+            'documento' => 'nullable|string|max:20',
             'placa' => 'nullable|string|max:20',
             'empresa' => 'nullable|string|max:255',
             'tipo' => 'required|in:inteira,meia',
@@ -45,6 +46,7 @@ class InvitationController extends Controller
         // Adiciona o responsável como o primeiro convidado automaticamente
         $convite->convidados()->create([
             'nome' => mb_strtoupper($data['nome_responsavel']),
+            'documento' => $data['documento'] ?? null,
             'empresa' => mb_strtoupper($data['empresa']),
             'valor' => $convite->valor,
         ]);
