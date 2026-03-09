@@ -650,12 +650,25 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-sm-6">
-                            <h3 class="mb-0">@yield('title')</h3>
+                            <h3 class="mb-0 text-capitalize">@yield('title')</h3>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-end">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">@yield('title')</li>
+                                @php $link = ""; @endphp
+                                @foreach(Request::segments() as $segment)
+                                    @if(!is_numeric($segment) && !in_array($segment, ['public', 'index']))
+                                        @php $link .= "/" . $segment; @endphp
+                                        <li class="breadcrumb-item {{ $loop->last ? 'active' : '' }} text-capitalize" 
+                                            {!! $loop->last ? 'aria-current="page"' : '' !!}>
+                                            @if($loop->last)
+                                                {{ str_replace(['-', '_'], ' ', $segment) }}
+                                            @else
+                                                <a href="{{ url($link) }}">{{ str_replace(['-', '_'], ' ', $segment) }}</a>
+                                            @endif
+                                        </li>
+                                    @endif
+                                @endforeach
                             </ol>
                         </div>
                     </div>

@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('protocolos:update-status')->dailyAt('00:00');
+        $schedule->command('agenda:inativar-periodos')->dailyAt('00:01');
     }
 
     /**

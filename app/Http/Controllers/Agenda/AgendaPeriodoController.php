@@ -9,7 +9,7 @@ class AgendaPeriodoController extends Controller
 {
     public function index(Request $request)
     {
-        $periodos = \App\Models\AgendaPeriodo::orderBy('data_inicial', 'desc')->paginate(15);
+        $periodos = \App\Models\AgendaPeriodo::orderBy('data_inicial', 'asc')->paginate(15);
 
         return view('agenda.periodos.index', compact('periodos'));
     }
