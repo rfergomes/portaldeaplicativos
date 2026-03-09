@@ -86,7 +86,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer bg-white d-flex justify-content-end gap-2">
+                    <div class="card-footer d-flex justify-content-end gap-2">
                         <a href="{{ route('users.index') }}"
                             class="btn btn-outline-secondary rounded-pill px-4">Cancelar</a>
                         <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm"><i

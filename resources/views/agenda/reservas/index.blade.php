@@ -42,11 +42,6 @@
             border-radius: 6px;
         }
 
-        .status-reservado {
-            background-color: #e8f4f8;
-        }
-
-        /* Azul clarinho */
         .status-pago {
             border-left-color: #198754 !important;
             background-color: #e8f8f5;
@@ -72,13 +67,53 @@
             background-color: #f8e8e8;
         }
 
-        /* Vermelho clarinho */
         .status-osasco {
             border-left-color: #6f42c1 !important;
             background-color: #f4e8f8;
         }
 
-        /* Roxo clarinho */
+        /* Ajustes para Dark Mode */
+        [data-bs-theme="dark"] .status-pago {
+            background-color: rgba(25, 135, 84, 0.15);
+        }
+
+        [data-bs-theme="dark"] .status-confirmado {
+            background-color: rgba(0, 31, 63, 0.4);
+        }
+
+        [data-bs-theme="dark"] .status-reservado {
+            background-color: rgba(13, 202, 240, 0.15);
+        }
+
+        [data-bs-theme="dark"] .status-livre {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        [data-bs-theme="dark"] .status-bloqueado {
+            background-color: rgba(220, 53, 69, 0.15);
+        }
+
+        [data-bs-theme="dark"] .status-osasco {
+            background-color: rgba(111, 66, 193, 0.15);
+        }
+
+        [data-bs-theme="dark"] .card-acomodacao .text-muted,
+        [data-bs-theme="dark"] .card-acomodacao .text-secondary,
+        [data-bs-theme="dark"] .card-espera .text-muted,
+        [data-bs-theme="dark"] .card-espera .text-secondary {
+            color: #cbd5e1 !important;
+            /* Texto claro para melhor contraste */
+        }
+
+        [data-bs-theme="dark"] .card-acomodacao .fw-bold,
+        [data-bs-theme="dark"] .card-espera strong {
+            color: #f8fafc;
+        }
+
+        [data-bs-theme="dark"] .coluna-espera .card-espera {
+            background-color: rgba(255, 193, 7, 0.05);
+            border-color: rgba(255, 193, 7, 0.2);
+        }
 
         @media (max-width: 991.98px) {
             .grid-reservas {
@@ -261,22 +296,22 @@
                         if ($reserva) {
                             if ($reserva->status == 'pago') {
                                 $statusClass = 'status-pago';
-                                $statusText = '<span class="badge bg-success">Pago</span>';
+                                $statusText = '<span class="badge text-bg-success shadow-sm">Pago</span>';
                             } elseif ($reserva->status == 'confirmado') {
                                 $statusClass = 'status-confirmado';
-                                $statusText = '<span class="badge" style="background-color: #001f3f; color: #fff;">Confirmado</span>';
+                                $statusText = '<span class="badge shadow-sm" style="background-color: #001f3f; color: #fff;">Confirmado</span>';
                             } elseif ($reserva->status == 'bloqueado') {
                                 $statusClass = stripos($reserva->bloqueio_nota, 'osasco') !== false ? 'status-osasco' : 'status-bloqueado';
                                 $statusText = stripos($reserva->bloqueio_nota, 'osasco') !== false
-                                    ? '<span class="badge" style="background-color: #6f42c1;">Cota Osasco</span>'
-                                    : '<span class="badge bg-danger"><i class="fa-solid fa-lock me-1"></i>Bloqueado</span>';
+                                    ? '<span class="badge shadow-sm" style="background-color: #6f42c1; color: #fff;">Cota Osasco</span>'
+                                    : '<span class="badge text-bg-danger shadow-sm"><i class="fa-solid fa-lock me-1"></i>Bloqueado</span>';
                             } else {
                                 $statusClass = 'status-reservado';
-                                $statusText = '<span class="badge bg-info text-dark">Reservado</span>';
+                                $statusText = '<span class="badge text-bg-info shadow-sm">Reservado</span>';
                             }
                         } else {
                             $statusClass = 'status-livre';
-                            $statusText = '<span class="badge bg-light text-muted border">Livre</span>';
+                            $statusText = '<span class="badge text-bg-light border shadow-sm">Livre</span>';
                         }
                     @endphp
 
@@ -497,7 +532,7 @@
                             </div>
 
                             <!-- Bloco Hóspede -->
-                            <div id="blocoHospede" class="border p-3 rounded bg-white shadow-sm mb-3">
+                            <div id="blocoHospede" class="border p-3 rounded shadow-sm mb-3">
                                 <h6 class="fw-bold text-primary mb-3 border-bottom pb-2"><i
                                         class="fa-solid fa-user me-2"></i>Dados do Ganhador</h6>
                                 <div class="row gx-2">
@@ -545,7 +580,7 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Destino da Vaga</label>
                                 <select name="colonia_acomodacao_id" id="selectAcomodacao" class="form-select">
-                                    <option value="">-> ACOMODAÇÃO <-</option>
+                                    <option value="">-> ACOMODAÇÃO <-< /option>
                                             <optgroup label="Acomodações Disponíveis">
                                                 @foreach($acomodacoes as $aco)
                                                     @if(!isset($reservas[$aco->id]))
@@ -587,7 +622,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Tipo de Alocação</label>
-                                    <select class="form-select border-primary bg-light" id="tipoAlocacaoEdit"
+                                    <select class="form-select border-primary" id="tipoAlocacaoEdit"
                                         onchange="toggleAlocacaoEditForms()">
                                         <option value="hospede">Hóspede (Sorteado)</option>
                                         <option value="bloqueio">Bloqueio / Cota Fixa</option>
@@ -595,7 +630,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3" id="blocoStatusEdit">
                                     <label class="form-label fw-bold">Situação *</label>
-                                    <select name="status" id="statusReservaEdit" class="form-select border-primary bg-light">
+                                    <select name="status" id="statusReservaEdit" class="form-select border-primary">
                                         <option value="reservado">Reservado</option>
                                         <option value="confirmado">Confirmado</option>
                                         <option value="pago">Pago</option>
@@ -606,7 +641,7 @@
                             </div>
 
                             <!-- Bloco Hóspede Edit -->
-                            <div id="blocoHospedeEdit" class="border p-3 rounded bg-white shadow-sm mb-3">
+                            <div id="blocoHospedeEdit" class="border p-3 rounded shadow-sm mb-3">
                                 <h6 class="fw-bold text-primary mb-3 border-bottom pb-2"><i
                                         class="fa-solid fa-user me-2"></i>Dados do Ganhador</h6>
                                 <div class="row gx-2">
@@ -682,10 +717,10 @@
                 Swal.fire({
                     title: 'Motivo da Exclusão',
                     html: `
-                                                                                                                    <p class="text-muted small mb-3">Informe o motivo para excluir esta reserva. Este registro ficará salvo no histórico.</p>
-                                                                                                                    <textarea id="motivoExclusao" rows="3" style="width:calc(100% - 4px);box-sizing:border-box;resize:vertical;border:1px solid #d9d9d9;border-radius:6px;padding:10px 12px;font-size:0.9rem;display:block;"
-                                                                                                                        placeholder="Ex: Desistência do hóspede, reagendamento, cancelamento, bloqueio..."></textarea>
-                                                                                                                `,
+                                                                                                                                    <p class="text-muted small mb-3">Informe o motivo para excluir esta reserva. Este registro ficará salvo no histórico.</p>
+                                                                                                                                    <textarea id="motivoExclusao" rows="3" style="width:calc(100% - 4px);box-sizing:border-box;resize:vertical;border:1px solid #d9d9d9;border-radius:6px;padding:10px 12px;font-size:0.9rem;display:block;"
+                                                                                                                                        placeholder="Ex: Desistência do hóspede, reagendamento, cancelamento, bloqueio..."></textarea>
+                                                                                                                                `,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#dc3545',

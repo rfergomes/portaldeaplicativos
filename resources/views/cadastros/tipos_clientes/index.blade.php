@@ -94,7 +94,7 @@
                             <input type="text" name="descricao" class="form-control" placeholder="...">
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-primary">Salvar</button>
                     </div>
@@ -124,7 +124,7 @@
                             <input type="text" name="descricao" id="edit_descricao" class="form-control">
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-info text-white">Salvar Alterações</button>
                     </div>

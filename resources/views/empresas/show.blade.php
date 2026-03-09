@@ -179,7 +179,7 @@
                             <input type="email" name="email" class="form-control" placeholder="email@contato.com">
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-primary">Salvar Contato</button>
                     </div>
@@ -227,7 +227,7 @@
                             <input type="email" name="email" id="edit_contato_email" class="form-control">
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-info text-white">Salvar Alterações</button>
                     </div>

@@ -106,7 +106,7 @@
                             <input type="text" name="nome" class="form-control" required placeholder="EX: CAMPINAS">
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-primary">Salvar Região</button>
                     </div>
@@ -136,7 +136,7 @@
                             <input type="text" name="nome" id="edit_nome" class="form-control" required>
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-primary">Salvar Alterações</button>
                     </div>

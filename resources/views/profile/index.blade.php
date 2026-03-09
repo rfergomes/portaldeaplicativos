@@ -41,12 +41,12 @@
 
                             <div class="mb-0">
                                 <label class="form-label fw-bold small">Usuário (Username)</label>
-                                <input type="text" class="form-control bg-light" value="{{ $user->username }}" readonly
+                                <input type="text" class="form-control" value="{{ $user->username }}" readonly
                                     disabled>
                                 <small class="text-muted">O nome de usuário não pode ser alterado.</small>
                             </div>
                         </div>
-                        <div class="card-footer bg-white border-top-0 d-flex justify-content-end">
+                        <div class="card-footer border-top-0 d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
                                 <i class="fa-solid fa-save me-2"></i>Salvar Alterações
                             </button>
@@ -68,7 +68,7 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold small">Senha Atual</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light"><i
+                                    <span class="input-group-text"><i
                                             class="fa-solid fa-lock-open text-muted small"></i></span>
                                     <input type="password" name="current_password"
                                         class="form-control @error('current_password') is-invalid @enderror" required>
@@ -80,7 +80,7 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold small">Nova Senha</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light"><i
+                                    <span class="input-group-text"><i
                                             class="fa-solid fa-lock text-muted small"></i></span>
                                     <input type="password" name="password"
                                         class="form-control @error('password') is-invalid @enderror" required>
@@ -91,13 +91,13 @@
                             <div class="mb-0">
                                 <label class="form-label fw-bold small">Confirmar Nova Senha</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light"><i
+                                    <span class="input-group-text"><i
                                             class="fa-solid fa-check text-muted small"></i></span>
                                     <input type="password" name="password_confirmation" class="form-control" required>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer bg-white border-top-0 d-flex justify-content-end">
+                        <div class="card-footer border-top-0 d-flex justify-content-end">
                             <button type="submit" class="btn btn-warning rounded-pill px-4 shadow-sm fw-bold">
                                 <i class="fa-solid fa-shield-halved me-2"></i>Atualizar Senha
                             </button>

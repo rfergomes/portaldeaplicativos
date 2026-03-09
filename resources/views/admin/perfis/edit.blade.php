@@ -48,8 +48,8 @@
                             @foreach($permissoes as $grupo => $lista)
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed py-2 fw-bold bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $grupo }}">
-                                            <i class="fa-solid fa-folder-open me-2 text-secondary"></i> Módulo: {{ ucfirst(str_replace('_', ' ', $grupo)) }}
+                                        <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $grupo }}">
+                                            <i class="fa-solid fa-folder-open me-2 text-primary opacity-75"></i> Módulo: {{ ucfirst(str_replace('_', ' ', $grupo)) }}
                                         </button>
                                     </h2>
                                     <div id="collapse{{ $grupo }}" class="accordion-collapse collapse" data-bs-parent="#permsAccordion">
@@ -62,8 +62,8 @@
                                                                    value="{{ $perm->id }}" id="perm{{ $perm->id }}"
                                                                    {{ in_array($perm->id, $perfilPermissoes ?? []) ? 'checked' : '' }}>
                                                             <label class="form-check-label ms-2" for="perm{{ $perm->id }}">
-                                                                <span class="fw-semibold d-block">{{ $perm->nome }}</span>
-                                                                <small class="text-muted">{{ $perm->descricao }}</small>
+                                                                <span class="fw-bold d-block">{{ $perm->nome }}</span>
+                                                                <small class="text-muted opacity-75">{{ $perm->descricao }}</small>
                                                             </label>
                                                         </div>
                                                     </div>

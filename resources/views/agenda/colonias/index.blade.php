@@ -119,7 +119,7 @@
                             <label class="form-check-label" for="ativoColonia">Colônia Ativa</label>
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save me-1"></i> Salvar</button>
                     </div>

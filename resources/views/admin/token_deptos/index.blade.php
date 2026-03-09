@@ -162,7 +162,7 @@
                         </div>
                     </div>
 
-                    <div class="modal-footer border-0 bg-white">
+                    <div class="modal-footer border-0">
                         <button type="button" class="btn btn-outline-secondary rounded-pill px-4 shadow-sm"
                             data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">

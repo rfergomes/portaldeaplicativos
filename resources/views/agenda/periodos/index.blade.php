@@ -150,7 +150,7 @@
                             <label class="form-check-label" for="ativoPeriodo">Período Aberto / Visível</label>
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-warning"><i class="fa-solid fa-save me-1"></i> Salvar
                             Período</button>
@@ -182,7 +182,7 @@
                             <input type="month" class="form-control text-center fs-5 shadow-sm" name="mes_ano" required>
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary"><i class="fa-solid fa-cogs me-1"></i> Gerar
                             Semanas</button>

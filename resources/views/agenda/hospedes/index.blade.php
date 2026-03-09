@@ -130,7 +130,7 @@
                             <label class="form-check-label" for="associadoHospede">Sócio Associado</label>
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-success"><i class="fa-solid fa-save me-1"></i> Salvar</button>
                     </div>

@@ -48,7 +48,7 @@
                             @foreach($permissoes as $grupo => $lista)
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed py-2 fw-bold bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $grupo }}">
+                                        <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $grupo }}">
                                             <i class="fa-solid fa-folder-open me-2 text-secondary"></i> Módulo: {{ ucfirst(str_replace('_', ' ', $grupo)) }}
                                         </button>
                                     </h2>

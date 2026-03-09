@@ -115,7 +115,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="d-flex justify-content-end bg-light p-3 rounded shadow-sm border mt-4">
+                                        <div class="d-flex justify-content-end p-3 rounded shadow-sm border mt-4">
                                             <button type="button" class="btn btn-primary px-4 shadow-sm"
                                                 onclick="proximoPasso(1)">
                                                 Próximo Passo <i class="fa-solid fa-arrow-right ms-2"></i>
@@ -183,8 +183,7 @@
                                             </div>
                                         </div>
 
-                                        <div
-                                            class="d-flex justify-content-between bg-light p-3 rounded shadow-sm border mt-4">
+                                        <div class="d-flex justify-content-between p-3 rounded shadow-sm border mt-4">
                                             <button type="button" class="btn btn-secondary px-4 shadow-sm"
                                                 onclick="voltarPasso()">
                                                 <i class="fa-solid fa-arrow-left me-2"></i> Anterior
@@ -221,8 +220,7 @@
                                                 somado não deve exceder 20MB)</small>
                                         </div>
 
-                                        <div
-                                            class="d-flex justify-content-between bg-light p-3 rounded shadow-sm border mt-5">
+                                        <div class="d-flex justify-content-between p-3 rounded shadow-sm border mt-5">
                                             <button type="button" class="btn btn-secondary px-4 shadow-sm"
                                                 onclick="voltarPasso()">
                                                 <i class="fa-solid fa-arrow-left me-2"></i> Anterior
@@ -374,7 +372,7 @@
             function adicionarDestinatarioPreenchido(nome, email, telefone, documento) {
                 const i = destinatarioIndex++;
                 const row = document.createElement('div');
-                row.className = 'destinatario-row border-top px-4 py-3 bg-light';
+                row.className = 'destinatario-row border-top px-4 py-3 ';
                 row.innerHTML = `
                                     <div class="row g-2 align-items-end">
                                         <div class="col-md-4">
