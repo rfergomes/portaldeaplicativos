@@ -162,7 +162,7 @@
     </div>
 
     <!-- Modal Novo Convite -->
-    <div class="modal fade" id="modalNovoConvite" tabindex="-1">
+    <div class="modal fade" id="modalNovoConvite" tabindex="-1" data-bs-focus="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form action="{{ route('convites.store', $evento) }}" method="POST">
@@ -189,15 +189,26 @@
                                 <input type="text" name="placa" class="form-control" placeholder="ABC-1234">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Empresa</label>
-                                <select name="empresa" class="form-select select2-tags">
-                                    <option value="">Nome da Empresa</option>
-                                    @foreach($empresas as $emp)
-                                        <option value="{{ $emp->nome_curto ?? $emp->razao_social }}">
-                                            {{ $emp->nome_curto ? $emp->nome_curto . ' (' . $emp->razao_social . ')' : $emp->razao_social }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                                    Empresa
+                                    <div class="form-check form-switch m-0 fs-6 fw-normal">
+                                        <input class="form-check-input" type="checkbox" id="switchEmp_novo" onchange="toggleEmpresa('novo')">
+                                        <label class="form-check-label" for="switchEmp_novo"><small>Outra (Digitar)</small></label>
+                                    </div>
+                                </label>
+                                <div id="containerSelect_novo">
+                                    <select name="empresa" id="selectEmp_novo" class="form-select select2-tags">
+                                        <option value="">Nome da Empresa</option>
+                                        @foreach($empresas as $emp)
+                                            <option value="{{ $emp->nome_curto ?? $emp->razao_social }}">
+                                                {{ $emp->nome_curto ? $emp->nome_curto . ' (' . $emp->razao_social . ')' : $emp->razao_social }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div id="containerInput_novo" style="display: none;">
+                                    <input type="text" id="inputEmp_novo" class="form-control" placeholder="Digite o nome da empresa" disabled>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
@@ -234,7 +245,7 @@
     </div>
 
     <!-- Modal Editar Convite -->
-    <div class="modal fade" id="modalEditarConvite" tabindex="-1">
+    <div class="modal fade" id="modalEditarConvite" tabindex="-1" data-bs-focus="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="formEditarConvite" method="POST">
@@ -257,15 +268,26 @@
                                     placeholder="ABC-1234">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Empresa</label>
-                                <select name="empresa" id="editInviteEmpresa" class="form-select select2-tags">
-                                    <option value="">Nome da Empresa</option>
-                                    @foreach($empresas as $emp)
-                                        <option value="{{ $emp->nome_curto ?? $emp->razao_social }}">
-                                            {{ $emp->nome_curto ? $emp->nome_curto . ' (' . $emp->razao_social . ')' : $emp->razao_social }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                                    Empresa
+                                    <div class="form-check form-switch m-0 fs-6 fw-normal">
+                                        <input class="form-check-input" type="checkbox" id="switchEmp_edit" onchange="toggleEmpresa('edit')">
+                                        <label class="form-check-label" for="switchEmp_edit"><small>Outra (Digitar)</small></label>
+                                    </div>
+                                </label>
+                                <div id="containerSelect_edit">
+                                    <select name="empresa" id="selectEmp_edit" class="form-select select2-tags">
+                                        <option value="">Nome da Empresa</option>
+                                        @foreach($empresas as $emp)
+                                            <option value="{{ $emp->nome_curto ?? $emp->razao_social }}">
+                                                {{ $emp->nome_curto ? $emp->nome_curto . ' (' . $emp->razao_social . ')' : $emp->razao_social }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div id="containerInput_edit" style="display: none;">
+                                    <input type="text" id="inputEmp_edit" class="form-control" placeholder="Digite o nome da empresa" disabled>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
@@ -384,7 +406,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modalConvidados" tabindex="-1">
+    <div class="modal fade" id="modalConvidados" tabindex="-1" data-bs-focus="false">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-light">
@@ -405,14 +427,26 @@
                                         placeholder="CPF">
                                 </div>
                                 <div class="col-md-3">
-                                    <select id="guestCompany" class="form-select form-select-sm select2-tags">
-                                        <option value="">Empresa</option>
-                                        @foreach($empresas as $emp)
-                                            <option value="{{ $emp->nome_curto ?? $emp->razao_social }}">
-                                                {{ $emp->nome_curto ? $emp->nome_curto . ' (' . $emp->razao_social . ')' : $emp->razao_social }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label m-0" style="font-size: 0.85rem; font-weight: bold;">Empresa</label>
+                                        <div class="form-check form-switch m-0" style="transform: scale(0.85); transform-origin: right;">
+                                            <input class="form-check-input" type="checkbox" id="switchEmp_add" onchange="toggleEmpresa('add')">
+                                            <label class="form-check-label" for="switchEmp_add" style="font-size: 0.85rem;">Outra</label>
+                                        </div>
+                                    </div>
+                                    <div id="containerSelect_add">
+                                        <select id="selectEmp_add" class="form-select form-select-sm select2-tags" name="empresa">
+                                            <option value="">Nenhuma / Outra</option>
+                                            @foreach($empresas as $emp)
+                                                <option value="{{ $emp->nome_curto ?? $emp->razao_social }}">
+                                                    {{ $emp->nome_curto ? $emp->nome_curto . ' (' . $emp->razao_social . ')' : $emp->razao_social }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div id="containerInput_add" style="display: none;">
+                                        <input type="text" id="inputEmp_add" class="form-control form-control-sm" placeholder="Nome da empresa" disabled>
+                                    </div>
                                 </div>
                                 <div class="col-md-2">
                                     <input type="number" id="guestValue" class="form-control form-control-sm"
@@ -460,23 +494,41 @@
                         return new bootstrap.Popover(popoverTriggerEl)
                     });
 
-                    // Initialize Select2 with tags for elements dynamically using a special class
-                    $('.select2-tags').each(function () {
-                        const $this = $(this);
-                        const isInsideModal = $this.closest('.modal').length > 0;
-                        $this.select2({
-                            theme: 'bootstrap-5',
-                            width: '100%',
-                            tags: true,
-                            dropdownParent: isInsideModal ? $this.closest('.modal') : $(document.body),
-                            language: {
-                                noResults: function () {
-                                    return "Pressione Enter para adicionar nova empresa";
-                                }
-                            }
-                        });
+                // Initialize Select2 with tags for elements dynamically using a special class
+                $('.select2-tags').each(function () {
+                    const $this = $(this);
+                    const isInsideModal = $this.closest('.modal').length > 0;
+                    $this.select2({
+                        theme: 'bootstrap-5',
+                        width: '100%',
+                        dropdownParent: isInsideModal ? $this.closest('.modal') : $(document.body)
                     });
                 });
+            });
+
+            function toggleEmpresa(prefix) {
+                const isCustom = document.getElementById('switchEmp_' + prefix).checked;
+                const selectContainer = document.getElementById('containerSelect_' + prefix);
+                const inputContainer = document.getElementById('containerInput_' + prefix);
+                const selectEl = document.getElementById('selectEmp_' + prefix);
+                const inputEl = document.getElementById('inputEmp_' + prefix);
+                
+                if (isCustom) {
+                    selectContainer.style.display = 'none';
+                    inputContainer.style.display = 'block';
+                    selectEl.removeAttribute('name');
+                    selectEl.disabled = true;
+                    inputEl.setAttribute('name', 'empresa');
+                    inputEl.disabled = false;
+                } else {
+                    selectContainer.style.display = 'block';
+                    inputContainer.style.display = 'none';
+                    inputEl.removeAttribute('name');
+                    inputEl.disabled = true;
+                    selectEl.setAttribute('name', 'empresa');
+                    selectEl.disabled = false;
+                }
+            }
 
                 function openGuestModal(inviteId, responsavel) {
                     currentInviteId = inviteId;
@@ -498,19 +550,19 @@
                             data.forEach(g => {
                                 const row = document.createElement('tr');
                                 row.innerHTML = `
-                                                                                                                <td>${g.nome}</td>
-                                                                                                                <td>${g.documento || '-'}</td>
-                                                                                                                <td>${g.empresa || '-'}</td>
-                                                                                                                <td>R$ ${parseFloat(g.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                                                                                                                <td class="text-end">
-                                                                                                                    <button class="btn btn-xs btn-outline-info btn-edit-guest">
-                                                                                                                        <i class="fa-solid fa-pen"></i>
-                                                                                                                    </button>
-                                                                                                                    <button class="btn btn-xs btn-outline-danger" onclick="deleteGuest(${g.id})">
-                                                                                                                        <i class="fa-solid fa-trash-can"></i>
-                                                                                                                    </button>
-                                                                                                                </td>
-                                                                                                            `;
+                                                                                                                                        <td>${g.nome}</td>
+                                                                                                                                        <td>${g.documento || '-'}</td>
+                                                                                                                                        <td>${g.empresa || '-'}</td>
+                                                                                                                                        <td>R$ ${parseFloat(g.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                                                                                                                                        <td class="text-end">
+                                                                                                                                            <button class="btn btn-xs btn-outline-info btn-edit-guest">
+                                                                                                                                                <i class="fa-solid fa-pen"></i>
+                                                                                                                                            </button>
+                                                                                                                                            <button class="btn btn-xs btn-outline-danger" onclick="deleteGuest(${g.id})">
+                                                                                                                                                <i class="fa-solid fa-trash-can"></i>
+                                                                                                                                            </button>
+                                                                                                                                        </td>
+                                                                                                                                    `;
 
                                 // Anexa evento de clique ao botão de editar de forma segura
                                 row.querySelector('.btn-edit-guest').addEventListener('click', () => editGuest(g));
@@ -538,15 +590,15 @@
                     Swal.fire({
                         title: 'Editar Lote',
                         html: `
-                                                                        <div class="mb-3 text-start">
-                                                                            <label class="form-label small fw-bold">Nome do Lote</label>
-                                                                            <input id="swalLoteNome" class="form-control" placeholder="Nome" value="${lote.nome}">
-                                                                        </div>
-                                                                        <div class="mb-3 text-start">
-                                                                            <label class="form-label small fw-bold">Quantidade Total</label>
-                                                                            <input id="swalLoteQtd" type="number" class="form-control" placeholder="Quantidade" value="${lote.quantidade_total}">
-                                                                        </div>
-                                                                    `,
+                                                                                                <div class="mb-3 text-start">
+                                                                                                    <label class="form-label small fw-bold">Nome do Lote</label>
+                                                                                                    <input id="swalLoteNome" class="form-control" placeholder="Nome" value="${lote.nome}">
+                                                                                                </div>
+                                                                                                <div class="mb-3 text-start">
+                                                                                                    <label class="form-label small fw-bold">Quantidade Total</label>
+                                                                                                    <input id="swalLoteQtd" type="number" class="form-control" placeholder="Quantidade" value="${lote.quantidade_total}">
+                                                                                                </div>
+                                                                                            `,
                         focusConfirm: false,
                         showCancelButton: true,
                         confirmButtonText: 'Salvar',
@@ -605,7 +657,7 @@
                         body: JSON.stringify({
                             nome: name,
                             documento: document.getElementById('guestDocument').value,
-                            empresa: document.getElementById('guestCompany').value,
+                            empresa: document.getElementById('switchEmp_add').checked ? document.getElementById('inputEmp_add').value : document.getElementById('selectEmp_add').value,
                             valor: document.getElementById('guestValue').value
                         })
                     }).then(() => {
@@ -620,26 +672,67 @@
                     Swal.fire({
                         title: 'Editar Convidado',
                         html: `
-                                                                                                                <input id="swalName" class="swal2-input" placeholder="Nome" value="${guest.nome}">
-                                                                                                                <input id="swalDoc" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="CPF" value="${guest.documento || ''}">
-                                                                                        <select id="swalEmp" class="swal2-select select2-tags" style="max-width: 90%; margin: 10px auto; display: flex;">
-                                                                                            <option value="">Nenhuma / Outra</option>
-                                                                                            @foreach($empresas as $emp)
-                                                                                                <option value="{{ $emp->nome_curto ?? $emp->razao_social }}" ${guest.empresa === '{{ $emp->nome_curto ?? $emp->razao_social }}' ? 'selected' : ''}>
-                                                                                                    {{ $emp->nome_curto ? $emp->nome_curto . ' (' . $emp->razao_social . ')' : $emp->razao_social }}
-                                                                                                </option>
-                                                                                            @endforeach
-                                                                                        </select>
-                                                                                        <input id="swalVal" type="number" step="0.01" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="Valor" value="${guest.valor}">
-                                                                                                            `,
+                                                                                                                                        <input id="swalName" class="swal2-input" placeholder="Nome" value="${guest.nome}">
+                                                                                                                                        <input id="swalDoc" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="CPF" value="${guest.documento || ''}">
+                                                                                                                <div style="text-align: left; max-width: 90%; margin: 10px auto;">
+                                                                                                                    <div class="form-check form-switch m-0 pb-1">
+                                                                                                                        <input class="form-check-input" type="checkbox" id="switchEmp_swal" onchange="toggleEmpresaSwal()">
+                                                                                                                        <label class="form-check-label" for="switchEmp_swal"><small>Outra Empresa (Digitar)</small></label>
+                                                                                                                    </div>
+                                                                                                                    <div id="containerSelect_swal">
+                                                                                                                        <select id="swalEmpSelect" class="swal2-select select2-tags" style="width: 100%; display: flex; margin: 0;">
+                                                                                                                            <option value="">Nenhuma / Outra</option>
+                                                                                                                            @foreach($empresas as $emp)
+                                                                                                                                <option value="{{ $emp->nome_curto ?? $emp->razao_social }}" ${guest.empresa === '{{ $emp->nome_curto ?? $emp->razao_social }}' ? 'selected' : ''}>
+                                                                                                                                    {{ $emp->nome_curto ? $emp->nome_curto . ' (' . $emp->razao_social . ')' : $emp->razao_social }}
+                                                                                                                                </option>
+                                                                                                                            @endforeach
+                                                                                                                        </select>
+                                                                                                                    </div>
+                                                                                                                    <div id="containerInput_swal" style="display: none;">
+                                                                                                                        <input type="text" id="swalEmpInput" class="swal2-input" style="width: 100%; margin: 0;" placeholder="Nome da empresa" value="${guest.empresa || ''}">
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                                <input id="swalVal" type="number" step="0.01" class="swal2-input" style="max-width: 90%; margin: 10px auto;" placeholder="Valor" value="${guest.valor}">
+                                                                                                                                    `,
                         focusConfirm: false,
                         showCancelButton: true,
                         confirmButtonText: 'Salvar',
+                        didOpen: () => {
+                            $('#swalEmpSelect').select2({
+                                theme: 'bootstrap-5',
+                                width: '100%',
+                                dropdownParent: $('.swal2-container')
+                            });
+                            
+                            window.toggleEmpresaSwal = function() {
+                                const isCustom = document.getElementById('switchEmp_swal').checked;
+                                if(isCustom) {
+                                    document.getElementById('containerSelect_swal').style.display = 'none';
+                                    document.getElementById('containerInput_swal').style.display = 'block';
+                                } else {
+                                    document.getElementById('containerSelect_swal').style.display = 'block';
+                                    document.getElementById('containerInput_swal').style.display = 'none';
+                                }
+                            };
+                            
+                            let isOptionExists = false;
+                            $('#swalEmpSelect option').each(function() {
+                                if (this.value === (guest.empresa || '')) {
+                                    isOptionExists = true;
+                                }
+                            });
+                            
+                            if (guest.empresa && !isOptionExists) {
+                                document.getElementById('switchEmp_swal').checked = true;
+                                toggleEmpresaSwal();
+                            }
+                        },
                         preConfirm: () => {
                             return {
                                 nome: document.getElementById('swalName').value,
                                 documento: document.getElementById('swalDoc').value,
-                                empresa: document.getElementById('swalEmp').value,
+                                empresa: document.getElementById('switchEmp_swal').checked ? document.getElementById('swalEmpInput').value : document.getElementById('swalEmpSelect').value,
                                 valor: document.getElementById('swalVal').value
                             }
                         }
