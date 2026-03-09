@@ -66,5 +66,41 @@ class Protocolo extends Model
     {
         return $this->hasMany(CarimboTempo::class);
     }
+
+    /**
+     * Atualiza o status geral do protocolo baseando-se no estágio mais avançado dos envios.
+     * Hierarquia: lido > entregue > enviado > queued > falha.
+     */
+    public function atualizarStatusGeral()
+    {
+        $envios = $this->envios()->get();
+        if ($envios->isEmpty()) {
+            return;
+        }
+
+        $statusWeights = [
+            'lido' => 50,
+            'concluido' => 50, // se aplicavel
+            'entregue' => 40,
+            'enviado' => 30,
+            'queued' => 20,
+            'falha' => 10,
+        ];
+
+        $bestStatus = null;
+        $maxWeight = -1;
+
+        foreach ($envios as $envio) {
+            $peso = $statusWeights[$envio->status] ?? 0;
+            if ($peso > $maxWeight) {
+                $maxWeight = $peso;
+                $bestStatus = $envio->status;
+            }
+        }
+
+        if ($bestStatus && $this->status !== $bestStatus) {
+            $this->update(['status' => $bestStatus]);
+        }
+    }
 }
 

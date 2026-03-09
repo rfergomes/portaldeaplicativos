@@ -20,6 +20,7 @@ class ProtocoloEnvio extends Model
         'entregue_em',
         'lido_em',
         'token_usado',
+        'consultas_status',
     ];
 
     protected $casts = [
