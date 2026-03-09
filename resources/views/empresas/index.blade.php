@@ -2,6 +2,25 @@
 
 @section('title', 'Empresas')
 
+@push('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <style>
+        .select2-container--bootstrap-5 .select2-selection {
+            border-radius: 50rem !important;
+            padding-left: 1rem;
+            font-size: 0.875rem;
+            min-height: 31px;
+        }
+
+        .modal .select2-container--bootstrap-5 .select2-selection {
+            border-radius: 0.375rem !important;
+            min-height: 38px;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="container-fluid">
         <div class="card card-outline card-primary shadow-sm mb-4">
@@ -18,7 +37,7 @@
             <div class="card-body border-top py-2">
                 <form action="{{ route('empresas.index') }}" method="GET" class="row g-2 align-items-center">
                     <div class="col-md-4">
-                        <select name="regiao_id" class="form-select form-select-sm rounded-pill px-3"
+                        <select name="regiao_id" id="filter_regiao_id" class="form-select form-select-sm select2-filter"
                             onchange="this.form.submit()">
                             <option value="">TODAS AS REGIÕES</option>
                             @foreach($regioes as $regiao)
@@ -39,8 +58,8 @@
                     </div>
                     <div class="col-md-2 d-flex align-items-center">
                         <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" name="ver_inativos" id="ver_inativos" 
-                                value="1" {{ $ver_inativos ? 'checked' : '' }} onchange="this.form.submit()">
+                            <input class="form-check-input" type="checkbox" name="ver_inativos" id="ver_inativos" value="1"
+                                {{ $ver_inativos ? 'checked' : '' }} onchange="this.form.submit()">
                             <label class="form-check-label small fw-bold" for="ver_inativos">Exibir Inativas</label>
                         </div>
                     </div>
@@ -87,7 +106,8 @@
                                         <div class="fw-bold">
                                             {{ $empresa->razao_social }}
                                             @if(!$empresa->ativo)
-                                                <span class="badge text-bg-danger rounded-pill x-small ms-1" style="font-size: 0.6rem;">INATIVA</span>
+                                                <span class="badge text-bg-danger rounded-pill x-small ms-1"
+                                                    style="font-size: 0.6rem;">INATIVA</span>
                                             @endif
                                         </div>
                                         <small class="text-muted small">
@@ -169,7 +189,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Região Geográfica</label>
-                                <select name="regiao_id" class="form-select" required>
+                                <select name="regiao_id" id="new_regiao_id" class="form-select select2-modal" required>
                                     <option value="">SELECIONE UMA REGIÃO</option>
                                     @foreach($regioes as $regiao)
                                         <option value="{{ $regiao->id }}">{{ $regiao->nome }} ({{ $regiao->area_adm }})</option>
@@ -254,7 +274,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Região Geográfica</label>
-                                <select name="regiao_id" id="edit_regiao_id" class="form-select" required>
+                                <select name="regiao_id" id="edit_regiao_id" class="form-select select2-modal" required>
                                     @foreach($regioes as $regiao)
                                         <option value="{{ $regiao->id }}">{{ $regiao->nome }} ({{ $regiao->area_adm }})</option>
                                     @endforeach
@@ -320,9 +340,37 @@
     </div>
 
     @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script>
+            $(document).ready(function () {
+                $('.select2-modal').select2({
+                    theme: 'bootstrap-5',
+                    dropdownParent: $('#modalNovaEmpresa') // Default, will override for Edit
+                });
+
+                $('.select2-filter').select2({
+                    theme: 'bootstrap-5',
+                    placeholder: 'TODAS AS REGIÕES',
+                    allowClear: true
+                });
+
+                $('#modalEditarEmpresa').on('shown.bs.modal', function () {
+                    $('#edit_regiao_id').select2({
+                        theme: 'bootstrap-5',
+                        dropdownParent: $('#modalEditarEmpresa')
+                    });
+                });
+
+                $('#modalNovaEmpresa').on('shown.bs.modal', function () {
+                    $('#new_regiao_id').select2({
+                        theme: 'bootstrap-5',
+                        dropdownParent: $('#modalNovaEmpresa')
+                    });
+                });
+            });
+
             function editEmpresa(empresa) {
-                document.getElementById('edit_regiao_id').value = empresa.regiao_id;
+                $('#edit_regiao_id').val(empresa.regiao_id).trigger('change');
                 document.getElementById('edit_empresa_erp').value = empresa.empresa_erp || '';
                 document.getElementById('edit_razao_social').value = empresa.razao_social;
                 document.getElementById('edit_nome_fantasia').value = empresa.nome_fantasia || '';

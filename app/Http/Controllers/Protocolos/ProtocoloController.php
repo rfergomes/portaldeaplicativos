@@ -84,8 +84,14 @@ class ProtocoloController extends Controller
             ->toArray();
 
         $totalGeral = array_sum($metrics);
-        $totalSucesso = $metrics['sucesso'] ?? 0;
-        $totalEnviados = $metrics['enviado'] ?? 0;
+
+        // Somatório inteligente para o card de Sucesso (engloba status novos e legados)
+        $totalSucesso = ($metrics['sucesso'] ?? 0)
+            + ($metrics['lido'] ?? 0)
+            + ($metrics['entregue'] ?? 0)
+            + ($metrics['concluido'] ?? 0);
+
+        $totalEnviados = ($metrics['enviado'] ?? 0) + ($metrics['queued'] ?? 0) + ($metrics['pendente'] ?? 0);
         $totalFalhas = $metrics['falha'] ?? 0;
 
         return view('protocolos.index', compact(

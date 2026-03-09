@@ -50,14 +50,29 @@ class ImportDataSeeder extends Seeder
                     $nomeCurto = implode(' ', array_slice($parts, 0, 2));
                 }
 
-                $regiaoId = (int) $data['regiao_id'] ?: 7;
+                $regiaoId = (int) ($data['regiao_id'] ?? 0);
+
+                // Se não houver ID válido, tenta buscar pelo nome ou de área (se existir nas colunas)
+                if ($regiaoId <= 0) {
+                    $nomeRegiao = mb_strtoupper($data['regiao_nome'] ?? $data['setor'] ?? '', 'UTF-8');
+                    if (!empty($nomeRegiao)) {
+                        $regiao = \App\Models\Regiao::where('nome', $nomeRegiao)->first();
+                        if ($regiao) {
+                            $regiaoId = $regiao->id;
+                        }
+                    }
+                }
+
+                // Fallback para ID 7 (CARAGUATATUBA ou NÃO DEFINIDO dependendo do seeder)
+                if ($regiaoId <= 0)
+                    $regiaoId = 7;
 
                 Empresa::updateOrCreate(
                     ['id' => (int) $data['id']],
                     [
                         'regiao_id' => $regiaoId,
                         'razao_social' => mb_substr(mb_strtoupper($data['razao_social'], 'UTF-8'), 0, 255),
-                        'nome_fantasia' => mb_substr(mb_strtoupper($data['nome_fantasia'], 'UTF-8'), 0, 255),
+                        'nome_fantasia' => mb_substr(mb_strtoupper($data['nome_fantasia'] ?? '', 'UTF-8'), 0, 255),
                         'nome_curto' => mb_substr(mb_strtoupper($nomeCurto, 'UTF-8'), 0, 255),
                         'cnpj' => $cnpj,
                         'empresa_erp' => mb_substr($data['empresa_erp'], 0, 50),
