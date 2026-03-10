@@ -457,6 +457,7 @@
         <aside class="app-sidebar bg-body-tertiary shadow" data-bs-theme="dark">
             <div class="sidebar-brand">
                 <a href="{{ route('dashboard') }}" class="brand-link">
+                    <img src="{{ asset('img/brand.png') }}" alt="Logo Portal de Aplicativos" class="brand-image img-circle elevation-6" style="opacity: .8">
                     <span class="brand-text fw-light">Portal de Aplicativos</span>
                 </a>
             </div>
