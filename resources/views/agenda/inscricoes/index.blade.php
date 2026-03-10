@@ -139,10 +139,10 @@
                                                 default => '',
                                             };
                                             $badgeClass = match ($insc->status) {
-                                                'sorteado' => 'bg-success',
-                                                'espera' => 'bg-warning',
-                                                'cancelado' => 'bg-secondary',
-                                                default => 'badge-outline border',
+                                                'sorteado' => 'bg-success text-white',
+                                                'espera' => 'bg-warning text-dark',
+                                                'cancelado' => 'bg-secondary text-white',
+                                                default => 'bg-light text-dark border',
                                             };
                                         @endphp
                                         <tr class="{{ $rowClass }}">
