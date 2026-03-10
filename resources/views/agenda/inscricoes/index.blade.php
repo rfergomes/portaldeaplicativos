@@ -378,8 +378,8 @@
                             </div>
                             <div class="col-md-12 mb-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="acessibilidade" id="editAcessibilidade" value="1">
-                                    <label class="form-check-label fw-bold" for="editAcessibilidade">
+                                    <input class="form-check-input" type="checkbox" name="acessibilidade" id="editAcess_inscricao" value="1">
+                                    <label class="form-check-label fw-bold" for="editAcess_inscricao">
                                         <i class="fa-solid fa-wheelchair me-1 text-primary"></i>Necessita de Acessibilidade
                                     </label>
                                 </div>
@@ -546,7 +546,7 @@
                 document.getElementById('editTelefone').value = telefone;
                 document.getElementById('editEmail').value = email;
                 document.getElementById('editObservacao').value = observacao;
-                document.getElementById('editAcessibilidade').checked = (acessibilidade == '1' || acessibilidade === true);
+                document.getElementById('editAcess_inscricao').checked = (acessibilidade == '1' || acessibilidade === true);
 
                 const toggleEdit = document.getElementById('toggleEmpresaLivreEdit');
                 
