@@ -454,7 +454,7 @@
         <!-- /.navbar -->
 
         <!-- Main Sidebar Container -->
-        <aside class="app-sidebar bg-dark shadow" data-bs-theme="dark">
+        <aside class="app-sidebar bg-body-tertiary shadow" data-bs-theme="dark">
             <div class="sidebar-brand">
                 <a href="{{ route('dashboard') }}" class="brand-link">
                     <span class="brand-text fw-light">Portal de Aplicativos</span>
@@ -668,7 +668,7 @@
         <!-- Content Wrapper. Contains page content -->
         <main class="app-main">
             <div class="app-content-header">
-                <div class="container-fluid">
+                <div class="container-fluid shadow-sm">
                     <div class="row">
                         <div class="col-sm-6">
                             <h3 class="mb-0 text-capitalize">@yield('title')</h3>

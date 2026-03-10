@@ -347,6 +347,12 @@
                                         <div class="text-end d-flex flex-column align-items-end">
                                             {!! $statusText !!}
                                             <div class="mt-1">
+                                                @if($reserva->hospede && $reserva->hospede->telefone)
+                                                    <button class="btn btn-sm btn-light border py-0 px-1 me-1" title="Notificar via WhatsApp"
+                                                        onclick="notificarWhatsApp({{ $reserva->id }}, this)">
+                                                        <i class="fa-brands fa-whatsapp fa-xs text-success"></i>
+                                                    </button>
+                                                @endif
                                                 <button class="btn btn-sm btn-light border py-0 px-1 me-1" title="Editar Reserva"
                                                     data-bs-toggle="modal" data-bs-target="#modalEditarReserva"
                                                     onclick="preencherEdicao({{ $reserva->id }}, '{{ $reserva->status }}', '{{ $reserva->bloqueio_nota }}', '{{ addslashes($reserva->hospede->nome ?? '') }}', '{{ $reserva->hospede->telefone ?? '' }}', '{{ $reserva->hospede->email ?? '' }}', '{{ $reserva->hospede->empresa_id ?? '' }}')">
@@ -945,6 +951,47 @@
 
                 // Ajusta visualização
                 toggleAlocacaoEditForms();
+            }
+
+            // Notificar via WhatsApp
+            function notificarWhatsApp(reservaId, btnElement) {
+                Swal.fire({
+                    title: 'Disparando Notificação...',
+                    text: 'Aguarde enquanto a notificação é configurada via WhatsApp.',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch(`{{ url('agenda/reservas') }}/${reservaId}/notificar-whatsapp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: data.message,
+                            timer: 3500,
+                            timerProgressBar: true,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire('Erro!', data.message || 'Erro desconhecido ao tentar notificar.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na requisição WhatsApp:', error);
+                    Swal.fire('Erro!', 'Falha ao conectar ou timeout no envio da notificação.', 'error');
+                });
             }
         </script>
     @endpush

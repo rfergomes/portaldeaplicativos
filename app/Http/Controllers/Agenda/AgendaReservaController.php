@@ -297,4 +297,54 @@ class AgendaReservaController extends Controller
             'colonia_id' => $colonia_id,
         ])->with('success', 'Reserva/Vaga liberada com sucesso.');
     }
+
+    /**
+     * Dispara notificação de WhatsApp para o hóspede
+     */
+    public function notificarWhatsApp(Request $request, string $id)
+    {
+        $reserva = \App\Models\AgendaReserva::with(['hospede', 'colonia', 'periodo'])->findOrFail($id);
+
+        if (!$reserva->hospede || empty($reserva->hospede->telefone)) {
+            return response()->json(['success' => false, 'message' => 'Hóspede não encontrado ou sem telefone cadastrado.'], 400);
+        }
+
+        $telefone = preg_replace('/\D/', '', $reserva->hospede->telefone);
+        if (strlen($telefone) >= 10 && strlen($telefone) <= 11) {
+            $telefone = '+55' . $telefone;
+        }
+
+        $primeiroNome = explode(' ', trim($reserva->hospede->nome))[0];
+        $nomeColonia = $reserva->colonia->nome;
+        $semanaReserva = $reserva->periodo ? $reserva->periodo->descricao : 'sua reserva';
+
+        $token = env('KWIK_API_TOKEN');
+        $agentEmail = env('KWIK_AGENT_EMAIL');
+        $fromNumber = env('KWIK_FROM_NUMBER');
+
+        if (empty($token) || empty($agentEmail) || empty($fromNumber)) {
+            return response()->json(['success' => false, 'message' => 'Configurações da API do WhatsApp ausentes no servidor.'], 500);
+        }
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'Authorization' => 'Token ' . $token,
+                'Content-Type'  => 'application/json'
+            ])->post('https://kwik.app.br/api/api/public/v1/notification/', [
+                'agent_email' => $agentEmail,
+                'from'        => $fromNumber,
+                'to'          => $telefone,
+                'template'    => 'colonia_reserva',
+                'body'        => [$primeiroNome, $semanaReserva, $nomeColonia]
+            ]);
+
+            if ($response->successful() || $response->status() == 201) {
+                return response()->json(['success' => true, 'message' => 'Notificação enviada com sucesso!']);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Erro na API do WhatsApp: ' . $response->body()], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Falha ao conectar com a API: ' . $e->getMessage()], 500);
+        }
+    }
 }
