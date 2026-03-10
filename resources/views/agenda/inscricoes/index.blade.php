@@ -375,6 +375,15 @@
                                 <div id="wrapperInputEmpresaEdit" class="d-none mt-2">
                                     <input type="text" name="empresa_livre" id="inputEmpresaLivreEdit" class="form-control" placeholder="Digite o nome da empresa ou sindicato">
                                 </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="acessibilidade" id="editAcessibilidade" value="1">
+                                    <label class="form-check-label fw-bold" for="editAcessibilidade">
+                                        <i class="fa-solid fa-wheelchair me-1 text-primary"></i>Necessita de Acessibilidade
+                                    </label>
+                                </div>
                             </div>
                             <div class="col-md-12 mb-2">
                                 <label class="form-label fw-bold">Observação</label>
