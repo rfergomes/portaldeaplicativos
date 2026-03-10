@@ -327,7 +327,12 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             @if($reserva->hospede)
-                                                <h6 class="mb-0 fw-bold fs-6">{{ $reserva->hospede->nome }}</h6>
+                                                <h6 class="mb-0 fw-bold fs-6">
+                                                    {{ $reserva->hospede->nome }}
+                                                    @if($reserva->hospede->acessibilidade)
+                                                        <i class="fa-solid fa-wheelchair text-primary ms-1" title="Necessita de Acessibilidade"></i>
+                                                    @endif
+                                                </h6>
                                                 <div class="text-muted" style="font-size: 0.75rem;">
                                                     <span class="me-2"><i
                                                             class="fa-solid fa-phone text-secondary me-1"></i>{{ $reserva->hospede->telefone ?? '--' }}</span>
@@ -347,6 +352,11 @@
                                         <div class="text-end d-flex flex-column align-items-end">
                                             {!! $statusText !!}
                                             <div class="mt-1">
+                                                @if($reserva->hospede && $reserva->hospede->acessibilidade)
+                                                    <span class="btn btn-sm btn-light border py-0 px-1 me-1" title="Necessita de Acessibilidade" style="cursor: help;">
+                                                        <i class="fa-solid fa-wheelchair fa-xs text-primary"></i>
+                                                    </span>
+                                                @endif
                                                 @if($reserva->hospede && $reserva->hospede->telefone)
                                                     <button class="btn btn-sm btn-light border py-0 px-1 me-1" title="Notificar via WhatsApp"
                                                         onclick="notificarWhatsApp({{ $reserva->id }}, this)">
@@ -355,7 +365,7 @@
                                                 @endif
                                                 <button class="btn btn-sm btn-light border py-0 px-1 me-1" title="Editar Reserva"
                                                     data-bs-toggle="modal" data-bs-target="#modalEditarReserva"
-                                                    onclick="preencherEdicao({{ $reserva->id }}, '{{ $reserva->status }}', '{{ $reserva->bloqueio_nota }}', '{{ addslashes($reserva->hospede->nome ?? '') }}', '{{ $reserva->hospede->telefone ?? '' }}', '{{ $reserva->hospede->email ?? '' }}', '{{ $reserva->hospede->empresa_id ?? '' }}')">
+                                                    onclick="preencherEdicao({{ $reserva->id }}, '{{ $reserva->status }}', '{{ $reserva->bloqueio_nota }}', '{{ addslashes($reserva->hospede->nome ?? '') }}', '{{ $reserva->hospede->telefone ?? '' }}', '{{ $reserva->hospede->email ?? '' }}', '{{ $reserva->hospede->empresa_id ?? '' }}', '{{ $reserva->hospede->acessibilidade ?? 0 }}')">
                                                     <i class="fa-solid fa-pen fa-xs text-primary"></i>
                                                 </button>
                                                 <form action="{{ route('agenda.reservas.destroy', $reserva->id) }}" method="POST"
@@ -408,7 +418,12 @@
                                     <span class="badge rounded-circle bg-warning text-dark me-3"
                                         style="width: 25px; height: 25px; display: flex; align-items: center; justify-content: center;">{{ $index + 1 }}</span>
                                     <div>
-                                        <strong class="d-block">{{ $espera->hospede->nome ?? 'Desconhecido' }}</strong>
+                                        <strong class="d-block">
+                                            {{ $espera->hospede->nome ?? 'Desconhecido' }}
+                                            @if(isset($espera->hospede->acessibilidade) && $espera->hospede->acessibilidade)
+                                                <i class="fa-solid fa-wheelchair text-primary ms-1" title="Necessita de Acessibilidade"></i>
+                                            @endif
+                                        </strong>
                                         <div class="text-muted" style="font-size: 0.75rem;">
                                             <span class="me-2"><i
                                                     class="fa-solid fa-phone text-secondary me-1"></i>{{ $espera->hospede->telefone ?? '--' }}</span>
@@ -423,10 +438,15 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="d-flex gap-1">
+                                <div class="d-flex gap-1 align-items-center">
+                                    @if(isset($espera->hospede->acessibilidade) && $espera->hospede->acessibilidade)
+                                        <span class="btn btn-sm border-0 px-1" title="Necessita de Acessibilidade" style="cursor: help;">
+                                            <i class="fa-solid fa-wheelchair text-primary"></i>
+                                        </span>
+                                    @endif
                                     <button class="btn btn-sm btn-outline-primary border-0" title="Editar Dados"
                                         data-bs-toggle="modal" data-bs-target="#modalEditarReserva"
-                                        onclick="preencherEdicao({{ $espera->id }}, '{{ $espera->status }}', '{{ $espera->bloqueio_nota }}', '{{ addslashes($espera->hospede->nome ?? '') }}', '{{ $espera->hospede->telefone ?? '' }}', '{{ $espera->hospede->email ?? '' }}', '{{ $espera->hospede->empresa_id ?? '' }}')">
+                                        onclick="preencherEdicao({{ $espera->id }}, '{{ $espera->status }}', '{{ $espera->bloqueio_nota }}', '{{ addslashes($espera->hospede->nome ?? '') }}', '{{ $espera->hospede->telefone ?? '' }}', '{{ $espera->hospede->email ?? '' }}', '{{ $espera->hospede->empresa_id ?? '' }}', '{{ $espera->hospede->acessibilidade ?? 0 }}')">
                                         <i class="fa-solid fa-pen"></i>
                                     </button>
                                     <button class="btn btn-sm btn-outline-success border-0"
@@ -567,6 +587,14 @@
                                             @endforeach
                                         </select>
                                     </div>
+                                    <div class="col-md-12 mb-2">
+                                        <div class="form-check mt-1">
+                                            <input class="form-check-input" type="checkbox" name="acessibilidade" id="checkAcessibilidadeRes">
+                                            <label class="form-check-label fw-bold small" for="checkAcessibilidadeRes">
+                                                <i class="fa-solid fa-wheelchair text-primary me-1"></i> Necessita de Acessibilidade
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -674,6 +702,14 @@
                                                 <option value="{{ $emp->id }}">{{ $emp->razao_social }}</option>
                                             @endforeach
                                         </select>
+                                    </div>
+                                    <div class="col-md-12 mb-2">
+                                        <div class="form-check mt-1">
+                                            <input class="form-check-input" type="checkbox" name="acessibilidade" id="edit_acessibilidade">
+                                            <label class="form-check-label fw-bold small" for="edit_acessibilidade">
+                                                <i class="fa-solid fa-wheelchair text-primary me-1"></i> Necessita de Acessibilidade
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -924,7 +960,7 @@
                 }
             }
 
-            function preencherEdicao(reservaId, status, bloqueioNota, nome, telefone, email, empresaId) {
+            function preencherEdicao(reservaId, status, bloqueioNota, nome, telefone, email, empresaId, acessibilidade) {
                 // Configura a Rota do Form
                 const urlBase = "{{ route('agenda.reservas.update', ':id') }}";
                 document.getElementById('formEditarReserva').action = urlBase.replace(':id', reservaId);
@@ -940,6 +976,7 @@
                 document.getElementById('edit_nome').value = nome;
                 document.getElementById('edit_telefone').value = telefone;
                 document.getElementById('edit_email').value = email;
+                document.getElementById('edit_acessibilidade').checked = (acessibilidade == '1' || acessibilidade === true);
 
                 if (window.tomSelectEdit) {
                     window.tomSelectEdit.setValue(empresaId);

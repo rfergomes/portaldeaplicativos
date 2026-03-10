@@ -90,8 +90,12 @@ class AgendaInscricaoController extends Controller
             'telefone_hospede' => 'nullable|string|max:50',
             'email_hospede' => 'nullable|email|max:255',
             'empresa_id' => 'nullable|exists:empresas,id',
+            'empresa_livre' => 'nullable|string|max:255',
+            'acessibilidade' => 'nullable|boolean',
             'observacao' => 'nullable|string',
         ]);
+
+        $acessibilidade = $request->has('acessibilidade') ? true : false;
 
         // Criar ou localizar hóspede
         $hospede = AgendaHospede::firstOrCreate(
@@ -99,6 +103,8 @@ class AgendaInscricaoController extends Controller
             [
                 'email' => $request->email_hospede,
                 'empresa_id' => $request->empresa_id,
+                'empresa_livre' => $request->empresa_livre,
+                'acessibilidade' => $acessibilidade,
             ]
         );
 
@@ -107,7 +113,8 @@ class AgendaInscricaoController extends Controller
             $hospede->update(array_filter([
                 'email' => $request->email_hospede,
                 'empresa_id' => $request->empresa_id,
-            ]));
+                'empresa_livre' => $request->empresa_livre,
+            ]) + ['acessibilidade' => $acessibilidade]);
         }
 
         AgendaInscricao::create([
@@ -131,6 +138,41 @@ class AgendaInscricaoController extends Controller
      */
     public function update(Request $request, AgendaInscricao $inscricao)
     {
+        // Verifica se é uma edição de dados da inscrição (possui nome_hospede)
+        if ($request->has('nome_hospede')) {
+            $request->validate([
+                'nome_hospede' => 'required|string|max:255',
+                'telefone_hospede' => 'nullable|string|max:50',
+                'email_hospede' => 'nullable|email|max:255',
+                'empresa_id' => 'nullable|exists:empresas,id',
+                'empresa_livre' => 'nullable|string|max:255',
+                'acessibilidade' => 'nullable|boolean',
+                'observacao' => 'nullable|string',
+            ]);
+
+            $acessibilidade = $request->has('acessibilidade') ? true : false;
+
+            $hospede = $inscricao->hospede;
+            if ($hospede) {
+                // Para manter a integridade, caso o usuário tenha trocado o nome/telefone, 
+                // ele altera o hóspede ou cria um novo? Aqui vamos apenas alterar o atual.
+                $hospede->update([
+                    'nome' => $request->nome_hospede,
+                    'telefone' => $request->telefone_hospede,
+                    'email' => $request->email_hospede,
+                    'empresa_id' => $request->empresa_id,
+                    'empresa_livre' => $request->empresa_livre,
+                    'acessibilidade' => $acessibilidade,
+                ]);
+            }
+
+            $inscricao->update([
+                'observacao' => $request->observacao
+            ]);
+
+            return redirect()->back()->with('success', 'Inscrição atualizada com sucesso!');
+        }
+
         $request->validate([
             'status' => 'required|in:pendente,sorteado,espera,cancelado',
             'acomodacao_id' => 'nullable|exists:colonia_acomodacaos,id',

@@ -104,18 +104,24 @@ class AgendaReservaController extends Controller
         ]);
 
         $hospedeId = null;
-
+        $acessibilidade = $request->has('acessibilidade') ? true : false;
+        
         if (empty($validated['bloqueio_nota']) && !empty($validated['nome_hospede'])) {
             $hospede = \App\Models\AgendaHospede::firstOrCreate(
                 ['nome' => $validated['nome_hospede'], 'telefone' => $validated['telefone_hospede']],
-                ['email' => $validated['email_hospede'], 'empresa_id' => $validated['empresa_id']]
+                [
+                    'email' => $validated['email_hospede'], 
+                    'empresa_id' => $validated['empresa_id'],
+                    'acessibilidade' => $acessibilidade
+                ]
             );
             $hospedeId = $hospede->id;
 
-            if ($hospede->email !== $validated['email_hospede'] || $hospede->empresa_id != $validated['empresa_id']) {
+            if ($hospede->email !== $validated['email_hospede'] || $hospede->empresa_id != $validated['empresa_id'] || $hospede->acessibilidade != $acessibilidade) {
                 $hospede->update([
                     'email' => $validated['email_hospede'] ?? $hospede->email,
-                    'empresa_id' => $validated['empresa_id'] ?? $hospede->empresa_id
+                    'empresa_id' => $validated['empresa_id'] ?? $hospede->empresa_id,
+                    'acessibilidade' => $acessibilidade
                 ]);
             }
         }
@@ -171,18 +177,24 @@ class AgendaReservaController extends Controller
         ]);
 
         $hospedeId = null;
-
+        $acessibilidade = $request->has('acessibilidade') ? true : false;
+        
         if (empty($validated['bloqueio_nota']) && !empty($validated['nome_hospede'])) {
             $hospede = \App\Models\AgendaHospede::firstOrCreate(
                 ['nome' => $validated['nome_hospede'], 'telefone' => $validated['telefone_hospede']],
-                ['email' => $validated['email_hospede'], 'empresa_id' => $validated['empresa_id']]
+                [
+                    'email' => $validated['email_hospede'], 
+                    'empresa_id' => $validated['empresa_id'],
+                    'acessibilidade' => $acessibilidade
+                ]
             );
             $hospedeId = $hospede->id;
 
-            if ($hospede->email !== $validated['email_hospede'] || $hospede->empresa_id != $validated['empresa_id']) {
+            if ($hospede->email !== $validated['email_hospede'] || $hospede->empresa_id != $validated['empresa_id'] || $hospede->acessibilidade != $acessibilidade) {
                 $hospede->update([
                     'email' => $validated['email_hospede'] ?? $hospede->email,
-                    'empresa_id' => $validated['empresa_id'] ?? $hospede->empresa_id
+                    'empresa_id' => $validated['empresa_id'] ?? $hospede->empresa_id,
+                    'acessibilidade' => $acessibilidade
                 ]);
             }
         }

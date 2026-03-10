@@ -14,6 +14,8 @@ class AgendaHospede extends Model
         'telefone',
         'email',
         'empresa_id',
+        'empresa_livre',
+        'acessibilidade',
         'associado',
     ];
 

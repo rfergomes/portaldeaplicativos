@@ -148,7 +148,12 @@
                                         <tr class="{{ $rowClass }}">
                                             <td class="ps-3 fw-bold text-muted">{{ $i + 1 }}</td>
                                             <td>
-                                                <strong class="d-block">{{ $insc->hospede?->nome ?? '—' }}</strong>
+                                                <strong class="d-block">
+                                                    {{ $insc->hospede?->nome ?? '—' }}
+                                                    @if($insc->hospede?->acessibilidade)
+                                                        <i class="fa-solid fa-wheelchair text-primary ms-1" title="Necessita de Acessibilidade"></i>
+                                                    @endif
+                                                </strong>
                                                 @if($insc->reserva_id)
                                                     <span class="badge bg-primary rounded-pill" style="font-size:0.7rem;">
                                                         <i class="fa-solid fa-link me-1"></i>Pré-Reserva Gerada
@@ -165,7 +170,12 @@
                                                     </div>
                                                 @endif
                                             </td>
-                                            <td style="font-size:0.8rem;">{{ $insc->hospede?->empresa?->razao_social ?? '—' }}</td>
+                                            <td style="font-size:0.8rem;">
+                                                {{ $insc->hospede?->empresa?->razao_social ?? $insc->hospede?->empresa_livre ?? '—' }}
+                                                @if($insc->hospede?->empresa_livre)
+                                                    <span class="badge bg-light text-dark border ms-1" style="font-size:0.6rem;">Livre</span>
+                                                @endif
+                                            </td>
                                             <td style="font-size:0.8rem; max-width:180px;">
                                                 {{ Str::limit($insc->observacao, 60) ?? '—' }}</td>
                                             <td class="text-center">
@@ -187,6 +197,16 @@
                                             </td>
                                             <td class="text-center">
                                                 <div class="d-flex justify-content-center align-items-center gap-2">
+                                                    @if($insc->hospede?->acessibilidade)
+                                                        <span class="text-primary" title="Necessita de Acessibilidade" style="cursor: help;">
+                                                            <i class="fa-solid fa-wheelchair"></i>
+                                                        </span>
+                                                    @endif
+                                                    <button class="btn btn-sm btn-outline-secondary" title="Editar Inscrição"
+                                                        onclick="abrirEdicao({{ $insc->id }}, '{{ addslashes($insc->hospede?->nome ?? '') }}', '{{ addslashes($insc->hospede?->telefone ?? '') }}', '{{ addslashes($insc->hospede?->email ?? '') }}', '{{ $insc->hospede?->empresa_id ?? '' }}', '{{ addslashes($insc->hospede?->empresa_livre ?? '') }}', '{{ addslashes($insc->observacao ?? '') }}', '{{ $insc->hospede?->acessibilidade ?? 0 }}')"
+                                                        data-bs-toggle="modal" data-bs-target="#modalEditarInscricao">
+                                                        <i class="fa-solid fa-pen"></i>
+                                                    </button>
                                                     <button class="btn btn-sm btn-outline-primary" title="Definir Resultado do Sorteio"
                                                         onclick="abrirResultado({{ $insc->id }}, '{{ $insc->status }}', '{{ $insc->acomodacao_id }}', '{{ addslashes($insc->observacao ?? '') }}')"
                                                         data-bs-toggle="modal" data-bs-target="#modalResultado">
@@ -261,14 +281,32 @@
                                     placeholder="email@exemplo.com">
                             </div>
                             <div class="col-md-12 mb-3">
-                                <label class="form-label fw-bold">Empresa / Sindicato</label>
-                                <select name="empresa_id" id="selectEmpresaInsc" class="form-select"
-                                    placeholder="Digite para buscar...">
-                                    <option value="">-- Sem Empresa Vinculada --</option>
-                                    @foreach($empresas as $emp)
-                                        <option value="{{ $emp->id }}">{{ $emp->razao_social }}</option>
-                                    @endforeach
-                                </select>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label fw-bold mb-0">Empresa / Sindicato</label>
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" id="toggleEmpresaLivre" onchange="toggleEmpresaInput(false)">
+                                        <label class="form-check-label small text-muted" for="toggleEmpresaLivre" style="cursor:pointer;">Digitar manualmente</label>
+                                    </div>
+                                </div>
+                                <div id="wrapperSelectEmpresa">
+                                    <select name="empresa_id" id="selectEmpresaInsc" class="form-select" placeholder="Digite para buscar...">
+                                        <option value="">-- Sem Empresa Vinculada --</option>
+                                        @foreach($empresas as $emp)
+                                            <option value="{{ $emp->id }}">{{ $emp->razao_social }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div id="wrapperInputEmpresa" class="d-none mt-2">
+                                    <input type="text" name="empresa_livre" id="inputEmpresaLivre" class="form-control" placeholder="Digite o nome da empresa ou sindicato">
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="acessibilidade" id="checkAcessibilidadeInsc" value="1">
+                                    <label class="form-check-label fw-bold" for="checkAcessibilidadeInsc">
+                                        <i class="fa-solid fa-wheelchair me-1 text-primary"></i>Necessita de Acessibilidade
+                                    </label>
+                                </div>
                             </div>
                             <div class="col-md-12 mb-2">
                                 <label class="form-label fw-bold">Observação</label>
@@ -281,6 +319,73 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa-solid fa-save me-1"></i> Registrar Inscrição
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- MODAL: EDITAR INSCRIÇÃO --}}
+    <div class="modal fade" id="modalEditarInscricao" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-primary">
+                        <i class="fa-solid fa-pen me-2"></i>Editar Inscrição
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formEditarInscricao" action="" method="POST">
+                    @csrf @method('PUT')
+                    <!-- Hidden inputs para forçar voltar p/ o mesmo lugar -->
+                    <input type="hidden" name="colonia_id" value="{{ request('colonia_id') }}">
+                    <input type="hidden" name="periodo_id" value="{{ request('periodo_id') }}">
+                    
+                    <div class="modal-body">
+                        <div class="row gx-3">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Nome Completo *</label>
+                                <input type="text" name="nome_hospede" id="editNome" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Telefone / WhatsApp</label>
+                                <input type="text" name="telefone_hospede" id="editTelefone" class="form-control">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">E-mail</label>
+                                <input type="email" name="email_hospede" id="editEmail" class="form-control">
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label fw-bold mb-0">Empresa / Sindicato</label>
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" id="toggleEmpresaLivreEdit" onchange="toggleEmpresaInput(true)">
+                                        <label class="form-check-label small text-muted" for="toggleEmpresaLivreEdit" style="cursor:pointer;">Digitar manualmente</label>
+                                    </div>
+                                </div>
+                                <div id="wrapperSelectEmpresaEdit">
+                                    <select name="empresa_id" id="selectEmpresaEdit" class="form-select" placeholder="Digite para buscar...">
+                                        <option value="">-- Sem Empresa Vinculada --</option>
+                                        @foreach($empresas as $emp)
+                                            <option value="{{ $emp->id }}">{{ $emp->razao_social }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div id="wrapperInputEmpresaEdit" class="d-none mt-2">
+                                    <input type="text" name="empresa_livre" id="inputEmpresaLivreEdit" class="form-control" placeholder="Digite o nome da empresa ou sindicato">
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-2">
+                                <label class="form-label fw-bold">Observação</label>
+                                <textarea name="observacao" id="editObservacao" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-save me-1"></i> Salvar Alterações
                         </button>
                     </div>
                 </form>
@@ -426,11 +531,66 @@
                 }
             }
 
+            // Editar Inscricao
+            window.abrirEdicao = function(inscId, nome, telefone, email, empresaId, empresaLivre, observacao, acessibilidade) {
+                document.getElementById('formEditarInscricao').action = `/agenda/inscricoes/${inscId}`;
+                document.getElementById('editNome').value = nome;
+                document.getElementById('editTelefone').value = telefone;
+                document.getElementById('editEmail').value = email;
+                document.getElementById('editObservacao').value = observacao;
+                document.getElementById('editAcessibilidade').checked = (acessibilidade == '1' || acessibilidade === true);
+
+                const toggleEdit = document.getElementById('toggleEmpresaLivreEdit');
+                
+                if (empresaLivre && empresaLivre.trim() !== '') {
+                    toggleEdit.checked = true;
+                    document.getElementById('inputEmpresaLivreEdit').value = empresaLivre;
+                    toggleEmpresaInput(true);
+                } else {
+                    toggleEdit.checked = false;
+                    toggleEmpresaInput(true);
+                    
+                    const selEdit = document.getElementById('selectEmpresaEdit');
+                    if (selEdit && selEdit.tomselect) {
+                        selEdit.tomselect.setValue(empresaId);
+                    } else if (selEdit) {
+                        selEdit.value = empresaId;
+                    }
+                }
+            };
+
+            window.toggleEmpresaInput = function(isEdit = false) {
+                const isChecked = document.getElementById(isEdit ? 'toggleEmpresaLivreEdit' : 'toggleEmpresaLivre').checked;
+                const selectWrapper = document.getElementById(isEdit ? 'wrapperSelectEmpresaEdit' : 'wrapperSelectEmpresa');
+                const inputWrapper = document.getElementById(isEdit ? 'wrapperInputEmpresaEdit' : 'wrapperInputEmpresa');
+
+                const selectEl = document.getElementById(isEdit ? 'selectEmpresaEdit' : 'selectEmpresaInsc');
+                const inputEl = document.getElementById(isEdit ? 'inputEmpresaLivreEdit' : 'inputEmpresaLivre');
+
+                if (isChecked) {
+                    selectWrapper.classList.add('d-none');
+                    inputWrapper.classList.remove('d-none');
+                    if (selectEl && selectEl.tomselect) {
+                        selectEl.tomselect.clear();
+                    } else if (selectEl) {
+                        selectEl.value = '';
+                    }
+                } else {
+                    selectWrapper.classList.remove('d-none');
+                    inputWrapper.classList.add('d-none');
+                    if (inputEl) inputEl.value = '';
+                }
+            };
+
             // TomSelect para busca de empresa
             document.addEventListener('DOMContentLoaded', function () {
                 const selEmp = document.getElementById('selectEmpresaInsc');
                 if (selEmp && typeof TomSelect !== 'undefined') {
                     new TomSelect(selEmp, { maxOptions: 50 });
+                }
+                const selEmpEdit = document.getElementById('selectEmpresaEdit');
+                if (selEmpEdit && typeof TomSelect !== 'undefined') {
+                    new TomSelect(selEmpEdit, { maxOptions: 50 });
                 }
             });
         </script>
