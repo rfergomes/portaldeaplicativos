@@ -385,7 +385,7 @@
                                 </div>
                             </div>
                             <div class="col-md-12 mb-2">
-                                <label class="form-label fw-bold">Observação</label>
+                                <label class="form-label fw-bold">Observações</label>
                                 <textarea name="observacao" id="editObservacao" class="form-control" rows="2"></textarea>
                             </div>
                         </div>
