@@ -375,7 +375,6 @@
                                 <div id="wrapperInputEmpresaEdit" class="d-none mt-2">
                                     <input type="text" name="empresa_livre" id="inputEmpresaLivreEdit" class="form-control" placeholder="Digite o nome da empresa ou sindicato">
                                 </div>
-                                </div>
                             </div>
                             <div class="col-md-12 mb-3">
                                 <div class="form-check">
