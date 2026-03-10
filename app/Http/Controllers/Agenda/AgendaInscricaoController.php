@@ -101,20 +101,21 @@ class AgendaInscricaoController extends Controller
         $hospede = AgendaHospede::firstOrCreate(
             ['nome' => $request->nome_hospede, 'telefone' => $request->telefone_hospede],
             [
-                'email' => $request->email_hospede,
-                'empresa_id' => $request->empresa_id,
-                'empresa_livre' => $request->empresa_livre,
+                'email' => $request->filled('email_hospede') ? $request->email_hospede : null,
+                'empresa_id' => $request->filled('empresa_id') ? $request->empresa_id : null,
+                'empresa_livre' => $request->filled('empresa_livre') ? $request->empresa_livre : null,
                 'acessibilidade' => $acessibilidade,
             ]
         );
 
         // Se o hóspede já existia, atualizar dados de contato se vieram no form
         if (!$hospede->wasRecentlyCreated) {
-            $hospede->update(array_filter([
-                'email' => $request->email_hospede,
-                'empresa_id' => $request->empresa_id,
-                'empresa_livre' => $request->empresa_livre,
-            ]) + ['acessibilidade' => $acessibilidade]);
+            $hospede->update([
+                'email' => $request->filled('email_hospede') ? $request->email_hospede : $hospede->email,
+                'empresa_id' => $request->filled('empresa_id') ? $request->empresa_id : $hospede->empresa_id,
+                'empresa_livre' => $request->filled('empresa_livre') ? $request->empresa_livre : $hospede->empresa_livre,
+                'acessibilidade' => $acessibilidade,
+            ]);
         }
 
         AgendaInscricao::create([
@@ -152,6 +153,7 @@ class AgendaInscricaoController extends Controller
 
             $acessibilidade = $request->has('acessibilidade') ? true : false;
 
+            $inscricao = \App\Models\Agenda\AgendaInscricao::with('hospede')->findOrFail($inscricao->id ?? $request->route('inscricao'));
             $hospede = $inscricao->hospede;
             if ($hospede) {
                 // Para manter a integridade, caso o usuário tenha trocado o nome/telefone, 
@@ -159,9 +161,9 @@ class AgendaInscricaoController extends Controller
                 $hospede->update([
                     'nome' => $request->nome_hospede,
                     'telefone' => $request->telefone_hospede,
-                    'email' => $request->email_hospede,
-                    'empresa_id' => $request->empresa_id,
-                    'empresa_livre' => $request->empresa_livre,
+                    'email' => $request->filled('email_hospede') ? $request->email_hospede : null,
+                    'empresa_id' => $request->filled('empresa_id') ? $request->empresa_id : null,
+                    'empresa_livre' => $request->filled('empresa_livre') ? $request->empresa_livre : null,
                     'acessibilidade' => $acessibilidade,
                 ]);
             }

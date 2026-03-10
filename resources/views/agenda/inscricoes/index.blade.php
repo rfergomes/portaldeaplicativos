@@ -197,11 +197,6 @@
                                             </td>
                                             <td class="text-center">
                                                 <div class="d-flex justify-content-center align-items-center gap-2">
-                                                    @if($insc->hospede?->acessibilidade)
-                                                        <span class="text-primary" title="Necessita de Acessibilidade" style="cursor: help;">
-                                                            <i class="fa-solid fa-wheelchair"></i>
-                                                        </span>
-                                                    @endif
                                                     <button class="btn btn-sm btn-outline-secondary" title="Editar Inscrição"
                                                         onclick="abrirEdicao({{ $insc->id }}, '{{ addslashes($insc->hospede?->nome ?? '') }}', '{{ addslashes($insc->hospede?->telefone ?? '') }}', '{{ addslashes($insc->hospede?->email ?? '') }}', '{{ $insc->hospede?->empresa_id ?? '' }}', '{{ addslashes($insc->hospede?->empresa_livre ?? '') }}', '{{ addslashes($insc->observacao ?? '') }}', '{{ $insc->hospede?->acessibilidade ?? 0 }}')"
                                                         data-bs-toggle="modal" data-bs-target="#modalEditarInscricao">
