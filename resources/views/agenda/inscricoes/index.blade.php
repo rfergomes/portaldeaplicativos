@@ -536,7 +536,7 @@
 
             // Editar Inscricao
             window.abrirEdicao = function(inscId, nome, telefone, email, empresaId, empresaLivre, observacao, acessibilidade) {
-                document.getElementById('formEditarInscricao').action = `/agenda/inscricoes/${inscId}`;
+                document.getElementById('formEditarInscricao').action = `/agenda/inscricoes/${inscId}?colonia_id={{ request('colonia_id') }}&periodo_id={{ request('periodo_id') }}`;
                 document.getElementById('editNome').value = nome;
                 document.getElementById('editTelefone').value = telefone;
                 document.getElementById('editEmail').value = email;
