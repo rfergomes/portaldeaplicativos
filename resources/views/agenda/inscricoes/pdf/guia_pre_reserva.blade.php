@@ -6,7 +6,8 @@
     <title>Guia de Pré-Reserva</title>
     <style>
         @page {
-            margin: 0;
+            margin: 5mm;
+            /* Reduce default domPDF margin, give consistent bleeding space */
         }
 
         body {
@@ -18,19 +19,22 @@
         }
 
         .page {
-            width: 210mm;
-            height: 297mm;
-            padding: 3mm 10mm;
+            width: 100%;
+            /* Remove hardcoded 297mm height to prevent blank extra pages when it overflows slightly */
+            padding: 0;
             box-sizing: border-box;
             position: relative;
         }
 
         .guia-wrapper {
-            height: 110mm;
-            width: 100%;
+            /* Height slightly reduced to ensure two fit in a page comfortably without spilling over */
+            height: 125mm;
+            /* Fix largura absoluta para caber perfeitamente numa A4 com margens ignorando problemas de box-sizing */
+            width: 190mm;
+            margin: 0 auto;
             border: 2px solid #1a237e;
             border-radius: 6px;
-            padding: 4mm 8mm;
+            padding: 6mm 4mm;
             box-sizing: border-box;
             position: relative;
             overflow: hidden;
@@ -106,13 +110,25 @@
         }
 
         .col-2 {
-            width: 48%;
+            width: 68%;
             float: left;
         }
 
         .col-2-right {
-            width: 48%;
+            width: 28%;
             float: right;
+            text-align: right;
+        }
+
+        .col-3 {
+            width: 58%;
+            float: left;
+        }
+
+        .col-3-right {
+            width: 38%;
+            float: right;
+            text-align: right;
         }
 
         .alert-box {
@@ -154,7 +170,7 @@
         .cutting-line {
             width: 100%;
             border-top: 1px dashed #000;
-            margin: 4mm 0;
+            margin: 5mm 0;
             text-align: center;
             height: 1px;
             position: relative;
@@ -182,8 +198,8 @@
             <div class="guia-wrapper">
                 <div class="header clearfix">
                     <div style="float: left; width: 50%;">
-                        <div style="font-weight: bold; color: #1a237e; font-size: 12pt;">QUÍMICOS UNIFICADOS</div>
-                        <div style="font-size: 7pt; color: #666;">Portal de Aplicativos</div>
+                        <div style="font-weight: bold; color: #1a237e; font-size: 12pt;">QUÍMICOS UNIFICADOS CAMPINAS</div>
+                        <div style="font-size: 7pt; color: #666;">Colônia de Férias</div>
                     </div>
                     <div class="title-container" style="width: 48%;">
                         <h1 class="main-title">PRÉ-RESERVA</h1>
@@ -193,36 +209,55 @@
 
                 <div class="info-section">
                     <div class="field-row">
-                        <span class="label">Pendente de Sorteio / Beneficiário</span>
+                        <span class="label">Nome / Empresa</span>
                         <span class="value" style="border-bottom: 2px solid #333;">&nbsp;</span>
                     </div>
 
                     <div class="clearfix" style="margin-top: 3mm;">
+
                         <div class="col-2">
-                            <span class="label">Data do Sorteio</span>
-                            <span
-                                class="value">{{ $periodo->data_sorteio ? $periodo->data_sorteio->format('d/m/Y') : '____/____/________' }}</span>
-                        </div>
-                        <div class="col-2-right">
                             <span class="label">Período de Estadia</span>
-                            <span class="value">{{ $periodo->data_inicial->format('d/m/Y') }} à
+                            <span class="value">{{ $periodo->descricao }} de {{ $periodo->data_inicial->format('d/m/Y') }} à
                                 {{ $periodo->data_final->format('d/m/Y') }}</span>
                         </div>
-                    </div>
-
-                    <div class="field-row" style="margin-top: 3mm;">
-                        <span class="label">Identificação da Semana / Bloco</span>
-                        <span class="value">{{ $periodo->descricao }}</span>
+                        <div class="col-2-right">
+                            <span class="label">Data do Sorteio</span>
+                            <span
+                                class="value">{{ $periodo->data_sorteio ? $periodo->data_sorteio->format('d/m/Y') : '____/____/______' }}</span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="alert-box">
                     <div class="alert-title">Confirmação e Pagamento</div>
                     <div class="alert-content">
-                        Para garantir sua reserva, o pagamento integral deve ser realizado impreterivelmente até:<br>
+                        Para garantir sua reserva, o pagamento integral deve ser realizado impreterivelmente até:<br><br>
                         <span class="deadline-text">
-                            {{ $periodo->data_limite_pagamento ? $periodo->data_limite_pagamento->format('d/m/Y') . ' (' . $periodo->data_limite_pagamento->locale('pt_BR')->dayName . ')' : '____/____/________' }}
+                            {{ $periodo->data_limite_pagamento ? $periodo->data_limite_pagamento->format('d/m/Y') . ' (' . $periodo->data_limite_pagamento->locale('pt_BR')->dayName . ')' : '____/____/______' }}
                         </span>
+                    </div>
+                </div>
+
+                <div class="alert-box">
+                    <div class="alert-title">Valor das diárias</div>
+                    <div class="alert-content clearfix">
+                        <div class="col-3">
+                            <strong>CARAGUATATUBA</strong>
+                            <ul style="margin-top: 2px; padding-left: 15px;">
+                                <li>Sócio e dependente a partir de 12 anos: R$44,00</li>
+                                <li>Sócio acima de 60 anos: R$25,00</li>
+                                <li>Convidados de 5 a 11 anos: R$40,00</li>
+                                <li>Convidados de 12 a 59 anos: R$74,00</li>
+                                <li>Convidados acima de 60 anos: R$40,00</li>
+                            </ul>
+                        </div>
+                        <div class="col-3">
+                            <strong>SANTOS - PRAIA GRANDE</strong>
+                            <ul style="margin-top: 2px; padding-left: 15px;">
+                                <li>Sócio e dependente a partir de 12 anos: R$44,00</li>
+                                <li>Convidados a partir de 12 anos: R$74,00</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
