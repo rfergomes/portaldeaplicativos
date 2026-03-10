@@ -29,7 +29,8 @@ class DashboardController extends Controller
         // Reservas Pendentes (Aguardando confirmação ou pagamento próximo do vencimento)
         $reservasPendentes = AgendaReserva::where('status', 'reservado')
             ->whereHas('periodo', function ($query) use ($now) {
-                $query->where('data_limite_pagamento', '>=', $now->copy()->subDays(2));
+                // Considera data_limite_pagamento se existir, senao usa data_limite
+                $query->whereRaw('COALESCE(data_limite_pagamento, data_limite) >= ?', [$now->copy()->subDays(2)]);
             })->count();
 
         // Dados para Gráfico de Protocolos (Últimos 6 meses preenchidos)
@@ -58,7 +59,8 @@ class DashboardController extends Controller
         $alertasVencidos = AgendaReserva::with(['hospede', 'periodo', 'colonia'])
             ->where('status', 'reservado')
             ->whereHas('periodo', function ($query) use ($now) {
-                $query->where('data_limite_pagamento', '<', $now);
+                // Vencido significa que a data limite (ou pagamento) já passou pelo início do dia de hoje (meia-noite)
+                $query->whereRaw('COALESCE(data_limite_pagamento, data_limite) < ?', [$now->startOfDay()]);
             })
             ->limit(5)
             ->get();

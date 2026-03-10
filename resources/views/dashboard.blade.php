@@ -147,7 +147,7 @@
         <div class="col-lg-4">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-white border-0 py-3 d-flex align-items-center">
-                    <h5 class="card-title mb-0 fw-bold text-danger">Reservas Vencidas</h5>
+                    <h5 class="card-title mb-0 fw-bold text-danger">Reservas com prazo vencido</h5>
                     <div class="card-tools ms-auto">
                         <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse"><i
                                 class="fa-solid fa-minus"></i></button>
@@ -162,9 +162,8 @@
                                     <h6 class="mb-1 fw-bold">{{ $reserva->hospede->nome ?? 'Hóspede' }}</h6>
                                     <small class="text-danger fw-bold">Vencido!</small>
                                 </div>
-                                <p class="mb-1 small text-muted">{{ $reserva->colonia->nome }}
-                                    ({{ $reserva->acomodacao->identificador ?? 'S/A' }})</p>
-                                <small>Limite: {{ $reserva->periodo->data_limite_pagamento->format('d/m/Y') }}</small>
+                                <p class="mb-1 small text-muted">{{ $reserva->colonia->nome }} ({{ $reserva->acomodacao->identificador ?? 'S/A' }})</p>
+                                <small>Limite: {{ $reserva->periodo->data_limite_pagamento ? $reserva->periodo->data_limite_pagamento->format('d/m/Y') : ($reserva->periodo->data_limite ? $reserva->periodo->data_limite->format('d/m/Y') : 'Não definido') }}</small>
                             </div>
                         @empty
                             <div class="p-4 text-center text-muted">

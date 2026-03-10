@@ -586,7 +586,7 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Destino da Vaga</label>
                                 <select name="colonia_acomodacao_id" id="selectAcomodacao" class="form-select">
-                                    <option value="">-> ACOMODAÇÃO <-< /option>
+                                    <option value="">-> ACOMODAÇÃO <-</option>
                                             <optgroup label="Acomodações Disponíveis">
                                                 @foreach($acomodacoes as $aco)
                                                     @if(!isset($reservas[$aco->id]))
