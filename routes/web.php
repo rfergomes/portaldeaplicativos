@@ -130,6 +130,7 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
         Route::get('reservas/pdf/acomodacoes', [AgendaImpressaoController::class, 'gerarListaReservas'])->name('reservas.pdf.acomodacoes')->middleware('can:reservas.visualizar');
         Route::get('reservas/pdf/espera', [AgendaImpressaoController::class, 'gerarListaEspera'])->name('reservas.pdf.espera')->middleware('can:reservas.visualizar');
         Route::resource('inscricoes', AgendaInscricaoController::class)
+            ->parameters(['inscricoes' => 'inscricao'])
             ->only(['index', 'store', 'update', 'destroy'])->middleware('can:inscricoes.visualizar');
     });
 
