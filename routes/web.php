@@ -103,8 +103,8 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     // AGENDA COLONIA
     Route::prefix('agenda')->name('agenda.')->group(function () {
         // Colônias e Acomodações
-        Route::resource('colonias', \App\Http\Controllers\Agenda\ColoniaController::class)->middleware('can:colonias.visualizar');
-        Route::resource('colonias.acomodacoes', \App\Http\Controllers\Agenda\ColoniaAcomodacaoController::class)->shallow()->middleware('can:acomodacoes.visualizar');
+        Route::resource('colonias', \App\Http\Controllers\Agenda\ColoniaController::class)->middleware(['can:colonias.visualizar', 'uppercase.agenda']);
+        Route::resource('colonias.acomodacoes', \App\Http\Controllers\Agenda\ColoniaAcomodacaoController::class)->shallow()->middleware(['can:acomodacoes.visualizar', 'uppercase.agenda']);
 
         // Períodos e Sorteios
         Route::post('periodos/gerar', [\App\Http\Controllers\Agenda\AgendaPeriodoController::class, 'gerarSemanas'])->name('periodos.gerar')->middleware('can:periodos.gerarsemanas');
@@ -117,7 +117,7 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
         Route::post('reservas/{reserva}/promover', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'promoverVaga'])->name('reservas.promover')->middleware('can:reservas.promover');
         Route::post('reservas/{reserva}/excluir', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'excluirComMotivo'])->name('reservas.excluir')->middleware('can:reservas.excluir');
         Route::post('reservas/{reserva}/notificar-whatsapp', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'notificarWhatsApp'])->name('reservas.notificar_whatsapp');
-        Route::resource('reservas', \App\Http\Controllers\Agenda\AgendaReservaController::class)->middleware('can:reservas.visualizar');
+        Route::resource('reservas', \App\Http\Controllers\Agenda\AgendaReservaController::class)->middleware(['can:reservas.visualizar', 'uppercase.agenda']);
 
         // Histórico de Exclusões de Reservas
         Route::get('historico', [\App\Http\Controllers\Agenda\AgendaHistoricoController::class, 'index'])->name('historico.index');
@@ -131,7 +131,7 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
         Route::get('reservas/pdf/espera', [AgendaImpressaoController::class, 'gerarListaEspera'])->name('reservas.pdf.espera')->middleware('can:reservas.visualizar');
         Route::resource('inscricoes', AgendaInscricaoController::class)
             ->parameters(['inscricoes' => 'inscricao'])
-            ->only(['index', 'store', 'update', 'destroy'])->middleware('can:inscricoes.visualizar');
+            ->only(['index', 'store', 'update', 'destroy'])->middleware(['can:inscricoes.visualizar', 'uppercase.agenda']);
     });
 
     // Endpoint AJAX para buscar contatos da empresa

@@ -45,7 +45,7 @@
                 <form method="GET" action="{{ route('agenda.inscricoes.index') }}" class="row g-3 align-items-end">
                     <div class="col-md-4">
                         <label class="form-label fw-bold mb-1">1. Selecione a Colônia</label>
-                        <select name="colonia_id" class="form-select" required onchange="this.form.submit()">
+                        <select name="colonia_id" class="form-select" required>
                             <option value="">-- Escolha uma Colônia --</option>
                             @foreach($colonias as $col)
                                 <option value="{{ $col->id }}" {{ $coloniaSelecionada == $col->id ? 'selected' : '' }}>
@@ -56,7 +56,7 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-bold mb-1">2. Selecione o Período</label>
-                        <select name="periodo_id" class="form-select">
+                        <select name="periodo_id" class="form-select" onchange="this.form.submit()">
                             <option value="">-- Selecione um Período --</option>
                             @foreach($periodos as $per)
                                 <option value="{{ $per->id }}" {{ $periodoSelecionado == $per->id ? 'selected' : '' }}>

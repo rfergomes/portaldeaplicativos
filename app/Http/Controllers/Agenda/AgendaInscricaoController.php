@@ -34,7 +34,9 @@ class AgendaInscricaoController extends Controller
             if ($coloniaSelecionada && $periodoSelecionado) {
                 $colonia = Colonia::with([
                     'acomodacoes' => function ($q) {
-                        $q->where('ativo', true)->orderBy('tipo')->orderBy('identificador');
+                        $q->where('ativo', true)
+                          ->orderByRaw('CAST(identificador AS UNSIGNED) ASC')
+                          ->orderBy('identificador');
                     }
                 ])->findOrFail($coloniaSelecionada);
 
