@@ -330,7 +330,8 @@
                                                 <h6 class="mb-0 fw-bold fs-6">
                                                     {{ $reserva->hospede->nome }}
                                                     @if($reserva->hospede->acessibilidade)
-                                                        <i class="fa-solid fa-wheelchair text-primary ms-1" title="Necessita de Acessibilidade"></i>
+                                                        <i class="fa-solid fa-wheelchair text-primary ms-1"
+                                                            title="Necessita de Acessibilidade"></i>
                                                     @endif
                                                 </h6>
                                                 <div class="text-muted" style="font-size: 0.75rem;">
@@ -352,20 +353,22 @@
                                         <div class="text-end d-flex flex-column align-items-end">
                                             {!! $statusText !!}
                                             <div class="mt-1">
-                                                @if($reserva->hospede && $reserva->hospede->acessibilidade)
-                                                    <span class="btn btn-sm btn-light border py-0 px-1 me-1" title="Necessita de Acessibilidade" style="cursor: help;">
-                                                        <i class="fa-solid fa-wheelchair fa-xs text-primary"></i>
+                                                @if($reserva->observacao)
+                                                    <span class="btn btn-sm btn-light border py-0 px-1 me-1"
+                                                        title="{{ $reserva->observacao }}" style="cursor: help;" data-bs-toggle="tooltip">
+                                                        <i class="fa-solid fa-circle-info fa-xs text-info"></i>
                                                     </span>
                                                 @endif
                                                 @if($reserva->hospede && $reserva->hospede->telefone)
-                                                    <button class="btn btn-sm btn-light border py-0 px-1 me-1" title="Notificar via WhatsApp"
+                                                    <button class="btn btn-sm btn-light border py-0 px-1 me-1"
+                                                        title="Notificar via WhatsApp"
                                                         onclick="notificarWhatsApp({{ $reserva->id }}, this)">
                                                         <i class="fa-brands fa-whatsapp fa-xs text-success"></i>
                                                     </button>
                                                 @endif
                                                 <button class="btn btn-sm btn-light border py-0 px-1 me-1" title="Editar Reserva"
                                                     data-bs-toggle="modal" data-bs-target="#modalEditarReserva"
-                                                    onclick="preencherEdicao({{ $reserva->id }}, '{{ $reserva->status }}', '{{ $reserva->bloqueio_nota }}', '{{ addslashes($reserva->hospede->nome ?? '') }}', '{{ $reserva->hospede->telefone ?? '' }}', '{{ $reserva->hospede->email ?? '' }}', '{{ $reserva->hospede->empresa_id ?? '' }}', '{{ $reserva->hospede->acessibilidade ?? 0 }}')">
+                                                    onclick="preencherEdicao({{ $reserva->id }}, '{{ $reserva->status }}', '{{ addslashes($reserva->bloqueio_nota ?? '') }}', '{{ addslashes($reserva->hospede->nome ?? '') }}', '{{ $reserva->hospede->telefone ?? '' }}', '{{ $reserva->hospede->email ?? '' }}', '{{ $reserva->hospede->empresa_id ?? '' }}', '{{ $reserva->hospede->acessibilidade ?? 0 }}', '{{ addslashes(str_replace("\r\n", '\n', $reserva->observacao ?? '')) }}')">
                                                     <i class="fa-solid fa-pen fa-xs text-primary"></i>
                                                 </button>
                                                 <form action="{{ route('agenda.reservas.destroy', $reserva->id) }}" method="POST"
@@ -421,7 +424,8 @@
                                         <strong class="d-block">
                                             {{ $espera->hospede->nome ?? 'Desconhecido' }}
                                             @if(isset($espera->hospede->acessibilidade) && $espera->hospede->acessibilidade)
-                                                <i class="fa-solid fa-wheelchair text-primary ms-1" title="Necessita de Acessibilidade"></i>
+                                                <i class="fa-solid fa-wheelchair text-primary ms-1"
+                                                    title="Necessita de Acessibilidade"></i>
                                             @endif
                                         </strong>
                                         <div class="text-muted" style="font-size: 0.75rem;">
@@ -439,14 +443,15 @@
                                     </div>
                                 </div>
                                 <div class="d-flex gap-1 align-items-center">
-                                    @if(isset($espera->hospede->acessibilidade) && $espera->hospede->acessibilidade)
-                                        <span class="btn btn-sm border-0 px-1" title="Necessita de Acessibilidade" style="cursor: help;">
-                                            <i class="fa-solid fa-wheelchair text-primary"></i>
+                                    @if(isset($espera->observacao) && $espera->observacao)
+                                        <span class="btn btn-sm border-0 px-1" title="{{ $espera->observacao }}" style="cursor: help;"
+                                            data-bs-toggle="tooltip">
+                                            <i class="fa-solid fa-circle-info text-info"></i>
                                         </span>
                                     @endif
                                     <button class="btn btn-sm btn-outline-primary border-0" title="Editar Dados"
                                         data-bs-toggle="modal" data-bs-target="#modalEditarReserva"
-                                        onclick="preencherEdicao({{ $espera->id }}, '{{ $espera->status }}', '{{ $espera->bloqueio_nota }}', '{{ addslashes($espera->hospede->nome ?? '') }}', '{{ $espera->hospede->telefone ?? '' }}', '{{ $espera->hospede->email ?? '' }}', '{{ $espera->hospede->empresa_id ?? '' }}', '{{ $espera->hospede->acessibilidade ?? 0 }}')">
+                                        onclick="preencherEdicao({{ $espera->id }}, '{{ $espera->status }}', '{{ addslashes($espera->bloqueio_nota ?? '') }}', '{{ addslashes($espera->hospede->nome ?? '') }}', '{{ $espera->hospede->telefone ?? '' }}', '{{ $espera->hospede->email ?? '' }}', '{{ $espera->hospede->empresa_id ?? '' }}', '{{ $espera->hospede->acessibilidade ?? 0 }}', '{{ addslashes(str_replace("\r\n", '\n', $espera->observacao ?? '')) }}')">
                                         <i class="fa-solid fa-pen"></i>
                                     </button>
                                     <button class="btn btn-sm btn-outline-success border-0"
@@ -589,11 +594,18 @@
                                     </div>
                                     <div class="col-md-12 mb-2">
                                         <div class="form-check mt-1">
-                                            <input class="form-check-input" type="checkbox" name="acessibilidade" id="checkAcessibilidadeRes">
+                                            <input class="form-check-input" type="checkbox" name="acessibilidade"
+                                                id="checkAcessibilidadeRes">
                                             <label class="form-check-label fw-bold small" for="checkAcessibilidadeRes">
-                                                <i class="fa-solid fa-wheelchair text-primary me-1"></i> Necessita de Acessibilidade
+                                                <i class="fa-solid fa-wheelchair text-primary me-1"></i> Necessita de
+                                                Acessibilidade
                                             </label>
                                         </div>
+                                    </div>
+                                    <div class="col-md-12 mb-2">
+                                        <label class="form-label fw-bold small mb-1">Observações</label>
+                                        <textarea name="observacao" class="form-control form-control-sm" rows="2"
+                                            placeholder="Ex: Vai pagar dia tal, pediu mais uma acomodação..."></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -614,7 +626,7 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Destino da Vaga</label>
                                 <select name="colonia_acomodacao_id" id="selectAcomodacao" class="form-select">
-                                    <option value="">-> ACOMODAÇÃO <-</option>
+                                    <option value="">-> ACOMODAÇÃO <-< /option>
                                             <optgroup label="Acomodações Disponíveis">
                                                 @foreach($acomodacoes as $aco)
                                                     @if(!isset($reservas[$aco->id]))
@@ -664,7 +676,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3" id="blocoStatusEdit">
                                     <label class="form-label fw-bold">Situação *</label>
-                                    <select name="status" id="statusReservaEdit" class="form-select border-primary">
+                                    <select name="status" id="statusReservaEdit" class="form-select border-primary" required>
                                         <option value="reservado">Reservado</option>
                                         <option value="confirmado">Confirmado</option>
                                         <option value="pago">Pago</option>
@@ -705,11 +717,19 @@
                                     </div>
                                     <div class="col-md-12 mb-2">
                                         <div class="form-check mt-1">
-                                            <input class="form-check-input" type="checkbox" name="acessibilidade" id="edit_acessibilidade">
+                                            <input class="form-check-input" type="checkbox" name="acessibilidade"
+                                                id="edit_acessibilidade">
                                             <label class="form-check-label fw-bold small" for="edit_acessibilidade">
-                                                <i class="fa-solid fa-wheelchair text-primary me-1"></i> Necessita de Acessibilidade
+                                                <i class="fa-solid fa-wheelchair text-primary me-1"></i> Necessita de
+                                                Acessibilidade
                                             </label>
                                         </div>
+                                    </div>
+                                    <div class="col-md-12 mb-2">
+                                        <label class="form-label fw-bold small mb-1">Observações</label>
+                                        <textarea name="observacao" id="edit_observacao" class="form-control form-control-sm"
+                                            rows="2"
+                                            placeholder="Ex: Vai pagar dia tal, pediu mais uma acomodação..."></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -753,16 +773,28 @@
             </script>
         @endif
 
+        @if($errors->any())
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro de Validação',
+                        html: `{!! implode('<br>', $errors->all()) !!}`,
+                    });
+                });
+            </script>
+        @endif
+
         <script>
             // Confirmar exclusão com motivo via SweetAlert
             function confirmarDelete(form) {
                 Swal.fire({
                     title: 'Motivo da Exclusão',
                     html: `
-                                                                                                                                    <p class="text-muted small mb-3">Informe o motivo para excluir esta reserva. Este registro ficará salvo no histórico.</p>
-                                                                                                                                    <textarea id="motivoExclusao" rows="3" style="width:calc(100% - 4px);box-sizing:border-box;resize:vertical;border:1px solid #d9d9d9;border-radius:6px;padding:10px 12px;font-size:0.9rem;display:block;"
-                                                                                                                                        placeholder="Ex: Desistência do hóspede, reagendamento, cancelamento, bloqueio..."></textarea>
-                                                                                                                                `,
+                                                                                                                                            <p class="text-muted small mb-3">Informe o motivo para excluir esta reserva. Este registro ficará salvo no histórico.</p>
+                                                                                                                                            <textarea id="motivoExclusao" rows="3" style="width:calc(100% - 4px);box-sizing:border-box;resize:vertical;border:1px solid #d9d9d9;border-radius:6px;padding:10px 12px;font-size:0.9rem;display:block;"
+                                                                                                                                                placeholder="Ex: Desistência do hóspede, reagendamento, cancelamento, bloqueio..."></textarea>
+                                                                                                                                        `,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#dc3545',
@@ -960,7 +992,7 @@
                 }
             }
 
-            function preencherEdicao(reservaId, status, bloqueioNota, nome, telefone, email, empresaId, acessibilidade) {
+            function preencherEdicao(reservaId, status, bloqueioNota, nome, telefone, email, empresaId, acessibilidade, observacao) {
                 // Configura a Rota do Form
                 const urlBase = "{{ route('agenda.reservas.update', ':id') }}";
                 document.getElementById('formEditarReserva').action = urlBase.replace(':id', reservaId);
@@ -971,12 +1003,15 @@
 
                 // Preencher campos
                 document.getElementById('edit_bloqueio').value = bloqueioNota;
-                document.getElementById('statusReservaEdit').value = status;
+
+                // Garantir case correto para status dropdown no caso de registros legados maiúsculos
+                document.getElementById('statusReservaEdit').value = status ? status.toLowerCase() : '';
 
                 document.getElementById('edit_nome').value = nome;
                 document.getElementById('edit_telefone').value = telefone;
                 document.getElementById('edit_email').value = email;
                 document.getElementById('edit_acessibilidade').checked = (acessibilidade == '1' || acessibilidade === true);
+                document.getElementById('edit_observacao').value = observacao || '';
 
                 if (window.tomSelectEdit) {
                     window.tomSelectEdit.setValue(empresaId);
@@ -1010,25 +1045,25 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}'
                     }
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Sucesso!',
-                            text: data.message,
-                            timer: 3500,
-                            timerProgressBar: true,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        Swal.fire('Erro!', data.message || 'Erro desconhecido ao tentar notificar.', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro na requisição WhatsApp:', error);
-                    Swal.fire('Erro!', 'Falha ao conectar ou timeout no envio da notificação.', 'error');
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sucesso!',
+                                text: data.message,
+                                timer: 3500,
+                                timerProgressBar: true,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire('Erro!', data.message || 'Erro desconhecido ao tentar notificar.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro na requisição WhatsApp:', error);
+                        Swal.fire('Erro!', 'Falha ao conectar ou timeout no envio da notificação.', 'error');
+                    });
             }
         </script>
     @endpush

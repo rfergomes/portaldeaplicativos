@@ -19,7 +19,9 @@ class UppercaseAgendaStrings
         $input = $request->all();
 
         array_walk_recursive($input, function (&$value, $key) {
-            if (is_string($value) && !in_array($key, ['_token', '_method', 'password', 'email', 'email_confirmation'])) {
+            // Campos que não devem ser convertidos para maiúsculas (senhas, tokens, emails, status internos)
+            $ignoredKeys = ['_token', '_method', 'password', 'email', 'email_confirmation', 'status', 'email_hospede'];
+            if (is_string($value) && !in_array($key, $ignoredKeys)) {
                 $value = mb_strtoupper($value, 'UTF-8');
             }
         });

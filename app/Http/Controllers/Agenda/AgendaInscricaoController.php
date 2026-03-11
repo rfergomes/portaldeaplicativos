@@ -210,6 +210,7 @@ class AgendaInscricaoController extends Controller
                 'agenda_hospede_id' => $hospedeId,
                 'colonia_acomodacao_id' => $request->acomodacao_id,
                 'status' => 'reservado',
+                'observacao' => $request->observacao ?? $inscricao->observacao,
             ]);
             $reservaId = $reserva->id;
         } elseif ($status === 'espera') {
@@ -226,6 +227,7 @@ class AgendaInscricaoController extends Controller
                 'colonia_acomodacao_id' => null,
                 'status' => 'reservado',
                 'ordem_fila' => $ordemFila,
+                'observacao' => $request->observacao ?? $inscricao->observacao,
             ]);
             $reservaId = $reserva->id;
         }

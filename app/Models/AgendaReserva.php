@@ -17,6 +17,7 @@ class AgendaReserva extends Model
         'bloqueio_nota',
         'status',
         'ordem_fila',
+        'observacao',
     ];
 
     public function periodo()

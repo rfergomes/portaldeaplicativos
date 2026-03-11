@@ -101,6 +101,7 @@ class AgendaReservaController extends Controller
             'telefone_hospede' => 'nullable|string|max:20',
             'email_hospede' => 'nullable|email|max:255',
             'empresa_id' => 'nullable|exists:empresas,id',
+            'observacao' => 'nullable|string',
         ]);
 
         $hospedeId = null;
@@ -156,6 +157,7 @@ class AgendaReservaController extends Controller
             'colonia_acomodacao_id' => $validated['colonia_acomodacao_id'],
             'agenda_hospede_id' => $hospedeId,
             'bloqueio_nota' => $validated['bloqueio_nota'] ?? null,
+            'observacao' => $validated['observacao'] ?? null,
             'status' => $status,
             'ordem_fila' => $ordemFila
         ]);
@@ -168,6 +170,7 @@ class AgendaReservaController extends Controller
 
     public function update(Request $request, string $id)
     {
+        \Log::info('AgendaReserva UPDATE Request:', $request->all());
         $reserva = \App\Models\AgendaReserva::with('hospede')->findOrFail($id);
 
         $validated = $request->validate([
@@ -177,6 +180,7 @@ class AgendaReservaController extends Controller
             'telefone_hospede' => 'nullable|string|max:20',
             'email_hospede' => 'nullable|email|max:255',
             'empresa_id' => 'nullable|exists:empresas,id',
+            'observacao' => 'nullable|string',
         ]);
 
         $hospedeId = null;
@@ -215,6 +219,7 @@ class AgendaReservaController extends Controller
         $reserva->update([
             'agenda_hospede_id' => $hospedeId,
             'bloqueio_nota' => $validated['bloqueio_nota'] ?? null,
+            'observacao' => $validated['observacao'] ?? null,
             'status' => $status,
         ]);
 
