@@ -184,7 +184,7 @@
                                             $cor = $cores[$protocolo->status] ?? 'secondary';
                                         @endphp
                                         <span class="badge text-bg-{{ $cor }} rounded-pill shadow-sm px-2">
-                                            {{ ucfirst($protocolo->status) }}
+                                            {{ strtoupper($protocolo->status) }}
                                         </span>
                                     </td>
                                     <td>

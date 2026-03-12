@@ -70,7 +70,7 @@
                                 $cor = $cores[$protocolo->status] ?? 'secondary';
                             @endphp
                             <span
-                                class="badge text-bg-{{ $cor }} rounded-pill px-3 py-2">{{ ucfirst($protocolo->status) }}</span>
+                                class="badge text-bg-{{ $cor }} rounded-pill px-3 py-2">{{ strtoupper($protocolo->status) }}</span>
                         </div>
                     </div>
                 </div>
