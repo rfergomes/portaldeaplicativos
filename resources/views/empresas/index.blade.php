@@ -77,8 +77,8 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="text-muted small text-uppercase">
                             <tr>
-                                <th class="ps-4" style="width: 80px;">ID</th>
-                                <th>ERP / CNPJ</th>
+                                <th class="ps-4" style="width: 80px;">CÓD.</th>
+                                <th>CNPJ</th>
                                 <th>Região</th>
                                 <th>Razão Social / Nome Fantasia</th>
                                 <th>Cidade/UF</th>
@@ -91,10 +91,9 @@
                             @forelse($empresas as $empresa)
                                 <tr>
                                     <td class="ps-4">
-                                        <span class="badge text-bg-light border shadow-sm px-2">#{{ $empresa->id }}</span>
+                                        <span class="badge text-bg-light border shadow-sm px-2">#{{ $empresa->empresa_erp ?? '-' }}</span>
                                     </td>
                                     <td>
-                                        <div class="fw-bold">{{ $empresa->empresa_erp ?? '-' }}</div>
                                         <small class="text-muted">{{ $empresa->cnpj }}</small>
                                     </td>
                                     <td>
@@ -197,8 +196,8 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">ID ERP (EMPRESA)</label>
-                                <input type="text" name="empresa_erp" class="form-control" placeholder="ID NO ERP">
+                                <label class="form-label fw-bold">CÓDIGO (ÁBACO)</label>
+                                <input type="text" name="empresa_erp" class="form-control" placeholder="CÓD. EMPRESA">
                             </div>
                         </div>
                         <div class="row">
@@ -281,7 +280,7 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">ID ERP (EMPRESA)</label>
+                                <label class="form-label fw-bold">CÓDIGO (ÁBACO)</label>
                                 <input type="text" name="empresa_erp" id="edit_empresa_erp" class="form-control">
                             </div>
                         </div>

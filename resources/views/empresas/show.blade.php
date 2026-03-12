@@ -55,7 +55,7 @@
                         </div>
                     </div>
                     <div class="card-footer text-muted small py-2 border-top border-0">
-                        <i class="fa-solid fa-circle-info me-1"></i> Dados cadastrados no ERP.
+                        <i class="fa-solid fa-circle-info me-1"></i> Dados cadastrados no SIS Ábaco.
                     </div>
                 </div>
             </div>
@@ -88,7 +88,6 @@
                                         <tr>
                                             <td class="ps-4">
                                                 <div class="fw-bold">{{ $contato->nome }}</div>
-                                                <small class="text-muted small">ID: {{ $contato->id }}</small>
                                             </td>
                                             <td>
                                                 <span class="badge text-bg-secondary rounded-pill shadow-sm px-2">
