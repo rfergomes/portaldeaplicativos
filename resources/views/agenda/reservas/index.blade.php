@@ -181,7 +181,7 @@
                 <div
                     class="d-flex flex-column justify-content-center h-100 p-3 rounded shadow-sm border border-primary border-opacity-25">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h4 class="fw-bold mb-0 text-primary">{{ $coloniaModel->nome }}</h4>
+                        <h3 class="fw-bold mb-0 text-primary">{{ $coloniaModel->nome }}</h3>
                         <div>
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle me-1" type="button"
@@ -626,7 +626,7 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Destino da Vaga</label>
                                 <select name="colonia_acomodacao_id" id="selectAcomodacao" class="form-select">
-                                    <option value="">-> ACOMODAÇÃO <-< /option>
+                                    <option value="">-> ACOMODAÇÃO <-</option>
                                             <optgroup label="Acomodações Disponíveis">
                                                 @foreach($acomodacoes as $aco)
                                                     @if(!isset($reservas[$aco->id]))
@@ -990,6 +990,11 @@
                     }
                     document.getElementById('edit_nome').required = true;
                 }
+                
+                // Disparar evento change para atualizar plugins visuais como Select2, se existirem
+                if (typeof $ !== 'undefined') {
+                    $(statusSelect).trigger('change');
+                }
             }
 
             function preencherEdicao(reservaId, status, bloqueioNota, nome, telefone, email, empresaId, acessibilidade, observacao) {
@@ -1005,7 +1010,11 @@
                 document.getElementById('edit_bloqueio').value = bloqueioNota;
 
                 // Garantir case correto para status dropdown no caso de registros legados maiúsculos
-                document.getElementById('statusReservaEdit').value = status ? status.toLowerCase() : '';
+                const selectElement = document.getElementById('statusReservaEdit');
+                selectElement.value = status ? status.toLowerCase().trim() : '';
+                if (typeof $ !== 'undefined') {
+                    $(selectElement).trigger('change');
+                }
 
                 document.getElementById('edit_nome').value = nome;
                 document.getElementById('edit_telefone').value = telefone;
