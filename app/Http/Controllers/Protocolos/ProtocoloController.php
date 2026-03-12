@@ -287,6 +287,10 @@ class ProtocoloController extends Controller
             }
         }
 
+        if ($atualizados > 0) {
+            $protocolo->atualizarStatusGeral();
+        }
+
         return back()->with('success', "Status atualizado: {$atualizados} envio(s) sincronizados.");
     }
 

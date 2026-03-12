@@ -54,7 +54,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-5">
                         <label class="form-label fw-bold mb-1">2. Selecione o Período</label>
                         <select name="periodo_id" class="form-select" onchange="this.form.submit()">
                             <option value="">-- Selecione um Período --</option>
@@ -66,7 +66,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <button type="submit" class="btn btn-primary w-100 rounded-pill shadow-sm">
                             <i class="fa-solid fa-search me-2"></i>Carregar Inscrições
                         </button>

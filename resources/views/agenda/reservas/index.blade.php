@@ -145,7 +145,7 @@
                             </select>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-5">
                             <label class="form-label fw-bold text-primary"><i class="fa-solid fa-clock me-1"></i> 2.
                                 Selecione o Período</label>
                             <select name="periodo_id" class="form-select" required onchange="this.form.submit()">
@@ -159,9 +159,9 @@
                             </select>
                         </div>
 
-                        <div class="col-md-4 d-flex align-items-end">
+                        <div class="col-md-3 col-sm-4 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">
-                                <i class="fa-solid fa-magnifying-glass me-2"></i> Carregar Planilha
+                                <i class="fa-solid fa-magnifying-glass me-2"></i> Carregar
                             </button>
                         </div>
                     </form>

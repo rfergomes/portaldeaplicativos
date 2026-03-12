@@ -79,13 +79,14 @@ class Protocolo extends Model
         }
 
         $statusWeights = [
-            'lido' => 40,
+            'lido'      => 40,
             'concluido' => 40,
-            'entregue' => 40,
-            'enviado' => 30,
-            'queued' => 20,
-            'pendente' => 20,
-            'falha' => 10,
+            'entregue'  => 40,
+            'enviado'   => 30,
+            'queued'    => 20,
+            'pendente'  => 20,
+            'processado' => 20,
+            'falha'     => 10,
         ];
 
         $maxWeight = -1;
@@ -97,11 +98,11 @@ class Protocolo extends Model
             }
         }
 
-        $bestStatus = match ($maxWeight) {
-            40 => 'sucesso',
-            30 => 'enviado',
-            20 => 'pendente',
-            10 => 'falha',
+        $bestStatus = match (true) {
+            $maxWeight >= 40 => 'sucesso',
+            $maxWeight >= 30 => 'enviado',
+            $maxWeight >= 20 => 'pendente',
+            $maxWeight >= 10 => 'falha',
             default => 'pendente',
         };
 

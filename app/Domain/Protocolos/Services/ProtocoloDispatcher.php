@@ -35,9 +35,11 @@ class ProtocoloDispatcher
         }
 
         // Atualiza status geral do protocolo
-        $protocolo->update([
-            'status' => $enviados > 0 ? 'enviado' : 'falha',
-        ]);
+        if ($enviados > 0) {
+            $protocolo->atualizarStatusGeral();
+        } else {
+            $protocolo->update(['status' => 'falha']);
+        }
 
         return $enviados;
     }
