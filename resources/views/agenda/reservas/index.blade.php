@@ -123,8 +123,9 @@
         }
     </style>
 @endpush
-
-@section('title', 'Painel de Reservas (Sorteio)')
+@section('title', 'Painel de Reservas - Agenda Colônias')
+@section('meta_description', 'Gerencie as reservas de acomodações nas colônias de férias. Organize hóspedes, períodos e disponibilidade em tempo real.')
+@section('meta_keywords', 'reservas, colônia de férias, hospedagem, agenda, químicos unificados')
 
 @section('content')
     <div class="row mb-4">
@@ -270,9 +271,8 @@
 
             <!-- LADO ESQUERDO: ACOMODAÃâ€¡Ãâ€¢ES -->
             <div class="coluna-acomodacoes">
-                <h5 class="fw-bold text-primary border-bottom border-primary pb-2 mb-3">
-                    <i class="fa-solid fa-house-chimney me-2"></i> Lista de Reservas
-                </h5>
+                <h1 class="fw-bold mb-0 fs-4"><i class="fa-solid fa-calendar-check text-primary me-2"></i>Painel de Reservas
+                </h1>
 
                 @if($acomodacoes->isEmpty() && request('colonia_id'))
                     <div class="alert alert-warning text-center border-0 shadow-sm mt-4 p-4">
