@@ -5,7 +5,28 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <title>@yield('title', 'Portal de Aplicativos') | AdminLTE 4</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="@yield('meta_description', 'Portal de Aplicativos - Sistema de Gestão Interna para Colônias e Protocolos.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'gestão, colônias, reservas, protocolos, portal, aplicativos')">
+    <meta name="author" content="TI Químicos Unificados">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="@yield('title', 'Portal de Aplicativos')">
+    <meta property="og:description" content="@yield('meta_description', 'Portal de Aplicativos - Sistema de Gestão Interna para Colônias e Protocolos.')">
+    <meta property="og:image" content="{{ asset('img/brand.png') }}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="@yield('title', 'Portal de Aplicativos')">
+    <meta property="twitter:description" content="@yield('meta_description', 'Portal de Aplicativos - Sistema de Gestão Interna para Colônias e Protocolos.')">
+    <meta property="twitter:image" content="{{ asset('img/brand.png') }}">
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
