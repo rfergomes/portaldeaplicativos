@@ -218,7 +218,11 @@ class AgendaReservaController extends Controller
         }
 
         // Se mudou de acomodação, verificar se a nova está livre (ou se é fila de espera)
-        $coloniaAcomodacaoId = $request->filled('colonia_acomodacao_id') ? $validated['colonia_acomodacao_id'] : null;
+        // Se o campo não estiver no request (ex: erro de frontend), mantém o original. 
+        // Se estiver vazio explicitamente, entende-se como Fila de Espera (null).
+        $coloniaAcomodacaoId = $request->has('colonia_acomodacao_id') 
+            ? ($request->filled('colonia_acomodacao_id') ? $validated['colonia_acomodacao_id'] : null)
+            : $reserva->colonia_acomodacao_id;
         
         if ($reserva->colonia_acomodacao_id != $coloniaAcomodacaoId && !empty($coloniaAcomodacaoId)) {
             $ocupada = \App\Models\AgendaReserva::where('agenda_periodo_id', $reserva->agenda_periodo_id)

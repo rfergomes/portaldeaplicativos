@@ -1087,7 +1087,29 @@
                 // Preencher Acomodação Atual
                 const acoSelect = document.getElementById('edit_colonia_acomodacao_id');
                 if (acoSelect) {
-                    acoSelect.value = acoId || '';
+                    // Primeiro, resetar qualquer disabled que foi removido anteriormente (limpeza básica)
+                    Array.from(acoSelect.options).forEach(opt => {
+                        if (opt.hasAttribute('data-was-disabled')) {
+                            opt.disabled = true;
+                            opt.removeAttribute('data-was-disabled');
+                        }
+                    });
+
+                    // Se temos um ID de acomodação, precisamos garantir que ele esteja habilitado para ser selecionado
+                    if (acoId) {
+                        const targetOption = acoSelect.querySelector(`option[value="${acoId}"]`);
+                        if (targetOption) {
+                            if (targetOption.disabled) {
+                                targetOption.disabled = false;
+                                targetOption.setAttribute('data-was-disabled', 'true');
+                            }
+                            acoSelect.value = acoId;
+                        } else {
+                            acoSelect.value = '';
+                        }
+                    } else {
+                        acoSelect.value = '';
+                    }
                 }
 
                 if (window.tomSelectEdit) {

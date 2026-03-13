@@ -1,3 +1,5 @@
+@extends('layouts.app')
+
 @section('title', 'Sorteio e Inscrições - Agenda Colônias')
 @section('meta_description', 'Participe do sorteio de vagas para as colônias de férias. Inscreva-se e acompanhe o resultado das acomodações.')
 @section('meta_keywords', 'sorteio, inscrições, colônia de férias, vagas, químicos unificados')
