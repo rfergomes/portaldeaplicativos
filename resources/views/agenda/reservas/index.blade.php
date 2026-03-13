@@ -368,8 +368,12 @@
                                                 @endif
                                                 <button class="btn btn-sm btn-light border py-0 px-1 me-1" title="Editar Reserva"
                                                     data-bs-toggle="modal" data-bs-target="#modalEditarReserva"
-                                                    onclick="preencherEdicao({{ $reserva->id }}, '{{ $reserva->status }}', '{{ addslashes($reserva->bloqueio_nota ?? '') }}', '{{ addslashes($reserva->hospede->nome ?? '') }}', '{{ $reserva->hospede->telefone ?? '' }}', '{{ $reserva->hospede->email ?? '' }}', '{{ $reserva->hospede->empresa_id ?? '' }}', '{{ $reserva->hospede->acessibilidade ?? 0 }}', '{{ addslashes(str_replace("\r\n", '\n', $reserva->observacao ?? '')) }}')">
+                                                    onclick="preencherEdicao({{ $reserva->id }}, '{{ $reserva->colonia_acomodacao_id }}', '{{ $reserva->status }}', '{{ addslashes($reserva->bloqueio_nota ?? '') }}', '{{ addslashes($reserva->hospede->nome ?? '') }}', '{{ $reserva->hospede->telefone ?? '' }}', '{{ $reserva->hospede->email ?? '' }}', '{{ $reserva->hospede->empresa_id ?? '' }}', '{{ $reserva->hospede->acessibilidade ?? 0 }}', '{{ addslashes(str_replace("\r\n", '\n', $reserva->observacao ?? '')) }}')">
                                                     <i class="fa-solid fa-pen fa-xs text-primary"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-light border py-0 px-1 me-1" title="Trocar Acomodação"
+                                                    onclick="abrirModalTroca({{ $reserva->id }}, '{{ addslashes($reserva->hospede->nome ?? ($reserva->bloqueio_nota ?? 'Bloqueado')) }}', '{{ $aco->identificador }}')">
+                                                    <i class="fa-solid fa-arrows-rotate fa-xs text-warning"></i>
                                                 </button>
                                                 <form action="{{ route('agenda.reservas.destroy', $reserva->id) }}" method="POST"
                                                     class="d-inline">
@@ -451,7 +455,7 @@
                                     @endif
                                     <button class="btn btn-sm btn-outline-primary border-0" title="Editar Dados"
                                         data-bs-toggle="modal" data-bs-target="#modalEditarReserva"
-                                        onclick="preencherEdicao({{ $espera->id }}, '{{ $espera->status }}', '{{ addslashes($espera->bloqueio_nota ?? '') }}', '{{ addslashes($espera->hospede->nome ?? '') }}', '{{ $espera->hospede->telefone ?? '' }}', '{{ $espera->hospede->email ?? '' }}', '{{ $espera->hospede->empresa_id ?? '' }}', '{{ $espera->hospede->acessibilidade ?? 0 }}', '{{ addslashes(str_replace("\r\n", '\n', $espera->observacao ?? '')) }}')">
+                                        onclick="preencherEdicao({{ $espera->id }}, '', '{{ $espera->status }}', '{{ addslashes($espera->bloqueio_nota ?? '') }}', '{{ addslashes($espera->hospede->nome ?? '') }}', '{{ $espera->hospede->telefone ?? '' }}', '{{ $espera->hospede->email ?? '' }}', '{{ $espera->hospede->empresa_id ?? '' }}', '{{ $espera->hospede->acessibilidade ?? 0 }}', '{{ addslashes(str_replace("\r\n", '\n', $espera->observacao ?? '')) }}')">
                                         <i class="fa-solid fa-pen"></i>
                                     </button>
                                     <button class="btn btn-sm btn-outline-success border-0"
@@ -684,6 +688,22 @@
                                         <option value="fila_espera" hidden>Fila de Espera</option>
                                     </select>
                                 </div>
+                                <div class="col-md-12 mb-3" id="blocoAcomodacaoEdit">
+                                    <label class="form-label fw-bold">Acomodação Destino</label>
+                                    <div class="input-group">
+                                        <select name="colonia_acomodacao_id" id="edit_colonia_acomodacao_id" class="form-select border-primary">
+                                            <option value="">-> FILA DE ESPERA <-</option>
+                                            @foreach($acomodacoes as $aco_edit)
+                                                @if(!isset($reservas[$aco_edit->id]))
+                                                    <option value="{{ $aco_edit->id }}">Unidade {{ $aco_edit->identificador }} ({{ $aco_edit->tipo ?? 'Padrão' }})</option>
+                                                @else
+                                                    <option value="{{ $aco_edit->id }}" disabled data-original="true">Unidade {{ $aco_edit->identificador }} (Ocupada)</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <small class="text-muted">Mude para uma acomodação vazia ou para a fila de espera.</small>
+                                </div>
                             </div>
 
                             <!-- Bloco Hóspede Edit -->
@@ -749,6 +769,43 @@
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
                             <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save me-1"></i> Salvar
                                 Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Modal Trocar Acomodação entre Hospedes (Swap) --}}
+    @if($periodoSelecionado && $coloniaSelecionada)
+        <div class="modal fade" id="modalTrocarAcomodacao" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title fw-bold"><i class="fa-solid fa-arrows-rotate me-2"></i>Trocar de Lugar</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="formTrocarAcomodacao" method="POST">
+                        @csrf
+                        <div class="modal-body">
+                            <p>O hóspede <strong id="nomeHospedeA"></strong> (<span id="acoHospedeA"></span>)</p>
+                            <p class="text-center my-2"><i class="fa-solid fa-repeat fa-2x text-warning"></i></p>
+                            <label class="form-label fw-bold">Trocar com o hóspede:</label>
+                            <select name="reserva_b_id" id="selectHospedeB" class="form-select" required>
+                                <option value="">-- Selecione o outro hóspede --</option>
+                                @foreach($acomodacoes as $aco_swap)
+                                    @isset($reservas[$aco_swap->id])
+                                        <option value="{{ $reservas[$aco_swap->id]->id }}">
+                                            {{ $reservas[$aco_swap->id]->hospede->nome ?? ($reservas[$aco_swap->id]->bloqueio_nota ?? 'Bloqueado') }} ({{ $aco_swap->identificador }})
+                                        </option>
+                                    @endisset
+                                @endforeach
+                            </select>
+                            <p class="mt-3 small text-muted">Ambos os hóspedes trocarão suas acomodações um com o outro de forma automática.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
+                            <button type="submit" class="btn btn-warning fw-bold">Confirmar Troca</button>
                         </div>
                     </form>
                 </div>
@@ -990,17 +1047,22 @@
                     }
                     document.getElementById('edit_nome').required = true;
                 }
-                
-                // Disparar evento change para atualizar plugins visuais como Select2, se existirem
-                if (typeof $ !== 'undefined') {
-                    $(statusSelect).trigger('change');
+
+                const blocoAco = document.getElementById('blocoAcomodacaoEdit');
+                if (blocoAco) {
+                    if (statusSelect.value === 'fila_espera' || tipo === 'bloqueio') {
+                        blocoAco.classList.add('d-none');
+                    } else {
+                        blocoAco.classList.remove('d-none');
+                    }
                 }
             }
 
-            function preencherEdicao(reservaId, status, bloqueioNota, nome, telefone, email, empresaId, acessibilidade, observacao) {
+            function preencherEdicao(reservaId, acoId, status, bloqueioNota, nome, telefone, email, empresaId, acessibilidade, observacao) {
                 // Configura a Rota do Form
                 const urlBase = "{{ route('agenda.reservas.update', ':id') }}";
-                document.getElementById('formEditarReserva').action = urlBase.replace(':id', reservaId);
+                const formEdit = document.getElementById('formEditarReserva');
+                formEdit.action = urlBase.replace(':id', reservaId);
 
                 // Define se é Bloqueio ou Hospede
                 const tipoAlocacao = (bloqueioNota && bloqueioNota.trim() !== '') ? 'bloqueio' : 'hospede';
@@ -1022,6 +1084,12 @@
                 document.getElementById('edit_acessibilidade').checked = (acessibilidade == '1' || acessibilidade === true);
                 document.getElementById('edit_observacao').value = observacao || '';
 
+                // Preencher Acomodação Atual
+                const acoSelect = document.getElementById('edit_colonia_acomodacao_id');
+                if (acoSelect) {
+                    acoSelect.value = acoId || '';
+                }
+
                 if (window.tomSelectEdit) {
                     window.tomSelectEdit.setValue(empresaId);
                 } else if (window.select2Edit) {
@@ -1032,6 +1100,25 @@
 
                 // Ajusta visualização
                 toggleAlocacaoEditForms();
+            }
+
+            // Trocar Acomodação Modal
+            function abrirModalTroca(reservaId, nome, acoId) {
+                document.getElementById('nomeHospedeA').textContent = nome;
+                document.getElementById('acoHospedeA').textContent = 'Acomodação ' + acoId;
+                
+                const formTroca = document.getElementById('formTrocarAcomodacao');
+                const baseUrl = '{{ url("/agenda/reservas") }}';
+                formTroca.action = baseUrl + '/' + reservaId + '/trocar';
+
+                // Remover o próprio hóspede da lista de troca
+                const selectB = document.getElementById('selectHospedeB');
+                Array.from(selectB.options).forEach(opt => {
+                    opt.disabled = (opt.value == reservaId);
+                });
+                selectB.value = '';
+
+                new bootstrap.Modal(document.getElementById('modalTrocarAcomodacao')).show();
             }
 
             // Notificar via WhatsApp

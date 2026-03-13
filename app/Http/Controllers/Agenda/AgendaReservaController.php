@@ -180,6 +180,7 @@ class AgendaReservaController extends Controller
             'telefone_hospede' => 'nullable|string|max:20',
             'email_hospede' => 'nullable|email|max:255',
             'empresa_id' => 'nullable|exists:empresas,id',
+            'colonia_acomodacao_id' => 'nullable|exists:colonia_acomodacaos,id',
             'observacao' => 'nullable|string',
         ]);
 
@@ -216,11 +217,28 @@ class AgendaReservaController extends Controller
             $status = 'reservado';
         }
 
+        // Se mudou de acomodação, verificar se a nova está livre (ou se é fila de espera)
+        $coloniaAcomodacaoId = $request->filled('colonia_acomodacao_id') ? $validated['colonia_acomodacao_id'] : null;
+        
+        if ($reserva->colonia_acomodacao_id != $coloniaAcomodacaoId && !empty($coloniaAcomodacaoId)) {
+            $ocupada = \App\Models\AgendaReserva::where('agenda_periodo_id', $reserva->agenda_periodo_id)
+                ->where('colonia_id', $reserva->colonia_id)
+                ->where('colonia_acomodacao_id', $coloniaAcomodacaoId)
+                ->where('id', '!=', $id)
+                ->exists();
+
+            if ($ocupada) {
+                return redirect()->back()->with('error', 'A nova acomodação selecionada já está ocupada por outro hóspede.');
+            }
+        }
+
         $reserva->update([
+            'colonia_acomodacao_id' => $coloniaAcomodacaoId,
             'agenda_hospede_id' => $hospedeId,
             'bloqueio_nota' => $validated['bloqueio_nota'] ?? null,
             'observacao' => $validated['observacao'] ?? null,
             'status' => $status,
+            'ordem_fila' => empty($coloniaAcomodacaoId) ? ($reserva->ordem_fila ?? 99) : null,
         ]);
 
         return redirect()->route('agenda.reservas.index', [
@@ -368,6 +386,52 @@ class AgendaReservaController extends Controller
             }
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Falha ao conectar com a API: ' . $e->getMessage()], 500);
+        }
+    }
+    /**
+     * Troca as acomodações entre dois hóspedes.
+     */
+    public function trocarAcomodacao(Request $request, string $id)
+    {
+        $reservaA = \App\Models\AgendaReserva::findOrFail($id);
+        
+        $request->validate([
+            'reserva_b_id' => 'required|exists:agenda_reservas,id',
+        ]);
+
+        $reservaB = \App\Models\AgendaReserva::findOrFail($request->reserva_b_id);
+
+        if ($reservaA->agenda_periodo_id != $reservaB->agenda_periodo_id || $reservaA->colonia_id != $reservaB->colonia_id) {
+            return redirect()->back()->with('error', 'As reservas devem pertencer ao mesmo período e colônia para realizar a troca.');
+        }
+
+        $acoA = $reservaA->colonia_acomodacao_id;
+        $acoB = $reservaB->colonia_acomodacao_id;
+
+        if (empty($acoA) || empty($acoB)) {
+            return redirect()->back()->with('error', 'Ambas as reservas devem possuir acomodação vinculada para realizar a troca.');
+        }
+
+        \Log::info("Iniciando Troca: Reserva A ($id em $acoA) com Reserva B ({$reservaB->id} em $acoB)");
+
+        try {
+            \DB::transaction(function() use ($id, $reservaB, $acoA, $acoB) {
+                // Usar query builder para evitar qualquer lógica de modelo ou state issues do Eloquent
+                \DB::table('agenda_reservas')->where('id', $id)->update(['colonia_acomodacao_id' => null]);
+                \DB::table('agenda_reservas')->where('id', $reservaB->id)->update(['colonia_acomodacao_id' => $acoA]);
+                \DB::table('agenda_reservas')->where('id', $id)->update(['colonia_acomodacao_id' => $acoB]);
+            });
+
+            \Log::info("Troca concluída com sucesso.");
+
+            return redirect()->route('agenda.reservas.index', [
+                'periodo_id' => $reservaA->agenda_periodo_id,
+                'colonia_id' => $reservaA->colonia_id,
+            ])->with('success', 'Troca de acomodações realizada com sucesso!');
+            
+        } catch (\Exception $e) {
+            \Log::error("Erro na Troca de Acomodação: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Erro interno ao processar a troca: ' . $e->getMessage());
         }
     }
 }

@@ -116,6 +116,7 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
         // Reservas e App (Visão de Planilha será feita no index de reservas)
         Route::post('reservas/{reserva}/promover', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'promoverVaga'])->name('reservas.promover')->middleware('can:reservas.promover');
         Route::post('reservas/{reserva}/excluir', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'excluirComMotivo'])->name('reservas.excluir')->middleware('can:reservas.excluir');
+        Route::post('reservas/{reserva}/trocar', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'trocarAcomodacao'])->name('reservas.trocar')->middleware('can:reservas.visualizar');
         Route::post('reservas/{reserva}/notificar-whatsapp', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'notificarWhatsApp'])->name('reservas.notificar_whatsapp');
         Route::resource('reservas', \App\Http\Controllers\Agenda\AgendaReservaController::class)->middleware(['can:reservas.visualizar', 'uppercase.agenda']);
 
