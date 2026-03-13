@@ -574,6 +574,69 @@
                             </li>
                         @endif
 
+                        <!-- Controle de Ativos (Ativos) -->
+                        <li class="nav-item {{ request()->routeIs('ativos.*') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->routeIs('ativos.*') ? 'active' : '' }}">
+                                <i class="nav-icon fa-solid fa-boxes-stacked"></i>
+                                <p>
+                                    Controle de Ativos
+                                    <i class="nav-arrow fa-solid fa-chevron-right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('ativos.equipamentos.index') }}"
+                                        class="nav-link {{ request()->routeIs('ativos.equipamentos.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fa-solid fa-laptop"></i>
+                                        <p>Equipamentos</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('ativos.movimentacoes.index') }}"
+                                        class="nav-link {{ request()->routeIs('ativos.movimentacoes.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fa-solid fa-right-left"></i>
+                                        <p>Movimentações</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('ativos.usuarios.index') }}"
+                                        class="nav-link {{ request()->routeIs('ativos.usuarios.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fa-solid fa-users-gear"></i>
+                                        <p>Cessionários</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ request()->routeIs('ativos.departamentos.*') || request()->routeIs('ativos.fabricantes.*') || request()->routeIs('ativos.fornecedores.*') ? 'menu-open' : '' }}">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon fa-solid fa-gears"></i>
+                                        <p>
+                                            Configurações
+                                            <i class="nav-arrow fa-solid fa-chevron-right"></i>
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="{{ route('ativos.departamentos.index') }}" class="nav-link {{ request()->routeIs('ativos.departamentos.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-sitemap"></i>
+                                                <p>Departamentos</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('ativos.fabricantes.index') }}" class="nav-link {{ request()->routeIs('ativos.fabricantes.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-industry"></i>
+                                                <p>Fabricantes</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('ativos.fornecedores.index') }}" class="nav-link {{ request()->routeIs('ativos.fornecedores.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-truck-field"></i>
+                                                <p>Fornecedores</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+
                         <!-- Cadastro -->
                         @if(auth()->user()->temPermissao('empresas.visualizar') || auth()->user()->temPermissao('regioes.visualizar'))
                             @php

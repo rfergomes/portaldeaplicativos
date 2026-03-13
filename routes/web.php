@@ -162,4 +162,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/password/change', [App\Http\Controllers\Auth\PasswordChangeController::class, 'show'])->name('password.change');
     Route::post('/password/change', [App\Http\Controllers\Auth\PasswordChangeController::class, 'update'])->name('password.change.update');
+    // Módulo de Controle de Ativos (Ativos)
+    Route::prefix('ativos')->name('ativos.')->group(function () {
+        Route::resource('equipamentos', \App\Http\Controllers\Ativos\AtivoEquipamentoController::class);
+        Route::resource('movimentacoes', \App\Http\Controllers\Ativos\AtivoMovimentacaoController::class)->only(['index', 'store']);
+        Route::resource('usuarios', \App\Http\Controllers\Ativos\AtivoUsuarioController::class);
+        Route::resource('departamentos', \App\Http\Controllers\Ativos\AtivoDepartamentoController::class)->except(['show']);
+        Route::resource('fabricantes', \App\Http\Controllers\Ativos\AtivoFabricanteController::class)->except(['show']);
+        Route::resource('fornecedores', \App\Http\Controllers\Ativos\AtivoFornecedorController::class)->except(['show']);
+    });
 });
