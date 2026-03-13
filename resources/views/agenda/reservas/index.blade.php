@@ -220,13 +220,15 @@
                             </button>
                         </div>
                     </div>
-                    <p class="text-muted mb-0 fs-5 pb-2 border-bottom">
-                        <i class="fa-regular fa-calendar text-primary me-1"></i> <strong>{{ $periodoModel->descricao }}</strong>
-                    </p>
-                    <p class="mb-0 mt-2 text-danger">
-                        <i class="fa-solid fa-triangle-exclamation me-1"></i> <strong>Limite para acerto:</strong>
-                        {{ $periodoModel->data_limite ? $periodoModel->data_limite->format('d/m/Y') : 'Não definido' }}
-                    </p>
+                    @if($periodoModel)
+                        <p class="text-muted mb-0 fs-5 pb-2 border-bottom">
+                            <i class="fa-regular fa-calendar text-primary me-1"></i> <strong>{{ $periodoModel->descricao }} - [{{ $periodoModel->data_inicial->format('d/m/Y') }} à {{ $periodoModel->data_final->format('d/m/Y') }}]</strong>
+                        </p>
+                        <p class="mb-0 mt-2 text-danger">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i> <strong>Limite para acerto:</strong>
+                            {{ $periodoModel->data_limite ? $periodoModel->data_limite->format('d/m/Y') : 'Não definido' }}
+                        </p>
+                    @endif
                 </div>
             </div>
 

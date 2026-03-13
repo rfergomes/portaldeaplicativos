@@ -17,6 +17,8 @@ class AgendaReservaController extends Controller
         $periodoSelecionado = $request->get('periodo_id');
         $coloniaSelecionada = $request->get('colonia_id');
 
+        $periodoModel = $periodoSelecionado ? \App\Models\AgendaPeriodo::find($periodoSelecionado) : null;
+
         $reservas = collect();
         $acomodacoes = collect();
         $filaEspera = collect();
@@ -80,6 +82,7 @@ class AgendaReservaController extends Controller
             'periodos',
             'colonias',
             'periodoSelecionado',
+            'periodoModel',
             'coloniaSelecionada',
             'acomodacoes',
             'reservas',
