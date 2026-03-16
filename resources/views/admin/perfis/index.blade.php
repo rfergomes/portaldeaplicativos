@@ -26,6 +26,7 @@
                             <table class="table table-hover table-striped align-middle mb-0">
                                 <thead>
                                     <tr>
+                                        <th>ID</th>
                                         <th>Nome do Perfil</th>
                                         <th>Descrição</th>
                                         <th class="text-center">Qtd. Permissões</th>
@@ -35,6 +36,7 @@
                                 <tbody>
                                     @forelse ($perfis as $perfil)
                                         <tr>
+                                            <td><span class="badge text-bg-light border shadow-sm px-2">#<span class="text-secondary">{{ $perfil->id }}</span></span></td>
                                             <td class="fw-bold text-primary">{{ $perfil->nome }}</td>
                                             <td>{{ $perfil->descricao ?? '-' }}</td>
                                             <td class="text-center">
