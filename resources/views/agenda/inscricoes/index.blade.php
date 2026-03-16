@@ -125,7 +125,7 @@
                                         <th>Candidato</th>
                                         <th>Contato</th>
                                         <th>Empresa</th>
-                                        <th>Observação</th>
+                                        <th>Observações</th>
                                         <th class="text-center">Status</th>
                                         <th class="text-center">Acomodação</th>
                                         <th class="text-center">Ações</th>
