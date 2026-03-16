@@ -62,36 +62,6 @@
                             </td>
                         </tr>
 
-                        <!-- Modal Edit -->
-                        <div class="modal fade" id="modalEditFab-{{ $fab->id }}" tabindex="-1">
-                            <div class="modal-dialog">
-                                <form action="{{ route('ativos.fabricantes.update', $fab->id) }}" method="POST" class="modal-content text-start">
-                                    @csrf @method('PUT')
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Editar Fabricante</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">Nome</label>
-                                            <input type="text" name="nome" class="form-control shadow-none" value="{{ $fab->nome }}" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">Site (URL)</label>
-                                            <input type="url" name="site" class="form-control shadow-none" value="{{ $fab->site }}" placeholder="https://...">
-                                        </div>
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" name="ativo" value="1" {{ $fab->ativo ? 'checked' : '' }}>
-                                            <label class="form-check-label">Fabricante Ativo</label>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
                         @empty
                         <tr>
                             <td colspan="5" class="text-center py-5 text-muted">Nenhum fabricante cadastrado.</td>
@@ -104,34 +74,83 @@
     </div>
 </div>
 
+<!-- Modais de Edição (Fora da tabela) -->
+@foreach($fabricantes as $fab)
+<div class="modal fade" id="modalEditFab-{{ $fab->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <form action="{{ route('ativos.fabricantes.update', $fab->id) }}" method="POST">
+                @csrf @method('PUT')
+                <div class="modal-header bg-primary text-white border-0 py-3">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-pen-to-square me-2"></i>Editar Fabricante
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="form-floating mb-3">
+                        <input type="text" name="nome" class="form-control bg-white shadow-none" id="edit-fab-nome-{{ $fab->id }}" value="{{ $fab->nome }}" placeholder="Nome do Fabricante" required>
+                        <label for="edit-fab-nome-{{ $fab->id }}" class="text-muted small fw-bold text-uppercase">Nome do Fabricante</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="url" name="site" class="form-control bg-white shadow-none" id="edit-fab-site-{{ $fab->id }}" value="{{ $fab->site }}" placeholder="Site (URL)">
+                        <label for="edit-fab-site-{{ $fab->id }}" class="text-muted small fw-bold text-uppercase">Site (URL)</label>
+                    </div>
+                    <div class="bg-light p-3 rounded-3 border">
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input" type="checkbox" name="ativo" value="1" id="edit-fab-ativo-{{ $fab->id }}" {{ $fab->ativo ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold text-secondary" for="edit-fab-ativo-{{ $fab->id }}">Fabricante Ativo no Sistema</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0 py-3">
+                    <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
+                        <i class="fa-solid fa-check me-2"></i>Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach
+
 <!-- Modal Novo -->
-<div class="modal fade" id="modalNovoFabricante" tabindex="-1">
-    <div class="modal-dialog">
-        <form action="{{ route('ativos.fabricantes.store') }}" method="POST" class="modal-content text-start">
-            @csrf
-            <div class="modal-header">
-                <h5 class="modal-title">Novo Fabricante</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label small fw-bold">Nome do Fabricante</label>
-                    <input type="text" name="nome" class="form-control shadow-none" placeholder="Ex: Dell, Samsung..." required>
+<div class="modal fade" id="modalNovoFabricante" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <form action="{{ route('ativos.fabricantes.store') }}" method="POST">
+                @csrf
+                <div class="modal-header bg-success text-white border-0 py-3">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-plus me-2"></i>Novo Fabricante
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-bold">Site (opcional)</label>
-                    <input type="url" name="site" class="form-control shadow-none" placeholder="https://...">
+                <div class="modal-body p-4">
+                    <div class="form-floating mb-3">
+                        <input type="text" name="nome" class="form-control bg-white shadow-none" id="new-nome" placeholder="Nome do Fabricante" required>
+                        <label for="new-nome" class="text-muted small fw-bold text-uppercase">Nome do Fabricante</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="url" name="site" class="form-control bg-white shadow-none" id="new-site" placeholder="Site (opcional)">
+                        <label for="new-site" class="text-muted small fw-bold text-uppercase">Site (opcional)</label>
+                    </div>
+                    <div class="bg-light p-3 rounded-3 border">
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input" type="checkbox" name="ativo" value="1" id="new-ativo" checked>
+                            <label class="form-check-label fw-bold text-secondary" for="new-ativo">Ativo no Sistema</label>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" name="ativo" value="1" checked>
-                    <label class="form-check-label">Ativo</label>
+                <div class="modal-footer bg-light border-0 py-3">
+                    <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
+                        <i class="fa-solid fa-plus me-2"></i>Criar Fabricante
+                    </button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Criar Fabricante</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
 @endsection

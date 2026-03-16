@@ -60,56 +60,6 @@
                             </td>
                         </tr>
 
-                        <!-- Modal Edit -->
-                        <div class="modal fade" id="modalEditForn-{{ $forn->id }}" tabindex="-1">
-                            <div class="modal-dialog modal-lg">
-                                <form action="{{ route('ativos.fornecedores.update', $forn->id) }}" method="POST" class="modal-content text-start">
-                                    @csrf @method('PUT')
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Editar Fornecedor</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row g-3">
-                                            <div class="col-md-8">
-                                                <label class="form-label small fw-bold">Razão Social / Nome</label>
-                                                <input type="text" name="nome" class="form-control" value="{{ $forn->nome }}" required>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="form-label small fw-bold">CNPJ</label>
-                                                <input type="text" name="cnpj" class="form-control" value="{{ $forn->cnpj }}">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label small fw-bold">E-mail</label>
-                                                <input type="email" name="email" class="form-control" value="{{ $forn->email }}">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label small fw-bold">Telefone</label>
-                                                <input type="text" name="telefone" class="form-control" value="{{ $forn->telefone }}">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label small fw-bold">Nome do Contato</label>
-                                                <input type="text" name="contato" class="form-control" value="{{ $forn->contato }}">
-                                            </div>
-                                            <div class="col-md-12">
-                                                <label class="form-label small fw-bold">Endereço</label>
-                                                <textarea name="endereco" class="form-control" rows="2">{{ $forn->endereco }}</textarea>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input" type="checkbox" name="ativo" value="1" {{ $forn->ativo ? 'checked' : '' }}>
-                                                    <label class="form-check-label">Fornecedor Ativo</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
                         @empty
                         <tr>
                             <td colspan="6" class="text-center py-5 text-muted">Nenhum fornecedor cadastrado.</td>
@@ -122,54 +72,139 @@
     </div>
 </div>
 
-<!-- Modal Novo -->
-<div class="modal fade" id="modalNovoFornecedor" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <form action="{{ route('ativos.fornecedores.store') }}" method="POST" class="modal-content text-start">
-            @csrf
-            <div class="modal-header">
-                <h5 class="modal-title">Novo Fornecedor</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row g-3">
-                    <div class="col-md-8">
-                        <label class="form-label small fw-bold">Razão Social / Nome</label>
-                        <input type="text" name="nome" class="form-control shadow-none" placeholder="Ex: Dell Tecnologia LTDA" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small fw-bold">CNPJ</label>
-                        <input type="text" name="cnpj" class="form-control shadow-none" placeholder="00.000.000/0000-00">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold">E-mail</label>
-                        <input type="email" name="email" class="form-control shadow-none" placeholder="contato@fornecedor.com">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold">Telefone</label>
-                        <input type="text" name="telefone" class="form-control shadow-none" placeholder="(00) 0000-0000">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold">Nome do Contato</label>
-                        <input type="text" name="contato" class="form-control shadow-none" placeholder="Nome do representante">
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Endereço</label>
-                        <textarea name="endereco" class="form-control shadow-none" rows="2" placeholder="Rua, número, bairro, cidade..."></textarea>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="ativo" value="1" checked>
-                            <label class="form-check-label">Ativo</label>
+<!-- Modais de Edição (Fora da tabela) -->
+@foreach($fornecedores as $forn)
+<div class="modal fade" id="modalEditForn-{{ $forn->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <form action="{{ route('ativos.fornecedores.update', $forn->id) }}" method="POST">
+                @csrf @method('PUT')
+                <div class="modal-header bg-primary text-white border-0 py-3">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-pen-to-square me-2"></i>Editar Fornecedor
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-8">
+                            <div class="form-floating">
+                                <input type="text" name="nome" class="form-control bg-white shadow-none" id="edit-forn-nome-{{ $forn->id }}" value="{{ $forn->nome }}" placeholder="Razão Social" required>
+                                <label for="edit-forn-nome-{{ $forn->id }}" class="text-muted small fw-bold text-uppercase">Razão Social / Nome</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" name="cnpj" class="form-control bg-white shadow-none" id="edit-forn-cnpj-{{ $forn->id }}" value="{{ $forn->cnpj }}" placeholder="CNPJ">
+                                <label for="edit-forn-cnpj-{{ $forn->id }}" class="text-muted small fw-bold text-uppercase">CNPJ</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="email" name="email" class="form-control bg-white shadow-none" id="edit-forn-email-{{ $forn->id }}" value="{{ $forn->email }}" placeholder="E-mail">
+                                <label for="edit-forn-email-{{ $forn->id }}" class="text-muted small fw-bold text-uppercase">E-mail</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" name="telefone" class="form-control bg-white shadow-none" id="edit-forn-tel-{{ $forn->id }}" value="{{ $forn->telefone }}" placeholder="Telefone">
+                                <label for="edit-forn-tel-{{ $forn->id }}" class="text-muted small fw-bold text-uppercase">Telefone</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <input type="text" name="contato" class="form-control bg-white shadow-none" id="edit-forn-contato-{{ $forn->id }}" value="{{ $forn->contato }}" placeholder="Nome do Contato">
+                                <label for="edit-forn-contato-{{ $forn->id }}" class="text-muted small fw-bold text-uppercase">Nome do Contato / Representante</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <textarea name="endereco" class="form-control bg-white shadow-none" id="edit-forn-end-{{ $forn->id }}" style="height: 80px" placeholder="Endereço">{{ $forn->endereco }}</textarea>
+                                <label for="edit-forn-end-{{ $forn->id }}" class="text-muted small fw-bold text-uppercase">Endereço Completo</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="bg-light p-3 rounded-3 border">
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input" type="checkbox" name="ativo" value="1" id="edit-forn-ativo-{{ $forn->id }}" {{ $forn->ativo ? 'checked' : '' }}>
+                                    <label class="form-check-label fw-bold text-secondary" for="edit-forn-ativo-{{ $forn->id }}">Fornecedor Ativo no Sistema</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Criar Fornecedor</button>
-            </div>
-        </form>
+                <div class="modal-footer bg-light border-0 py-3">
+                    <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
+                        <i class="fa-solid fa-check me-2"></i>Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach
+
+<!-- Modal Novo -->
+<div class="modal fade" id="modalNovoFornecedor" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <form action="{{ route('ativos.fornecedores.store') }}" method="POST">
+                @csrf
+                <div class="modal-header bg-success text-white border-0 py-3">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-plus me-2"></i>Novo Fornecedor
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-8">
+                            <div class="form-floating">
+                                <input type="text" name="nome" class="form-control bg-white shadow-none" id="new-nome" placeholder="Razão Social" required>
+                                <label for="new-nome" class="text-muted small fw-bold text-uppercase">Razão Social / Nome</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" name="cnpj" class="form-control bg-white shadow-none" id="new-cnpj" placeholder="CNPJ">
+                                <label for="new-cnpj" class="text-muted small fw-bold text-uppercase">CNPJ</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="email" name="email" class="form-control bg-white shadow-none" id="new-email" placeholder="E-mail">
+                                <label for="new-email" class="text-muted small fw-bold text-uppercase">E-mail</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" name="telefone" class="form-control bg-white shadow-none" id="new-tel" placeholder="Telefone">
+                                <label for="new-tel" class="text-muted small fw-bold text-uppercase">Telefone</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <input type="text" name="contato" class="form-control bg-white shadow-none" id="new-contato" placeholder="Nome do Contato">
+                                <label for="new-contato" class="text-muted small fw-bold text-uppercase">Nome do Contato / Representante</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <textarea name="endereco" class="form-control bg-white shadow-none" id="new-end" style="height: 80px" placeholder="Endereço"></textarea>
+                                <label for="new-end" class="text-muted small fw-bold text-uppercase">Endereço Completo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0 py-3">
+                    <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
+                        <i class="fa-solid fa-plus me-2"></i>Criar Fornecedor
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 @endsection

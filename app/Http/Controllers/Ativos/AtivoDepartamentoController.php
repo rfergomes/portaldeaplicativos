@@ -12,7 +12,20 @@ class AtivoDepartamentoController extends Controller
      */
     public function index()
     {
-        $departamentos = \App\Models\AtivoDepartamento::orderBy('nome')->get();
+        $departamentos = \App\Models\AtivoDepartamento::withCount('usuarios')
+            ->orderBy('nome')
+            ->get()
+            ->map(function ($depto) {
+                // Conta equipamentos que estão "em_uso" e pertencem a usuários deste departamento
+                $depto->equipamentos_count = \App\Models\AtivoEquipamento::where('status', 'em_uso')
+                    ->whereHas('ultimaMovimentacao', function ($q) use ($depto) {
+                        $q->whereHas('usuario', function ($qu) use ($depto) {
+                            $qu->where('departamento_id', $depto->id);
+                        });
+                    })->count();
+                return $depto;
+            });
+
         return view('ativos.departamentos.index', compact('departamentos'));
     }
 

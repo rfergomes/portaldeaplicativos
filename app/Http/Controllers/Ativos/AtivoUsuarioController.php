@@ -13,7 +13,10 @@ class AtivoUsuarioController extends Controller
     public function index()
     {
         $usuarios = \App\Models\AtivoUsuario::with(['empresa', 'departamento'])->orderBy('nome')->get();
-        $empresas = \App\Models\Empresa::where('ativo', true)->orderBy('razao_social')->get();
+        $empresas = \App\Models\Empresa::where('ativo', true)
+            ->where('categoria', 'PARCEIRO')
+            ->orderBy('razao_social')
+            ->get();
         $departamentos = \App\Models\AtivoDepartamento::where('ativo', true)->orderBy('nome')->get();
         
         return view('ativos.usuarios.index', compact('usuarios', 'empresas', 'departamentos'));

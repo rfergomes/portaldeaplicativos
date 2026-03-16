@@ -81,6 +81,7 @@
                                 <th>CNPJ</th>
                                 <th>Região</th>
                                 <th>Razão Social / Nome Fantasia</th>
+                                <th>Categoria</th>
                                 <th>Cidade/UF</th>
                                 <th>Contatos</th>
                                 <th>Telefone/Email</th>
@@ -113,6 +114,11 @@
                                             {{ $empresa->nome_curto ? $empresa->nome_curto . ' | ' : '' }}
                                             {{ $empresa->nome_fantasia ?? '-' }}
                                         </small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border shadow-sm px-2 small">
+                                            {{ $empresa->categoria ?? '-' }}
+                                        </span>
                                     </td>
                                     <td>{{ $empresa->cidade ?? '-' }}/{{ $empresa->estado ?? '-' }}</td>
                                     <td>
@@ -245,7 +251,12 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">Categoria</label>
-                                <input type="text" name="categoria" class="form-control" placeholder="EX: TRANSPORTE">
+                                <select name="categoria" class="form-select" required>
+                                    <option value="">SELECIONE</option>
+                                    <option value="QUIMICA">QUÍMICA</option>
+                                    <option value="FARMACEUTICA">FARMACÊUTICA</option>
+                                    <option value="PARCEIRA">PARCEIRA</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -325,7 +336,11 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">Categoria</label>
-                                <input type="text" name="categoria" id="edit_categoria" class="form-control">
+                                <select name="categoria" id="edit_categoria" class="form-select" required>
+                                    <option value="QUIMICA">QUÍMICA</option>
+                                    <option value="FARMACEUTICA">FARMACÊUTICA</option>
+                                    <option value="PARCEIRA">PARCEIRA</option>
+                                </select>
                             </div>
                         </div>
                     </div>
