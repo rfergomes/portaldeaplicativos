@@ -34,7 +34,7 @@
                     <tbody>
                         @forelse($departamentos as $depto)
                         <tr>
-                            <td class="ps-4">#{{ $depto->id }}</td>
+                            <td class="ps-4"><span class="badge text-bg-light border shadow-sm px-2">#DPT_{{ $depto->id ?? '-' }}</span></td>                           
                             <td class="fw-bold">{{ $depto->nome }}</td>
                             <td class="text-center">
                                 <span class="badge bg-light text-primary border fw-bold">

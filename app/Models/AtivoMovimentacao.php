@@ -19,6 +19,7 @@ class AtivoMovimentacao extends Model
         'data_previsao_devolucao',
         'data_devolucao_real',
         'responsavel_id',
+        'cessao_id',
         'origem',
         'destino',
         'observacao',
@@ -43,6 +44,11 @@ class AtivoMovimentacao extends Model
     public function responsavel()
     {
         return $this->belongsTo(User::class, 'responsavel_id');
+    }
+
+    public function cessao()
+    {
+        return $this->belongsTo(AtivoCessao::class, 'cessao_id');
     }
 
     public function anexos()

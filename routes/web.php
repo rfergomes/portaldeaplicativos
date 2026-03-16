@@ -170,5 +170,12 @@ Route::middleware('auth')->group(function () {
         Route::resource('departamentos', \App\Http\Controllers\Ativos\AtivoDepartamentoController::class)->except(['show']);
         Route::resource('fabricantes', \App\Http\Controllers\Ativos\AtivoFabricanteController::class)->except(['show']);
         Route::resource('fornecedores', \App\Http\Controllers\Ativos\AtivoFornecedorController::class)->except(['show']);
+
+        // Gestão de Cessões
+        Route::get('cessoes', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'index'])->name('cessoes.index');
+        Route::post('cessoes', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'store'])->name('cessoes.store');
+        Route::get('cessoes/{cessao}/pdf', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'generatePdf'])->name('cessoes.pdf');
+        Route::post('cessoes/{cessao}/anexos', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'uploadAnexo'])->name('cessoes.anexos.store');
+        Route::delete('anexos/{anexo}', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'destroyAnexo'])->name('anexos.destroy');
     });
 });

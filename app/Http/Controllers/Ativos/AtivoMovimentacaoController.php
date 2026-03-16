@@ -41,6 +41,20 @@ class AtivoMovimentacaoController extends Controller
             $tipoUso = $equipamento->tipo_uso;
             $localizacao = $equipamento->localizacao_atual;
 
+            $cessaoId = null;
+            if ($validated['tipo'] == 'cessao') {
+                $ultimoId = \App\Models\AtivoCessao::max('id') ?? 0;
+                $codigo = 'CSN' . str_pad($ultimoId + 1, 3, '0', STR_PAD_LEFT);
+                
+                $cessao = \App\Models\AtivoCessao::create([
+                    'usuario_id' => $validated['usuario_id'],
+                    'data_cessao' => now(),
+                    'codigo_cessao' => $codigo,
+                    'observacoes' => $validated['observacao'],
+                ]);
+                $cessaoId = $cessao->id;
+            }
+
             switch ($validated['tipo']) {
                 case 'cessao':
                 case 'emprestimo':
@@ -71,6 +85,7 @@ class AtivoMovimentacaoController extends Controller
                 'data_movimentacao' => now(),
                 'data_previsao_devolucao' => $validated['data_previsao_devolucao'],
                 'responsavel_id' => auth()->id(),
+                'cessao_id' => $cessaoId,
                 'origem' => $origem,
                 'destino' => $localizacao,
                 'observacao' => $validated['observacao'],
@@ -84,7 +99,8 @@ class AtivoMovimentacaoController extends Controller
                 'data_devolucao_prevista' => $validated['data_previsao_devolucao'],
             ]);
 
-            return redirect()->back()->with('success', 'Movimentação registrada com sucesso!');
+            return redirect()->back()->with('success', 'Movimentação registrada com sucesso!')
+                             ->with('cessao_id', $cessaoId);
         });
     }
 }

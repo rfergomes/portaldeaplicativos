@@ -33,7 +33,7 @@
                     <tbody>
                         @forelse($fabricantes as $fab)
                         <tr>
-                            <td class="ps-4">#{{ $fab->id }}</td>
+                            <td class="ps-4"><span class="badge text-bg-light border shadow-sm px-2">#FAB_{{ $fab->id }}</span></td>
                             <td class="fw-bold">{{ $fab->nome }}</td>
                             <td>
                                 @if($fab->site)

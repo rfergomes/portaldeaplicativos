@@ -14,6 +14,7 @@ class AtivoAnexo extends Model
     protected $fillable = [
         'equipamento_id',
         'movimentacao_id',
+        'cessao_id',
         'caminho',
         'nome_original',
         'mime_type',
@@ -28,5 +29,10 @@ class AtivoAnexo extends Model
     public function movimentacao()
     {
         return $this->belongsTo(AtivoMovimentacao::class, 'movimentacao_id');
+    }
+
+    public function cessao()
+    {
+        return $this->belongsTo(AtivoCessao::class, 'cessao_id');
     }
 }

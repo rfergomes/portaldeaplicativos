@@ -12,7 +12,6 @@ class AtivoEquipamento extends Model
     protected $table = 'ativo_equipamentos';
 
     protected $fillable = [
-        'identificador',
         'descricao',
         'modelo',
         'numero_serie',

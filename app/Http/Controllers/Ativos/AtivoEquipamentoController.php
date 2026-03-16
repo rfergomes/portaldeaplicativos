@@ -12,17 +12,29 @@ class AtivoEquipamentoController extends Controller
      */
     public function index(Request $request)
     {
-        $query = \App\Models\AtivoEquipamento::with(['fabricante', 'fornecedor']);
+        $query = \App\Models\AtivoEquipamento::with(['fabricante', 'fornecedor', 'ultimaMovimentacao.usuario']);
 
         // Filtros
-        if ($request->filled('identificador')) {
-            $query->where('identificador', 'like', '%' . $request->identificador . '%');
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('id', $search)
+                  ->orWhere('descricao', 'like', "%{$search}%")
+                  ->orWhere('modelo', 'like', "%{$search}%")
+                  ->orWhere('numero_serie', 'like', "%{$search}%")
+                  ->orWhereHas('movimentacoes', function($mq) use ($search) {
+                      $mq->where('tipo', 'cessao')
+                         ->whereHas('usuario', function($uq) use ($search) {
+                             $uq->where('nome', 'like', "%{$search}%");
+                         });
+                  });
+            });
         }
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        $equipamentos = $query->orderBy('identificador')->paginate(15);
+        $equipamentos = $query->orderBy('id', 'desc')->paginate(15);
         
         return view('ativos.equipamentos.index', compact('equipamentos'));
     }
@@ -37,7 +49,7 @@ class AtivoEquipamentoController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'identificador' => 'required|string|unique:ativo_equipamentos,identificador|max:50',
+            'identificador' => 'nullable|string|max:50',
             'descricao' => 'required|string|max:255',
             'modelo' => 'nullable|string|max:255',
             'numero_serie' => 'nullable|string|max:255',
@@ -74,7 +86,7 @@ class AtivoEquipamentoController extends Controller
         $equipamento = \App\Models\AtivoEquipamento::findOrFail($id);
 
         $validated = $request->validate([
-            'identificador' => 'required|string|unique:ativo_equipamentos,identificador,' . $id . '|max:50',
+            'identificador' => 'nullable|string|max:50',
             'descricao' => 'required|string|max:255',
             'modelo' => 'nullable|string|max:255',
             'numero_serie' => 'nullable|string|max:255',

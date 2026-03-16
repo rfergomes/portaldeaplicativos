@@ -55,7 +55,7 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th class="ps-4">ID / Identificador</th>
+                            <th class="ps-4">ID</th>
                             <th>Descrição</th>
                             <th>Modelo / Série</th>
                             <th>Status</th>
@@ -67,8 +67,7 @@
                         @forelse($equipamentos as $equipamento)
                         <tr>
                             <td class="ps-4">
-                                <span class="fw-bold text-primary">{{ $equipamento->identificador }}</span>
-                                <div class="small text-muted">ID: #{{ $equipamento->id }}</div>
+                                <span class="badge text-bg-light border shadow-sm px-2">#EQP_{{ $equipamento->id }}</span>
                             </td>
                             <td>
                                 <div>{{ $equipamento->descricao }}</div>
@@ -94,7 +93,13 @@
                             </td>
                             <td>
                                 <i class="fa-solid fa-location-dot text-muted me-1"></i>
-                                <span class="small">{{ $equipamento->localizacao_atual }}</span>
+                                <span class="small">
+                                    @if($equipamento->status === 'em_uso' && $equipamento->ultimaMovimentacao && $equipamento->ultimaMovimentacao->usuario)
+                                        {{ $equipamento->ultimaMovimentacao->usuario->nome }}
+                                    @else
+                                        {{ $equipamento->localizacao_atual }}
+                                    @endif
+                                </span>
                             </td>
                             <td class="text-end pe-4">
                                 <div class="btn-group shadow-sm">
@@ -114,72 +119,64 @@
                         <!-- Modal Nova Movimentação -->
                         <div class="modal fade" id="modalMovimentacao-{{ $equipamento->id }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
-                                <form action="{{ route('ativos.movimentacoes.store') }}" method="POST" class="modal-content border-0 shadow-lg">
-                                    @csrf
-                                    <input type="hidden" name="equipamento_id" value="{{ $equipamento->id }}">
-                                    <div class="modal-header bg-success text-white border-0 py-3">
-                                        <h5 class="modal-title fw-bold">
-                                            <i class="fa-solid fa-right-left me-2"></i>Mover: {{ $equipamento->identificador }}
-                                        </h5>
-                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body p-4">
-                                        <div class="row g-4">
-                                            <div class="col-md-12">
-                                                <div class="form-floating">
-                                                    <select name="tipo" class="form-select border-0 bg-light shadow-none select-tipo-movimento" required>
+                                <div class="modal-content border-0 shadow-lg">
+                                    <form action="{{ route('ativos.movimentacoes.store') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="equipamento_id" value="{{ $equipamento->id }}">
+                                        <div class="modal-header bg-success text-white border-0 py-3">
+                                            <h5 class="modal-title fw-bold">
+                                                <i class="fa-solid fa-right-left me-2"></i>Mover: #{{ $equipamento->id }}
+                                            </h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <div class="row g-3">
+                                                <div class="col-md-12">
+                                                    <label class="form-label small fw-bold text-muted text-uppercase">Tipo de Ação</label>
+                                                    <select name="tipo" class="form-select bg-light border-0 shadow-none select-tipo-movimento" required>
                                                         <option value="">Selecione...</option>
-                                                        <option value="cessao">Cessão de Uso (Longo Prazo)</option>
-                                                        <option value="emprestimo">Empréstimo (Curto Prazo)</option>
-                                                        <option value="devolucao" {{ $equipamento->status == 'em_uso' ? '' : 'disabled' }}>Devolução ao Estoque</option>
-                                                        <option value="manutencao">Enviar para Manutenção</option>
-                                                        <option value="transferencia">Transferência Interna</option>
+                                                        <option value="cessao" {{ $equipamento->status !== 'disponivel' ? 'disabled' : '' }}>Cessão de Uso (Longo Prazo)</option>
+                                                        <option value="emprestimo" {{ $equipamento->status !== 'disponivel' ? 'disabled' : '' }}>Empréstimo (Curto Prazo)</option>
+                                                        <option value="devolucao" {{ $equipamento->status === 'disponivel' ? 'disabled' : '' }}>Devolução ao Estoque</option>
+                                                        <option value="manutencao" {{ $equipamento->status !== 'disponivel' ? 'disabled' : '' }}>Enviar para Manutenção</option>
+                                                        <option value="transferencia" {{ $equipamento->status !== 'disponivel' ? 'disabled' : '' }}>Transferência Interna</option>
                                                     </select>
-                                                    <label class="text-muted small fw-bold text-uppercase">Tipo de Ação</label>
                                                 </div>
-                                            </div>
-
-                                            <div class="col-md-12 field-usuario" style="display:none;">
-                                                <div class="form-floating">
-                                                    <select name="usuario_id" class="form-select border-0 bg-light shadow-none">
+    
+                                                <div class="col-md-12 field-usuario" style="display:none;">
+                                                    <label class="form-label small fw-bold text-muted text-uppercase">Cessionário / Responsável</label>
+                                                    <select name="usuario_id" class="form-select bg-light border-0 shadow-none">
                                                         <option value="">Selecione a pessoa...</option>
                                                         @foreach(\App\Models\AtivoUsuario::where('ativo', true)->orderBy('nome')->get() as $u)
                                                             <option value="{{ $u->id }}">{{ $u->nome }} ({{ $u->empresa->razao_social ?? 'S/ Empresa' }})</option>
                                                         @endforeach
                                                     </select>
-                                                    <label class="text-muted small fw-bold text-uppercase">Cessionário / Responsável</label>
                                                 </div>
-                                            </div>
-
-                                            <div class="col-md-12 field-devolu-prev" style="display:none;">
-                                                <div class="form-floating">
-                                                    <input type="date" name="data_previsao_devolucao" class="form-control border-0 bg-light shadow-none">
-                                                    <label class="text-muted small fw-bold text-uppercase">Previsão de Devolução</label>
+    
+                                                <div class="col-md-12 field-devolu-prev" style="display:none;">
+                                                    <label class="form-label small fw-bold text-muted text-uppercase">Previsão de Devolução</label>
+                                                    <input type="date" name="data_previsao_devolucao" class="form-control bg-light border-0 shadow-none">
                                                 </div>
-                                            </div>
-
-                                            <div class="col-md-12 field-destino" style="display:none;">
-                                                <div class="form-floating">
-                                                    <input type="text" name="destino" class="form-control border-0 bg-light shadow-none" placeholder="Destino / Localização">
-                                                    <label class="text-muted small fw-bold text-uppercase">Destino / Localização</label>
+    
+                                                <div class="col-md-12 field-destino" style="display:none;">
+                                                    <label class="form-label small fw-bold text-muted text-uppercase">Destino / Localização</label>
+                                                    <input type="text" name="destino" class="form-control bg-light border-0 shadow-none" placeholder="Ex: Sala 02, CPD, Filial...">
                                                 </div>
-                                            </div>
-
-                                            <div class="col-md-12">
-                                                <div class="form-floating">
-                                                    <textarea name="observacao" class="form-control border-0 bg-light shadow-none" style="height: 100px" placeholder="Observações"></textarea>
-                                                    <label class="text-muted small fw-bold text-uppercase">Observações / Motivo</label>
+    
+                                                <div class="col-md-12">
+                                                    <label class="form-label small fw-bold text-muted text-uppercase">Observações / Motivo</label>
+                                                    <textarea name="observacao" class="form-control bg-light border-0 shadow-none" rows="3" placeholder="Detalhes adicionais..."></textarea>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="modal-footer bg-light border-0 py-3">
-                                        <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
-                                            <i class="fa-solid fa-check me-2"></i>Confirmar Registro
-                                        </button>
-                                    </div>
-                                </form>
+                                        <div class="modal-footer bg-light border-0 py-3">
+                                            <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-success px-4 shadow-sm fw-bold">
+                                                <i class="fa-solid fa-check me-2"></i>Confirmar Registro
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                         @empty
@@ -220,6 +217,25 @@ document.addEventListener('DOMContentLoaded', function() {
             fieldDestino.style.display = (val === 'transferencia' || val === 'manutencao') ? 'block' : 'none';
         });
     });
+    @if(session('success'))
+        @if(session('cessao_id'))
+            Swal.fire({
+                title: 'Sucesso!',
+                text: "{{ session('success') }}",
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa-solid fa-file-pdf me-1"></i> Gerar Termo de Cessão',
+                cancelButtonText: 'Fechar',
+                confirmButtonColor: '#0d6efd'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open("{{ route('ativos.cessoes.pdf', session('cessao_id')) }}", '_blank');
+                }
+            });
+        @else
+            Swal.fire('Sucesso!', "{{ session('success') }}", 'success');
+        @endif
+    @endif
 });
 </script>
 @endsection

@@ -20,12 +20,7 @@
                 <div class="card-body">
                     <h5 class="card-title mb-4 pb-2 border-bottom text-primary">Informações Básicas</h5>
                     <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold">Identificador Único (Tag)</label>
-                            <input type="text" name="identificador" class="form-control shadow-none bg-light fw-bold" value="{{ old('identificador', $equipamento->identificador) }}" placeholder="Ex: NT-001" required>
-                            <div class="form-text x-small">Este código deve ser único por equipamento.</div>
-                        </div>
-                        <div class="col-md-8">
+                        <div class="col-md-12">
                             <label class="form-label small fw-bold">Descrição Curta</label>
                             <input type="text" name="descricao" class="form-control shadow-none" value="{{ old('descricao', $equipamento->descricao) }}" placeholder="Ex: Notebook Dell Latitude 3420" required>
                         </div>

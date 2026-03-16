@@ -22,6 +22,7 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
+                            <th class="ps-4">ID</th>
                             <th class="ps-4">Nome</th>
                             <th>Empresa</th>
                             <th>Departamento</th>
@@ -34,8 +35,10 @@
                         @forelse($usuarios as $usuario)
                         <tr>
                             <td class="ps-4">
+                                <span class="badge text-bg-light border shadow-sm px-2">#USR_{{ $usuario->id }}</span>
+                            </td>
+                            <td class="ps-4">
                                 <div class="fw-bold text-dark">{{ $usuario->nome }}</div>
-                                <div class="small text-muted">ID: #{{ $usuario->id }}</div>
                             </td>
                             <td>{{ $usuario->empresa->razao_social ?? 'S/ Empresa' }}</td>
                             <td>{{ $usuario->departamento->nome ?? 'S/ Depto' }}</td>

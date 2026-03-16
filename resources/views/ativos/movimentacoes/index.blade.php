@@ -34,7 +34,7 @@
                             </td>
                             <td>
                                 <a href="{{ route('ativos.equipamentos.show', $mov->equipamento_id) }}" class="text-decoration-none fw-bold">
-                                    {{ $mov->equipamento->identificador }}
+                                    <span class="badge text-bg-light border shadow-sm px-2">#EQP_{{ $mov->equipamento->id }}</span>
                                 </a>
                                 <div class="x-small text-muted">{{ $mov->equipamento->descricao }}</div>
                             </td>

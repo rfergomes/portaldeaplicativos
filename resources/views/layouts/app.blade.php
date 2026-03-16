@@ -592,6 +592,13 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="{{ route('ativos.cessoes.index') }}"
+                                        class="nav-link {{ request()->routeIs('ativos.cessoes.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fa-solid fa-file-signature"></i>
+                                        <p>Cessões</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="{{ route('ativos.movimentacoes.index') }}"
                                         class="nav-link {{ request()->routeIs('ativos.movimentacoes.*') ? 'active' : '' }}">
                                         <i class="nav-icon fa-solid fa-right-left"></i>
