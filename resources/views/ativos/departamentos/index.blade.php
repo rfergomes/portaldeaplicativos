@@ -9,11 +9,13 @@
             </h1>
             <p class="text-muted">Gerencie os departamentos vinculados aos ativos.</p>
         </div>
+        @can('ativos.criar')
         <div class="col-md-4 text-end">
             <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNovoDepto">
                 <i class="fa-solid fa-plus me-2"></i>Novo Departamento
             </button>
         </div>
+        @endcan
     </div>
 
     <!-- Tabela -->
@@ -52,15 +54,19 @@
                                 </span>
                             </td>
                             <td class="text-end pe-4">
+                                @can('ativos.editar')
                                 <button type="button" class="btn btn-sm btn-white border" data-bs-toggle="modal" data-bs-target="#modalEditDepto-{{ $depto->id }}">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
+                                @endcan
+                                @can('ativos.excluir')
                                 <form action="{{ route('ativos.departamentos.destroy', $depto->id) }}" method="POST" class="d-inline">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-white border text-danger" onclick="return confirm('Excluir este departamento?')">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
                             </td>
                         </tr>
 

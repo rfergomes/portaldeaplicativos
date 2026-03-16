@@ -185,6 +185,7 @@
                         <h3 class="fw-bold mb-0 text-primary">{{ $coloniaModel->nome }}</h3>
                         <div>
                             <div class="btn-group">
+                                @can('reservas.visualizar')
                                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle me-1" type="button"
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-solid fa-print me-1"></i> PDF / Relatórios
@@ -213,11 +214,14 @@
                                         </a>
                                     </li>
                                 </ul>
+                                @endcan
                             </div>
+                            @can('reservas.criar')
                             <button class="btn btn-sm btn-success shadow-sm" data-bs-toggle="modal"
                                 data-bs-target="#modalNovaReserva">
                                 <i class="fa-solid fa-plus"></i> Adicionar
                             </button>
+                            @endcan
                         </div>
                     </div>
                     @if($periodoModel)
@@ -362,21 +366,28 @@
                                                     </span>
                                                 @endif
                                                 @if($reserva->hospede && $reserva->hospede->telefone)
+                                                    @can('reservas.visualizar')
                                                     <button class="btn btn-sm btn-light border py-0 px-1 me-1"
                                                         title="Notificar via WhatsApp"
                                                         onclick="notificarWhatsApp({{ $reserva->id }}, this)">
                                                         <i class="fa-brands fa-whatsapp fa-xs text-success"></i>
                                                     </button>
+                                                    @endcan
                                                 @endif
+                                                @can('reservas.editar')
                                                 <button class="btn btn-sm btn-light border py-0 px-1 me-1" title="Editar Reserva"
                                                     data-bs-toggle="modal" data-bs-target="#modalEditarReserva"
                                                     onclick="preencherEdicao({{ $reserva->id }}, '{{ $reserva->colonia_acomodacao_id }}', '{{ $reserva->status }}', '{{ addslashes($reserva->bloqueio_nota ?? '') }}', '{{ addslashes($reserva->hospede->nome ?? '') }}', '{{ $reserva->hospede->telefone ?? '' }}', '{{ $reserva->hospede->email ?? '' }}', '{{ $reserva->hospede->empresa_id ?? '' }}', '{{ $reserva->hospede->acessibilidade ?? 0 }}', '{{ addslashes(str_replace("\r\n", '\n', $reserva->observacao ?? '')) }}')">
                                                     <i class="fa-solid fa-pen fa-xs text-primary"></i>
                                                 </button>
+                                                @endcan
+                                                @can('reservas.visualizar')
                                                 <button class="btn btn-sm btn-light border py-0 px-1 me-1" title="Trocar Acomodação"
                                                     onclick="abrirModalTroca({{ $reserva->id }}, '{{ addslashes($reserva->hospede->nome ?? ($reserva->bloqueio_nota ?? 'Bloqueado')) }}', '{{ $aco->identificador }}')">
                                                     <i class="fa-solid fa-arrows-rotate fa-xs text-warning"></i>
                                                 </button>
+                                                @endcan
+                                                @can('reservas.excluir')
                                                 <form action="{{ route('agenda.reservas.destroy', $reserva->id) }}" method="POST"
                                                     class="d-inline">
                                                     @csrf @method('DELETE')
@@ -385,6 +396,7 @@
                                                         <i class="fa-solid fa-trash-can fa-xs text-danger"></i>
                                                     </button>
                                                 </form>
+                                                @endcan
                                             </div>
                                         </div>
                                     </div>
@@ -455,16 +467,21 @@
                                             <i class="fa-solid fa-circle-info text-info"></i>
                                         </span>
                                     @endif
+                                    @can('reservas.editar')
                                     <button class="btn btn-sm btn-outline-primary border-0" title="Editar Dados"
                                         data-bs-toggle="modal" data-bs-target="#modalEditarReserva"
                                         onclick="preencherEdicao({{ $espera->id }}, '', '{{ $espera->status }}', '{{ addslashes($espera->bloqueio_nota ?? '') }}', '{{ addslashes($espera->hospede->nome ?? '') }}', '{{ $espera->hospede->telefone ?? '' }}', '{{ $espera->hospede->email ?? '' }}', '{{ $espera->hospede->empresa_id ?? '' }}', '{{ $espera->hospede->acessibilidade ?? 0 }}', '{{ addslashes(str_replace("\r\n", '\n', $espera->observacao ?? '')) }}')">
                                         <i class="fa-solid fa-pen"></i>
                                     </button>
+                                    @endcan
+                                    @can('reservas.promover')
                                     <button class="btn btn-sm btn-outline-success border-0"
                                         title="Promover para Vaga (Puxar da fila)"
                                         onclick="abrirPromover({{ $espera->id }}, '{{ addslashes($espera->hospede->nome ?? 'Suplente') }}')">
                                         <i class="fa-solid fa-arrow-left-long"></i> Vaga
                                     </button>
+                                    @endcan
+                                    @can('reservas.excluir')
                                     <form action="{{ route('agenda.reservas.destroy', $espera->id) }}" method="POST"
                                         class="d-inline">
                                         @csrf @method('DELETE')
@@ -473,6 +490,7 @@
                                             <i class="fa-solid fa-xmark"></i>
                                         </button>
                                     </form>
+                                    @endcan
                                 </div>
                             </div>
                         </div>
@@ -483,12 +501,14 @@
                         </div>
                     @endforelse
 
+                    @can('reservas.criar')
                     <div class="mt-3 text-center">
                         <button class="btn btn-warning w-100 fw-bold shadow-sm" data-bs-toggle="modal"
                             data-bs-target="#modalNovaReserva" onclick="preencherFilaEspera()">
                             <i class="fa-solid fa-user-plus me-1"></i> Adicionar à Fila de Espera
                         </button>
                     </div>
+                    @endcan
                 </div>
             </div>
         </div>

@@ -60,7 +60,9 @@ class DashboardController extends Controller
             ->where('status', 'reservado')
             ->whereHas('periodo', function ($query) use ($now) {
                 // Vencido significa que a data limite (ou pagamento) já passou pelo início do dia de hoje (meia-noite)
-                $query->whereRaw('COALESCE(data_limite_pagamento, data_limite) < ?', [$now->startOfDay()]);
+                $query->whereRaw('COALESCE(data_limite_pagamento, data_limite) < ?', [$now->startOfDay()])
+                      ->whereMonth(DB::raw('COALESCE(data_limite_pagamento, data_limite)'), $now->month)
+                      ->whereYear(DB::raw('COALESCE(data_limite_pagamento, data_limite)'), $now->year);
             })
             ->limit(5)
             ->get();

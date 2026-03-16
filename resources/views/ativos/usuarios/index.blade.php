@@ -9,11 +9,13 @@
             </h1>
             <p class="text-muted">Pessoas autorizadas a retirar e utilizar equipamentos da empresa.</p>
         </div>
+        @can('ativos.criar')
         <div class="col-md-4 text-end">
             <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNovoUsuario">
                 <i class="fa-solid fa-user-plus me-2"></i>Novo Cessionário
             </button>
         </div>
+        @endcan
     </div>
 
     <div class="card shadow-sm border-0">
@@ -52,15 +54,19 @@
                                 </span>
                             </td>
                             <td class="text-end pe-4">
+                                @can('ativos.editar')
                                 <button type="button" class="btn btn-sm btn-white border" data-bs-toggle="modal" data-bs-target="#modalEditUser-{{ $usuario->id }}">
                                     <i class="fa-solid fa-user-pen"></i>
                                 </button>
+                                @endcan
+                                @can('ativos.excluir')
                                 <form action="{{ route('ativos.usuarios.destroy', $usuario->id) }}" method="POST" class="d-inline">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-white border text-danger" onclick="return confirm('Excluir este cessionário?')">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
                             </td>
                         </tr>
 

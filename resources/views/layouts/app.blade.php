@@ -575,6 +575,7 @@
                         @endif
 
                         <!-- Controle de Ativos (Ativos) -->
+                        @if(auth()->user()->temPermissao('ativos.visualizar'))
                         <li class="nav-item {{ request()->routeIs('ativos.*') ? 'menu-open' : '' }}">
                             <a href="#" class="nav-link {{ request()->routeIs('ativos.*') ? 'active' : '' }}">
                                 <i class="nav-icon fa-solid fa-boxes-stacked"></i>
@@ -643,6 +644,7 @@
                                 </li>
                             </ul>
                         </li>
+                        @endif
 
                         <!-- Cadastro -->
                         @if(auth()->user()->temPermissao('empresas.visualizar') || auth()->user()->temPermissao('regioes.visualizar'))

@@ -9,11 +9,13 @@
             </h1>
             <p class="text-muted">Gerencie os fabricantes de seus equipamentos.</p>
         </div>
+        @can('ativos.criar')
         <div class="col-md-4 text-end">
             <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNovoFabricante">
                 <i class="fa-solid fa-plus me-2"></i>Novo Fabricante
             </button>
         </div>
+        @endcan
     </div>
 
     <!-- Tabela -->
@@ -50,15 +52,19 @@
                                 </span>
                             </td>
                             <td class="text-end pe-4">
+                                @can('ativos.editar')
                                 <button type="button" class="btn btn-sm btn-white border" data-bs-toggle="modal" data-bs-target="#modalEditFab-{{ $fab->id }}">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
+                                @endcan
+                                @can('ativos.excluir')
                                 <form action="{{ route('ativos.fabricantes.destroy', $fab->id) }}" method="POST" class="d-inline">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-white border text-danger" onclick="return confirm('Excluir este fabricante?')">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
                             </td>
                         </tr>
 

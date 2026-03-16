@@ -25,6 +25,7 @@ class PermissionSeeder extends Seeder
             'reservas' => ['Visualizar', 'Criar', 'Editar', 'Excluir', 'Promover'],
             'inscricoes' => ['Visualizar', 'Criar', 'Editar', 'Excluir'],
             'usuarios' => ['Visualizar', 'Criar', 'Editar', 'Excluir', 'Administrar'],
+            'ativos' => ['Visualizar', 'Criar', 'Editar', 'Excluir'],
         ];
 
         $allPermissionIds = [];
@@ -47,6 +48,31 @@ class PermissionSeeder extends Seeder
         $admin = Perfil::where('nome', 'Administrador')->first();
         if ($admin) {
             $admin->permissoes()->sync($allPermissionIds);
+        }
+
+        // Atualizar perfil Operador
+        $operador = Perfil::where('nome', 'Operador')->first();
+        if ($operador) {
+            $operadorPermIds = Permissao::where(function($q) {
+                $q->where('chave', 'like', '%.visualizar')
+                  ->orWhere('chave', 'like', '%.criar')
+                  ->orWhere('chave', 'like', '%.editar')
+                  ->orWhere('chave', 'like', '%.notificar_whatsapp');
+            })
+            ->where('chave', 'not like', 'usuarios.%') // Não permite gerenciar usuários
+            ->where('chave', 'not like', 'ativos.%')  // NÃO permite gerenciar ativos automaticamente
+            ->pluck('id');
+            
+            $operador->permissoes()->sync($operadorPermIds);
+        }
+
+        // Atualizar perfil Consultor
+        $consultor = Perfil::where('nome', 'Consultor')->first();
+        if ($consultor) {
+            $consultorPermIds = Permissao::where('chave', 'like', '%.visualizar')
+                ->where('chave', 'not like', 'ativos.%') // NÃO permite visualizar ativos automaticamente
+                ->pluck('id');
+            $consultor->permissoes()->sync($consultorPermIds);
         }
 
         // Permissão legado para manter compatibilidade com middlewares atuais

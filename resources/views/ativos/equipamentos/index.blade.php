@@ -9,11 +9,13 @@
             </h1>
             <p class="text-muted">Gerencie o inventário de hardware e dispositivos da empresa.</p>
         </div>
+        @can('ativos.criar')
         <div class="col-md-4 text-end">
             <a href="{{ route('ativos.equipamentos.create') }}" class="btn btn-primary shadow-sm">
                 <i class="fa-solid fa-plus me-2"></i>Novo Equipamento
             </a>
         </div>
+        @endcan
     </div>
 
     <!-- Filtros -->
@@ -106,12 +108,14 @@
                                     <a href="{{ route('ativos.equipamentos.show', $equipamento) }}" class="btn btn-sm btn-white border" title="Detalhes">
                                         <i class="fa-solid fa-eye text-primary"></i>
                                     </a>
+                                    @can('ativos.editar')
                                     <a href="{{ route('ativos.equipamentos.edit', $equipamento) }}" class="btn btn-sm btn-white border" title="Editar">
                                         <i class="fa-solid fa-pen-to-square text-dark"></i>
                                     </a>
                                     <button type="button" class="btn btn-sm btn-white border" title="Nova Movimentação" data-bs-toggle="modal" data-bs-target="#modalMovimentacao-{{ $equipamento->id }}">
                                         <i class="fa-solid fa-right-left text-success"></i>
                                     </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>
