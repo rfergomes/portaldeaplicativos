@@ -7,7 +7,7 @@
             <h1 class="h3 mb-0 text-gray-800">
                 <i class="fa-solid fa-right-left me-2 text-primary"></i>Histórico Geral de Movimentações
             </h1>
-            <p class="text-muted">Acompanhe todas as entradas, saídas e transferências de ativos do sistema.</p>
+            <p class="text-muted">Acompanhe todas as entradas, saídas e transferências de ativos do sistema!</p>
         </div>
     </div>
 
