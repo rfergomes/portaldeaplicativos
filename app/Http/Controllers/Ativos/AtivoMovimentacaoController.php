@@ -12,11 +12,45 @@ class AtivoMovimentacaoController extends Controller
      */
     public function index(Request $request)
     {
-        $movimentacoes = \App\Models\AtivoMovimentacao::with(['equipamento', 'usuario', 'responsavel'])
-            ->orderBy('data_movimentacao', 'desc')
-            ->paginate(20);
-            
-        return view('ativos.movimentacoes.index', compact('movimentacoes'));
+        $query = \App\Models\AtivoMovimentacao::with(['equipamento', 'usuario.empresa', 'responsavel']);
+
+        // Filtros
+        if ($request->filled('equipamento_id')) {
+            $query->where('equipamento_id', $request->equipamento_id);
+        }
+
+        if ($request->filled('usuario_id')) {
+            $query->where('usuario_id', $request->usuario_id);
+        }
+
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+
+        if ($request->filled('destino')) {
+            $query->where('destino', 'like', '%' . $request->destino . '%');
+        }
+
+        if ($request->filled('responsavel_id')) {
+            $query->where('responsavel_id', $request->responsavel_id);
+        }
+
+        if ($request->filled('data_inicio')) {
+            $query->whereDate('data_movimentacao', '>=', $request->data_inicio);
+        }
+
+        if ($request->filled('data_fim')) {
+            $query->whereDate('data_movimentacao', '<=', $request->data_fim);
+        }
+
+        $movimentacoes = $query->orderBy('data_movimentacao', 'desc')->paginate(20);
+
+        // Dados para os filtros
+        $equipamentos = \App\Models\AtivoEquipamento::select('id', 'descricao', 'modelo')->orderBy('descricao')->get();
+        $usuarios = \App\Models\AtivoUsuario::select('id', 'nome')->orderBy('nome')->get();
+        $operadores = \App\Models\User::select('id', 'name')->orderBy('name')->get();
+
+        return view('ativos.movimentacoes.index', compact('movimentacoes', 'equipamentos', 'usuarios', 'operadores'));
     }
 
     public function store(Request $request)
