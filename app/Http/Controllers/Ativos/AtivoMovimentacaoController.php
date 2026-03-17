@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Ativos;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AtivoMovimentacaoController extends Controller
 {
@@ -41,6 +42,13 @@ class AtivoMovimentacaoController extends Controller
 
         if ($request->filled('data_fim')) {
             $query->whereDate('data_movimentacao', '<=', $request->data_fim);
+        }
+
+        // Exportar PDF se solicitado
+        if ($request->export === 'pdf') {
+            $movimentacoes = $query->orderBy('data_movimentacao', 'desc')->get();
+            $pdf = Pdf::loadView('ativos.movimentacoes.pdf', compact('movimentacoes'));
+            return $pdf->download('historico_movimentacoes_' . now()->format('YmdHis') . '.pdf');
         }
 
         $movimentacoes = $query->orderBy('data_movimentacao', 'desc')->paginate(20);
