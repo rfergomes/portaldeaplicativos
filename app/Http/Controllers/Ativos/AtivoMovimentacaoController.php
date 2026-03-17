@@ -47,8 +47,12 @@ class AtivoMovimentacaoController extends Controller
         // Exportar PDF se solicitado
         if ($request->export === 'pdf') {
             $movimentacoes = $query->orderBy('data_movimentacao', 'desc')->get();
-            $pdf = Pdf::loadView('ativos.movimentacoes.pdf', compact('movimentacoes'));
-            return $pdf->download('historico_movimentacoes_' . now()->format('YmdHis') . '.pdf');
+            $pdf = Pdf::loadView('ativos.movimentacoes.pdf', compact('movimentacoes'))
+                ->setPaper('a4', 'landscape');
+
+            $filename = 'historico_movimentacoes_' . now()->format('d_m_Y_H_i_s') . '.pdf';
+
+            return $pdf->download($filename);
         }
 
         $movimentacoes = $query->orderBy('data_movimentacao', 'desc')->paginate(20);
