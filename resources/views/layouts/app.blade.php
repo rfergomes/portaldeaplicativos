@@ -589,7 +589,16 @@
                                     <a href="{{ route('ativos.equipamentos.index') }}"
                                         class="nav-link {{ request()->routeIs('ativos.equipamentos.*') ? 'active' : '' }}">
                                         <i class="nav-icon fa-solid fa-laptop"></i>
-                                        <p>Equipamentos</p>
+                                        <p>
+                                            Equipamentos
+                                            <span class="badge badge-info right">{{ \App\Models\AtivoEquipamento::count() }}</span>
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('ativos.aquisicoes.index') }}" class="nav-link {{ request()->routeIs('ativos.aquisicoes.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fa-solid fa-file-invoice-dollar text-success"></i>
+                                        <p>Entrada de NFs (Lote)</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -613,7 +622,7 @@
                                         <p>Cessionários</p>
                                     </a>
                                 </li>
-                                <li class="nav-item {{ request()->routeIs('ativos.departamentos.*') || request()->routeIs('ativos.fabricantes.*') || request()->routeIs('ativos.fornecedores.*') ? 'menu-open' : '' }}">
+                                <li class="nav-item {{ request()->routeIs('ativos.departamentos.*') || request()->routeIs('ativos.fabricantes.*') || request()->routeIs('ativos.fornecedores.*') || request()->routeIs('ativos.marketplaces.*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link">
                                         <i class="nav-icon fa-solid fa-gears"></i>
                                         <p>
@@ -631,7 +640,12 @@
                                         <li class="nav-item">
                                             <a href="{{ route('ativos.fabricantes.index') }}" class="nav-link {{ request()->routeIs('ativos.fabricantes.*') ? 'active' : '' }}">
                                                 <i class="nav-icon fa-solid fa-industry"></i>
-                                                <p>Fabricantes</p>
+                                        </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('ativos.marketplaces.index') }}" class="nav-link {{ request()->routeIs('ativos.marketplaces.*') ? 'active' : '' }}">
+                                                <i class="fa-solid fa-store nav-icon"></i>
+                                                <p>Marketplaces</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">

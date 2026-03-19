@@ -17,6 +17,8 @@ class AtivoEquipamento extends Model
         'numero_serie',
         'fabricante_id',
         'fornecedor_id',
+        'aquisicao_id',
+        'marketplace_id',
         'data_compra',
         'valor_item',
         'valor_nota',
@@ -42,6 +44,16 @@ class AtivoEquipamento extends Model
     public function fornecedor()
     {
         return $this->belongsTo(AtivoFornecedor::class, 'fornecedor_id');
+    }
+
+    public function aquisicao()
+    {
+        return $this->belongsTo(AtivoAquisicao::class, 'aquisicao_id');
+    }
+
+    public function marketplace()
+    {
+        return $this->belongsTo(AtivoMarketplace::class, 'marketplace_id');
     }
 
     public function movimentacoes()
