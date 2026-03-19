@@ -74,6 +74,11 @@
                                 <a href="{{ route('ativos.aquisicoes.show', $aq->id) }}" class="btn btn-sm btn-white border text-primary" title="Visualizar Detalhes">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
+                                @can('ativos.editar')
+                                <a href="{{ route('ativos.aquisicoes.edit', $aq->id) }}" class="btn btn-sm btn-white border text-secondary" title="Editar Cabeçalho">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                @endcan
                                 @can('ativos.excluir')
                                 <form action="{{ route('ativos.aquisicoes.destroy', $aq->id) }}" method="POST" class="d-inline">
                                     @csrf @method('DELETE')

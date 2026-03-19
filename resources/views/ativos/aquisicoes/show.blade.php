@@ -9,6 +9,11 @@
             </h1>
         </div>
         <div class="col-md-4 text-end">
+            @can('ativos.editar')
+            <a href="{{ route('ativos.aquisicoes.edit', $aquisicao->id) }}" class="btn btn-primary shadow-sm me-2">
+                <i class="fa-solid fa-pen-to-square me-2"></i>Editar
+            </a>
+            @endcan
             <a href="{{ route('ativos.aquisicoes.index') }}" class="btn btn-outline-secondary shadow-sm">
                 <i class="fa-solid fa-arrow-left me-2"></i>Voltar
             </a>

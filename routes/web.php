@@ -172,7 +172,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('departamentos', \App\Http\Controllers\Ativos\AtivoDepartamentoController::class)->except(['show']);
         Route::resource('fabricantes', \App\Http\Controllers\Ativos\AtivoFabricanteController::class)->except(['show']);
         Route::resource('marketplaces', \App\Http\Controllers\Ativos\AtivoMarketplaceController::class)->except(['show']);
-        Route::resource('aquisicoes', \App\Http\Controllers\Ativos\AtivoAquisicaoController::class)->except(['edit', 'update']);
+        Route::resource('aquisicoes', \App\Http\Controllers\Ativos\AtivoAquisicaoController::class);
         Route::resource('fornecedores', \App\Http\Controllers\Ativos\AtivoFornecedorController::class)->except(['show']);
 
         // Gestão de Cessões

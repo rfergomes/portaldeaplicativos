@@ -99,6 +99,54 @@ class AtivoAquisicaoController extends Controller
         return view('ativos.aquisicoes.show', compact('aquisicao'));
     }
 
+    public function edit($id)
+    {
+        $aquisicao = AtivoAquisicao::findOrFail($id);
+        $fornecedores = AtivoFornecedor::where('ativo', true)->orderBy('nome')->get();
+        $marketplaces = AtivoMarketplace::where('ativo', true)->orderBy('nome')->get();
+
+        return view('ativos.aquisicoes.edit', compact('aquisicao', 'fornecedores', 'marketplaces'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $aquisicao = AtivoAquisicao::findOrFail($id);
+
+        $validated = $request->validate([
+            'numero_nf' => 'nullable|string|max:255',
+            'chave_acesso' => 'nullable|string|max:255',
+            'data_aquisicao' => 'required|date',
+            'fornecedor_id' => 'nullable|exists:ativo_fornecedores,id',
+            'marketplace_id' => 'nullable|exists:ativo_marketplaces,id',
+            'valor_frete' => 'nullable|numeric|min:0',
+            'valor_total' => 'nullable|numeric|min:0',
+            'observacao' => 'nullable|string',
+        ]);
+
+        $aquisicao->update([
+            'numero_nf' => $validated['numero_nf'] ?? null,
+            'chave_acesso' => $validated['chave_acesso'] ?? null,
+            'data_aquisicao' => $validated['data_aquisicao'],
+            'fornecedor_id' => $validated['fornecedor_id'] ?? null,
+            'marketplace_id' => $validated['marketplace_id'] ?? null,
+            'valor_frete' => $validated['valor_frete'] ?? null,
+            'valor_total' => $validated['valor_total'] ?? null,
+            'observacao' => $validated['observacao'] ?? null,
+        ]);
+
+        // Sincroniza os equipamentos filhos se houver mudança nesses dados herdeiros
+        if ($aquisicao->wasChanged(['fornecedor_id', 'marketplace_id', 'data_aquisicao', 'numero_nf'])) {
+            $aquisicao->equipamentos()->update([
+                'fornecedor_id' => $aquisicao->fornecedor_id,
+                'marketplace_id' => $aquisicao->marketplace_id,
+                'data_compra' => $aquisicao->data_aquisicao,
+                'valor_nota' => $aquisicao->numero_nf,
+            ]);
+        }
+
+        return redirect()->route('ativos.aquisicoes.show', $aquisicao->id)->with('success', 'Cabeçalho da aquisição atualizado com sucesso!');
+    }
+
     public function destroy($id)
     {
         $aquisicao = AtivoAquisicao::findOrFail($id);
