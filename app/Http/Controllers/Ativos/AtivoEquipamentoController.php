@@ -15,13 +15,14 @@ class AtivoEquipamentoController extends Controller
         $query = \App\Models\AtivoEquipamento::with(['fabricante', 'fornecedor', 'ultimaMovimentacao.usuario']);
 
         // Filtros
-        if ($request->filled('search')) {
-            $search = $request->search;
+        if ($request->filled('identificador')) {
+            $search = $request->identificador;
             $query->where(function($q) use ($search) {
                 $q->where('id', $search)
                   ->orWhere('descricao', 'like', "%{$search}%")
                   ->orWhere('modelo', 'like', "%{$search}%")
                   ->orWhere('numero_serie', 'like', "%{$search}%")
+                  ->orWhere('valor_nota', 'like', "%{$search}%")
                   ->orWhereHas('movimentacoes', function($mq) use ($search) {
                       $mq->where('tipo', 'cessao')
                          ->whereHas('usuario', function($uq) use ($search) {
@@ -34,7 +35,7 @@ class AtivoEquipamentoController extends Controller
             $query->where('status', $request->status);
         }
 
-        $equipamentos = $query->orderBy('id', 'asc')->paginate(15);
+        $equipamentos = $query->orderBy('id', 'asc')->paginate(15)->appends($request->all());
         
         return view('ativos.equipamentos.index', compact('equipamentos'));
     }

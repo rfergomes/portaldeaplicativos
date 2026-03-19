@@ -15,10 +15,31 @@ use Illuminate\Support\Facades\DB;
 
 class AtivoAquisicaoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $aquisicoes = AtivoAquisicao::with(['fornecedor', 'marketplace'])->withCount('equipamentos')->orderBy('data_aquisicao', 'desc')->get();
-        return view('ativos.aquisicoes.index', compact('aquisicoes'));
+        $query = AtivoAquisicao::with(['fornecedor', 'marketplace'])->withCount('equipamentos');
+
+        // Filtros
+        if ($request->filled('numero_nf')) {
+            $query->where('numero_nf', 'like', '%' . $request->numero_nf . '%');
+        }
+
+        if ($request->filled('fornecedor_id')) {
+            $query->where('fornecedor_id', $request->fornecedor_id);
+        }
+
+        if ($request->filled('data_inicio')) {
+            $query->whereDate('data_aquisicao', '>=', $request->data_inicio);
+        }
+
+        if ($request->filled('data_fim')) {
+            $query->whereDate('data_aquisicao', '<=', $request->data_fim);
+        }
+
+        $aquisicoes = $query->orderBy('data_aquisicao', 'desc')->paginate(20)->appends($request->all());
+        $fornecedores = AtivoFornecedor::orderBy('nome')->get();
+
+        return view('ativos.aquisicoes.index', compact('aquisicoes', 'fornecedores'));
     }
 
     public function create()

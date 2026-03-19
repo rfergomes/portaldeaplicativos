@@ -17,6 +17,43 @@
         </div>
         @endcan
     </div>
+    
+    <!-- Filtros de Aquisição -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form action="{{ route('ativos.aquisicoes.index') }}" method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Número da NF</label>
+                    <input type="text" name="numero_nf" class="form-control" placeholder="Buscar por Nota..." value="{{ request('numero_nf') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Fornecedor</label>
+                    <select name="fornecedor_id" class="form-select">
+                        <option value="">Todos</option>
+                        @foreach($fornecedores as $f)
+                            <option value="{{ $f->id }}" {{ request('fornecedor_id') == $f->id ? 'selected' : '' }}>{{ $f->nome }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold">Período da Aquisição</label>
+                    <div class="input-group">
+                        <input type="date" name="data_inicio" class="form-control" value="{{ request('data_inicio') }}">
+                        <span class="input-group-text">até</span>
+                        <input type="date" name="data_fim" class="form-control" value="{{ request('data_fim') }}">
+                    </div>
+                </div>
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-dark w-100" title="Pesquisar">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                    <a href="{{ route('ativos.aquisicoes.index') }}" class="btn btn-light border w-100" title="Limpar Filtros">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
@@ -80,9 +117,9 @@
                                 </a>
                                 @endcan
                                 @can('ativos.excluir')
-                                <form action="{{ route('ativos.aquisicoes.destroy', $aq->id) }}" method="POST" class="d-inline">
+                                <form action="{{ route('ativos.aquisicoes.destroy', $aq->id) }}" method="POST" class="d-inline form-delete-aq">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-white border text-danger" onclick="return confirm('ATENÇÃO: Isso excluirá permanentemente a entrada E TODOS {{ $aq->equipamentos_count }} equipamentos vinculados a ela se não houver histórico de cessão. Continuar?')" title="Excluir Entrada e Itens">
+                                    <button type="button" class="btn btn-sm btn-white border text-danger" onclick="deleteAquisicao(event, this)" data-count="{{ $aq->equipamentos_count }}" title="Excluir Entrada e Itens">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </form>
@@ -97,7 +134,38 @@
                     </tbody>
                 </table>
             </div>
+            
+            @if($aquisicoes->hasPages())
+            <div class="card-footer bg-white border-0 py-3">
+                {{ $aquisicoes->links() }}
+            </div>
+            @endif
         </div>
     </div>
 </div>
+
+<script>
+function deleteAquisicao(event, button) {
+    event.preventDefault();
+    const form = button.closest('form');
+    const eqCount = button.getAttribute('data-count');
+    
+    Swal.fire({
+        title: 'Tem certeza?',
+        html: `Isso excluirá permanentemente esta entrada e <b>TUDO</b> vinculado a ela.<br/><br/>
+               Essa ação removerá os <b>${eqCount} equipamentos</b> do seu inventário de forma definitiva.<br/><br/>
+               <i>Nota: Caso um dos equipamentos já esteja em uso/cedido, o sistema de segurança bloqueará a exclusão de tudo.</i>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="fa-solid fa-trash me-2"></i> Sim, excluir tudo!',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
+}
+</script>
 @endsection

@@ -60,6 +60,7 @@
                             <th class="ps-4">ID</th>
                             <th>Descrição</th>
                             <th>Modelo / Série</th>
+                            <th>Nº Doc. fiscal</th>
                             <th>Status</th>
                             <th>Localização</th>
                             <th class="text-end pe-4">Ações</th>
@@ -78,6 +79,13 @@
                             <td>
                                 <div class="badge bg-light text-dark border">{{ $equipamento->modelo ?? '-' }}</div>
                                 <div class="small text-muted">SN: {{ $equipamento->numero_serie ?? '-' }}</div>
+                            </td>
+                            <td>
+                                @if($equipamento->valor_nota)
+                                    <span class="badge bg-secondary-subtle text-secondary border">{{ $equipamento->valor_nota }}</span>
+                                @else
+                                    <span class="text-muted small">Sem Nota</span>
+                                @endif
                             </td>
                             <td>
                                 @php
