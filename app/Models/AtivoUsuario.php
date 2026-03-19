@@ -15,6 +15,8 @@ class AtivoUsuario extends Model
         'nome',
         'email',
         'telefone',
+        'cpf',
+        'endereco',
         'empresa_id',
         'departamento_id',
         'ativo',

@@ -28,6 +28,7 @@
                             <th class="ps-4" style="width: 80px;">ID</th>
                             <th>Nome</th>
                             <th>Site</th>
+                            <th>Equipamentos</th>
                             <th>Status</th>
                             <th class="text-end pe-4">Ações</th>
                         </tr>
@@ -45,6 +46,11 @@
                                 @else
                                     <span class="text-muted small">Não informado</span>
                                 @endif
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-secondary border rounded-pill px-2 py-1">
+                                    <i class="fa-solid fa-laptop me-1"></i> {{ $fab->equipamentos_count }}
+                                </span>
                             </td>
                             <td>
                                 <span class="badge {{ $fab->ativo ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">

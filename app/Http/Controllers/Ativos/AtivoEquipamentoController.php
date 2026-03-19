@@ -34,7 +34,7 @@ class AtivoEquipamentoController extends Controller
             $query->where('status', $request->status);
         }
 
-        $equipamentos = $query->orderBy('id', 'desc')->paginate(15);
+        $equipamentos = $query->orderBy('id', 'asc')->paginate(15);
         
         return view('ativos.equipamentos.index', compact('equipamentos'));
     }

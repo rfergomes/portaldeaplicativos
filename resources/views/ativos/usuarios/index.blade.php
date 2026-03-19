@@ -105,6 +105,12 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating">
+                                <input type="text" name="cpf" class="form-control bg-white shadow-none" id="edit-cpf-{{ $usuario->id }}" value="{{ $usuario->cpf }}" placeholder="CPF" required>
+                                <label for="edit-cpf-{{ $usuario->id }}" class="text-muted small fw-bold text-uppercase">CPF</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
                                 <input type="email" name="email" class="form-control bg-white shadow-none" id="edit-email-{{ $usuario->id }}" value="{{ $usuario->email }}" placeholder="E-mail">
                                 <label for="edit-email-{{ $usuario->id }}" class="text-muted small fw-bold text-uppercase">E-mail</label>
                             </div>
@@ -128,7 +134,7 @@
                                 <label for="edit-emp-{{ $usuario->id }}" class="text-muted small fw-bold text-uppercase">Empresa</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-floating">
                                 <select name="departamento_id" class="form-select bg-white shadow-none" id="edit-depto-{{ $usuario->id }}">
                                     <option value="">Selecione o Departamento</option>
@@ -139,6 +145,12 @@
                                     @endforeach
                                 </select>
                                 <label for="edit-depto-{{ $usuario->id }}" class="text-muted small fw-bold text-uppercase">Departamento</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <input type="text" name="endereco" class="form-control bg-white shadow-none" id="edit-endereco-{{ $usuario->id }}" value="{{ $usuario->endereco }}" placeholder="Endereço">
+                                <label for="edit-endereco-{{ $usuario->id }}" class="text-muted small fw-bold text-uppercase">Endereço</label>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -185,6 +197,12 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating">
+                                <input type="text" name="cpf" class="form-control bg-white shadow-none" id="new-cpf" placeholder="CPF" required>
+                                <label for="new-cpf" class="text-muted small fw-bold text-uppercase">CPF</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
                                 <input type="email" name="email" class="form-control bg-white shadow-none" id="new-email" placeholder="E-mail">
                                 <label for="new-email" class="text-muted small fw-bold text-uppercase">E-mail</label>
                             </div>
@@ -206,7 +224,7 @@
                                 <label for="new-emp" class="text-muted small fw-bold text-uppercase">Empresa</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-floating">
                                 <select name="departamento_id" class="form-select bg-white shadow-none" id="new-depto">
                                     <option value="">Selecione o Departamento</option>
@@ -215,6 +233,12 @@
                                     @endforeach
                                 </select>
                                 <label for="new-depto" class="text-muted small fw-bold text-uppercase">Departamento</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <input type="text" name="endereco" class="form-control bg-white shadow-none" id="new-endereco" placeholder="Endereço">
+                                <label for="new-endereco" class="text-muted small fw-bold text-uppercase">Endereço</label>
                             </div>
                         </div>
                     </div>

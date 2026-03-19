@@ -26,6 +26,8 @@ class AtivoUsuarioController extends Controller
     {
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
+            'cpf' => 'required|string|max:18',
+            'endereco' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'telefone' => 'nullable|string|max:20',
             'empresa_id' => 'nullable|exists:empresas,id',
@@ -44,6 +46,8 @@ class AtivoUsuarioController extends Controller
         
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
+            'cpf' => 'required|string|max:18',
+            'endereco' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'telefone' => 'nullable|string|max:20',
             'empresa_id' => 'nullable|exists:empresas,id',

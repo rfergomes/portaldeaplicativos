@@ -29,6 +29,7 @@
                             <th>CNPJ / Contato</th>
                             <th>E-mail</th>
                             <th>Telefone</th>
+                            <th>Equip. / Compras</th>
                             <th>Status</th>
                             <th class="text-end pe-4">Ações</th>
                         </tr>
@@ -46,6 +47,11 @@
                             </td>
                             <td>{{ $forn->email ?? '-' }}</td>
                             <td>{{ $forn->telefone ?? '-' }}</td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-secondary border rounded-pill px-2 py-1">
+                                    <i class="fa-solid fa-boxes-stacked me-1"></i> {{ $forn->equipamentos_count }}
+                                </span>
+                            </td>
                             <td>
                                 <span class="badge {{ $forn->ativo ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
                                     {{ $forn->ativo ? 'Ativo' : 'Inativo' }}

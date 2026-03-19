@@ -12,7 +12,7 @@ class AtivoFabricanteController extends Controller
      */
     public function index()
     {
-        $fabricantes = \App\Models\AtivoFabricante::orderBy('nome')->get();
+        $fabricantes = \App\Models\AtivoFabricante::withCount('equipamentos')->orderBy('nome')->get();
         return view('ativos.fabricantes.index', compact('fabricantes'));
     }
 

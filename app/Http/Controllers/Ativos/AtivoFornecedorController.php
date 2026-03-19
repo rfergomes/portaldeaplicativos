@@ -12,7 +12,7 @@ class AtivoFornecedorController extends Controller
      */
     public function index()
     {
-        $fornecedores = \App\Models\AtivoFornecedor::orderBy('nome')->get();
+        $fornecedores = \App\Models\AtivoFornecedor::withCount('equipamentos')->orderBy('nome')->get();
         return view('ativos.fornecedores.index', compact('fornecedores'));
     }
 
