@@ -59,15 +59,18 @@ class MigrarLegadoEquipamentos extends Command
         try {
             foreach ($grupos as $chaveGrupo => $itensNoGrupo) {
                 $primeiro = $itensNoGrupo->first();
+                
+                // Calcula o valor total presumido somando o valor_item de todos equipamentos deste grupo
+                $valorTotalPresumido = $itensNoGrupo->sum('valor_item');
 
                 // Cria a NFE / Aquisição Mãe
                 $aquisicao = AtivoAquisicao::create([
-                    // Como não tínhamos um campo número NF antes, deixamos null ou colocamos aviso
-                    'numero_nf' => null, 
+                    // Como descobrimos, o campo "valor_nota" antigo na verdade guardava o NÚMERO DA NOTA
+                    'numero_nf' => $primeiro->valor_nota ?? null, 
                     'data_aquisicao' => $primeiro->data_compra ?? now(),
                     'fornecedor_id' => $primeiro->fornecedor_id,
-                    'valor_total' => $primeiro->valor_nota,
-                    'observacao' => 'Aquisição (Nota Fiscal) agrupada e gerada automaticamente pelo script de migração do legado.',
+                    'valor_total' => $valorTotalPresumido > 0 ? $valorTotalPresumido : null,
+                    'observacao' => 'Aquisição gerada automaticamente pelo script de migração do legado.',
                 ]);
 
                 // Atualiza todos os equipamentos deste grupo para pertencerem a esta Aquisição
