@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Ativos;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\AtivoAquisicao;
 use App\Models\AtivoEquipamento;
+use App\Models\AtivoAquisicao;
 use App\Models\AtivoFornecedor;
 use App\Models\AtivoMarketplace;
+use App\Models\AtivoAnexo;
 use App\Models\AtivoFabricante;
 use Illuminate\Support\Facades\DB;
 
@@ -41,6 +42,7 @@ class AtivoAquisicaoController extends Controller
             'valor_frete' => 'nullable|numeric|min:0',
             'valor_total' => 'nullable|numeric|min:0',
             'observacao' => 'nullable|string',
+            'anexos.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx|max:10240',
 
             // Itens Array
             'itens' => 'required|array|min:1',
@@ -84,6 +86,19 @@ class AtivoAquisicaoController extends Controller
                 }
             }
 
+            if ($request->hasFile('anexos')) {
+                foreach ($request->file('anexos') as $file) {
+                    $path = $file->store('ativos/anexos', 'public');
+                    AtivoAnexo::create([
+                        'aquisicao_id' => $aquisicao->id,
+                        'caminho' => $path,
+                        'nome_original' => $file->getClientOriginalName(),
+                        'mime_type' => $file->getMimeType(),
+                        'tamanho' => $file->getSize(),
+                    ]);
+                }
+            }
+
             DB::commit();
 
             return redirect()->route('ativos.aquisicoes.index')->with('success', 'Aquisição e equipamentos registrados com sucesso!');
@@ -95,7 +110,7 @@ class AtivoAquisicaoController extends Controller
 
     public function show($id)
     {
-        $aquisicao = AtivoAquisicao::with(['fornecedor', 'marketplace', 'equipamentos.fabricante'])->findOrFail($id);
+        $aquisicao = AtivoAquisicao::with(['fornecedor', 'marketplace', 'equipamentos.fabricante', 'anexos'])->findOrFail($id);
         return view('ativos.aquisicoes.show', compact('aquisicao'));
     }
 
@@ -172,5 +187,24 @@ class AtivoAquisicaoController extends Controller
             DB::rollBack();
             return back()->with('error', 'Erro ao excluir: ' . $e->getMessage());
         }
+    }
+
+    public function uploadAnexo(Request $request, AtivoAquisicao $aquisicao)
+    {
+        $request->validate([
+            'arquivo' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx|max:10240', // 10MB
+        ]);
+
+        $file = $request->file('arquivo');
+        $path = $file->store('ativos/anexos', 'public');
+
+        $aquisicao->anexos()->create([
+            'caminho' => $path,
+            'nome_original' => $file->getClientOriginalName(),
+            'mime_type' => $file->getMimeType(),
+            'tamanho' => $file->getSize(),
+        ]);
+
+        return redirect()->back()->with('success', 'Documento anexado à NF com sucesso!');
     }
 }

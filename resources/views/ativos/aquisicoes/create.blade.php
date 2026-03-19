@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <form action="{{ route('ativos.aquisicoes.store') }}" method="POST" id="form-aquisicao">
+    <form action="{{ route('ativos.aquisicoes.store') }}" method="POST" id="form-aquisicao" enctype="multipart/form-data">
         @csrf
         
         <!-- Bloco 1: Dados Gerais da Compra da Nota -->
@@ -88,6 +88,11 @@
                             <textarea name="observacao" class="form-control" id="observacao" style="height: 60px" placeholder="Obs">{{ old('observacao') }}</textarea>
                             <label for="observacao" class="text-muted small fw-bold">Observações gerais sobre a compra / link do comprovante</label>
                         </div>
+                    </div>
+                    <div class="col-md-12 mt-3">
+                        <label class="text-muted small fw-bold mb-1"><i class="fa-solid fa-paperclip me-1"></i>Anexos (DANFE em PDF, Imagens, Recibos...)</label>
+                        <input type="file" name="anexos[]" class="form-control bg-light" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
+                        <div class="form-text small">Você pode selecionar vários arquivos segurando a tecla CTRL. Máx: 5MB por arquivo.</div>
                     </div>
                 </div>
             </div>

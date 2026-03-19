@@ -173,6 +173,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('fabricantes', \App\Http\Controllers\Ativos\AtivoFabricanteController::class)->except(['show']);
         Route::resource('marketplaces', \App\Http\Controllers\Ativos\AtivoMarketplaceController::class)->except(['show']);
         Route::resource('aquisicoes', \App\Http\Controllers\Ativos\AtivoAquisicaoController::class);
+        Route::post('aquisicoes/{aquisicao}/anexos', [\App\Http\Controllers\Ativos\AtivoAquisicaoController::class, 'uploadAnexo'])->name('aquisicoes.anexos.store');
         Route::resource('fornecedores', \App\Http\Controllers\Ativos\AtivoFornecedorController::class)->except(['show']);
 
         // Gestão de Cessões

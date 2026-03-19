@@ -591,7 +591,6 @@
                                         <i class="nav-icon fa-solid fa-laptop"></i>
                                         <p>
                                             Equipamentos
-                                            <span class="badge badge-info right">{{ \App\Models\AtivoEquipamento::count() }}</span>
                                         </p>
                                     </a>
                                 </li>
@@ -640,7 +639,8 @@
                                         <li class="nav-item">
                                             <a href="{{ route('ativos.fabricantes.index') }}" class="nav-link {{ request()->routeIs('ativos.fabricantes.*') ? 'active' : '' }}">
                                                 <i class="nav-icon fa-solid fa-industry"></i>
-                                        </a>
+                                                <p>Fabricantes</p>
+                                            </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('ativos.marketplaces.index') }}" class="nav-link {{ request()->routeIs('ativos.marketplaces.*') ? 'active' : '' }}">

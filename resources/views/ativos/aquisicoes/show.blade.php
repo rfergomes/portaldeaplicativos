@@ -66,6 +66,57 @@
                     @endif
                 </div>
             </div>
+
+            <!-- Card de Anexos -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="m-0 fw-bold text-secondary"><i class="fa-solid fa-paperclip me-2"></i>Anexos / Documentos</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if($aquisicao->anexos->count() > 0)
+                        <div class="list-group mb-4">
+                            @foreach($aquisicao->anexos as $anexo)
+                            <div class="list-group-item d-flex justify-content-between align-items-center px-3 py-2">
+                                <div class="d-flex align-items-center text-truncate">
+                                    <i class="fa-solid fa-file-{{ str_contains($anexo->mime_type, 'pdf') ? 'pdf text-danger' : (str_contains($anexo->mime_type, 'image') ? 'image text-success' : 'lines text-secondary') }} fs-4 me-3"></i>
+                                    <div>
+                                        <a href="{{ asset('storage/' . $anexo->caminho) }}" target="_blank" class="fw-bold text-decoration-none text-dark d-block text-truncate" style="max-width: 200px;" title="{{ $anexo->nome_original }}">
+                                            {{ $anexo->nome_original }}
+                                        </a>
+                                        <small class="text-muted">{{ number_format($anexo->tamanho / 1024, 2) }} KB</small>
+                                    </div>
+                                </div>
+                                @can('ativos.excluir')
+                                <form action="{{ route('ativos.anexos.destroy', $anexo->id) }}" method="POST" class="ms-2">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-white border text-danger" title="Excluir Anexo" onclick="return confirm('Tem certeza que deseja excluir permanentemente este documento?')"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                                @endcan
+                            </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-3 text-muted bg-light rounded border mb-3">
+                            <i class="fa-solid fa-folder-open mb-2 fs-3 text-secondary opacity-50"></i>
+                            <p class="small m-0">Nenhum anexo salvo para esta NF.</p>
+                        </div>
+                    @endif
+
+                    <!-- Form de Upload Avulso -->
+                    @can('ativos.editar')
+                    <form action="{{ route('ativos.aquisicoes.anexos.store', $aquisicao->id) }}" method="POST" enctype="multipart/form-data" class="bg-light p-3 border rounded shadow-sm">
+                        @csrf
+                        <label class="form-label text-muted fw-bold small mb-2">Adicionar novo anexo</label>
+                        <div class="input-group input-group-sm">
+                            <input type="file" name="arquivo" class="form-control bg-white" required accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
+                            <button type="submit" class="btn btn-primary fw-bold px-3">
+                                Enviar
+                            </button>
+                        </div>
+                    </form>
+                    @endcan
+                </div>
+            </div>
         </div>
 
         <!-- Itens / Equipamentos Gerados -->

@@ -42,4 +42,9 @@ class AtivoAquisicao extends Model
     {
         return $this->hasMany(AtivoEquipamento::class, 'aquisicao_id');
     }
+
+    public function anexos()
+    {
+        return $this->hasMany(AtivoAnexo::class, 'aquisicao_id');
+    }
 }
