@@ -30,7 +30,7 @@ class MigrarLegadoEquipamentos extends Command
     {
         $this->info('Iniciando migração de equipamentos legados...');
 
-        // Busca equipamentos órfãos (criados antes do módulo de aquisições)
+        // Busca equipamentos órfãos (criados antes do módulo de aquisições).
         $equipamentosOrfaos = AtivoEquipamento::whereNull('aquisicao_id')->get();
 
         if ($equipamentosOrfaos->isEmpty()) {
