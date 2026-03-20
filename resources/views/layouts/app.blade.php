@@ -812,8 +812,11 @@
         <!-- /.content-wrapper -->
 
         <!-- Main Footer -->
-        <footer class="app-footer text-center">
-            <strong>Copyright &copy; 2024-{{ date('Y') }} &nbsp;<a href="#" class="text-decoration-none">Portal de
+        <footer class="app-footer">
+            <div class="float-end d-none d-sm-inline text-muted" style="font-size: 0.75rem;">
+                <i class="fa-solid fa-code-commit me-1"></i> {{ $appVersion }}
+            </div>
+            <strong>Copyright &copy; 2024-{{ date('Y') }} &nbsp;<a href="#" class="text-decoration-none text-dark">Portal de
                     Aplicativos - TI
                     Químicos
                     Unificados</a>.</strong> All rights reserved.
