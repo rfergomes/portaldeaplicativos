@@ -208,3 +208,4 @@ Route::get('/_health', function () {
         return response()->json(['status' => 'error'], 500);
     }
 });
+Route::get('/version', fn() => now());
