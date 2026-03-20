@@ -144,6 +144,8 @@ return [
         // 'store' => 'redis',
     ],
 
+    'deploy_token' => env('APP_DEPLOY_TOKEN'),
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

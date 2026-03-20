@@ -10,6 +10,7 @@ use App\Models\AtivoUsuario;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class AtivoCessaoController extends Controller
@@ -109,10 +110,18 @@ class AtivoCessaoController extends Controller
         $filename = 'termo_cessao_' . $cessao->codigo_cessao . '.pdf';
         
         // Armazenar PDF para consultas futuras
-        $path = 'ativos/cessoes/' . $filename;
-        Storage::disk('public')->put($path, $pdf->output());
+        $directory = 'ativos/cessoes';
+        $path = $directory . '/' . $filename;
         
-        $cessao->update(['termo_pdf_path' => $path]);
+        try {
+            if (!Storage::disk('public')->exists($directory)) {
+                Storage::disk('public')->makeDirectory($directory);
+            }
+            Storage::disk('public')->put($path, $pdf->output());
+            $cessao->update(['termo_pdf_path' => $path]);
+        } catch (\Exception $e) {
+            \Log::error("Erro ao salvar PDF da Cessão: " . $e->getMessage());
+        }
 
         return $pdf->stream($filename);
     }

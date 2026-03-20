@@ -184,3 +184,16 @@ Route::middleware('auth')->group(function () {
         Route::delete('anexos/{anexo}', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'destroyAnexo'])->name('anexos.destroy');
     });
 });
+
+Route::post('/_deploy/opcache-reset', function () {
+    if (request()->header('X-Deploy-Token') !== config('app.deploy_token')) {
+        abort(403);
+    }
+
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+        return ['status' => 'ok', 'message' => 'OPcache resetado com sucesso'];
+    }
+
+    return ['status' => 'error', 'message' => 'OPcache não está habilitado ou disponível'];
+});
