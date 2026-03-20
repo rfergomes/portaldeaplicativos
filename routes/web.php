@@ -181,6 +181,7 @@ Route::middleware('auth')->group(function () {
         Route::post('cessoes', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'store'])->name('cessoes.store');
         Route::get('cessoes/{cessao}/pdf', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'generatePdf'])->name('cessoes.pdf');
         Route::post('cessoes/{cessao}/anexos', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'uploadAnexo'])->name('cessoes.anexos.store');
+        Route::get('anexos/{anexo}/download', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'downloadAnexo'])->name('anexos.download');
         Route::delete('anexos/{anexo}', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'destroyAnexo'])->name('anexos.destroy');
     });
 });

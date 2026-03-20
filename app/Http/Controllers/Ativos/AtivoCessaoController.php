@@ -147,6 +147,15 @@ class AtivoCessaoController extends Controller
         return redirect()->back()->with('success', 'Documento anexado com sucesso!');
     }
 
+    public function downloadAnexo(\App\Models\AtivoAnexo $anexo)
+    {
+        if (!Storage::disk('public')->exists($anexo->caminho)) {
+            return redirect()->back()->with('error', 'Arquivo não encontrado no servidor.');
+        }
+
+        return Storage::disk('public')->download($anexo->caminho, $anexo->nome_original);
+    }
+
     public function destroyAnexo(\App\Models\AtivoAnexo $anexo)
     {
         Storage::disk('public')->delete($anexo->caminho);

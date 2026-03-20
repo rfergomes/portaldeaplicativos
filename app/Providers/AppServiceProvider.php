@@ -24,16 +24,22 @@ class AppServiceProvider extends ServiceProvider
     {
         \Illuminate\Pagination\Paginator::useBootstrapFive();
 
-        // Compartilha a versão do Git com todas as views
+        // Tenta ler a versão de um arquivo (gerado no deploy) ou do Git
         $appVersion = 'v1.0.0';
-        try {
-            $hash = trim(@exec('git log -1 --format=%h'));
-            $date = trim(@exec('git log -1 --format=%cd --date=format:"%d/%m %H:%i"'));
-            if ($hash) {
-                $appVersion = "rev.{$hash} ({$date})";
+        $versionFile = base_path('.version');
+
+        if (file_exists($versionFile)) {
+            $appVersion = trim(file_get_contents($versionFile));
+        } else {
+            try {
+                $hash = trim(@shell_exec('git log -1 --format=%h'));
+                $date = trim(@shell_exec('git log -1 --format=%cd --date=format:"%d/%m %H:%M"'));
+                if ($hash) {
+                    $appVersion = "rev.{$hash} ({$date})";
+                }
+            } catch (\Exception $e) {
+                // Silencioso
             }
-        } catch (\Exception $e) {
-            // Silencioso
         }
 
         view()->share('appVersion', $appVersion);
