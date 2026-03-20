@@ -14,6 +14,9 @@ use App\Http\Controllers\Agenda\AgendaReservaController;
 use App\Http\Controllers\Agenda\AgendaHistoricoController;
 use App\Http\Controllers\Agenda\AgendaImpressaoController;
 use App\Http\Controllers\Agenda\AgendaInscricaoController;
+use App\Http\Controllers\Ativos\AtivoEquipamentoController;
+use App\Http\Controllers\Ativos\AtivoLicencaController;
+use App\Http\Controllers\Ativos\AtivoEstacaoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -121,7 +124,6 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
             ->name('reservas.notificar_whatsapp')
             ->middleware('can:reservas.visualizar');
         Route::resource('reservas', \App\Http\Controllers\Agenda\AgendaReservaController::class)->middleware(['can:reservas.visualizar', 'uppercase.agenda']);
-
         // Histórico de Exclusões de Reservas
         Route::get('historico', [\App\Http\Controllers\Agenda\AgendaHistoricoController::class, 'index'])->name('historico.index');
 
@@ -183,6 +185,13 @@ Route::middleware('auth')->group(function () {
         Route::post('cessoes/{cessao}/anexos', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'uploadAnexo'])->name('cessoes.anexos.store');
         Route::get('anexos/{anexo}/download', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'downloadAnexo'])->name('anexos.download');
         Route::delete('anexos/{anexo}', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'destroyAnexo'])->name('anexos.destroy');
+        
+        // Novas rotas de Inventário e Licenças
+        Route::resource('licencas', AtivoLicencaController::class);
+        Route::post('licencas/{equipamento}/vincular', [AtivoLicencaController::class, 'vincularEquipamento'])->name('licencas.vincular');
+        Route::delete('licencas/{licenca}/{equipamento}/desvincular', [AtivoLicencaController::class, 'desvincularEquipamento'])->name('licencas.desvincular');
+        
+        Route::resource('estacoes', AtivoEstacaoController::class)->only(['index', 'store', 'update', 'destroy']);
     });
 });
 

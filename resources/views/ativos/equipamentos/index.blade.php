@@ -104,7 +104,10 @@
                             <td>
                                 <i class="fa-solid fa-location-dot text-muted me-1"></i>
                                 <span class="small">
-                                    @if($equipamento->status === 'em_uso' && $equipamento->ultimaMovimentacao && $equipamento->ultimaMovimentacao->usuario)
+                                    @if($equipamento->estacao)
+                                        <div class="text-primary fw-bold" style="font-size: 0.8rem;">{{ $equipamento->estacao->nome }}</div>
+                                        <div class="x-small text-muted text-uppercase" style="font-size: 0.65rem;">{{ $equipamento->estacao->departamento->nome }}</div>
+                                    @elseif($equipamento->status === 'em_uso' && $equipamento->ultimaMovimentacao && $equipamento->ultimaMovimentacao->usuario)
                                         {{ $equipamento->ultimaMovimentacao->usuario->nome }}
                                     @else
                                         {{ $equipamento->localizacao_atual }}

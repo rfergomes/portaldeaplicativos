@@ -1,0 +1,99 @@
+@extends('layouts.app')
+
+@section('title', 'Licenças de Software')
+
+@section('content')
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-0">Gestão de Licenças</h4>
+            <p class="text-muted small mb-0">Controle de chaves, seats e vencimentos de softwares corporativos.</p>
+        </div>
+        <a href="{{ route('ativos.licencas.create') }}" class="btn btn-primary shadow-sm">
+            <i class="fa-solid fa-plus me-1"></i> Nova Licença
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr style="font-size: 0.75rem;" class="text-muted text-uppercase">
+                            <th class="ps-4">Software</th>
+                            <th>Fabricante</th>
+                            <th>Tipo</th>
+                            <th>Expiração / Status</th>
+                            <th>Utilização (Seats)</th>
+                            <th class="text-end pe-4">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($licencas as $licenca)
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark">{{ $licenca->nome }}</div>
+                                <div class="small text-muted font-monospace">{{ $licenca->chave ?: 'Chave sob consulta' }}</div>
+                            </td>
+                            <td>{{ $licenca->fabricante->nome ?? 'N/D' }}</td>
+                            <td>
+                                @if($licenca->tipo_licenca == 'vitalicia')
+                                    <span class="badge bg-info-subtle text-info">Vitalícia</span>
+                                @else
+                                    <span class="badge bg-secondary-subtle text-secondary">Assinatura</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($licenca->data_validade)
+                                    @php $vencida = $licenca->data_validade < now(); @endphp
+                                    <div class="small {{ $vencida ? 'text-danger fw-bold' : '' }}">
+                                        {{ $licenca->data_validade->format('d/m/Y') }}
+                                    </div>
+                                    @if($vencida)
+                                        <span class="badge bg-danger rounded-pill x-small">Vencida</span>
+                                    @endif
+                                @else
+                                    <span class="text-muted small">Sem expiração</span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="progress mb-1" style="height: 6px; width: 100px;">
+                                    @php $percent = ($licenca->equipamentos_count / $licenca->quantidade_seats) * 100; @endphp
+                                    <div class="progress-bar {{ $percent > 90 ? 'bg-danger' : 'bg-primary' }}" 
+                                         role="progressbar" 
+                                         style="width: {{ min($percent, 100) }}%"></div>
+                                </div>
+                                <small class="text-muted">{{ $licenca->equipamentos_count }} / {{ $licenca->quantidade_seats }} usado(s)</small>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ route('ativos.licencas.edit', $licenca->id) }}" class="btn btn-link text-primary p-0 me-2">
+                                        <i class="fa-solid fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('ativos.licencas.destroy', $licenca->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-link text-danger p-0" onclick="return confirm('Excluir esta licença?')">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">Nenhuma licença cadastrada.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            @if($licencas->hasPages())
+                <div class="card-footer bg-white border-0 py-3">
+                    {{ $licencas->links() }}
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+@endsection

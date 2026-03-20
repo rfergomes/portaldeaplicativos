@@ -120,7 +120,7 @@ class AtivoCessaoController extends Controller
             Storage::disk('public')->put($path, $pdf->output());
             $cessao->update(['termo_pdf_path' => $path]);
         } catch (\Exception $e) {
-            \Log::error("Erro ao salvar PDF da Cessão: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error("Erro ao gerar PDF de cessão {$cessao->id}: " . $e->getMessage());
         }
 
         return $pdf->stream($filename);

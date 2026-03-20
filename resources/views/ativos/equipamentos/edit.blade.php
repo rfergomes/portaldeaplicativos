@@ -54,6 +54,24 @@
                         </div>
                     </div>
 
+                    <h5 class="card-title mt-5 mb-4 pb-2 border-bottom text-primary">Localização / Estação de Trabalho</h5>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold">Estação de Trabalho</label>
+                            <select name="estacao_id" class="form-select shadow-none">
+                                <option value="">Sem estação definida (Em estoque)</option>
+                                @foreach($departamentos as $depto)
+                                    <optgroup label="{{ $depto->nome }}">
+                                        @foreach($depto->estacoes as $esta)
+                                            <option value="{{ $esta->id }}" {{ old('estacao_id', $equipamento->estacao_id) == $esta->id ? 'selected' : '' }}>{{ $esta->nome }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                            </select>
+                            <div class="form-text small">Selecione para qual estação de trabalho este item está alocado.</div>
+                        </div>
+                    </div>
+
                     <h5 class="card-title mt-5 mb-4 pb-2 border-bottom text-primary">Dados de Aquisição</h5>
                     <div class="row g-3">
                         <div class="col-md-6">

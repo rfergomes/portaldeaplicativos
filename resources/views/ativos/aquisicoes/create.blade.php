@@ -146,6 +146,12 @@
                                 <label class="text-success fw-bold small">R$ Unitário *</label>
                             </div>
                         </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <textarea name="itens[0][numeros_serie]" class="form-control" placeholder="Números de Série" style="height: 60px"></textarea>
+                                <label class="text-muted small fw-bold">Números de Série (Separe por vírgula ou uma por linha se QTD > 1)</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- Fim Primeiro Item -->
@@ -198,6 +204,12 @@
                 <div class="form-floating">
                     <input type="number" step="0.01" name="itens[__INDEX__][valor_unitario]" class="form-control text-end font-monospace" placeholder="0.00" required disabled>
                     <label class="text-success fw-bold small">R$ Unitário *</label>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-floating">
+                    <textarea name="itens[__INDEX__][numeros_serie]" class="form-control" placeholder="Números de Série" style="height: 60px" disabled></textarea>
+                    <label class="text-muted small fw-bold">Números de Série (Separe por vírgula ou uma por linha se QTD > 1)</label>
                 </div>
             </div>
         </div>

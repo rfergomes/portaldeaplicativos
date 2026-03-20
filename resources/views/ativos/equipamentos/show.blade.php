@@ -36,7 +36,13 @@
                             $color = $statusClasses[$equipamento->status] ?? 'text-secondary';
                         @endphp
                         <h2 class="fw-bold {{ $color }} mb-1 text-uppercase">{{ str_replace('_', ' ', $equipamento->status) }}</h2>
-                        <div class="small text-muted fw-bold">LOCALIZAÇÃO: {{ $equipamento->localizacao_atual }}</div>
+                        <div class="small text-muted fw-bold">
+                            @if($equipamento->estacao)
+                                <i class="fa-solid fa-desktop me-1"></i>ESTAÇÃO: {{ $equipamento->estacao->nome }}
+                            @else
+                                <i class="fa-solid fa-location-dot me-1"></i>LOCAL: {{ $equipamento->localizacao_atual }}
+                            @endif
+                        </div>
                     </div>
 
                     <ul class="list-group list-group-flush small">
@@ -57,6 +63,36 @@
                             <span class="fw-bold text-end">{{ $equipamento->fornecedor->nome ?? '-' }}</span>
                         </li>
                     </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-key me-2 text-primary"></i>Licenças de Software</h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalVincularLicenca">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="list-group list-group-flush">
+                        @forelse($equipamento->licencas as $lic)
+                            <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold small">{{ $lic->nome }}</div>
+                                    <div class="x-small text-muted">{{ $lic->chave ?? 'S/ Chave' }}</div>
+                                </div>
+                                <form action="{{ route('ativos.licencas.desvincular', [$lic->id, $equipamento->id]) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-link text-danger p-0" onclick="return confirm('Desvincular licença?')">
+                                        <i class="fa-solid fa-unlink small"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        @empty
+                            <div class="text-center py-3 text-muted x-small">Nenhuma licença vinculada.</div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
 
@@ -218,6 +254,34 @@
                 <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
                     <i class="fa-solid fa-check me-2"></i>Confirmar Registro
                 </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Vincular Licença -->
+<div class="modal fade" id="modalVincularLicenca" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="{{ route('ativos.licencas.vincular', $equipamento->id) }}" method="POST" class="modal-content border-0 shadow-lg">
+            @csrf
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold">Vincular Licença de Software</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Selecione o Software / Licença</label>
+                    <select name="licenca_id" class="form-select" required>
+                        <option value="">Selecione...</option>
+                        @foreach(\App\Models\AtivoLicenca::orderBy('nome')->get() as $lic)
+                            <option value="{{ $lic->id }}">{{ $lic->nome }} ({{ $lic->chave }})</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary px-4 fw-bold">Vincular Agora</button>
             </div>
         </form>
     </div>

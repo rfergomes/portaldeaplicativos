@@ -107,10 +107,14 @@
                                 <div class="small text-muted">{{ $mov->data_movimentacao->format('H:i') }}</div>
                             </td>
                             <td>
-                                <a href="{{ route('ativos.equipamentos.show', $mov->equipamento_id) }}" class="text-decoration-none fw-bold">
-                                    <span class="badge text-bg-light border shadow-sm px-2">#EQP_{{ $mov->equipamento->id }}</span>
-                                </a>
-                                <div class="x-small text-muted">{{ $mov->equipamento->descricao }}</div>
+                                @if($mov->equipamento)
+                                    <a href="{{ route('ativos.equipamentos.show', $mov->equipamento->id) }}" class="text-decoration-none fw-bold">
+                                        <span class="badge text-bg-light border shadow-sm px-2">#EQP_{{ $mov->equipamento->id }}</span>
+                                    </a>
+                                    <div class="x-small text-muted">{{ $mov->equipamento->descricao }}</div>
+                                @else
+                                    <span class="text-muted small">Equipamento Removido</span>
+                                @endif
                             </td>
                             <td>
                                 @php
@@ -130,7 +134,7 @@
                             <td>
                                 @if($mov->usuario)
                                     <div>{{ $mov->usuario->nome }}</div>
-                                    <div class="x-small text-muted">{{ $mov->usuario->empresa->razao_social ?? 'S/ Empresa' }}</div>
+                                    <div class="x-small text-muted">{{ optional($mov->usuario->empresa)->razao_social ?? 'S/ Empresa' }}</div>
                                 @else
                                     <span class="text-muted small">N/A</span>
                                 @endif
@@ -144,7 +148,7 @@
                                 @endif
                             </td>
                             <td class="text-end pe-4">
-                                <div class="small fw-bold">{{ $mov->responsavel->name }}</div>
+                                <div class="small fw-bold">{{ optional($mov->responsavel)->name ?? 'Sistema' }}</div>
                             </td>
                         </tr>
                         @empty

@@ -66,7 +66,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($cessoes as $cessao)
+                        @if($cessoes->count() > 0)
+                        @foreach($cessoes as $cessao)
                         <tr>
                             <td class="ps-4">
                                 <span class="fw-bold">{{ $cessao->codigo_cessao }}</span>
@@ -94,113 +95,12 @@
                             </td>
                         </tr>
 
-                        <!-- Modal de Detalhes -->
-                        <div class="modal fade" id="modalDetalhes{{ $cessao->id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Detalhes da Cessão: {{ $cessao->codigo_cessao }}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row mb-4">
-                                            <div class="col-md-6">
-                                                <div class="small fw-bold text-muted text-uppercase mb-1">Cessionário</div>
-                                                <div class="h6 mb-0">{{ $cessao->usuario->nome }}</div>
-                                                <div class="small text-muted">{{ $cessao->usuario->empresa->razao_social ?? 'S/ Empresa' }}</div>
-                                            </div>
-                                            <div class="col-md-6 text-md-end">
-                                                <div class="small fw-bold text-muted text-uppercase mb-1">Data da Operação</div>
-                                                <div class="h6 mb-0">{{ $cessao->data_cessao->format('d/m/Y H:i:s') }}</div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Itens da Cessão -->
-                                        <div class="card bg-light border-0 mb-4">
-                                            <div class="card-body p-3">
-                                                <h6 class="card-title h6 small fw-bold mb-3 text-primary">
-                                                    <i class="fa-solid fa-box-open me-1"></i>Itens Vinculados
-                                                </h6>
-                                                <div class="table-responsive">
-                                                    <table class="table table-sm table-hover align-middle mb-0">
-                                                        <thead class="table-light">
-                                                            <tr style="font-size: 0.7rem;" class="text-muted text-uppercase">
-                                                                <th>Patrimônio / ID</th>
-                                                                <th>Descrição</th>
-                                                                <th>Marca/Modelo</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach($cessao->movimentacoes as $mov)
-                                                            <tr>
-                                                                <td><span class="badge text-bg-light border">#{{ $mov->equipamento->id }}</span></td>
-                                                                <td class="small fw-bold">{{ $mov->equipamento->descricao }}</td>
-                                                                <td class="small text-muted">
-                                                                    {{ $mov->equipamento->fabricante->nome ?? '-' }} / {{ $mov->equipamento->modelo ?? '-' }}
-                                                                </td>
-                                                            </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="card bg-light border-0 mb-4">
-                                            <div class="card-body p-3">
-                                                <h6 class="card-title h6 small fw-bold mb-3">
-                                                    <i class="fa-solid fa-paperclip me-1"></i>Anexos / Documentos
-                                                </h6>
-                                                
-                                                <ul class="list-group list-group-flush bg-transparent">
-                                                    @forelse($cessao->anexos as $anexo)
-                                                        <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
-                                                            <div class="d-flex align-items-center">
-                                                                <i class="fa-solid fa-file-pdf text-danger me-2"></i>
-                                                                <small>{{ $anexo->nome_original }}</small>
-                                                            </div>
-                                                            <div class="btn-group btn-group-sm">
-                                                                <a href="{{ route('ativos.anexos.download', $anexo->id) }}" target="_blank" class="btn btn-link text-primary p-0 me-2" title="Baixar/Visualizar">
-                                                                    <i class="fa-solid fa-eye"></i>
-                                                                </a>
-                                                                <form action="{{ route('ativos.anexos.destroy', $anexo->id) }}" method="POST" class="d-inline">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" class="btn btn-link text-danger p-0">
-                                                                        <i class="fa-solid fa-trash-can"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                        </li>
-                                                    @empty
-                                                        <li class="list-group-item bg-transparent text-center py-3 text-muted">
-                                                            Nenhum anexo disponível.
-                                                        </li>
-                                                    @endforelse
-                                                </ul>
-
-                                                <form action="{{ route('ativos.cessoes.anexos.store', $cessao->id) }}" method="POST" enctype="multipart/form-data" class="mt-3">
-                                                    @csrf
-                                                    <div class="input-group input-group-sm">
-                                                        <input type="file" name="arquivo" class="form-control" required>
-                                                        <button class="btn btn-success" type="submit">Anexar</button>
-                                                    </div>
-                                                    <div class="form-text x-small text-muted">Anexe aqui o termo assinado ou outros documentos relevantes.</div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @empty
+                        @endforeach
+                        @else
                         <tr>
                             <td colspan="5" class="text-center py-5 text-muted">Nenhuma cessão registrada.</td>
                         </tr>
-                        @endforelse
+                        @endif
                     </tbody>
                 </table>
             </div>
@@ -212,6 +112,118 @@
         @endif
     </div>
 </div>
+
+@foreach($cessoes as $cessao)
+<!-- Modal de Detalhes -->
+<div class="modal fade" id="modalDetalhes{{ $cessao->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 shadow-sm bg-light">
+                <h5 class="modal-title fw-bold">Detalhes da Cessão: {{ $cessao->codigo_cessao }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row mb-4">
+                    <div class="col-md-6 border-start border-4 border-primary ps-3">
+                        <div class="small fw-bold text-muted text-uppercase mb-1">Cessionário</div>
+                        <div class="h6 mb-0 fw-bold">{{ $cessao->usuario->nome }}</div>
+                        <div class="small text-muted">{{ $cessao->usuario->empresa->razao_social ?? 'S/ Empresa' }}</div>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="small fw-bold text-muted text-uppercase mb-1">Data da Operação</div>
+                        <div class="h6 mb-0">{{ $cessao->data_cessao->format('d/m/Y H:i:s') }}</div>
+                    </div>
+                </div>
+
+                <!-- Itens da Cessão -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-0">
+                        <h6 class="mb-0 fw-bold text-primary">
+                            <i class="fa-solid fa-box-open me-2"></i>Itens Vinculados
+                        </h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr style="font-size: 0.7rem;" class="text-muted text-uppercase">
+                                        <th class="ps-3">Patrimônio / ID</th>
+                                        <th>Descrição</th>
+                                        <th class="pe-3">Marca/Modelo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($cessao->movimentacoes as $mov)
+                                    <tr>
+                                        <td class="ps-3"><span class="badge text-bg-light border">#{{ optional($mov->equipamento)->id }}</span></td>
+                                        <td class="small fw-bold">{{ optional($mov->equipamento)->descricao ?? 'Equipamento Removido' }}</td>
+                                        <td class="small text-muted pe-3">
+                                            {{ optional(optional($mov->equipamento)->fabricante)->nome ?? '-' }} / {{ optional($mov->equipamento)->modelo ?? '-' }}
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-0">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="fa-solid fa-paperclip me-2 text-primary"></i>Anexos / Documentos
+                        </h6>
+                    </div>
+                    <div class="card-body pt-0">
+                        <ul class="list-group list-group-flush">
+                            @forelse($cessao->anexos as $anexo)
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa-solid fa-file-pdf text-danger me-2 shadow-sm"></i>
+                                        <small class="fw-bold">{{ $anexo->nome_original }}</small>
+                                    </div>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ route('ativos.anexos.download', $anexo->id) }}" target="_blank" class="btn btn-link text-primary p-0 me-3" title="Baixar/Visualizar">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        <form action="{{ route('ativos.anexos.destroy', $anexo->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-link text-danger p-0" onclick="return confirm('Excluir anexo?')">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </li>
+                            @empty
+                                <li class="list-group-item text-center py-4 text-muted border-0">
+                                    <i class="fa-solid fa-folder-open d-block mb-2 opacity-50 h4"></i>
+                                    Nenhum anexo disponível.
+                                </li>
+                            @endforelse
+                        </ul>
+
+                        <form action="{{ route('ativos.cessoes.anexos.store', $cessao->id) }}" method="POST" enctype="multipart/form-data" class="mt-4 p-3 bg-light rounded-3 border border-dashed">
+                            @csrf
+                            <label class="form-label small fw-bold text-muted text-uppercase mb-2">Enviar Novo Documento</label>
+                            <div class="input-group input-group-sm">
+                                <input type="file" name="arquivo" class="form-control" required>
+                                <button class="btn btn-primary px-3 fw-bold" type="submit">
+                                    <i class="fa-solid fa-upload me-1"></i> Anexar
+                                </button>
+                            </div>
+                            <div class="form-text x-small text-muted mt-2">Formatos aceitos: PDF, JPG, PNG (máx 5mb).</div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
 
 <!-- Modal Nova Cessão Múltipla -->
 <div class="modal fade" id="modalNovaCessaoMultipla" tabindex="-1" aria-hidden="true">

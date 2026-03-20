@@ -621,6 +621,20 @@
                                         <p>Cessionários</p>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('ativos.estacoes.index') }}"
+                                        class="nav-link {{ request()->routeIs('ativos.estacoes.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fa-solid fa-desktop"></i>
+                                        <p>Estações de Trabalho</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('ativos.licencas.index') }}"
+                                        class="nav-link {{ request()->routeIs('ativos.licencas.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fa-solid fa-key"></i>
+                                        <p>Licenças de Software</p>
+                                    </a>
+                                </li>
                                 <li class="nav-item {{ request()->routeIs('ativos.departamentos.*') || request()->routeIs('ativos.fabricantes.*') || request()->routeIs('ativos.fornecedores.*') || request()->routeIs('ativos.marketplaces.*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link">
                                         <i class="nav-icon fa-solid fa-gears"></i>

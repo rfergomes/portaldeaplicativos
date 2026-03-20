@@ -24,4 +24,9 @@ class AtivoDepartamento extends Model
     {
         return $this->hasMany(AtivoUsuario::class, 'departamento_id');
     }
+
+    public function estacoes()
+    {
+        return $this->hasMany(AtivoEstacao::class, 'departamento_id');
+    }
 }

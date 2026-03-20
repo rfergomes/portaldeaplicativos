@@ -44,7 +44,8 @@ class AtivoEquipamentoController extends Controller
     {
         $fabricantes = \App\Models\AtivoFabricante::where('ativo', true)->orderBy('nome')->get();
         $fornecedores = \App\Models\AtivoFornecedor::where('ativo', true)->orderBy('nome')->get();
-        return view('ativos.equipamentos.create', compact('fabricantes', 'fornecedores'));
+        $departamentos = \App\Models\AtivoDepartamento::with('estacoes')->where('ativo', true)->orderBy('nome')->get();
+        return view('ativos.equipamentos.create', compact('fabricantes', 'fornecedores', 'departamentos'));
     }
 
     public function store(Request $request)
@@ -56,6 +57,7 @@ class AtivoEquipamentoController extends Controller
             'numero_serie' => 'nullable|string|max:255',
             'fabricante_id' => 'nullable|exists:ativo_fabricantes,id',
             'fornecedor_id' => 'nullable|exists:ativo_fornecedores,id',
+            'estacao_id' => 'nullable|exists:ativo_estacoes,id',
             'data_compra' => 'nullable|date',
             'valor_item' => 'nullable|numeric',
             'valor_nota' => 'nullable|string|max:255',
@@ -79,7 +81,8 @@ class AtivoEquipamentoController extends Controller
         $equipamento = \App\Models\AtivoEquipamento::findOrFail($id);
         $fabricantes = \App\Models\AtivoFabricante::where('ativo', true)->orderBy('nome')->get();
         $fornecedores = \App\Models\AtivoFornecedor::where('ativo', true)->orderBy('nome')->get();
-        return view('ativos.equipamentos.edit', compact('equipamento', 'fabricantes', 'fornecedores'));
+        $departamentos = \App\Models\AtivoDepartamento::with('estacoes')->where('ativo', true)->orderBy('nome')->get();
+        return view('ativos.equipamentos.edit', compact('equipamento', 'fabricantes', 'fornecedores', 'departamentos'));
     }
 
     public function update(Request $request, string $id)
@@ -93,6 +96,7 @@ class AtivoEquipamentoController extends Controller
             'numero_serie' => 'nullable|string|max:255',
             'fabricante_id' => 'nullable|exists:ativo_fabricantes,id',
             'fornecedor_id' => 'nullable|exists:ativo_fornecedores,id',
+            'estacao_id' => 'nullable|exists:ativo_estacoes,id',
             'data_compra' => 'nullable|date',
             'valor_item' => 'nullable|numeric',
             'valor_nota' => 'nullable|string|max:255',

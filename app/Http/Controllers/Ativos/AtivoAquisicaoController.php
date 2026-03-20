@@ -72,6 +72,7 @@ class AtivoAquisicaoController extends Controller
             'itens.*.fabricante_id' => 'nullable|exists:ativo_fabricantes,id',
             'itens.*.quantidade' => 'required|integer|min:1',
             'itens.*.valor_unitario' => 'required|numeric|min:0',
+            'itens.*.numeros_serie' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
@@ -91,6 +92,11 @@ class AtivoAquisicaoController extends Controller
 
             // Percorre os Itens e Cadastra os Equipamentos um por vez
             foreach ($validated['itens'] as $item) {
+                // Processa números de série se fornecidos
+                $seriaisStr = $item['numeros_serie'] ?? '';
+                $seriais = preg_split('/[\n,]+/', $seriaisStr, -1, PREG_SPLIT_NO_EMPTY);
+                $seriais = array_map('trim', $seriais);
+
                 for ($i = 0; $i < $item['quantidade']; $i++) {
                     AtivoEquipamento::create([
                         'descricao' => $item['descricao'],
@@ -103,6 +109,7 @@ class AtivoAquisicaoController extends Controller
                         'marketplace_id' => $aquisicao->marketplace_id,
                         'data_compra' => $aquisicao->data_aquisicao,
                         'valor_nota' => $aquisicao->numero_nf,
+                        'numero_serie' => $seriais[$i] ?? null,
                     ]);
                 }
             }

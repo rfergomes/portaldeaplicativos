@@ -27,6 +27,7 @@ class AtivoEquipamento extends Model
         'tipo_uso',
         'localizacao_atual',
         'data_devolucao_prevista',
+        'estacao_id',
         'observacao',
     ];
 
@@ -35,6 +36,18 @@ class AtivoEquipamento extends Model
         'data_devolucao_prevista' => 'date',
         'valor_item' => 'decimal:2',
     ];
+
+    public function estacao()
+    {
+        return $this->belongsTo(AtivoEstacao::class, 'estacao_id');
+    }
+
+    public function licencas()
+    {
+        return $this->belongsToMany(AtivoLicenca::class, 'ativo_licenca_equipamento', 'equipamento_id', 'licenca_id')
+                    ->withPivot('atribuido_em')
+                    ->withTimestamps();
+    }
 
     public function fabricante()
     {
