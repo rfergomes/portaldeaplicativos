@@ -68,6 +68,9 @@
 </head>
 <body>
     <div class="header">
+        <div style="text-align: center; margin-bottom: 10px;">
+            <img src="{{ public_path('img/logo.jpg') }}" alt="Logo" style="max-width: 120px;">
+        </div>
         <div class="title">Histórico de Movimentações de Ativos</div>
         <div class="subtitle">Relatório gerado em {{ now()->format('d/m/Y H:i') }}</div>
     </div>

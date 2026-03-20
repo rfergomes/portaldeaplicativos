@@ -197,9 +197,8 @@
 
             <div class="guia-wrapper">
                 <div class="header clearfix">
-                    <div style="float: left; width: 50%;">
-                        <div style="font-weight: bold; color: #1a237e; font-size: 12pt;">QUÍMICOS UNIFICADOS CAMPINAS</div>
-                        <div style="font-size: 7pt; color: #666;">Colônia de Férias</div>
+                    <div style="float: left; width: 40%;">
+                        <img src="{{ public_path('img/logo.jpg') }}" alt="Logo" style="max-height: 18mm;">
                     </div>
                     <div class="title-container" style="width: 48%;">
                         <h1 class="main-title">PRÉ-RESERVA</h1>

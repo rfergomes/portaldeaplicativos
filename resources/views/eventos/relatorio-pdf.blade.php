@@ -139,13 +139,14 @@
 
 <body>
     <div class="header">
-        <table style="width: 100%; border: none;">
+        <table style="width: 100%; border: none; margin-bottom: 10px;">
             <tr>
-                <td style="width: 70%; border: none;">
-                    <span class="event-title">{{ $evento->nome }}</span>
+                <td style="width: 40%; border: none;">
+                    <img src="{{ public_path('img/logo.jpg') }}" alt="Logo" style="max-height: 20mm;">
                 </td>
-                <td style="width: 30%; text-align: right; border: none;">
-                    <span style="font-size: 16px; font-weight: bold; color: #444;">EVENTOS</span>
+                <td style="width: 60%; text-align: right; border: none; vertical-align: middle;">
+                    <div class="event-title">{{ $evento->nome }}</div>
+                    <div style="font-size: 12px; font-weight: bold; color: #666;">RELATÓRIO DE EVENTO</div>
                 </td>
             </tr>
         </table>

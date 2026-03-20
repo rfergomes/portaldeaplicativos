@@ -25,7 +25,7 @@
 <body>
     <div class="header">
         <div class="logo">
-             <img src="{{ public_path('images/logo.png') }}" alt="Logo" style="max-width: 150px;">
+             <img src="{{ public_path('img/logo.jpg') }}" alt="Logo" style="max-width: 150px;">
         </div>
         <div class="title">Termo de Cessão de Uso de Equipamentos</div>
     </div>

@@ -126,9 +126,8 @@
 
 <body>
     <div class="header clearfix">
-        <div style="float: left; width: 50%;">
-            <div style="font-weight: bold; color: #1a237e; font-size: 14pt;">SINDICATO QUÍMICOS UNIFICADOS</div>
-            <div style="font-size: 8pt; color: #666;">Portal de Aplicativos</div>
+        <div style="float: left; width: 40%;">
+            <img src="{{ public_path('img/logo.jpg') }}" alt="Logo" style="max-height: 20mm;">
         </div>
         <div class="info-header" style="float: right; width: 48%; text-align: right;">
             <strong>{{ $colonia->nome }}</strong><br>
