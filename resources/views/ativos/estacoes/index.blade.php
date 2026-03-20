@@ -18,11 +18,11 @@
         @foreach($departamentos as $depto)
         <div class="col-12 mb-4">
             <div class="card border-0 shadow-sm overflow-hidden">
-                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
                     <h5 class="card-title h6 fw-bold mb-0 text-primary">
                         <i class="fa-solid fa-sitemap me-2"></i>{{ $depto->nome }}
                     </h5>
-                    <span class="badge bg-secondary rounded-pill small">{{ $depto->estacoes->count() }} Estações</span>
+                    <span class="badge bg-secondary rounded-pill small ms-auto">{{ $depto->estacoes->count() }} Estações</span>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
