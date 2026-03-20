@@ -14,7 +14,6 @@ class AtivoUsuarioController extends Controller
     {
         $usuarios = \App\Models\AtivoUsuario::with(['empresa', 'departamento'])->orderBy('nome')->get();
         $empresas = \App\Models\Empresa::where('ativo', true)
-            ->where('categoria', 'PARCEIRO')
             ->orderBy('razao_social')
             ->get();
         $departamentos = \App\Models\AtivoDepartamento::where('ativo', true)->orderBy('nome')->get();
