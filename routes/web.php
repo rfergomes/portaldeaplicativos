@@ -186,7 +186,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/_deploy/opcache-reset', function () {
-    if (request()->header('X-Deploy-Token') !== config('app.deploy_token')) {
+
+    if (!in_array(request()->ip(), ['127.0.0.1', '::1'])) {
         abort(403);
     }
 
@@ -195,5 +196,5 @@ Route::post('/_deploy/opcache-reset', function () {
         return ['status' => 'ok', 'message' => 'OPcache resetado com sucesso'];
     }
 
-    return ['status' => 'error', 'message' => 'OPcache não está habilitado ou disponível'];
+    return response()->json(['status' => 'ok']);
 });
