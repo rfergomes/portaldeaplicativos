@@ -88,31 +88,68 @@
                             <td class="text-end pe-4">
                                 <button type="button" class="btn btn-sm btn-outline-primary" 
                                         data-bs-toggle="modal" 
-                                        data-bs-target="#modalAnexos{{ $cessao->id }}">
-                                    <i class="fa-solid fa-paperclip me-1"></i> Anexos
+                                        data-bs-target="#modalDetalhes{{ $cessao->id }}">
+                                    <i class="fa-solid fa-eye me-1"></i> Ver Detalhes
                                 </button>
                             </td>
                         </tr>
 
-                        <!-- Modal de Anexos -->
-                        <div class="modal fade" id="modalAnexos{{ $cessao->id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog">
+                        <!-- Modal de Detalhes -->
+                        <div class="modal fade" id="modalDetalhes{{ $cessao->id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Detalhes da Cessão: {{ $cessao->codigo_cessao }}</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <div class="mb-4">
-                                            <div class="small fw-bold text-muted text-uppercase mb-1">Cessionário</div>
-                                            <div class="h6 mb-0">{{ $cessao->usuario->nome }}</div>
-                                            <div class="small text-muted">Data: {{ $cessao->data_cessao->format('d/m/Y H:i:s') }}</div>
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <div class="small fw-bold text-muted text-uppercase mb-1">Cessionário</div>
+                                                <div class="h6 mb-0">{{ $cessao->usuario->nome }}</div>
+                                                <div class="small text-muted">{{ $cessao->usuario->empresa->razao_social ?? 'S/ Empresa' }}</div>
+                                            </div>
+                                            <div class="col-md-6 text-md-end">
+                                                <div class="small fw-bold text-muted text-uppercase mb-1">Data da Operação</div>
+                                                <div class="h6 mb-0">{{ $cessao->data_cessao->format('d/m/Y H:i:s') }}</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Itens da Cessão -->
+                                        <div class="card bg-light border-0 mb-4">
+                                            <div class="card-body p-3">
+                                                <h6 class="card-title h6 small fw-bold mb-3 text-primary">
+                                                    <i class="fa-solid fa-box-open me-1"></i>Itens Vinculados
+                                                </h6>
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm table-hover align-middle mb-0">
+                                                        <thead class="table-light">
+                                                            <tr style="font-size: 0.7rem;" class="text-muted text-uppercase">
+                                                                <th>Patrimônio / ID</th>
+                                                                <th>Descrição</th>
+                                                                <th>Marca/Modelo</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($cessao->movimentacoes as $mov)
+                                                            <tr>
+                                                                <td><span class="badge text-bg-light border">#{{ $mov->equipamento->id }}</span></td>
+                                                                <td class="small fw-bold">{{ $mov->equipamento->descricao }}</td>
+                                                                <td class="small text-muted">
+                                                                    {{ $mov->equipamento->fabricante->nome ?? '-' }} / {{ $mov->equipamento->modelo ?? '-' }}
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div class="card bg-light border-0 mb-4">
                                             <div class="card-body p-3">
                                                 <h6 class="card-title h6 small fw-bold mb-3">
-                                                    <i class="fa-solid fa-paperclip me-1"></i>Anexos
+                                                    <i class="fa-solid fa-paperclip me-1"></i>Anexos / Documentos
                                                 </h6>
                                                 
                                                 <ul class="list-group list-group-flush bg-transparent">
