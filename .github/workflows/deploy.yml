@@ -17,4 +17,4 @@ jobs:
           username: deploy
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            /var/www/deploy.sh
+            sudo -u deploy /var/www/deploy.sh
