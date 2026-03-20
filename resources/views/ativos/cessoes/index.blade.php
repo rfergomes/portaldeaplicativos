@@ -1,4 +1,4 @@
-@extends('layouts.app')
+cl@extends('layouts.app')
 
 @section('content')
 <div class="container-fluid py-4">
@@ -81,15 +81,9 @@
                                 <div class="small text-muted">{{ $cessao->usuario->empresa->razao_social ?? 'S/ Empresa' }}</div>
                             </td>
                             <td class="text-center">
-                                @if($cessao->termo_pdf_path)
-                                    <a href="{{ asset('storage/' . $cessao->termo_pdf_path) }}" target="_blank" class="btn btn-sm btn-outline-danger">
-                                        <i class="fa-solid fa-file-pdf"></i>
-                                    </a>
-                                @else
-                                    <a href="{{ route('ativos.cessoes.pdf', $cessao->id) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                        <i class="fa-solid fa-file-circle-plus"></i> Gerar
-                                    </a>
-                                @endif
+                                <a href="{{ route('ativos.cessoes.pdf', $cessao->id) }}" target="_blank" class="btn btn-sm {{ $cessao->termo_pdf_path ? 'btn-outline-danger' : 'btn-outline-secondary' }}" title="{{ $cessao->termo_pdf_path ? 'Visualizar PDF' : 'Gerar PDF' }}">
+                                    <i class="fa-solid fa-file-pdf"></i> {{ $cessao->termo_pdf_path ? '' : 'Gerar' }}
+                                </a>
                             </td>
                             <td class="text-end pe-4">
                                 <button type="button" class="btn btn-sm btn-outline-primary" 
