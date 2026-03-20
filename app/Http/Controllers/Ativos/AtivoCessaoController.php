@@ -149,11 +149,13 @@ class AtivoCessaoController extends Controller
 
     public function downloadAnexo(\App\Models\AtivoAnexo $anexo)
     {
-        if (!Storage::disk('public')->exists($anexo->caminho)) {
+        $fullPath = Storage::disk('public')->path($anexo->caminho);
+        
+        if (!file_exists($fullPath)) {
             return redirect()->back()->with('error', 'Arquivo não encontrado no servidor.');
         }
 
-        return Storage::disk('public')->download($anexo->caminho, $anexo->nome_original);
+        return response()->download($fullPath, $anexo->nome_original);
     }
 
     public function destroyAnexo(\App\Models\AtivoAnexo $anexo)
