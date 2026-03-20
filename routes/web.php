@@ -198,3 +198,12 @@ Route::post('/_deploy/opcache-reset', function () {
 
     return response()->json(['status' => 'ok']);
 });
+
+Route::get('/_health', function () {
+    try {
+        \DB::connection()->getPdo();
+        return response()->json(['status' => 'ok'], 200);
+    } catch (\Throwable $e) {
+        return response()->json(['status' => 'error'], 500);
+    }
+});
