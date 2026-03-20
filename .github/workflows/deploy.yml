@@ -18,4 +18,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             sudo -u deploy /var/www/deploy.sh
-            cd /var/www/portaldeaplicativos && git log -1 --format="%h (%cd)" --date=format:"%d/%m %H:%M" > .version
+            cd /var/www/portaldeaplicativos/current && git log -1 --format="%h (%cd)" --date=format:"%d/%m %H:%M" > .version
