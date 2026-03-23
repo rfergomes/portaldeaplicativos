@@ -23,12 +23,17 @@ class AtivoMovimentacao extends Model
         'origem',
         'destino',
         'observacao',
+        'valor_orcamento',
+        'dados_cedente',
+        'data_retirada',
     ];
 
     protected $casts = [
         'data_movimentacao' => 'datetime',
         'data_previsao_devolucao' => 'date',
         'data_devolucao_real' => 'datetime',
+        'valor_orcamento' => 'decimal:2',
+        'data_retirada' => 'date',
     ];
 
     public function equipamento()

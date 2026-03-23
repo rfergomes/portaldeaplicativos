@@ -66,5 +66,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'force_password_change' => \App\Http\Middleware\ForcePasswordChange::class,
         'uppercase.agenda' => \App\Http\Middleware\UppercaseAgendaStrings::class,
+        'uppercase.ativos' => \App\Http\Middleware\UppercaseAtivoStrings::class,
     ];
 }

@@ -223,14 +223,35 @@
                                     <option value="{{ $u->id }}">{{ $u->nome }} ({{ $u->empresa->razao_social ?? 'S/ Empresa' }})</option>
                                 @endforeach
                             </select>
-                            <label for="new-mov-usuario" class="text-muted small fw-bold text-uppercase">Cessionário / Responsável</label>
+                            <label for="new-mov-usuario" class="text-muted small fw-bold text-uppercase label-usuario">Cessionário / Responsável</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 field-cedente" style="display:none;">
+                        <div class="form-floating">
+                            <input type="text" name="dados_cedente" class="form-control border-0 bg-light shadow-none" id="new-mov-cedente" placeholder="Dados de quem está emprestando">
+                            <label for="new-mov-cedente" class="text-muted small fw-bold text-uppercase">Dados do Cedente (Lente)</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 field-retirada" style="display:none;">
+                        <div class="form-floating">
+                            <input type="date" name="data_retirada" class="form-control border-0 bg-light shadow-none" id="new-mov-retirada">
+                            <label for="new-mov-retirada" class="text-muted small fw-bold text-uppercase">Data de Retirada</label>
                         </div>
                     </div>
 
                     <div class="col-md-12 field-devolu-prev" style="display:none;">
                         <div class="form-floating">
                             <input type="date" name="data_previsao_devolucao" class="form-control border-0 bg-light shadow-none" id="new-mov-data">
-                            <label for="new-mov-data" class="text-muted small fw-bold text-uppercase">Previsão de Devolução</label>
+                            <label for="new-mov-data" class="text-muted small fw-bold text-uppercase label-devolu">Previsão de Devolução</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 field-orcamento" style="display:none;">
+                        <div class="form-floating">
+                            <input type="number" step="0.01" name="valor_orcamento" class="form-control border-0 bg-light shadow-none" id="new-mov-orcamento" placeholder="Valor do Orçamento">
+                            <label for="new-mov-orcamento" class="text-muted small fw-bold text-uppercase">Valor do Orçamento (R$)</label>
                         </div>
                     </div>
 
@@ -291,15 +312,46 @@
 document.addEventListener('DOMContentLoaded', function() {
     const selectTipo = document.getElementById('selectTipoMovimento');
     const fieldUsuario = document.querySelector('.field-usuario');
+    const labelUsuario = document.querySelector('.label-usuario');
+    const fieldCedente = document.querySelector('.field-cedente');
+    const fieldRetirada = document.querySelector('.field-retirada');
     const fieldDevolu = document.querySelector('.field-devolu-prev');
+    const labelDevolu = document.querySelector('.label-devolu');
+    const fieldOrcamento = document.querySelector('.field-orcamento');
     const fieldDestino = document.querySelector('.field-destino');
 
     selectTipo.addEventListener('change', function() {
         const val = this.value;
         
-        fieldUsuario.style.display = (val === 'cessao' || val === 'emprestimo') ? 'block' : 'none';
-        fieldDevolu.style.display = (val === 'emprestimo') ? 'block' : 'none';
-        fieldDestino.style.display = (val === 'transferencia' || val === 'manutencao') ? 'block' : 'none';
+        // Reset visibility
+        fieldUsuario.style.display = 'none';
+        fieldCedente.style.display = 'none';
+        fieldRetirada.style.display = 'none';
+        fieldDevolu.style.display = 'none';
+        fieldOrcamento.style.display = 'none';
+        fieldDestino.style.display = 'none';
+
+        if (val === 'cessao') {
+            fieldUsuario.style.display = 'block';
+            labelUsuario.textContent = 'Cessionário';
+            fieldDevolu.style.display = 'block';
+            labelDevolu.textContent = 'Previsão de Devolução';
+        } else if (val === 'manutencao') {
+            fieldRetirada.style.display = 'block';
+            fieldDevolu.style.display = 'block';
+            labelDevolu.textContent = 'Previsão de Retorno';
+            fieldOrcamento.style.display = 'block';
+        } else if (val === 'emprestimo') {
+            fieldUsuario.style.display = 'block'; // Quem recebe
+            labelUsuario.textContent = 'Responsável pelo Empréstimo';
+            fieldCedente.style.display = 'block'; // Quem empresta
+            fieldDevolu.style.display = 'block';
+            labelDevolu.textContent = 'Previsão de Devolução';
+        } else if (val === 'transferencia') {
+            fieldDestino.style.display = 'block';
+        } else if (val === 'devolucao') {
+            // Apenas observação
+        }
     });
 });
 </script>

@@ -69,9 +69,12 @@ class AtivoMovimentacaoController extends Controller
     {
         $validated = $request->validate([
             'equipamento_id' => 'required|exists:ativo_equipamentos,id',
-            'usuario_id' => 'nullable|exists:ativo_usuarios,id',
+            'usuario_id' => 'nullable|required_if:tipo,cessao,emprestimo|exists:ativo_usuarios,id',
             'tipo' => 'required|in:cessao,emprestimo,devolucao,manutencao,transferencia',
             'data_previsao_devolucao' => 'nullable|date',
+            'data_retirada' => 'nullable|date',
+            'valor_orcamento' => 'nullable|numeric',
+            'dados_cedente' => 'nullable|string|max:255',
             'origem' => 'nullable|string|max:255',
             'destino' => 'nullable|string|max:255',
             'observacao' => 'nullable|string',
@@ -130,6 +133,9 @@ class AtivoMovimentacaoController extends Controller
                 'tipo' => $validated['tipo'],
                 'data_movimentacao' => now(),
                 'data_previsao_devolucao' => $validated['data_previsao_devolucao'],
+                'data_retirada' => $validated['data_retirada'],
+                'valor_orcamento' => $validated['valor_orcamento'],
+                'dados_cedente' => $validated['dados_cedente'],
                 'responsavel_id' => auth()->id(),
                 'cessao_id' => $cessaoId,
                 'origem' => $origem,
