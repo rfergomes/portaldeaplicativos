@@ -168,6 +168,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/password/change', [App\Http\Controllers\Auth\PasswordChangeController::class, 'update'])->name('password.change.update');
     // Módulo de Controle de Ativos (Ativos)
     Route::prefix('ativos')->name('ativos.')->middleware('can:ativos.visualizar')->group(function () {
+        Route::get('equipamentos/pdf/inventario', [AtivoEquipamentoController::class, 'gerarInventarioPdf'])->name('equipamentos.inventario.pdf');
         Route::resource('equipamentos', \App\Http\Controllers\Ativos\AtivoEquipamentoController::class);
         Route::resource('movimentacoes', \App\Http\Controllers\Ativos\AtivoMovimentacaoController::class)->only(['index', 'store']);
         Route::resource('usuarios', \App\Http\Controllers\Ativos\AtivoUsuarioController::class);

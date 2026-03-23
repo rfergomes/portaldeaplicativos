@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Ativos;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AtivoEquipamentoController extends Controller
 {
@@ -121,5 +122,20 @@ class AtivoEquipamentoController extends Controller
         $equipamento->delete();
 
         return redirect()->route('ativos.equipamentos.index')->with('success', 'Equipamento excluído com sucesso!');
+    }
+
+    public function gerarInventarioPdf()
+    {
+        $equipamentos = \App\Models\AtivoEquipamento::with('aquisicao')
+            ->where('status', 'disponivel')
+            ->get()
+            ->groupBy(function($item) {
+                return $item->aquisicao->numero_nf ?? $item->valor_nota ?? 'SEM NOTA FISCAL';
+            });
+
+        $pdf = Pdf::loadView('ativos.equipamentos.pdf_inventario', compact('equipamentos'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('inventario_equipamentos_' . now()->format('d_m_Y') . '.pdf');
     }
 }

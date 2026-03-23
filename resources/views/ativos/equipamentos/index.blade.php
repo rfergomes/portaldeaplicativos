@@ -9,13 +9,16 @@
             </h1>
             <p class="text-muted">Gerencie o inventário de hardware e dispositivos da empresa.</p>
         </div>
-        @can('ativos.criar')
         <div class="col-md-4 text-end">
+            <a href="{{ route('ativos.equipamentos.inventario.pdf') }}" class="btn btn-outline-danger shadow-sm me-2" target="_blank">
+                <i class="fa-solid fa-file-pdf me-2"></i>Gerar Inventário
+            </a>
+            @can('ativos.criar')
             <a href="{{ route('ativos.equipamentos.create') }}" class="btn btn-primary shadow-sm">
                 <i class="fa-solid fa-plus me-2"></i>Novo Equipamento
             </a>
+            @endcan
         </div>
-        @endcan
     </div>
 
     <!-- Filtros -->
