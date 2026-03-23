@@ -29,6 +29,7 @@ class AtivoEquipamento extends Model
         'data_devolucao_prevista',
         'estacao_id',
         'observacao',
+        'acessorios',
     ];
 
     protected $casts = [

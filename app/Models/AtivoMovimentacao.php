@@ -26,6 +26,11 @@ class AtivoMovimentacao extends Model
         'valor_orcamento',
         'dados_cedente',
         'data_retirada',
+        'local_manutencao',
+        'contato_manutencao',
+        'destino_departamento_id',
+        'destino_estacao_id',
+        'acessorios',
     ];
 
     protected $casts = [
@@ -59,5 +64,15 @@ class AtivoMovimentacao extends Model
     public function anexos()
     {
         return $this->hasMany(AtivoAnexo::class, 'movimentacao_id');
+    }
+
+    public function destinoDepartamento()
+    {
+        return $this->belongsTo(AtivoDepartamento::class, 'destino_departamento_id');
+    }
+
+    public function destinoEstacao()
+    {
+        return $this->belongsTo(AtivoEstacao::class, 'destino_estacao_id');
     }
 }

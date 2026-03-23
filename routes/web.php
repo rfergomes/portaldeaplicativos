@@ -169,6 +169,7 @@ Route::middleware('auth')->group(function () {
     // Módulo de Controle de Ativos (Ativos)
     Route::prefix('ativos')->name('ativos.')->middleware(['can:ativos.visualizar', 'uppercase.ativos'])->group(function () {
         Route::get('equipamentos/pdf/inventario', [AtivoEquipamentoController::class, 'gerarInventarioPdf'])->name('equipamentos.inventario.pdf');
+        Route::get('equipamentos/{equipamento}/pdf/baixa', [AtivoEquipamentoController::class, 'pdfBaixa'])->name('equipamentos.pdf_baixa');
         Route::resource('equipamentos', \App\Http\Controllers\Ativos\AtivoEquipamentoController::class);
         Route::resource('movimentacoes', \App\Http\Controllers\Ativos\AtivoMovimentacaoController::class)->only(['index', 'store']);
         Route::resource('usuarios', \App\Http\Controllers\Ativos\AtivoUsuarioController::class);
@@ -183,6 +184,7 @@ Route::middleware('auth')->group(function () {
         Route::get('cessoes', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'index'])->name('cessoes.index');
         Route::post('cessoes', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'store'])->name('cessoes.store');
         Route::get('cessoes/{cessao}/pdf', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'generatePdf'])->name('cessoes.pdf');
+        Route::get('movimentacoes/{movimentacao}/pdf/devolucao', [\App\Http\Controllers\Ativos\AtivoMovimentacaoController::class, 'pdfDevolucao'])->name('devolucao.pdf');
         Route::post('cessoes/{cessao}/anexos', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'uploadAnexo'])->name('cessoes.anexos.store');
         Route::get('anexos/{anexo}/download', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'downloadAnexo'])->name('anexos.download');
         Route::delete('anexos/{anexo}', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'destroyAnexo'])->name('anexos.destroy');
@@ -193,8 +195,18 @@ Route::middleware('auth')->group(function () {
         Route::delete('licencas/{licenca}/{equipamento}/desvincular', [AtivoLicencaController::class, 'desvincularEquipamento'])->name('licencas.desvincular');
         
         Route::resource('estacoes', AtivoEstacaoController::class)->only(['index', 'store', 'update', 'destroy']);
+
+        // API endpoints
+        Route::get('api/estacoes', function (Illuminate\Http\Request $request) {
+            $query = \App\Models\AtivoEstacao::query();
+            if ($request->filled('departamento_id')) {
+                $query->where('departamento_id', $request->departamento_id);
+            }
+            return response()->json($query->orderBy('nome')->get(['id', 'nome']));
+        })->name('api.estacoes');
     });
 });
+
 
 Route::post('/_deploy/opcache-reset', function () {
 

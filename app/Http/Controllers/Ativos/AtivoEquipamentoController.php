@@ -63,6 +63,7 @@ class AtivoEquipamentoController extends Controller
             'valor_item' => 'nullable|numeric',
             'valor_nota' => 'nullable|string|max:255',
             'garantia_meses' => 'nullable|integer',
+            'acessorios' => 'nullable|string',
             'observacao' => 'nullable|string',
         ]);
 
@@ -103,6 +104,7 @@ class AtivoEquipamentoController extends Controller
             'valor_nota' => 'nullable|string|max:255',
             'garantia_meses' => 'nullable|integer',
             'status' => 'required|in:disponivel,em_uso,manutencao,baixado',
+            'acessorios' => 'nullable|string',
             'observacao' => 'nullable|string',
         ]);
 
@@ -137,5 +139,21 @@ class AtivoEquipamentoController extends Controller
             ->setPaper('a4', 'portrait');
 
         return $pdf->stream('inventario_equipamentos_' . now()->format('d_m_Y') . '.pdf');
+    }
+
+    public function pdfBaixa(string $id)
+    {
+        $equipamento = \App\Models\AtivoEquipamento::with(['ultimaMovimentacao', 'aquisicao', 'fabricante'])->findOrFail($id);
+
+        if ($equipamento->status !== 'baixado' || !$equipamento->ultimaMovimentacao || $equipamento->ultimaMovimentacao->tipo !== 'baixa') {
+            return redirect()->back()->with('error', 'O equipamento selecionado não possui um registro de baixa válido.');
+        }
+
+        $movimentacao = $equipamento->ultimaMovimentacao;
+
+        $pdf = Pdf::loadView('ativos.equipamentos.pdf_baixa', compact('equipamento', 'movimentacao'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream("termo_baixa_equipamento_{$equipamento->id}.pdf");
     }
 }

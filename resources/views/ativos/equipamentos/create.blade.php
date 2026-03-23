@@ -92,10 +92,16 @@
                         </div>
                     </div>
 
-                    <h5 class="card-title mt-5 mb-4 pb-2 border-bottom text-primary">Observações</h5>
+                    <h5 class="card-title mt-5 mb-4 pb-2 border-bottom text-primary">Acessórios e Observações</h5>
                     <div class="row g-3">
                         <div class="col-md-12">
-                            <textarea name="observacao" class="form-control shadow-none" rows="4" placeholder="Detalhes adicionais, histórico de compras, avarias prévias..."></textarea>
+                            <label class="form-label small fw-bold">Acessórios Inclusos</label>
+                            <input type="text" name="acessorios" class="form-control shadow-none" placeholder="Ex: Mouse, Teclado, Fonte de Energia, Maleta">
+                            <div class="form-text small">Especifique os acessórios que vêm junto com este equipamento.</div>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <label class="form-label small fw-bold">Observações Adicionais</label>
+                            <textarea name="observacao" class="form-control shadow-none" rows="3" placeholder="Detalhes adicionais, histórico de compras, avarias prévias..."></textarea>
                         </div>
                     </div>
                 </div>

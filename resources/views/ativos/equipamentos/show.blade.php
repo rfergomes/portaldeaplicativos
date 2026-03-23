@@ -59,6 +59,10 @@
                             <span class="fw-bold text-break">{{ $equipamento->numero_serie ?? '-' }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">Acessórios Inclusos</span>
+                            <span class="fw-bold text-end text-break">{{ $equipamento->acessorios ?: '-' }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span class="text-muted">Fornecedor</span>
                             <span class="fw-bold text-end">{{ $equipamento->fornecedor->nome ?? '-' }}</span>
                         </li>
@@ -189,7 +193,7 @@
 
 <!-- Modal Nova Movimentação -->
 <div class="modal fade" id="modalNovaMovimentacao" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <form action="{{ route('ativos.movimentacoes.store') }}" method="POST" class="modal-content border-0 shadow-lg">
             @csrf
             <input type="hidden" name="equipamento_id" value="{{ $equipamento->id }}">
@@ -200,74 +204,88 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <div class="row g-4">
-                    <div class="col-md-12">
-                        <div class="form-floating">
-                            <select name="tipo" class="form-select border-0 bg-light shadow-none" id="selectTipoMovimento" required>
-                                <option value="">Selecione...</option>
-                                <option value="cessao">Cessão de Uso (Longo Prazo)</option>
-                                <option value="emprestimo">Empréstimo (Curto Prazo)</option>
-                                <option value="devolucao" {{ $equipamento->status == 'em_uso' ? '' : 'disabled' }}>Devolução ao Estoque</option>
-                                <option value="manutencao">Enviar para Manutenção</option>
-                                <option value="transferencia">Transferência Interna</option>
-                            </select>
-                            <label for="selectTipoMovimento" class="text-muted small fw-bold text-uppercase">Tipo de Ação</label>
-                        </div>
+                <div class="row g-3">
+
+                    {{-- Tipo de Ação --}}
+                    <div class="col-12">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Tipo de Ação</label>
+                        <select name="tipo" class="form-select bg-light border-0 shadow-none mov-select-tipo" id="selectTipoMovimento" required>
+                            <option value="">Selecione...</option>
+                            <option value="cessao">Cessão de Uso (Longo Prazo)</option>
+                            <option value="emprestimo">Empréstimo (Curto Prazo)</option>
+                            <option value="devolucao" {{ $equipamento->status == 'em_uso' ? '' : 'disabled' }}>Devolução ao Estoque</option>
+                            <option value="manutencao">Enviar para Manutenção</option>
+                            <option value="transferencia">Transferência Interna</option>
+                            <option value="baixa">Baixa de Equipamento</option>
+                        </select>
                     </div>
 
+                    {{-- CESSÃO: Cessionário + Previsão de Devolução --}}
                     <div class="col-md-12 field-usuario" style="display:none;">
-                        <div class="form-floating">
-                            <select name="usuario_id" class="form-select border-0 bg-light shadow-none" id="new-mov-usuario">
-                                <option value="">Selecione a pessoa...</option>
-                                @foreach(\App\Models\AtivoUsuario::where('ativo', true)->orderBy('nome')->get() as $u)
-                                    <option value="{{ $u->id }}">{{ $u->nome }} ({{ $u->empresa->razao_social ?? 'S/ Empresa' }})</option>
-                                @endforeach
-                            </select>
-                            <label for="new-mov-usuario" class="text-muted small fw-bold text-uppercase label-usuario">Cessionário / Responsável</label>
+                        <label class="form-label small fw-bold text-muted text-uppercase mov-label-usuario">Cessionário</label>
+                        <select name="usuario_id" class="form-select bg-light border-0 shadow-none">
+                            <option value="">Selecione...</option>
+                            @foreach(\App\Models\AtivoUsuario::where('ativo', true)->orderBy('nome')->get() as $u)
+                                <option value="{{ $u->id }}">{{ $u->nome }} ({{ $u->empresa->razao_social ?? 'S/ Empresa' }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 field-devolu-prev" style="display:none;">
+                        <label class="form-label small fw-bold text-muted text-uppercase mov-label-devolu">Previsão de Devolução</label>
+                        <input type="date" name="data_previsao_devolucao" class="form-control bg-light border-0 shadow-none">
+                    </div>
+
+                    {{-- MANUTENÇÃO: Local + Contato + Previsão de Retorno --}}
+                    <div class="col-md-6 field-local-man" style="display:none;">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Local / Fornecedor</label>
+                        <input type="text" name="local_manutencao" class="form-control bg-light border-0 shadow-none" placeholder="Ex: Assistência Técnica ABC">
+                    </div>
+
+                    <div class="col-md-6 field-contato-man" style="display:none;">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Contato</label>
+                        <input type="text" name="contato_manutencao" class="form-control bg-light border-0 shadow-none" placeholder="Telefone ou e-mail">
+                    </div>
+
+                    {{-- TRANSFERÊNCIA: Departamento + Estação --}}
+                    <div class="col-md-6 field-depto-dest" style="display:none;">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Departamento de Destino</label>
+                        <select name="destino_departamento_id" class="form-select bg-light border-0 shadow-none mov-select-depto">
+                            <option value="">Selecione o departamento...</option>
+                            @foreach(\App\Models\AtivoDepartamento::where('ativo', true)->orderBy('nome')->get() as $dep)
+                                <option value="{{ $dep->id }}">{{ $dep->nome }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 field-estacao-dest" style="display:none;">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Estação de Trabalho de Destino</label>
+                        <select name="destino_estacao_id" class="form-select bg-light border-0 shadow-none mov-select-estacao">
+                            <option value="">Selecione a estação...</option>
+                        </select>
+                    </div>
+
+                    {{-- BAIXA: Aviso --}}
+                    <div class="col-12 field-baixa-aviso" style="display:none;">
+                        <div class="alert alert-danger border-0 mb-0">
+                            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                            <strong>Atenção:</strong> Ao confirmar a baixa, o equipamento será marcado como <strong>Baixado</strong> e um documento para contabilidade será gerado automaticamente.
                         </div>
                     </div>
 
-                    <div class="col-md-12 field-cedente" style="display:none;">
-                        <div class="form-floating">
-                            <input type="text" name="dados_cedente" class="form-control border-0 bg-light shadow-none" id="new-mov-cedente" placeholder="Dados de quem está emprestando">
-                            <label for="new-mov-cedente" class="text-muted small fw-bold text-uppercase">Dados do Cedente (Lente)</label>
-                        </div>
+                    {{-- ACESSÓRIOS INCLUSOS --}}
+                    <div class="col-12 field-acessorios" style="display:none;">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Acessórios Inclusos</label>
+                        <input type="text" name="acessorios" class="form-control bg-light border-0 shadow-none mov-input-acessorios" value="{{ $equipamento->acessorios }}" placeholder="Cabos, Mouses, Fontes...">
+                        <div class="form-text small">Confirme os acessórios que acompanham o equipamento nesta saída.</div>
                     </div>
 
-                    <div class="col-md-12 field-retirada" style="display:none;">
-                        <div class="form-floating">
-                            <input type="date" name="data_retirada" class="form-control border-0 bg-light shadow-none" id="new-mov-retirada">
-                            <label for="new-mov-retirada" class="text-muted small fw-bold text-uppercase">Data de Retirada</label>
-                        </div>
+                    {{-- OBSERVAÇÃO (todos os tipos) --}}
+                    <div class="col-12" id="field-obs-wrapper">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Observações / Motivo</label>
+                        <textarea name="observacao" class="form-control bg-light border-0 shadow-none" rows="3" placeholder="Detalhes adicionais..."></textarea>
                     </div>
 
-                    <div class="col-md-12 field-devolu-prev" style="display:none;">
-                        <div class="form-floating">
-                            <input type="date" name="data_previsao_devolucao" class="form-control border-0 bg-light shadow-none" id="new-mov-data">
-                            <label for="new-mov-data" class="text-muted small fw-bold text-uppercase label-devolu">Previsão de Devolução</label>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12 field-orcamento" style="display:none;">
-                        <div class="form-floating">
-                            <input type="number" step="0.01" name="valor_orcamento" class="form-control border-0 bg-light shadow-none" id="new-mov-orcamento" placeholder="Valor do Orçamento">
-                            <label for="new-mov-orcamento" class="text-muted small fw-bold text-uppercase">Valor do Orçamento (R$)</label>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12 field-destino" style="display:none;">
-                        <div class="form-floating">
-                            <input type="text" name="destino" class="form-control border-0 bg-light shadow-none" id="new-mov-destino" placeholder="Destino / Localização">
-                            <label for="new-mov-destino" class="text-muted small fw-bold text-uppercase">Destino / Localização</label>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12">
-                        <div class="form-floating">
-                            <textarea name="observacao" class="form-control border-0 bg-light shadow-none" id="new-mov-obs" style="height: 100px" placeholder="Observações"></textarea>
-                            <label for="new-mov-obs" class="text-muted small fw-bold text-uppercase">Observações / Motivo</label>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div class="modal-footer bg-light border-0 py-3">
@@ -308,51 +326,124 @@
     </div>
 </div>
 
+@push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const selectTipo = document.getElementById('selectTipoMovimento');
-    const fieldUsuario = document.querySelector('.field-usuario');
-    const labelUsuario = document.querySelector('.label-usuario');
-    const fieldCedente = document.querySelector('.field-cedente');
-    const fieldRetirada = document.querySelector('.field-retirada');
-    const fieldDevolu = document.querySelector('.field-devolu-prev');
-    const labelDevolu = document.querySelector('.label-devolu');
-    const fieldOrcamento = document.querySelector('.field-orcamento');
-    const fieldDestino = document.querySelector('.field-destino');
-
-    selectTipo.addEventListener('change', function() {
-        const val = this.value;
+$(document).ready(function() {
+    function handleMovShow(val) {
+        const modal = $('#modalNovaMovimentacao .modal-body');
         
-        // Reset visibility
-        fieldUsuario.style.display = 'none';
-        fieldCedente.style.display = 'none';
-        fieldRetirada.style.display = 'none';
-        fieldDevolu.style.display = 'none';
-        fieldOrcamento.style.display = 'none';
-        fieldDestino.style.display = 'none';
+        // Reset
+        modal.find('.field-usuario').slideUp(300).find('select, input').prop('required', false);
+        modal.find('.field-devolu-prev').slideUp(300).find('input').prop('required', false);
+        modal.find('.field-local-man').slideUp(300).find('input').prop('required', false);
+        modal.find('.field-contato-man').slideUp(300).find('input').prop('required', false);
+        modal.find('.field-depto-dest').slideUp(300).find('select').prop('required', false);
+        modal.find('.field-estacao-dest').slideUp(300).find('select').prop('required', false);
+        modal.find('.field-baixa-aviso').slideUp(300);
+        modal.find('.field-acessorios').slideUp(300);
 
         if (val === 'cessao') {
-            fieldUsuario.style.display = 'block';
-            labelUsuario.textContent = 'Cessionário';
-            fieldDevolu.style.display = 'block';
-            labelDevolu.textContent = 'Previsão de Devolução';
-        } else if (val === 'manutencao') {
-            fieldRetirada.style.display = 'block';
-            fieldDevolu.style.display = 'block';
-            labelDevolu.textContent = 'Previsão de Retorno';
-            fieldOrcamento.style.display = 'block';
+            modal.find('.field-usuario').slideDown(300).find('select, input').prop('required', true);
+            modal.find('.mov-label-usuario').text('Cessionário');
+            modal.find('.field-devolu-prev').slideDown(300).find('input').prop('required', false);
+            modal.find('.mov-label-devolu').text('Previsão de Devolução (Opcional)');
+            modal.find('.field-acessorios').slideDown(300);
         } else if (val === 'emprestimo') {
-            fieldUsuario.style.display = 'block'; // Quem recebe
-            labelUsuario.textContent = 'Responsável pelo Empréstimo';
-            fieldCedente.style.display = 'block'; // Quem empresta
-            fieldDevolu.style.display = 'block';
-            labelDevolu.textContent = 'Previsão de Devolução';
+            modal.find('.field-usuario').slideDown(300).find('select, input').prop('required', true);
+            modal.find('.mov-label-usuario').text('Responsável pelo Empréstimo');
+            modal.find('.field-devolu-prev').slideDown(300).find('input').prop('required', true);
+            modal.find('.mov-label-devolu').text('Previsão de Devolução');
+            modal.find('.field-acessorios').slideDown(300);
+        } else if (val === 'manutencao') {
+            modal.find('.field-local-man').slideDown(300).find('input').prop('required', true);
+            modal.find('.field-contato-man').slideDown(300).find('input').prop('required', true);
+            modal.find('.field-devolu-prev').slideDown(300).find('input').prop('required', true);
+            modal.find('.mov-label-devolu').text('Previsão de Retorno');
         } else if (val === 'transferencia') {
-            fieldDestino.style.display = 'block';
-        } else if (val === 'devolucao') {
-            // Apenas observação
+            modal.find('.field-depto-dest').slideDown(300).find('select').prop('required', true);
+            modal.find('.field-estacao-dest').slideDown(300).find('select').prop('required', false); // Optional
+        } else if (val === 'baixa') {
+            modal.find('.field-baixa-aviso').slideDown(300);
+            modal.find('[name="observacao"]').prop('required', true);
+        }
+
+        if (val !== 'baixa') {
+            modal.find('[name="observacao"]').prop('required', false);
+        }
+    }
+
+    $('#selectTipoMovimento').on('change select2:select', function() {
+        handleMovShow($(this).val());
+    });
+
+    // Load estações when departamento changes (transferência)
+    $('.mov-select-depto').on('change select2:select', function() {
+        const deptoId = $(this).val();
+        const estacaoSelect = $(this).closest('.modal-body').find('.mov-select-estacao');
+        estacaoSelect.html('<option value="">Carregando...</option>');
+        if (deptoId) {
+            $.get('/ativos/api/estacoes?departamento_id=' + deptoId, function(data) {
+                let opts = '<option value="">Selecione a estação...</option>';
+                data.forEach(e => opts += `<option value="${e.id}">${e.nome}</option>`);
+                estacaoSelect.html(opts);
+            });
+        } else {
+            estacaoSelect.html('<option value="">Selecione a estação...</option>');
         }
     });
+
+    // Reset when modal closes
+    $('#modalNovaMovimentacao').on('hidden.bs.modal', function() {
+        $('#selectTipoMovimento').val('').trigger('change');
+    });
+
+    @if(session('success'))
+        @if(session('mov_tipo') === 'baixa')
+            Swal.fire({
+                title: 'Sucesso!',
+                text: "{{ session('success') }}",
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa-solid fa-file-pdf me-1"></i> Gerar Documento de Baixa',
+                cancelButtonText: 'Fechar',
+                confirmButtonColor: '#dc3545'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open("{{ route('ativos.equipamentos.pdf_baixa', session('mov_equipamento_id')) }}", '_blank');
+                }
+            });
+        @elseif(session('cessao_id'))
+            Swal.fire({
+                title: 'Sucesso!',
+                text: "{{ session('success') }}",
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa-solid fa-file-pdf me-1"></i> Gerar Termo de Cessão',
+                cancelButtonText: 'Fechar',
+                confirmButtonColor: '#0d6efd'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open("{{ route('ativos.cessoes.pdf', session('cessao_id')) }}", '_blank');
+                }
+            });
+        @elseif(session('devolucao_id'))
+            Swal.fire({
+                title: 'Sucesso!',
+                text: "{{ session('success') }}",
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa-solid fa-file-pdf me-1"></i> Gerar Termo de Devolução',
+                cancelButtonText: 'Fechar',
+                confirmButtonColor: '#0d6efd'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open("{{ route('ativos.devolucao.pdf', session('devolucao_id')) }}", '_blank');
+                }
+            });
+        @endif
+    @endif
+
 });
 </script>
+@endpush
 @endsection
