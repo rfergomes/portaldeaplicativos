@@ -77,7 +77,7 @@ class AtivoMovimentacaoController extends Controller
             $tipoUso = $equipamento->tipo_uso;
             $localizacao = $equipamento->localizacao_atual;
             $cessaoId = null;
-            $ultimaMovimentacao = clone $equipamento->ultimaMovimentacao; // Clone to preserve the previous state before new movement is created
+            $ultimaMovimentacao = $equipamento->ultimaMovimentacao ? clone $equipamento->ultimaMovimentacao : null;
 
             // Criar cessão se necessário
             if ($validated['tipo'] === 'cessao') {
@@ -119,16 +119,21 @@ class AtivoMovimentacaoController extends Controller
                     break;
 
                 case 'transferencia':
+                    $departamento = \App\Models\AtivoDepartamento::find($validated['destino_departamento_id']);
                     $estacao = isset($validated['destino_estacao_id'])
-                        ? \App\Models\AtivoEstacao::with('departamento')->find($validated['destino_estacao_id'])
+                        ? \App\Models\AtivoEstacao::find($validated['destino_estacao_id'])
                         : null;
-                    $localizacao = $estacao
-                        ? ($estacao->departamento->nome ?? '') . ' / ' . $estacao->nome
-                        : ($validated['destino'] ?? $localizacao);
+
+                    if ($estacao && $departamento) {
+                        $localizacao = $departamento->nome . ' / ' . $estacao->nome;
+                    } elseif ($departamento) {
+                        $localizacao = $departamento->nome;
+                    } else {
+                        $localizacao = $validated['destino'] ?? $localizacao;
+                    }
 
                     // Atualizar estação do equipamento
-                    $equipamento->estacao_id = $validated['destino_estacao_id'] ?? $equipamento->estacao_id;
-                    $equipamento->save();
+                    $equipamento->estacao_id = $validated['destino_estacao_id'] ?? null;
                     break;
 
                 case 'baixa':
