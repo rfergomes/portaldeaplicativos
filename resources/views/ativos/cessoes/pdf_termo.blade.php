@@ -50,7 +50,7 @@
                 01 {{ $mov->equipamento->descricao }} {{ $mov->equipamento->modelo }} 
                 (N/S: {{ $mov->equipamento->numero_serie ?? 'N/A' }}) - 
                 @if($mov->equipamento->valor_nota) 
-                    Observação: NF.: {{ $mov->equipamento->valor_nota }} - R$ {{ number_format($mov->equipamento->valor_item, 2, ',', '.') }}
+                    Observação: NF.: {{ $mov->equipamento->valor_nota }}
                 @endif
             </div>
             @endforeach

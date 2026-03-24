@@ -323,13 +323,7 @@ $(document).ready(function() {
         dropdownParent: $('body')
     });
 
-    // Modal behavior
-    $('#modalNovaCessaoMultipla').on('shown.bs.modal', function () {
-        $('.select2-modal').select2({
-            theme: 'bootstrap-5',
-            dropdownParent: $('#modalNovaCessaoMultipla')
-        });
-    });
+    // Modal behavior handled on step transition
 
     $('#checkAll').on('change', function() {
         $('.equip-check').prop('checked', this.checked);
@@ -348,6 +342,15 @@ $(document).ready(function() {
         $('#btnPrev').show();
         $('#btnSubmit').show();
         $('.modal-title').text('Cessão Múltipla: Informar Destino');
+
+        // Initialize select2 only when step2 is visible to prevent duplicate/empty broken renders
+        if (!$('.select2-modal').hasClass('select2-hidden-accessible')) {
+            $('.select2-modal').select2({
+                theme: 'bootstrap-5',
+                dropdownParent: $('#modalNovaCessaoMultipla'),
+                width: '100%'
+            });
+        }
     });
 
     $('#btnPrev').on('click', function() {
