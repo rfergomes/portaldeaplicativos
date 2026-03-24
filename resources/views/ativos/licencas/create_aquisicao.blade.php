@@ -18,6 +18,22 @@
 
     <form action="{{ route('ativos.licencas.store_aquisicao') }}" method="POST" enctype="multipart/form-data">
         @csrf
+
+        @if($errors->any())
+            <div class="alert alert-danger shadow-sm border-0 mb-4">
+                <div class="d-flex">
+                    <i class="fa-solid fa-circle-exclamation me-2 mt-1"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Ops! Verifique os erros abaixo:</h6>
+                        <ul class="mb-0 small">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        @endif
         
         <!-- Bloco 1: Dados da Nota Fiscal -->
         <div class="card shadow-sm border-0 mb-4">
@@ -28,32 +44,36 @@
                 <div class="row g-4">
                     <div class="col-md-3">
                         <div class="form-floating">
-                            <input type="text" name="numero_nf" class="form-control" id="numero_nf" placeholder="NF-e" value="{{ old('numero_nf') }}">
+                            <input type="text" name="numero_nf" class="form-control @error('numero_nf') is-invalid @enderror" id="numero_nf" placeholder="NF-e" value="{{ old('numero_nf') }}">
                             <label for="numero_nf" class="text-muted small fw-bold">Número da Nota (Opcional)</label>
+                            @error('numero_nf') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="text" name="chave_acesso" class="form-control font-monospace" id="chave_acesso" placeholder="Chave de Acesso" value="{{ old('chave_acesso') }}" maxlength="44">
+                            <input type="text" name="chave_acesso" class="form-control font-monospace @error('chave_acesso') is-invalid @enderror" id="chave_acesso" placeholder="Chave de Acesso" value="{{ old('chave_acesso') }}" maxlength="44">
                             <label for="chave_acesso" class="text-muted small fw-bold">Chave de Acesso da DANFE (Opcional)</label>
+                            @error('chave_acesso') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating">
-                            <input type="date" name="data_aquisicao" class="form-control" id="data_aquisicao" value="{{ old('data_aquisicao', date('Y-m-d')) }}" required>
+                            <input type="date" name="data_aquisicao" class="form-control @error('data_aquisicao') is-invalid @enderror" id="data_aquisicao" value="{{ old('data_aquisicao', date('Y-m-d')) }}" required>
                             <label for="data_aquisicao" class="text-muted small fw-bold">Data da Aquisição *</label>
+                            @error('data_aquisicao') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
                     
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <select name="fornecedor_id" id="fornecedor_id" class="form-select">
+                            <select name="fornecedor_id" id="fornecedor_id" class="form-select @error('fornecedor_id') is-invalid @enderror">
                                 <option value="">Selecione o Fornecedor...</option>
                                 @foreach($fornecedores as $forn)
                                     <option value="{{ $forn->id }}" {{ old('fornecedor_id') == $forn->id ? 'selected' : '' }}>{{ $forn->nome }}</option>
                                 @endforeach
                             </select>
                             <label for="fornecedor_id" class="text-muted small fw-bold">Fornecedor Emissor</label>
+                            @error('fornecedor_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
                     
@@ -71,15 +91,17 @@
 
                     <div class="col-md-4">
                         <div class="form-floating">
-                            <input type="number" step="0.01" name="valor_frete" class="form-control" id="valor_frete" placeholder="Frete" value="{{ old('valor_frete') }}">
+                            <input type="number" step="0.01" name="valor_frete" class="form-control @error('valor_frete') is-invalid @enderror" id="valor_frete" placeholder="Frete" value="{{ old('valor_frete') }}">
                             <label for="valor_frete" class="text-muted small fw-bold">Custo de Frete (R$)</label>
+                            @error('valor_frete') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
                     
                     <div class="col-md-4">
                         <div class="form-floating">
-                            <input type="number" step="0.01" name="valor_total" class="form-control" id="valor_total" placeholder="Total" value="{{ old('valor_total') }}">
+                            <input type="number" step="0.01" name="valor_total" class="form-control @error('valor_total') is-invalid @enderror" id="valor_total" placeholder="Total" value="{{ old('valor_total') }}">
                             <label for="valor_total" class="text-muted small fw-bold">Valor Total da NF (R$)</label>
+                            @error('valor_total') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
 
@@ -100,62 +122,142 @@
                 </button>
             </div>
             <div class="card-body p-4 bg-light" id="items-container">
-                <!-- Item 0 -->
-                <div class="item-row p-4 bg-white border rounded mb-3 shadow-sm position-relative">
-                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3 btn-remove-item" style="display: none;"></button>
-                    <div class="row g-3">
-                        <div class="col-md-5">
-                            <div class="form-floating">
-                                <input type="text" name="itens[0][nome]" class="form-control border-success-subtle fw-bold" placeholder="Nome do Software" required>
-                                <label class="text-success small fw-bold">Nome do Software / Licença *</label>
+                @if(old('itens'))
+                    @foreach(old('itens') as $index => $item)
+                        <div class="item-row p-4 bg-white border rounded mb-3 shadow-sm position-relative">
+                            <button type="button" class="btn-close position-absolute top-0 end-0 m-3 btn-remove-item" style="{{ count(old('itens')) > 1 ? '' : 'display: none;' }}"></button>
+                            <div class="row g-3">
+                                <div class="col-md-5">
+                                    <div class="form-floating">
+                                        <input type="text" name="itens[{{ $index }}][nome]" class="form-control border-success-subtle fw-bold @error("itens.{$index}.nome") is-invalid @enderror" placeholder="Nome do Software" value="{{ $item['nome'] }}" required>
+                                        <label class="text-success small fw-bold">Nome do Software / Licença *</label>
+                                        @error("itens.{$index}.nome") <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <select name="itens[{{ $index }}][fabricante_id]" class="form-select @error("itens.{$index}.fabricante_id") is-invalid @enderror">
+                                            <option value="">Selecione...</option>
+                                            @foreach($fabricantes as $fab)
+                                                <option value="{{ $fab->id }}" {{ $item['fabricante_id'] == $fab->id ? 'selected' : '' }}>{{ $fab->nome }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="text-muted small fw-bold">Fabricante</label>
+                                        @error("itens.{$index}.fabricante_id") <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <select name="itens[{{ $index }}][tipo_licenca]" class="form-select @error("itens.{$index}.tipo_licenca") is-invalid @enderror" required>
+                                            <option value="assinatura" {{ $item['tipo_licenca'] == 'assinatura' ? 'selected' : '' }}>Assinatura / Renovável</option>
+                                            <option value="vitalicia" {{ $item['tipo_licenca'] == 'vitalicia' ? 'selected' : '' }}>Vitalícia / Permanente</option>
+                                        </select>
+                                        <label class="text-muted small fw-bold">Tipo de Licença *</label>
+                                        @error("itens.{$index}.tipo_licenca") <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="itens[{{ $index }}][chave]" class="form-control font-monospace @error("itens.{$index}.chave") is-invalid @enderror" placeholder="Serial Key" value="{{ $item['chave'] }}">
+                                        <label class="text-muted small fw-bold">Chave / Serial / Código de Ativação</label>
+                                        @error("itens.{$index}.chave") <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-floating">
+                                        <input type="number" name="itens[{{ $index }}][quantidade_seats]" class="form-control @error("itens.{$index}.quantidade_seats") is-invalid @enderror" min="1" value="{{ $item['quantidade_seats'] }}" required>
+                                        <label class="text-primary small fw-bold">Seats (Ativações) *</label>
+                                        @error("itens.{$index}.quantidade_seats") <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-floating">
+                                        <input type="number" step="0.01" name="itens[{{ $index }}][valor_unitario]" class="form-control text-end @error("itens.{$index}.valor_unitario") is-invalid @enderror" placeholder="0.00" value="{{ $item['valor_unitario'] }}" required>
+                                        <label class="text-success small fw-bold">R$ Unitário *</label>
+                                        @error("itens.{$index}.valor_unitario") <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-floating">
+                                        <input type="date" name="itens[{{ $index }}][data_validade]" class="form-control @error("itens.{$index}.data_validade") is-invalid @enderror" value="{{ $item['data_validade'] }}">
+                                        <label class="text-muted small fw-bold">Vencimento (Opc.)</label>
+                                        @error("itens.{$index}.data_validade") <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-floating">
+                                        <textarea name="itens[{{ $index }}][observacao]" class="form-control @error("itens.{$index}.observacao") is-invalid @enderror" style="height: 60px" placeholder="Obs">{{ $item['observacao'] ?? '' }}</textarea>
+                                        <label class="text-muted small fw-bold">Observações deste item</label>
+                                        @error("itens.{$index}.observacao") <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-floating">
-                                <select name="itens[0][fabricante_id]" class="form-select">
-                                    <option value="">Selecione...</option>
-                                    @foreach($fabricantes as $fab)
-                                        <option value="{{ $fab->id }}">{{ $fab->nome }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="text-muted small fw-bold">Fabricante</label>
+                    @endforeach
+                @else
+                    <!-- Item 0 (Default) -->
+                    <div class="item-row p-4 bg-white border rounded mb-3 shadow-sm position-relative">
+                        <button type="button" class="btn-close position-absolute top-0 end-0 m-3 btn-remove-item" style="display: none;"></button>
+                        <div class="row g-3">
+                            <div class="col-md-5">
+                                <div class="form-floating">
+                                    <input type="text" name="itens[0][nome]" class="form-control border-success-subtle fw-bold" placeholder="Nome do Software" required>
+                                    <label class="text-success small fw-bold">Nome do Software / Licença *</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-floating">
-                                <select name="itens[0][tipo_licenca]" class="form-select" required>
-                                    <option value="assinatura">Assinatura / Renovável</option>
-                                    <option value="vitalicia">Vitalícia / Permanente</option>
-                                </select>
-                                <label class="text-muted small fw-bold">Tipo de Licença *</label>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <select name="itens[0][fabricante_id]" class="form-select">
+                                        <option value="">Selecione...</option>
+                                        @foreach($fabricantes as $fab)
+                                            <option value="{{ $fab->id }}">{{ $fab->nome }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="text-muted small fw-bold">Fabricante</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating">
-                                <input type="text" name="itens[0][chave]" class="form-control font-monospace" placeholder="Serial Key">
-                                <label class="text-muted small fw-bold">Chave / Serial / Código de Ativação</label>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <select name="itens[0][tipo_licenca]" class="form-select" required>
+                                        <option value="assinatura">Assinatura / Renovável</option>
+                                        <option value="vitalicia">Vitalícia / Permanente</option>
+                                    </select>
+                                    <label class="text-muted small fw-bold">Tipo de Licença *</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-floating">
-                                <input type="number" name="itens[0][quantidade_seats]" class="form-control" min="1" value="1" required>
-                                <label class="text-primary small fw-bold">Seats (Ativações) *</label>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="itens[0][chave]" class="form-control font-monospace" placeholder="Serial Key">
+                                    <label class="text-muted small fw-bold">Chave / Serial / Código de Ativação</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-floating">
-                                <input type="number" step="0.01" name="itens[0][valor_unitario]" class="form-control text-end" placeholder="0.00" required>
-                                <label class="text-success small fw-bold">R$ Unitário *</label>
+                            <div class="col-md-2">
+                                <div class="form-floating">
+                                    <input type="number" name="itens[0][quantidade_seats]" class="form-control" min="1" value="1" required>
+                                    <label class="text-primary small fw-bold">Seats (Ativações) *</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-floating">
-                                <input type="date" name="itens[0][data_validade]" class="form-control">
-                                <label class="text-muted small fw-bold">Vencimento (Opc.)</label>
+                            <div class="col-md-2">
+                                <div class="form-floating">
+                                    <input type="number" step="0.01" name="itens[0][valor_unitario]" class="form-control text-end" placeholder="0.00" required>
+                                    <label class="text-success small fw-bold">R$ Unitário *</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-floating">
+                                    <input type="date" name="itens[0][data_validade]" class="form-control">
+                                    <label class="text-muted small fw-bold">Vencimento (Opc.)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <textarea name="itens[0][observacao]" class="form-control" style="height: 60px" placeholder="Obs"></textarea>
+                                    <label class="text-muted small fw-bold">Observações deste item</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
 
@@ -231,7 +333,7 @@
         const btnAdd = document.getElementById('btn-add-item');
         const container = document.getElementById('items-container');
         const template = document.getElementById('item-template').innerHTML;
-        let itemIndex = 1;
+        let itemIndex = {{ old('itens') ? count(old('itens')) : 1 }};
 
         btnAdd.addEventListener('click', function() {
             let newItemHtml = template.replace(/__INDEX__/g, itemIndex);

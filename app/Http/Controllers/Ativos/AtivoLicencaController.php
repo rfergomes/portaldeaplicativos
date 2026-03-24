@@ -29,6 +29,24 @@ class AtivoLicencaController extends Controller
 
     public function storeAquisicao(Request $request)
     {
+        // Sanitize numeric inputs (replace , with .)
+        if ($request->has('valor_frete')) {
+            $request->merge(['valor_frete' => str_replace(',', '.', $request->valor_frete)]);
+        }
+        if ($request->has('valor_total')) {
+            $request->merge(['valor_total' => str_replace(',', '.', $request->valor_total)]);
+        }
+        
+        if ($request->has('itens')) {
+            $itens = $request->itens;
+            foreach ($itens as $i => $item) {
+                if (isset($item['valor_unitario'])) {
+                    $itens[$i]['valor_unitario'] = str_replace(',', '.', $item['valor_unitario']);
+                }
+            }
+            $request->merge(['itens' => $itens]);
+        }
+
         $validated = $request->validate([
             // Cabeçalho
             'numero_nf' => 'nullable|string|max:255',
