@@ -47,4 +47,9 @@ class AtivoAquisicao extends Model
     {
         return $this->hasMany(AtivoAnexo::class, 'aquisicao_id');
     }
+
+    public function licencas()
+    {
+        return $this->hasMany(AtivoLicenca::class, 'aquisicao_id');
+    }
 }

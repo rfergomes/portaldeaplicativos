@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
-    <title>@yield('title', 'Portal de Aplicativos') | AdminLTE 4</title>
+    <title>@yield('title', 'Portal de Aplicativos') | Químicos Unificados</title>
 
     <!-- SEO Meta Tags -->
     <meta name="description" content="@yield('meta_description', 'Portal de Aplicativos - Sistema de Gestão Interna para Colônias e Protocolos.')">

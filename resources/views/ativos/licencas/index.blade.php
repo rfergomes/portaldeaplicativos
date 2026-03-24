@@ -9,9 +9,14 @@
             <h4 class="mb-0">Gestão de Licenças</h4>
             <p class="text-muted small mb-0">Controle de chaves, seats e vencimentos de softwares corporativos.</p>
         </div>
-        <a href="{{ route('ativos.licencas.create') }}" class="btn btn-primary shadow-sm">
-            <i class="fa-solid fa-plus me-1"></i> Nova Licença
-        </a>
+        <div>
+            <a href="{{ route('ativos.licencas.create_aquisicao') }}" class="btn btn-success shadow-sm me-2">
+                <i class="fa-solid fa-file-invoice-dollar me-2"></i>Entrada por Nota (Itens)
+            </a>
+            <a href="{{ route('ativos.licencas.create') }}" class="btn btn-primary shadow-sm">
+                <i class="fa-solid fa-plus me-1"></i> Nova Licença Solo
+            </a>
+        </div>
     </div>
 
     <div class="card border-0 shadow-sm">
@@ -21,8 +26,9 @@
                     <thead class="bg-light">
                         <tr style="font-size: 0.75rem;" class="text-muted text-uppercase">
                             <th class="ps-4">Software</th>
-                            <th>Fabricante</th>
+                            <th>Fabricante / Fornecedor</th>
                             <th>Tipo</th>
+                            <th>NF / Compra</th>
                             <th>Expiração / Status</th>
                             <th>Utilização (Seats)</th>
                             <th class="text-end pe-4">Ações</th>
@@ -35,13 +41,20 @@
                                 <div class="fw-bold text-dark">{{ $licenca->nome }}</div>
                                 <div class="small text-muted font-monospace">{{ $licenca->chave ?: 'Chave sob consulta' }}</div>
                             </td>
-                            <td>{{ $licenca->fabricante->nome ?? 'N/D' }}</td>
+                            <td>
+                                <div class="text-dark">{{ $licenca->fabricante->nome ?? 'N/D' }}</div>
+                                <div class="small text-muted">{{ $licenca->fornecedor->nome ?? 'Sem fornecedor' }}</div>
+                            </td>
                             <td>
                                 @if($licenca->tipo_licenca == 'vitalicia')
                                     <span class="badge bg-info-subtle text-info">Vitalícia</span>
                                 @else
                                     <span class="badge bg-secondary-subtle text-secondary">Assinatura</span>
                                 @endif
+                            </td>
+                            <td>
+                                <div class="text-dark">{{ $licenca->numero_nf ?: 'S/NF' }}</div>
+                                <div class="small text-muted">{{ $licenca->data_aquisicao ? $licenca->data_aquisicao->format('d/m/Y') : '-' }}</div>
                             </td>
                             <td>
                                 @if($licenca->data_validade)

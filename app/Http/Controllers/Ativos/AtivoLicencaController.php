@@ -11,7 +11,7 @@ class AtivoLicencaController extends Controller
 {
     public function index()
     {
-        $licencas = AtivoLicenca::with('fabricante')
+        $licencas = AtivoLicenca::with(['fabricante', 'fornecedor', 'aquisicao'])
             ->withCount('equipamentos')
             ->orderBy('nome')
             ->paginate(15);
@@ -19,10 +19,105 @@ class AtivoLicencaController extends Controller
         return view('ativos.licencas.index', compact('licencas'));
     }
 
+    public function createAquisicao()
+    {
+        $fabricantes = AtivoFabricante::where('ativo', true)->orderBy('nome')->get();
+        $fornecedores = \App\Models\AtivoFornecedor::where('ativo', true)->orderBy('nome')->get();
+        $marketplaces = \App\Models\AtivoMarketplace::where('ativo', true)->orderBy('nome')->get();
+        return view('ativos.licencas.create_aquisicao', compact('fabricantes', 'fornecedores', 'marketplaces'));
+    }
+
+    public function storeAquisicao(Request $request)
+    {
+        $validated = $request->validate([
+            // Cabeçalho
+            'numero_nf' => 'nullable|string|max:255',
+            'chave_acesso' => 'nullable|string|max:255',
+            'data_aquisicao' => 'required|date',
+            'fornecedor_id' => 'nullable|exists:ativo_fornecedores,id',
+            'marketplace_id' => 'nullable|exists:ativo_marketplaces,id',
+            'valor_frete' => 'nullable|numeric|min:0',
+            'valor_total' => 'nullable|numeric|min:0',
+            'observacao' => 'nullable|string',
+            'anexos.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx|max:10240',
+
+            // Itens Array
+            'itens' => 'required|array|min:1',
+            'itens.*.nome' => 'required|string|max:255',
+            'itens.*.chave' => 'nullable|string|max:255',
+            'itens.*.fabricante_id' => 'nullable|exists:ativo_fabricantes,id',
+            'itens.*.tipo_licenca' => 'required|in:vitalicia,assinatura',
+            'itens.*.data_validade' => 'nullable|date',
+            'itens.*.quantidade_seats' => 'required|integer|min:1',
+            'itens.*.valor_unitario' => 'required|numeric|min:0',
+            'itens.*.observacao' => 'nullable|string',
+        ]);
+
+        \Illuminate\Support\Facades\DB::beginTransaction();
+
+        try {
+            // Cria a Aquisição de Ativo (Genericamente usada para Equipamentos e agora Licenças)
+            $aquisicao = \App\Models\AtivoAquisicao::create([
+                'numero_nf' => $validated['numero_nf'] ?? null,
+                'chave_acesso' => $validated['chave_acesso'] ?? null,
+                'data_aquisicao' => $validated['data_aquisicao'],
+                'fornecedor_id' => $validated['fornecedor_id'] ?? null,
+                'marketplace_id' => $validated['marketplace_id'] ?? null,
+                'valor_frete' => $validated['valor_frete'] ?? null,
+                'valor_total' => $validated['valor_total'] ?? null,
+                'observacao' => $validated['observacao'] ?? null,
+            ]);
+
+            // Percorre os Itens e Cadastra as Licenças
+            foreach ($validated['itens'] as $item) {
+                AtivoLicenca::create([
+                    'aquisicao_id' => $aquisicao->id,
+                    'nome' => $item['nome'],
+                    'chave' => $item['chave'] ?? null,
+                    'fabricante_id' => $item['fabricante_id'] ?? null,
+                    'tipo_licenca' => $item['tipo_licenca'],
+                    'data_validade' => $item['data_validade'] ?? null,
+                    'quantidade_seats' => $item['quantidade_seats'],
+                    'observacao' => $item['observacao'] ?? null,
+                    // Dados denormalizados da aquisição para manter compatibilidade com views atuais
+                    'fornecedor_id' => $aquisicao->fornecedor_id,
+                    'marketplace_id' => $aquisicao->marketplace_id,
+                    'numero_nf' => $aquisicao->numero_nf,
+                    'chave_acesso' => $aquisicao->chave_acesso,
+                    'data_aquisicao' => $aquisicao->data_aquisicao,
+                    'valor_total' => $item['valor_unitario'] * $item['quantidade_seats'], // Valor específico desta licença
+                ]);
+            }
+
+            // Anexos
+            if ($request->hasFile('anexos')) {
+                foreach ($request->file('anexos') as $file) {
+                    $path = $file->store('ativos/anexos', 'public');
+                    \App\Models\AtivoAnexo::create([
+                        'aquisicao_id' => $aquisicao->id,
+                        'caminho' => $path,
+                        'nome_original' => $file->getClientOriginalName(),
+                        'mime_type' => $file->getMimeType(),
+                        'tamanho' => $file->getSize(),
+                    ]);
+                }
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return redirect()->route('ativos.licencas.index')->with('success', 'Aquisição de licenças registrada com sucesso!');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            return back()->withInput()->with('error', 'Erro ao salvar a aquisição: ' . $e->getMessage());
+        }
+    }
+
     public function create()
     {
         $fabricantes = AtivoFabricante::where('ativo', true)->orderBy('nome')->get();
-        return view('ativos.licencas.create', compact('fabricantes'));
+        $fornecedores = \App\Models\AtivoFornecedor::where('ativo', true)->orderBy('nome')->get();
+        $marketplaces = \App\Models\AtivoMarketplace::where('ativo', true)->orderBy('nome')->get();
+        return view('ativos.licencas.create', compact('fabricantes', 'fornecedores', 'marketplaces'));
     }
 
     public function store(Request $request)
@@ -33,6 +128,13 @@ class AtivoLicencaController extends Controller
             'tipo_licenca' => 'required|in:vitalicia,assinatura',
             'data_validade' => 'nullable|date',
             'fabricante_id' => 'nullable|exists:ativo_fabricantes,id',
+            'fornecedor_id' => 'nullable|exists:ativo_fornecedores,id',
+            'marketplace_id' => 'nullable|exists:ativo_marketplaces,id',
+            'numero_nf' => 'nullable|string|max:255',
+            'chave_acesso' => 'nullable|string|max:255',
+            'data_aquisicao' => 'nullable|date',
+            'valor_total' => 'nullable|numeric|min:0',
+            'valor_frete' => 'nullable|numeric|min:0',
             'quantidade_seats' => 'required|integer|min:1',
             'observacao' => 'nullable|string',
         ]);
@@ -45,7 +147,9 @@ class AtivoLicencaController extends Controller
     public function edit(AtivoLicenca $licenca)
     {
         $fabricantes = AtivoFabricante::where('ativo', true)->orderBy('nome')->get();
-        return view('ativos.licencas.edit', compact('licenca', 'fabricantes'));
+        $fornecedores = \App\Models\AtivoFornecedor::where('ativo', true)->orderBy('nome')->get();
+        $marketplaces = \App\Models\AtivoMarketplace::where('ativo', true)->orderBy('nome')->get();
+        return view('ativos.licencas.edit', compact('licenca', 'fabricantes', 'fornecedores', 'marketplaces'));
     }
 
     public function update(Request $request, AtivoLicenca $licenca)
@@ -56,6 +160,13 @@ class AtivoLicencaController extends Controller
             'tipo_licenca' => 'required|in:vitalicia,assinatura',
             'data_validade' => 'nullable|date',
             'fabricante_id' => 'nullable|exists:ativo_fabricantes,id',
+            'fornecedor_id' => 'nullable|exists:ativo_fornecedores,id',
+            'marketplace_id' => 'nullable|exists:ativo_marketplaces,id',
+            'numero_nf' => 'nullable|string|max:255',
+            'chave_acesso' => 'nullable|string|max:255',
+            'data_aquisicao' => 'nullable|date',
+            'valor_total' => 'nullable|numeric|min:0',
+            'valor_frete' => 'nullable|numeric|min:0',
             'quantidade_seats' => 'required|integer|min:1',
             'observacao' => 'nullable|string',
         ]);
