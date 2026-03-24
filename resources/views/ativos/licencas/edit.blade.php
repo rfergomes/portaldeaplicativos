@@ -51,8 +51,8 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-bold small">Tipo de Licença</label>
                                 <select name="tipo_licenca" class="form-select @error('tipo_licenca') is-invalid @enderror" required>
-                                    <option value="assinatura" {{ old('tipo_licenca', $licenca->tipo_licenca) == 'assinatura' ? 'selected' : '' }}>Assinatura / Renovável</option>
-                                    <option value="vitalicia" {{ old('tipo_licenca', $licenca->tipo_licenca) == 'vitalicia' ? 'selected' : '' }}>Vitalícia / Permanente</option>
+                                    <option value="assinatura" {{ strtolower(old('tipo_licenca', $licenca->tipo_licenca)) == 'assinatura' ? 'selected' : '' }}>Assinatura / Renovável</option>
+                                    <option value="vitalicia" {{ strtolower(old('tipo_licenca', $licenca->tipo_licenca)) == 'vitalicia' ? 'selected' : '' }}>Vitalícia / Permanente</option>
                                 </select>
                                 @error('tipo_licenca') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>

@@ -29,19 +29,25 @@ class AtivoLicencaController extends Controller
 
     public function storeAquisicao(Request $request)
     {
-        // Sanitize numeric inputs (replace , with .)
+        // Sanitize numeric inputs (replace , with .) and handle empty strings
         if ($request->has('valor_frete')) {
-            $request->merge(['valor_frete' => str_replace(',', '.', $request->valor_frete)]);
+            $val = $request->valor_frete !== null ? str_replace(',', '.', $request->valor_frete) : null;
+            $request->merge(['valor_frete' => ($val === '' ? null : $val)]);
         }
         if ($request->has('valor_total')) {
-            $request->merge(['valor_total' => str_replace(',', '.', $request->valor_total)]);
+            $val = $request->valor_total !== null ? str_replace(',', '.', $request->valor_total) : null;
+            $request->merge(['valor_total' => ($val === '' ? null : $val)]);
         }
         
         if ($request->has('itens')) {
             $itens = $request->itens;
             foreach ($itens as $i => $item) {
                 if (isset($item['valor_unitario'])) {
-                    $itens[$i]['valor_unitario'] = str_replace(',', '.', $item['valor_unitario']);
+                    $val = str_replace(',', '.', $item['valor_unitario']);
+                    $itens[$i]['valor_unitario'] = ($val === '' ? null : $val);
+                }
+                if (isset($item['tipo_licenca'])) {
+                    $itens[$i]['tipo_licenca'] = $item['tipo_licenca'] !== null ? strtolower($item['tipo_licenca']) : null;
                 }
             }
             $request->merge(['itens' => $itens]);
@@ -140,6 +146,19 @@ class AtivoLicencaController extends Controller
 
     public function store(Request $request)
     {
+        // Sanitize numeric inputs (replace , with .) and handle empty strings
+        if ($request->has('valor_frete')) {
+            $val = $request->valor_frete !== null ? str_replace(',', '.', $request->valor_frete) : null;
+            $request->merge(['valor_frete' => ($val === '' ? null : $val)]);
+        }
+        if ($request->has('valor_total')) {
+            $val = $request->valor_total !== null ? str_replace(',', '.', $request->valor_total) : null;
+            $request->merge(['valor_total' => ($val === '' ? null : $val)]);
+        }
+        if ($request->has('tipo_licenca')) {
+            $request->merge(['tipo_licenca' => $request->tipo_licenca !== null ? strtolower($request->tipo_licenca) : null]);
+        }
+
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
             'chave' => 'nullable|string|max:255',
@@ -172,6 +191,19 @@ class AtivoLicencaController extends Controller
 
     public function update(Request $request, AtivoLicenca $licenca)
     {
+        // Sanitize numeric inputs (replace , with .) and handle empty strings
+        if ($request->has('valor_frete')) {
+            $val = $request->valor_frete !== null ? str_replace(',', '.', $request->valor_frete) : null;
+            $request->merge(['valor_frete' => ($val === '' ? null : $val)]);
+        }
+        if ($request->has('valor_total')) {
+            $val = $request->valor_total !== null ? str_replace(',', '.', $request->valor_total) : null;
+            $request->merge(['valor_total' => ($val === '' ? null : $val)]);
+        }
+        if ($request->has('tipo_licenca')) {
+            $request->merge(['tipo_licenca' => $request->tipo_licenca !== null ? strtolower($request->tipo_licenca) : null]);
+        }
+
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
             'chave' => 'nullable|string|max:255',

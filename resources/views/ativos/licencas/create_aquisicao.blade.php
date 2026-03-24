@@ -149,8 +149,8 @@
                                 <div class="col-md-3">
                                     <div class="form-floating">
                                         <select name="itens[{{ $index }}][tipo_licenca]" class="form-select @error("itens.{$index}.tipo_licenca") is-invalid @enderror" required>
-                                            <option value="assinatura" {{ $item['tipo_licenca'] == 'assinatura' ? 'selected' : '' }}>Assinatura / Renovável</option>
-                                            <option value="vitalicia" {{ $item['tipo_licenca'] == 'vitalicia' ? 'selected' : '' }}>Vitalícia / Permanente</option>
+                                            <option value="assinatura" {{ strtolower($item['tipo_licenca']) == 'assinatura' ? 'selected' : '' }}>Assinatura / Renovável</option>
+                                            <option value="vitalicia" {{ strtolower($item['tipo_licenca']) == 'vitalicia' ? 'selected' : '' }}>Vitalícia / Permanente</option>
                                         </select>
                                         <label class="text-muted small fw-bold">Tipo de Licença *</label>
                                         @error("itens.{$index}.tipo_licenca") <div class="invalid-feedback">{{ $message }}</div> @enderror
