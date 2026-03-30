@@ -54,7 +54,7 @@ class AtivoAquisicaoController extends Controller
     public function store(Request $request)
     {
         if ($request->has('chave_acesso') && $request->chave_acesso !== null) {
-            $request->merge(['chave_acesso' => str_replace(' ', '', $request->chave_acesso)]);
+            $request->merge(['chave_acesso' => preg_replace('/[^0-9]/', '', $request->chave_acesso)]);
         }
 
         $validated = $request->validate([
@@ -160,7 +160,7 @@ class AtivoAquisicaoController extends Controller
         $aquisicao = AtivoAquisicao::findOrFail($id);
 
         if ($request->has('chave_acesso') && $request->chave_acesso !== null) {
-            $request->merge(['chave_acesso' => str_replace(' ', '', $request->chave_acesso)]);
+            $request->merge(['chave_acesso' => preg_replace('/[^0-9]/', '', $request->chave_acesso)]);
         }
 
         $validated = $request->validate([
