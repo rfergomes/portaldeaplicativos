@@ -111,9 +111,15 @@
                 <td>{{ $equipamento->aquisicao->numero_nf ?? 'Sem NF vinculada' }}</td>
             </tr>
             <tr>
-                <th>Valor Aprox.</th>
-                <td>R$ {{ number_format($equipamento->valor_nota, 2, ',', '.') }}</td>
+                <th>Valor de Aquisição</th>
+                <td>R$ {{ number_format((float)$equipamento->valor_item, 2, ',', '.') }}</td>
             </tr>
+            @if($equipamento->is_depreciavel)
+            <tr>
+                <th>Valor Contábil Residual</th>
+                <td>R$ {{ number_format((float)$equipamento->valor_atual, 2, ',', '.') }}</td>
+            </tr>
+            @endif
         </table>
     </div>
 

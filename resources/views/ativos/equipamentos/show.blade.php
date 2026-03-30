@@ -137,12 +137,15 @@
                 <div class="card-body pt-0">
                     <div class="mb-3">
                         <div class="d-flex justify-content-between mb-1 small">
-                            <span class="text-muted">Progresso ({{ min(100, round(($equipamento->meses_uso / $equipamento->vida_util_meses) * 100)) }}%)</span>
+                            @php
+                                $vidaUtilSafe = max(1, $equipamento->vida_util_meses ?? 1);
+                                $percent = min(100, ($equipamento->meses_uso / $vidaUtilSafe) * 100);
+                            @endphp
+                            <span class="text-muted">Progresso ({{ round($percent) }}%)</span>
                             <span class="fw-bold">{{ $equipamento->meses_uso }} / {{ $equipamento->vida_util_meses }} meses</span>
                         </div>
                         <div class="progress" style="height: 10px;">
                             @php
-                                $percent = min(100, ($equipamento->meses_uso / $equipamento->vida_util_meses) * 100);
                                 $progressClass = $percent >= 100 ? 'bg-danger' : ($percent >= 80 ? 'bg-warning' : 'bg-success');
                             @endphp
                             <div class="progress-bar {{ $progressClass }}" role="progressbar" style="width: {{ $percent }}%"></div>

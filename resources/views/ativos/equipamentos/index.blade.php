@@ -63,7 +63,7 @@
                             <th class="ps-4">ID</th>
                             <th>Descrição</th>
                             <th>Modelo / Série</th>
-                            <th>Nº Doc. fiscal</th>
+                            <th>Aquisição / Valor</th>
                             <th>Status</th>
                             <th>Localização</th>
                             <th class="text-end pe-4">Ações</th>
@@ -84,11 +84,16 @@
                                 <div class="small text-muted">SN: {{ $equipamento->numero_serie ?? '-' }}</div>
                             </td>
                             <td>
-                                @if($equipamento->valor_nota)
-                                    <span class="badge bg-secondary-subtle text-secondary border">{{ $equipamento->valor_nota }}</span>
-                                @else
-                                    <span class="text-muted small">Sem Nota</span>
-                                @endif
+                                <div>
+                                    @if($equipamento->valor_nota)
+                                        <span class="badge bg-secondary-subtle text-secondary border mb-1" title="Nº Nota Fiscal"><i class="fa-solid fa-file-invoice me-1"></i>{{ $equipamento->valor_nota }}</span>
+                                    @else
+                                        <span class="text-muted small mb-1 d-block">Sem Nota</span>
+                                    @endif
+                                </div>
+                                <div class="small fw-bold {{ $equipamento->is_depreciavel ? 'text-primary' : 'text-muted' }}" title="Valor Contábil Atual">
+                                    R$ {{ number_format($equipamento->valor_atual, 2, ',', '.') }}
+                                </div>
                             </td>
                             <td>
                                 @php

@@ -18,8 +18,9 @@
                 @csrf
                 @method('PUT')
                 <div class="card-body">
-                    <h5 class="card-title mb-4 pb-2 border-bottom text-primary">Informações Básicas</h5>
+                    
                     <div class="row g-3">
+                        <h5 class="card-title mt-5 pb-2 border-bottom bg-secondary text-white rounded p-2">Informações Básicas</h5>
                         <div class="col-md-12">
                             <label class="form-label small fw-bold">Descrição Curta</label>
                             <input type="text" name="descricao" class="form-control shadow-none" value="{{ old('descricao', $equipamento->descricao) }}" placeholder="Ex: Notebook Dell Latitude 3420" required>
@@ -54,8 +55,9 @@
                         </div>
                     </div>
 
-                    <h5 class="card-title mt-5 mb-4 pb-2 border-bottom text-primary">Localização / Estação de Trabalho</h5>
+                    
                     <div class="row g-3">
+                        <h5 class="card-title mt-5 pb-2 border-bottom bg-secondary text-white rounded p-2">Localização / Estação de Trabalho</h5>
                         <div class="col-md-12">
                             <label class="form-label small fw-bold">Estação de Trabalho</label>
                             <select name="estacao_id" class="form-select shadow-none">
@@ -72,8 +74,9 @@
                         </div>
                     </div>
 
-                    <h5 class="card-title mt-5 mb-4 pb-2 border-bottom text-primary">Dados de Aquisição</h5>
+                    
                     <div class="row g-3">
+                        <h5 class="card-title mt-5 pb-2 border-bottom bg-secondary text-white rounded p-2">Dados de Aquisição</h5>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Fornecedor</label>
                             <select name="fornecedor_id" class="form-select shadow-none">
@@ -102,8 +105,9 @@
                         </div>
                     </div>
 
-                    <h5 class="card-title mt-5 mb-4 pb-2 border-bottom text-primary">Acessórios e Observações</h5>
+                    
                     <div class="row g-3">
+                        <h5 class="card-title mt-5 pb-2 border-bottom bg-secondary text-white rounded p-2">Acessórios e Observações</h5>
                         <div class="col-md-12">
                             <label class="form-label small fw-bold">Acessórios Inclusos</label>
                             <input type="text" name="acessorios" class="form-control shadow-none" value="{{ old('acessorios', $equipamento->acessorios) }}" placeholder="Ex: Mouse, Teclado, Fonte de Energia, Maleta">
@@ -115,8 +119,9 @@
                         </div>
                     </div>
 
-                    <h5 class="card-title mt-5 mb-4 pb-2 border-bottom text-primary">Cálculo de Depreciação (Contábil)</h5>
+                    
                     <div class="row g-3">
+                        <h5 class="card-title mt-5 pb-2 border-bottom bg-secondary text-white rounded p-2">Cálculo de Depreciação (Contábil)</h5>
                         <div class="col-md-12 mb-2">
                             <div class="form-check form-switch mt-2">
                                 <input type="hidden" name="is_depreciavel" value="0">

@@ -124,7 +124,7 @@ class AtivoEquipamento extends Model
      */
     public function getDepreciacaoAcumuladaAttribute()
     {
-        if (!$this->is_depreciavel) return 0;
+        if (!$this->is_depreciavel || !$this->vida_util_meses) return 0;
 
         $meses = min($this->meses_uso, $this->vida_util_meses);
 
@@ -149,7 +149,7 @@ class AtivoEquipamento extends Model
      */
     public function getTotalmenteDepreciadoAttribute()
     {
-        if (!$this->is_depreciavel) return false;
+        if (!$this->is_depreciavel || !$this->vida_util_meses) return false;
         
         return $this->meses_uso >= $this->vida_util_meses;
     }
