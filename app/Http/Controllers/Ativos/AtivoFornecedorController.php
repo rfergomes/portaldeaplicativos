@@ -10,9 +10,20 @@ class AtivoFornecedorController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $fornecedores = \App\Models\AtivoFornecedor::withCount('equipamentos')->orderBy('nome')->get();
+        $query = \App\Models\AtivoFornecedor::withCount('equipamentos');
+
+        if ($request->filled('nome')) {
+            $query->where('nome', 'like', '%' . $request->nome . '%');
+        }
+
+        if ($request->filled('cnpj')) {
+            $query->where('cnpj', 'like', '%' . $request->cnpj . '%');
+        }
+
+        $fornecedores = $query->orderBy('nome')->paginate(15)->appends($request->all());
+
         return view('ativos.fornecedores.index', compact('fornecedores'));
     }
 

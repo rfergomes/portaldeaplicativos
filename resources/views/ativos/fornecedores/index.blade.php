@@ -18,6 +18,32 @@
         @endcan
     </div>
 
+    <!-- Filtros -->
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+            <form action="{{ route('ativos.fornecedores.index') }}" method="GET" class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label small fw-bold">Razão Social / Nome</label>
+                    <input type="text" name="nome" class="form-control shadow-none" placeholder="Ex: Dell, Kalunga..." value="{{ request('nome') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">CNPJ</label>
+                    <input type="text" name="cnpj" class="form-control shadow-none" placeholder="Apenas números ou formatado..." value="{{ request('cnpj') }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-dark w-100">
+                        <i class="fa-solid fa-magnifying-glass me-2"></i>Filtrar
+                    </button>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <a href="{{ route('ativos.fornecedores.index') }}" class="btn btn-outline-secondary w-100">
+                        Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -76,13 +102,21 @@
 
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">Nenhum fornecedor cadastrado.</td>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-inbox fa-3x mb-3 opacity-25"></i>
+                                <p>Nenhum fornecedor encontrado.</p>
+                            </td>
                         </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
+        @if($fornecedores->hasPages())
+        <div class="card-footer bg-white border-0 py-3">
+            {{ $fornecedores->links() }}
+        </div>
+        @endif
     </div>
 </div>
 
