@@ -30,12 +30,20 @@ class AtivoEquipamento extends Model
         'estacao_id',
         'observacao',
         'acessorios',
+        'is_depreciavel',
+        'valor_residual',
+        'vida_util_meses',
+        'metodo_depreciacao',
+        'categoria_depreciacao',
     ];
 
     protected $casts = [
         'data_compra' => 'date',
         'data_devolucao_prevista' => 'date',
         'valor_item' => 'decimal:2',
+        'valor_residual' => 'decimal:2',
+        'is_depreciavel' => 'boolean',
+        'vida_util_meses' => 'integer',
     ];
 
     public function estacao()
@@ -83,5 +91,66 @@ class AtivoEquipamento extends Model
     public function ultimaMovimentacao()
     {
         return $this->hasOne(AtivoMovimentacao::class, 'equipamento_id')->latestOfMany();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Depreciation Accessors (Calculated on the fly)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Get months since purchase.
+     */
+    public function getMesesUsoAttribute()
+    {
+        if (!$this->data_compra) return 0;
+        
+        return $this->data_compra->diffInMonths(now());
+    }
+
+    /**
+     * Get monthly depreciation value.
+     */
+    public function getDepreciacaoMensalAttribute()
+    {
+        if (!$this->is_depreciavel || !$this->valor_item || !$this->vida_util_meses) return 0;
+
+        return ($this->valor_item - ($this->valor_residual ?? 0)) / $this->vida_util_meses;
+    }
+
+    /**
+     * Get total accumulated depreciation.
+     */
+    public function getDepreciacaoAcumuladaAttribute()
+    {
+        if (!$this->is_depreciavel) return 0;
+
+        $meses = min($this->meses_uso, $this->vida_util_meses);
+
+        return $meses * $this->depreciacao_mensal;
+    }
+
+    /**
+     * Get current book value.
+     */
+    public function getValorAtualAttribute()
+    {
+        if (!$this->is_depreciavel) return $this->valor_item;
+
+        return max(
+            $this->valor_item - $this->depreciacao_acumulada,
+            $this->valor_residual ?? 0
+        );
+    }
+
+    /**
+     * Check if asset is fully depreciated.
+     */
+    public function getTotalmenteDepreciadoAttribute()
+    {
+        if (!$this->is_depreciavel) return false;
+        
+        return $this->meses_uso >= $this->vida_util_meses;
     }
 }

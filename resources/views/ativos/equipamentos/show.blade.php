@@ -100,7 +100,7 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white border-0 py-3">
                     <h5 class="mb-0 fw-bold"><i class="fa-solid fa-receipt me-2 text-primary"></i>Aquisição</h5>
                 </div>
@@ -125,6 +125,51 @@
                     </ul>
                 </div>
             </div>
+
+            @if($equipamento->is_depreciavel)
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-chart-line me-2 text-primary"></i>Depreciação Contábil</h5>
+                    @if($equipamento->totalmente_depreciado)
+                        <span class="badge bg-danger">TOTAL</span>
+                    @endif
+                </div>
+                <div class="card-body pt-0">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1 small">
+                            <span class="text-muted">Progresso ({{ min(100, round(($equipamento->meses_uso / $equipamento->vida_util_meses) * 100)) }}%)</span>
+                            <span class="fw-bold">{{ $equipamento->meses_uso }} / {{ $equipamento->vida_util_meses }} meses</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            @php
+                                $percent = min(100, ($equipamento->meses_uso / $equipamento->vida_util_meses) * 100);
+                                $progressClass = $percent >= 100 ? 'bg-danger' : ($percent >= 80 ? 'bg-warning' : 'bg-success');
+                            @endphp
+                            <div class="progress-bar {{ $progressClass }}" role="progressbar" style="width: {{ $percent }}%"></div>
+                        </div>
+                    </div>
+
+                    <ul class="list-group list-group-flush small">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">Depreciação Mensal</span>
+                            <span class="fw-bold">R$ {{ number_format($equipamento->depreciacao_mensal, 2, ',', '.') }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">Acumulada</span>
+                            <span class="fw-bold">R$ {{ number_format($equipamento->depreciacao_acumulada, 2, ',', '.') }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">Valor Residual</span>
+                            <span class="fw-bold">R$ {{ number_format($equipamento->valor_residual, 2, ',', '.') }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 bg-light p-2 rounded">
+                            <span class="text-muted fw-bold">Valor Contábil Atual</span>
+                            <span class="fw-bold text-primary" style="font-size: 1.1rem;">R$ {{ number_format($equipamento->valor_atual, 2, ',', '.') }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            @endif
         </div>
 
         <!-- Coluna da Direita: Histórico e Ações -->

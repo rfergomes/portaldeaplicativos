@@ -51,6 +51,14 @@ class AtivoEquipamentoController extends Controller
 
     public function store(Request $request)
     {
+        // Sanitize numeric inputs
+        if ($request->has('valor_item') && $request->valor_item !== null) {
+            $request->merge(['valor_item' => str_replace(',', '.', $request->valor_item)]);
+        }
+        if ($request->has('valor_residual') && $request->valor_residual !== null) {
+            $request->merge(['valor_residual' => str_replace(',', '.', $request->valor_residual)]);
+        }
+
         $validated = $request->validate([
             'identificador' => 'nullable|string|max:50',
             'descricao' => 'required|string|max:255',
@@ -65,6 +73,11 @@ class AtivoEquipamentoController extends Controller
             'garantia_meses' => 'nullable|integer',
             'acessorios' => 'nullable|string',
             'observacao' => 'nullable|string',
+            'is_depreciavel' => 'boolean',
+            'valor_residual' => 'nullable|numeric|min:0',
+            'vida_util_meses' => 'nullable|integer|min:0',
+            'metodo_depreciacao' => 'nullable|string|max:50',
+            'categoria_depreciacao' => 'nullable|string|max:50',
         ]);
 
         \App\Models\AtivoEquipamento::create($validated);
@@ -91,6 +104,14 @@ class AtivoEquipamentoController extends Controller
     {
         $equipamento = \App\Models\AtivoEquipamento::findOrFail($id);
 
+        // Sanitize numeric inputs
+        if ($request->has('valor_item') && $request->valor_item !== null) {
+            $request->merge(['valor_item' => str_replace(',', '.', $request->valor_item)]);
+        }
+        if ($request->has('valor_residual') && $request->valor_residual !== null) {
+            $request->merge(['valor_residual' => str_replace(',', '.', $request->valor_residual)]);
+        }
+
         $validated = $request->validate([
             'identificador' => 'nullable|string|max:50',
             'descricao' => 'required|string|max:255',
@@ -106,6 +127,11 @@ class AtivoEquipamentoController extends Controller
             'status' => 'required|in:disponivel,em_uso,manutencao,baixado',
             'acessorios' => 'nullable|string',
             'observacao' => 'nullable|string',
+            'is_depreciavel' => 'boolean',
+            'valor_residual' => 'nullable|numeric|min:0',
+            'vida_util_meses' => 'nullable|integer|min:0',
+            'metodo_depreciacao' => 'nullable|string|max:50',
+            'categoria_depreciacao' => 'nullable|string|max:50',
         ]);
 
         $equipamento->update($validated);

@@ -104,7 +104,58 @@
                             <textarea name="observacao" class="form-control shadow-none" rows="3" placeholder="Detalhes adicionais, histórico de compras, avarias prévias..."></textarea>
                         </div>
                     </div>
+
+                    <h5 class="card-title mt-5 mb-4 pb-2 border-bottom text-primary">Cálculo de Depreciação (Contábil)</h5>
+                    <div class="row g-3">
+                        <div class="col-md-12 mb-2">
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" name="is_depreciavel" id="is_depreciavel" value="1" checked>
+                                <label class="form-check-label fw-bold small" for="is_depreciavel">Este item está sujeito a depreciação?</label>
+                            </div>
+                        </div>
+
+                        <div id="depreciation_fields" class="row g-3 m-0 p-0">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Categoria</label>
+                                <select name="categoria_depreciacao" id="categoria_depreciacao" class="form-select shadow-none">
+                                    <option value="">Selecione a Categoria</option>
+                                    <option value="informatica">Informática (Padrão 5 anos)</option>
+                                    <option value="telefonia">Telefonia (Padrão 10 anos)</option>
+                                    <option value="outros">Outros / Personalizado</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Vida Útil (Meses)</label>
+                                <input type="number" name="vida_util_meses" id="vida_util_meses" class="form-control shadow-none" value="60" placeholder="60">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Valor Residual (R$)</label>
+                                <input type="number" step="0.01" name="valor_residual" class="form-control shadow-none" value="1.00" placeholder="1.00">
+                                <div class="form-text small">Valor mínimo após depreciação total.</div>
+                            </div>
+                            <input type="hidden" name="metodo_depreciacao" value="linear">
+                        </div>
+                    </div>
                 </div>
+
+                @push('scripts')
+                <script>
+                    document.getElementById('is_depreciavel').addEventListener('change', function() {
+                        const fields = document.getElementById('depreciation_fields');
+                        fields.style.opacity = this.checked ? '1' : '0.5';
+                        fields.querySelectorAll('input, select').forEach(el => el.disabled = !this.checked);
+                    });
+
+                    document.getElementById('categoria_depreciacao').addEventListener('change', function() {
+                        const lifeInput = document.getElementById('vida_util_meses');
+                        if (this.value === 'informatica') {
+                            lifeInput.value = 60;
+                        } else if (this.value === 'telefonia') {
+                            lifeInput.value = 120;
+                        }
+                    });
+                </script>
+                @endpush
                 <div class="card-footer bg-light py-3 text-end">
                     <a href="{{ route('ativos.equipamentos.index') }}" class="btn btn-light border me-2">Cancelar</a>
                     <button type="submit" class="btn btn-primary px-4">
