@@ -53,6 +53,10 @@ class AtivoAquisicaoController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->has('chave_acesso') && $request->chave_acesso !== null) {
+            $request->merge(['chave_acesso' => str_replace(' ', '', $request->chave_acesso)]);
+        }
+
         $validated = $request->validate([
             // Cabeçalho
             'numero_nf' => 'nullable|string|max:255',
@@ -154,6 +158,10 @@ class AtivoAquisicaoController extends Controller
     public function update(Request $request, $id)
     {
         $aquisicao = AtivoAquisicao::findOrFail($id);
+
+        if ($request->has('chave_acesso') && $request->chave_acesso !== null) {
+            $request->merge(['chave_acesso' => str_replace(' ', '', $request->chave_acesso)]);
+        }
 
         $validated = $request->validate([
             'numero_nf' => 'nullable|string|max:255',

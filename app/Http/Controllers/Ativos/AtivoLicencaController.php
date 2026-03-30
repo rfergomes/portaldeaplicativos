@@ -29,6 +29,10 @@ class AtivoLicencaController extends Controller
 
     public function storeAquisicao(Request $request)
     {
+        if ($request->has('chave_acesso') && $request->chave_acesso !== null) {
+            $request->merge(['chave_acesso' => str_replace(' ', '', $request->chave_acesso)]);
+        }
+
         // Sanitize numeric inputs (replace , with .) and handle empty strings
         if ($request->has('valor_frete')) {
             $val = $request->valor_frete !== null ? str_replace(',', '.', $request->valor_frete) : null;
@@ -146,6 +150,10 @@ class AtivoLicencaController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->has('chave_acesso') && $request->chave_acesso !== null) {
+            $request->merge(['chave_acesso' => str_replace(' ', '', $request->chave_acesso)]);
+        }
+
         // Sanitize numeric inputs (replace , with .) and handle empty strings
         if ($request->has('valor_frete')) {
             $val = $request->valor_frete !== null ? str_replace(',', '.', $request->valor_frete) : null;
@@ -191,6 +199,10 @@ class AtivoLicencaController extends Controller
 
     public function update(Request $request, AtivoLicenca $licenca)
     {
+        if ($request->has('chave_acesso') && $request->chave_acesso !== null) {
+            $request->merge(['chave_acesso' => str_replace(' ', '', $request->chave_acesso)]);
+        }
+
         // Sanitize numeric inputs (replace , with .) and handle empty strings
         if ($request->has('valor_frete')) {
             $val = $request->valor_frete !== null ? str_replace(',', '.', $request->valor_frete) : null;
