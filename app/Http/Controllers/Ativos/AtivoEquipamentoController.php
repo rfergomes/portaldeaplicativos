@@ -160,12 +160,29 @@ class AtivoEquipamentoController extends Controller
 
     public function gerarInventarioPdf()
     {
-        $equipamentos = \App\Models\AtivoEquipamento::with('aquisicao')
+        $equipamentosList = \App\Models\AtivoEquipamento::with(['aquisicao.fornecedor', 'fornecedor'])
             ->where('status', 'disponivel')
-            ->get()
-            ->groupBy(function($item) {
-                return $item->aquisicao->numero_nf ?? $item->valor_nota ?? 'SEM NOTA FISCAL';
-            });
+            ->get();
+
+        $equipamentosList = $equipamentosList->sortBy(function($item) {
+            $date = $item->aquisicao ? $item->aquisicao->data_aquisicao : $item->data_compra;
+            return $date ? $date->format('Y-m-d') : '9999-12-31';
+        });
+
+        $equipamentos = $equipamentosList->groupBy(function($item) {
+            $dataStr = '';
+            if ($item->aquisicao && $item->aquisicao->data_aquisicao) {
+                $dataStr = $item->aquisicao->data_aquisicao->format('d/m/Y');
+            } elseif ($item->data_compra) {
+                $dataStr = $item->data_compra->format('d/m/Y');
+            }
+            $data = $dataStr ?: 'S/ Data';
+            
+            $nf = $item->aquisicao ? ($item->aquisicao->numero_nf ?: 'Sem NF') : ($item->valor_nota ?: 'Sem NF');
+            $forn = $item->aquisicao && $item->aquisicao->fornecedor ? $item->aquisicao->fornecedor->nome : ($item->fornecedor ? $item->fornecedor->nome : 'Fornecedor N/D');
+            
+            return $data . '::' . $nf . '::' . $forn;
+        });
 
         $pdf = Pdf::loadView('ativos.equipamentos.pdf_inventario', compact('equipamentos'))
             ->setPaper('a4', 'portrait');

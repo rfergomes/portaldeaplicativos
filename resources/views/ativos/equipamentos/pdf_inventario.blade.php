@@ -79,18 +79,25 @@
         <div style="margin-top: 5px; font-weight: bold; color: #d9534f;">APENAS EQUIPAMENTOS DISPONÍVEIS NO ESTOQUE</div>
     </div>
 
-    @forelse($equipamentos as $nf => $itens)
-        <div class="nf-header">
-            NOTA FISCAL: {{ $nf }}
+    @forelse($equipamentos as $groupKey => $itens)
+        @php
+            $parts = explode('::', $groupKey);
+            $data = $parts[0] ?? 'S/ Data';
+            $nf = $parts[1] ?? 'Sem NF';
+            $forn = $parts[2] ?? 'Fornecedor N/D';
+        @endphp
+        <div class="nf-header" style="font-size: 11px;">
+            <span style="display:inline-block; width: 20%; color:#d9534f">DATA EMISSÃO: <span style="font-weight:normal; color:#333">{{ $data }}</span></span>
+            <span style="display:inline-block; width: 30%; color:#d9534f">Nº NOTA: <span style="font-weight:normal; color:#333">{{ $nf }}</span></span>
+            <span style="display:inline-block; width: 45%; color:#d9534f">FORNECEDOR: <span style="font-weight:normal; color:#333">{{ $forn }}</span></span>
         </div>
         <table>
             <thead>
                 <tr>
                     <th style="width: 5%;">ID</th>
-                    <th style="width: 30%;">DESCRIÇÃO</th>
-                    <th style="width: 15%;">MODELO</th>
-                    <th style="width: 15%;">Nº SÉRIE</th>
-                    <th style="width: 15%;">VALOR (R$)</th>
+                    <th style="width: 35%;">DESCRIÇÃO</th>
+                    <th style="width: 20%;">MODELO</th>
+                    <th style="width: 20%;">Nº SÉRIE</th>
                     <th style="width: 20%;">LOCALIDADE</th>
                 </tr>
             </thead>
@@ -101,7 +108,6 @@
                         <td>{{ $item->descricao }}</td>
                         <td>{{ $item->modelo ?? '-' }}</td>
                         <td>{{ $item->numero_serie ?? '-' }}</td>
-                        <td>{{ number_format($item->valor_atual, 2, ',', '.') }}</td>
                         <td style="background-color: #fff;"></td>
                     </tr>
                 @endforeach
