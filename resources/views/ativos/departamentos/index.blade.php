@@ -78,7 +78,7 @@
                                         <span class="badge bg-light text-primary border fw-bold">
                                             <i class="fa-solid fa-users me-1"></i>{{ $depto->usuarios_count }}
                                             <div class="progress progress-sm mt-1">
-                                                <div class="progress-bar bg-primary"
+                                                <div class="progress-bar progress-bar-striped bg-primary"
                                                     style="width: {{ $depto->usuarios_count }}%"></div>
                                             </div>
                                         </span>
@@ -87,7 +87,7 @@
                                         <span class="badge bg-light text-dark border fw-bold">
                                             <i class="fa-solid fa-laptop me-1"></i>{{ $depto->equipamentos_count }}
                                             <div class="progress progress-sm mt-1">
-                                                <div class="progress-bar bg-primary"
+                                                <div class="progress-bar progress-bar-striped bg-primary"
                                                     style="width: {{ $depto->equipamentos_count }}%"></div>
                                             </div>
                                         </span>

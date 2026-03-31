@@ -21,6 +21,66 @@
         </div>
     </div>
 
+    <!-- Cards Informativos -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-success h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-success text-uppercase">Disponíveis</div>
+                        <i class="fa-solid fa-check-circle text-success opacity-50"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $totalDisponivel }}</div>
+                    <div class="progress progress-sm mt-3 shadow-sm">
+                        <div class="progress-bar bg-success" style="width: {{ $totalGeral > 0 ? ($totalDisponivel / $totalGeral) * 100 : 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-primary text-uppercase">Em Uso</div>
+                        <i class="fa-solid fa-laptop text-primary opacity-50"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $totalEmUso }}</div>
+                    <div class="progress progress-sm mt-3 shadow-sm">
+                        <div class="progress-bar bg-primary" style="width: {{ $totalGeral > 0 ? ($totalEmUso / $totalGeral) * 100 : 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-warning h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-warning text-uppercase">Manutenção</div>
+                        <i class="fa-solid fa-screwdriver-wrench text-warning opacity-50"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $totalManutencao }}</div>
+                    <div class="progress progress-sm mt-3 shadow-sm">
+                        <div class="progress-bar bg-warning" style="width: {{ $totalGeral > 0 ? ($totalManutencao / $totalGeral) * 100 : 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-danger h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-danger text-uppercase">Baixados</div>
+                        <i class="fa-solid fa-arrow-down text-danger opacity-50"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $totalBaixado }}</div>
+                    <div class="progress progress-sm mt-3 shadow-sm">
+                        <div class="progress-bar bg-danger" style="width: {{ $totalGeral > 0 ? ($totalBaixado / $totalGeral) * 100 : 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Filtros -->
     <div class="card shadow-sm mb-4 border-0">
         <div class="card-body">

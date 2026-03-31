@@ -38,7 +38,13 @@ class AtivoEquipamentoController extends Controller
 
         $equipamentos = $query->orderBy('id', 'asc')->paginate(15)->appends($request->all());
         
-        return view('ativos.equipamentos.index', compact('equipamentos'));
+        $totalDisponivel = \App\Models\AtivoEquipamento::where('status', 'disponivel')->count();
+        $totalEmUso = \App\Models\AtivoEquipamento::where('status', 'em_uso')->count();
+        $totalManutencao = \App\Models\AtivoEquipamento::where('status', 'manutencao')->count();
+        $totalBaixado = \App\Models\AtivoEquipamento::where('status', 'baixado')->count();
+        $totalGeral = $totalDisponivel + $totalEmUso + $totalManutencao + $totalBaixado;
+
+        return view('ativos.equipamentos.index', compact('equipamentos', 'totalDisponivel', 'totalEmUso', 'totalManutencao', 'totalBaixado', 'totalGeral'));
     }
 
     public function create()

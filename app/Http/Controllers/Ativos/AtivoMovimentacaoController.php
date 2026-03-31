@@ -49,7 +49,13 @@ class AtivoMovimentacaoController extends Controller
         $usuarios = \App\Models\AtivoUsuario::select('id', 'nome')->orderBy('nome')->get();
         $operadores = \App\Models\User::select('id', 'name')->orderBy('name')->get();
 
-        return view('ativos.movimentacoes.index', compact('movimentacoes', 'equipamentos', 'usuarios', 'operadores'));
+        // Estatísticas
+        $totalMovimentacoes = \App\Models\AtivoMovimentacao::count();
+        $movimentacoesMes = \App\Models\AtivoMovimentacao::whereMonth('data_movimentacao', date('m'))->whereYear('data_movimentacao', date('Y'))->count();
+        $emprestimosRealizados = \App\Models\AtivoMovimentacao::where('tipo', 'emprestimo')->count();
+        $baixasExecutadas = \App\Models\AtivoMovimentacao::where('tipo', 'baixa')->count();
+
+        return view('ativos.movimentacoes.index', compact('movimentacoes', 'equipamentos', 'usuarios', 'operadores', 'totalMovimentacoes', 'movimentacoesMes', 'emprestimosRealizados', 'baixasExecutadas'));
     }
 
     public function store(Request $request)

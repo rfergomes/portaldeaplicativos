@@ -19,6 +19,58 @@
         </div>
     </div>
 
+    <!-- Cards Informativos -->
+    <div class="row g-3 mb-4">
+        <!-- Card 1 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-primary text-uppercase">Licenças Adquiridas</div>
+                        <i class="fa-solid fa-key text-primary opacity-50 mt-1" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $totalLicencas }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-warning h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-warning text-uppercase">Expirando (30 dias) / Vencidas</div>
+                        <i class="fa-solid fa-bell text-warning opacity-50 mt-1" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold {{ $licencasExpirando > 0 ? 'text-danger' : 'text-gray-800' }}">{{ $licencasExpirando }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-info h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-info text-uppercase">Utilização Total (Seats)</div>
+                        <i class="fa-solid fa-users text-info opacity-50 mt-1" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $seatsEmUso }} / <span class="text-muted">{{ $totalSeats }}</span></div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-success h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-success text-uppercase">Custo Total Atual</div>
+                        <i class="fa-solid fa-dollar-sign text-success opacity-50 mt-1" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">R$ {{ number_format($custoSoftware, 2, ',', '.') }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Filtros -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body p-3">

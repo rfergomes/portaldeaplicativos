@@ -39,7 +39,13 @@ class AtivoAquisicaoController extends Controller
         $aquisicoes = $query->orderBy('data_aquisicao', 'desc')->paginate(20)->appends($request->all());
         $fornecedores = AtivoFornecedor::orderBy('nome')->get();
 
-        return view('ativos.aquisicoes.index', compact('aquisicoes', 'fornecedores'));
+        // Estatísticas
+        $totalNFs = AtivoAquisicao::count();
+        $totalInvestido = AtivoAquisicao::sum('valor_total');
+        $totalEquipamentos = AtivoEquipamento::whereNotNull('aquisicao_id')->count();
+        $investidoAno = AtivoAquisicao::whereYear('data_aquisicao', date('Y'))->sum('valor_total');
+
+        return view('ativos.aquisicoes.index', compact('aquisicoes', 'fornecedores', 'totalNFs', 'totalInvestido', 'totalEquipamentos', 'investidoAno'));
     }
 
     public function create()

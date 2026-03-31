@@ -40,7 +40,15 @@ class AtivoUsuarioController extends Controller
             ->get();
         $departamentos = \App\Models\AtivoDepartamento::where('ativo', true)->orderBy('nome')->get();
         
-        return view('ativos.usuarios.index', compact('usuarios', 'empresas', 'departamentos'));
+        // Estatísticas
+        $totalCessionarios = \App\Models\AtivoUsuario::count();
+        $empresasAtendidas = \App\Models\AtivoUsuario::whereNotNull('empresa_id')->distinct('empresa_id')->count('empresa_id');
+        $comEquipamento = \App\Models\AtivoUsuario::whereHas('movimentacoes', function($q) {
+            $q->whereIn('tipo', ['cessao', 'emprestimo']);
+        })->count();
+        $ativosNaEmpresa = \App\Models\AtivoUsuario::where('ativo', true)->count();
+
+        return view('ativos.usuarios.index', compact('usuarios', 'empresas', 'departamentos', 'totalCessionarios', 'empresasAtendidas', 'comEquipamento', 'ativosNaEmpresa'));
     }
 
     public function store(Request $request)

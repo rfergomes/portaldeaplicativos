@@ -74,7 +74,7 @@
                                             class="badge text-bg-light border shadow-sm px-2">#FAB_{{ $fab->id }}</span></td>
                                     <td class="fw-bold">{{ $fab->nome }}
                                         <div class="progress progress-sm">
-                                            <div class="progress-bar bg-primary" style="width: {{ $fab->equipamentos_count }}%">
+                                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width: {{ $fab->equipamentos_count }}%">
                                             </div>
                                         </div>
                                     </td>

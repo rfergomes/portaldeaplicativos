@@ -41,7 +41,7 @@
                                                 class="badge text-bg-info rounded-pill text-decoration-none">
                                                 <i class="fa-solid fa-bed me-1"></i> {{ $col->acomodacoes_count }} Unidades
                                                 <div class="progress progress-sm my-1 mx-2">
-                                                    <div class="progress-bar bg-warning"
+                                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
                                                         style="width: {{ $col->acomodacoes_count }}%"></div>
                                                 </div>
                                             </a>

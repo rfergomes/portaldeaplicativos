@@ -32,7 +32,16 @@ class AtivoLicencaController extends Controller
         $licencas = $query->orderBy('nome')->paginate(15);
         $fabricantes = AtivoFabricante::where('ativo', true)->orderBy('nome')->get();
             
-        return view('ativos.licencas.index', compact('licencas', 'fabricantes'));
+        // Estatísticas
+        $totalLicencas = AtivoLicenca::count();
+        $licencasExpirando = AtivoLicenca::whereNotNull('data_validade')
+            ->whereDate('data_validade', '<=', now()->addDays(30))
+            ->count();
+        $custoSoftware = AtivoLicenca::sum('valor_total');
+        $totalSeats = AtivoLicenca::sum('quantidade_seats');
+        $seatsEmUso = \Illuminate\Support\Facades\DB::table('ativo_licenca_equipamento')->count();
+
+        return view('ativos.licencas.index', compact('licencas', 'fabricantes', 'totalLicencas', 'licencasExpirando', 'custoSoftware', 'totalSeats', 'seatsEmUso'));
     }
 
     public function createAquisicao()

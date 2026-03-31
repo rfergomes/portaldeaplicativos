@@ -14,6 +14,58 @@
         </button>
     </div>
 
+    <!-- Cards Informativos -->
+    <div class="row g-3 mb-4">
+        <!-- Card 1 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-primary text-uppercase">Total de Estações</div>
+                        <i class="fa-solid fa-desktop text-primary opacity-50 mt-1" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $totalEstacoes }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-success h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-success text-uppercase">Estações Livres</div>
+                        <i class="fa-solid fa-chair text-success opacity-50 mt-1" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $estacoesLivres }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-warning h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-warning text-uppercase">Equipamentos Fixados</div>
+                        <i class="fa-solid fa-plug circle text-warning opacity-50 mt-1" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $equipamentosAlocados }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-info h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-info text-uppercase">Setores Mapeados</div>
+                        <i class="fa-solid fa-sitemap text-info opacity-50 mt-1" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $totalDepartamentos }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         @foreach($departamentos as $depto)
         <div class="col-12 mb-4">

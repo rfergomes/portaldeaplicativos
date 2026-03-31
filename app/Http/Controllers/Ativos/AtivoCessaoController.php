@@ -38,7 +38,16 @@ class AtivoCessaoController extends Controller
         $cessoes = $query->orderBy('data_cessao', 'desc')->paginate(15);
         $usuarios = AtivoUsuario::orderBy('nome')->get();
 
-        return view('ativos.cessoes.index', compact('cessoes', 'usuarios'));
+        // Estatísticas
+        $totalTermos = AtivoCessao::count();
+        $itensCedidos = AtivoEquipamento::where('status', 'em_uso')->count();
+        $cessionariosUnicos = AtivoCessao::distinct('usuario_id')->count('usuario_id');
+        $devolucoesAtrasadas = AtivoEquipamento::where('status', 'em_uso')
+                                ->whereNotNull('data_devolucao_prevista')
+                                ->whereDate('data_devolucao_prevista', '<', now())
+                                ->count();
+
+        return view('ativos.cessoes.index', compact('cessoes', 'usuarios', 'totalTermos', 'itensCedidos', 'cessionariosUnicos', 'devolucoesAtrasadas'));
     }
 
     public function store(Request $request)

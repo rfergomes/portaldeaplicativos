@@ -72,7 +72,7 @@
                                         <div class="fw-bold">{{ $forn->nome }}</div>
                                         <div class="small text-muted">{{ $forn->contato ?? 'Sem contato' }}</div>
                                         <div class="progress progress-sm">
-                                            <div class="progress-bar bg-primary"
+                                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
                                                 style="width: {{ $forn->equipamentos_count }}%"></div>
                                         </div>
                                     </td>

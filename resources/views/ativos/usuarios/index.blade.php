@@ -18,6 +18,58 @@
         @endcan
     </div>
 
+    <!-- Cards Informativos -->
+    <div class="row g-3 mb-4">
+        <!-- Card 1 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-primary text-uppercase">Total Cadastrados</div>
+                        <i class="fa-solid fa-users text-primary opacity-50 mt-1" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $totalCessionarios }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-success h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-success text-uppercase">Cessionários Ativos</div>
+                        <i class="fa-solid fa-user-check text-success opacity-50 mt-1" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $ativosNaEmpresa }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-warning h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-warning text-uppercase">C/ Equipamento</div>
+                        <i class="fa-solid fa-laptop-medical text-warning opacity-50 mt-1" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $comEquipamento }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-info h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-xs fw-bold text-info text-uppercase">Empresas Atendidas</div>
+                        <i class="fa-solid fa-building text-info opacity-50 mt-1" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ $empresasAtendidas }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Filtros -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body p-3">

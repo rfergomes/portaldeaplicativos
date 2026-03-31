@@ -15,7 +15,13 @@ class AtivoEstacaoController extends Controller
             ->where('ativo', true)
             ->get();
             
-        return view('ativos.estacoes.index', compact('departamentos'));
+        // Estatísticas
+        $totalEstacoes = AtivoEstacao::count();
+        $estacoesLivres = AtivoEstacao::doesntHave('equipamentos')->count();
+        $totalDepartamentos = AtivoDepartamento::count();
+        $equipamentosAlocados = \App\Models\AtivoEquipamento::whereNotNull('estacao_id')->count();
+
+        return view('ativos.estacoes.index', compact('departamentos', 'totalEstacoes', 'estacoesLivres', 'totalDepartamentos', 'equipamentosAlocados'));
     }
 
     public function store(Request $request)

@@ -36,7 +36,7 @@
                                         <div class="fw-bold">{{ $regiao->nome }}</div>
                                         <div class="progress-group">
                                             <div class="progress progress-sm">
-                                                <div class="progress-bar bg-primary"
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
                                                     style="width: {{ ($regiao->empresas_count / $totalEmpresas) * 100 }}%">
                                                 </div>
                                             </div>
@@ -51,7 +51,7 @@
                                         <div class="progress-group">
                                             <span class="badge text-bg-info text-white rounded-pill shadow-sm px-2">
                                                 {{ $regiao->empresas_count ?? 0 }} / {{ $totalEmpresas }} Empresas
-                                            </span>                                          
+                                            </span>
                                         </div>
                                     </td>
                                     <td class="text-end pe-4">
