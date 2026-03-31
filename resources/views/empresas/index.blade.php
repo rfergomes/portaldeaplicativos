@@ -127,7 +127,7 @@
                                             {{ $empresa->clientes_count }} Contato(s)
                                             <div class="progress progress-sm progress-bar-striped my-1 mx-1">
                                                 <div class="progress-bar bg-warning"
-                                                    style="width: {{ $empresa->clientes_count }}%"></div>
+                                                    style="width: {{ $empresa->clientes_count*100/10}}%"></div>
                                             </div>
                                         </span>
                                     </td>
