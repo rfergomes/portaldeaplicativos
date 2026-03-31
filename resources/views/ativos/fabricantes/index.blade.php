@@ -1,168 +1,234 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1 class="h3 mb-0 text-gray-800">
-                <i class="fa-solid fa-industry me-2 text-primary"></i>Fabricantes
-            </h1>
-            <p class="text-muted">Gerencie os fabricantes de seus equipamentos.</p>
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fa-solid fa-industry me-2 text-primary"></i>Fabricantes
+                </h1>
+                <p class="text-muted">Gerencie os fabricantes de seus equipamentos.</p>
+            </div>
+            @can('ativos.criar')
+                <div class="col-md-4 text-end">
+                    <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal"
+                        data-bs-target="#modalNovoFabricante">
+                        <i class="fa-solid fa-plus me-2"></i>Novo Fabricante
+                    </button>
+                </div>
+            @endcan
         </div>
-        @can('ativos.criar')
-        <div class="col-md-4 text-end">
-            <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNovoFabricante">
-                <i class="fa-solid fa-plus me-2"></i>Novo Fabricante
-            </button>
+
+        <!-- Filtros -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-3">
+                <form action="{{ route('ativos.fabricantes.index') }}" method="GET" class="row g-3 align-items-center">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i
+                                    class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                            <input type="text" name="search" class="form-control border-start-0 ps-0 shadow-none"
+                                placeholder="Buscar por nome..." value="{{ request('search') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="status" class="form-select shadow-none">
+                            <option value="">Todos os Status</option>
+                            <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Ativo</option>
+                            <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inativo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-auto">
+                        <button type="submit" class="btn btn-primary shadow-sm"><i
+                                class="fa-solid fa-filter me-2"></i>Filtrar</button>
+                    </div>
+                    @if(request()->anyFilled(['search', 'status']))
+                        <div class="col-md-auto">
+                            <a href="{{ route('ativos.fabricantes.index') }}" class="btn btn-light text-muted"><i
+                                    class="fa-solid fa-xmark me-2"></i>Limpar</a>
+                        </div>
+                    @endif
+                </form>
+            </div>
         </div>
-        @endcan
-    </div>
 
-    <!-- Tabela -->
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4" style="width: 80px;">ID</th>
-                            <th>Nome</th>
-                            <th>Site</th>
-                            <th>Equipamentos</th>
-                            <th>Status</th>
-                            <th class="text-end pe-4">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($fabricantes as $fab)
-                        <tr>
-                            <td class="ps-4"><span class="badge text-bg-light border shadow-sm px-2">#FAB_{{ $fab->id }}</span></td>
-                            <td class="fw-bold">{{ $fab->nome }}</td>
-                            <td>
-                                @if($fab->site)
-                                    <a href="{{ $fab->site }}" target="_blank" class="text-decoration-none small">
-                                        <i class="fa-solid fa-link me-1"></i>Visitar Site
-                                    </a>
-                                @else
-                                    <span class="text-muted small">Não informado</span>
-                                @endif
-                            </td>
-                            <td>
-                                <span class="badge bg-secondary-subtle text-secondary border rounded-pill px-2 py-1">
-                                    <i class="fa-solid fa-laptop me-1"></i> {{ $fab->equipamentos_count }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge {{ $fab->ativo ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
-                                    {{ $fab->ativo ? 'Ativo' : 'Inativo' }}
-                                </span>
-                            </td>
-                            <td class="text-end pe-4">
-                                @can('ativos.editar')
-                                <button type="button" class="btn btn-sm btn-white border" data-bs-toggle="modal" data-bs-target="#modalEditFab-{{ $fab->id }}">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </button>
-                                @endcan
-                                @can('ativos.excluir')
-                                <form action="{{ route('ativos.fabricantes.destroy', $fab->id) }}" method="POST" class="d-inline">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-white border text-danger" onclick="return confirm('Excluir este fabricante?')">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </form>
-                                @endcan
-                            </td>
-                        </tr>
+        <!-- Tabela -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4" style="width: 80px;">ID</th>
+                                <th>Nome</th>
+                                <th>Site</th>
+                                <th>Equipamentos</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($fabricantes as $fab)
+                                <tr>
+                                    <td class="ps-4"><span
+                                            class="badge text-bg-light border shadow-sm px-2">#FAB_{{ $fab->id }}</span></td>
+                                    <td class="fw-bold">{{ $fab->nome }}
+                                        <div class="progress progress-sm">
+                                            <div class="progress-bar bg-primary" style="width: {{ $fab->equipamentos_count }}%">
+                                            </div>
+                                        </div>
+                                    </td>
 
-                        @empty
-                        <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">Nenhum fabricante cadastrado.</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                                    <td>
+                                        @if($fab->site)
+                                            <a href="{{ $fab->site }}" target="_blank" class="text-decoration-none small">
+                                                <i class="fa-solid fa-link me-1"></i>Visitar Site
+                                            </a>
+                                        @else
+                                            <span class="text-muted small">Não informado</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary-subtle text-secondary border rounded-pill px-2 py-1">
+                                            <i class="fa-solid fa-laptop me-1"></i> {{ $fab->equipamentos_count }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="badge {{ $fab->ativo ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
+                                            {{ $fab->ativo ? 'Ativo' : 'Inativo' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        @can('ativos.editar')
+                                            <button type="button" class="btn btn-sm btn-white border" data-bs-toggle="modal"
+                                                data-bs-target="#modalEditFab-{{ $fab->id }}">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                        @endcan
+                                        @can('ativos.excluir')
+                                            <form action="{{ route('ativos.fabricantes.destroy', $fab->id) }}" method="POST"
+                                                class="d-inline">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-white border text-danger"
+                                                    onclick="return confirm('Excluir este fabricante?')">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endcan
+                                    </td>
+                                </tr>
+
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">Nenhum fabricante cadastrado.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                @if($fabricantes->hasPages())
+                    <div class="px-4 py-3 border-top">
+                        {{ $fabricantes->appends(request()->query())->links() }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modais de Edição (Fora da tabela) -->
-@foreach($fabricantes as $fab)
-<div class="modal fade" id="modalEditFab-{{ $fab->id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <form action="{{ route('ativos.fabricantes.update', $fab->id) }}" method="POST">
-                @csrf @method('PUT')
-                <div class="modal-header bg-primary text-white border-0 py-3">
-                    <h5 class="modal-title fw-bold">
-                        <i class="fa-solid fa-pen-to-square me-2"></i>Editar Fabricante
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Modais de Edição (Fora da tabela) -->
+    @foreach($fabricantes as $fab)
+        <div class="modal fade" id="modalEditFab-{{ $fab->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <form action="{{ route('ativos.fabricantes.update', $fab->id) }}" method="POST">
+                        @csrf @method('PUT')
+                        <div class="modal-header bg-primary text-white border-0 py-3">
+                            <h5 class="modal-title fw-bold">
+                                <i class="fa-solid fa-pen-to-square me-2"></i>Editar Fabricante
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="form-floating mb-3">
+                                <input type="text" name="nome" class="form-control bg-white shadow-none"
+                                    id="edit-fab-nome-{{ $fab->id }}" value="{{ $fab->nome }}" placeholder="Nome do Fabricante"
+                                    required>
+                                <label for="edit-fab-nome-{{ $fab->id }}" class="text-muted small fw-bold text-uppercase">Nome
+                                    do Fabricante</label>
+                            </div>
+                            <div class="form-floating mb-4">
+                                <input type="url" name="site" class="form-control bg-white shadow-none"
+                                    id="edit-fab-site-{{ $fab->id }}" value="{{ $fab->site }}" placeholder="Site (URL)">
+                                <label for="edit-fab-site-{{ $fab->id }}" class="text-muted small fw-bold text-uppercase">Site
+                                    (URL)</label>
+                            </div>
+                            <div class="bg-light p-3 rounded-3 border">
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input" type="checkbox" name="ativo" value="1"
+                                        id="edit-fab-ativo-{{ $fab->id }}" {{ $fab->ativo ? 'checked' : '' }}>
+                                    <label class="form-check-label fw-bold text-secondary"
+                                        for="edit-fab-ativo-{{ $fab->id }}">Fabricante Ativo no Sistema</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light border-0 py-3">
+                            <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none"
+                                data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
+                                <i class="fa-solid fa-check me-2"></i>Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div class="modal-body p-4">
-                    <div class="form-floating mb-3">
-                        <input type="text" name="nome" class="form-control bg-white shadow-none" id="edit-fab-nome-{{ $fab->id }}" value="{{ $fab->nome }}" placeholder="Nome do Fabricante" required>
-                        <label for="edit-fab-nome-{{ $fab->id }}" class="text-muted small fw-bold text-uppercase">Nome do Fabricante</label>
+            </div>
+        </div>
+    @endforeach
+
+    <!-- Modal Novo -->
+    <div class="modal fade" id="modalNovoFabricante" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <form action="{{ route('ativos.fabricantes.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-header bg-success text-white border-0 py-3">
+                        <h5 class="modal-title fw-bold">
+                            <i class="fa-solid fa-plus me-2"></i>Novo Fabricante
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
-                    <div class="form-floating mb-4">
-                        <input type="url" name="site" class="form-control bg-white shadow-none" id="edit-fab-site-{{ $fab->id }}" value="{{ $fab->site }}" placeholder="Site (URL)">
-                        <label for="edit-fab-site-{{ $fab->id }}" class="text-muted small fw-bold text-uppercase">Site (URL)</label>
-                    </div>
-                    <div class="bg-light p-3 rounded-3 border">
-                        <div class="form-check form-switch m-0">
-                            <input class="form-check-input" type="checkbox" name="ativo" value="1" id="edit-fab-ativo-{{ $fab->id }}" {{ $fab->ativo ? 'checked' : '' }}>
-                            <label class="form-check-label fw-bold text-secondary" for="edit-fab-ativo-{{ $fab->id }}">Fabricante Ativo no Sistema</label>
+                    <div class="modal-body p-4">
+                        <div class="form-floating mb-3">
+                            <input type="text" name="nome" class="form-control bg-white shadow-none" id="new-nome"
+                                placeholder="Nome do Fabricante" required>
+                            <label for="new-nome" class="text-muted small fw-bold text-uppercase">Nome do Fabricante</label>
+                        </div>
+                        <div class="form-floating mb-4">
+                            <input type="url" name="site" class="form-control bg-white shadow-none" id="new-site"
+                                placeholder="Site (opcional)">
+                            <label for="new-site" class="text-muted small fw-bold text-uppercase">Site (opcional)</label>
+                        </div>
+                        <div class="bg-light p-3 rounded-3 border">
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" name="ativo" value="1" id="new-ativo"
+                                    checked>
+                                <label class="form-check-label fw-bold text-secondary" for="new-ativo">Ativo no
+                                    Sistema</label>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer bg-light border-0 py-3">
-                    <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
-                        <i class="fa-solid fa-check me-2"></i>Salvar Alterações
-                    </button>
-                </div>
-            </form>
+                    <div class="modal-footer bg-light border-0 py-3">
+                        <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
+                            <i class="fa-solid fa-plus me-2"></i>Criar Fabricante
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-@endforeach
-
-<!-- Modal Novo -->
-<div class="modal fade" id="modalNovoFabricante" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <form action="{{ route('ativos.fabricantes.store') }}" method="POST">
-                @csrf
-                <div class="modal-header bg-success text-white border-0 py-3">
-                    <h5 class="modal-title fw-bold">
-                        <i class="fa-solid fa-plus me-2"></i>Novo Fabricante
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="form-floating mb-3">
-                        <input type="text" name="nome" class="form-control bg-white shadow-none" id="new-nome" placeholder="Nome do Fabricante" required>
-                        <label for="new-nome" class="text-muted small fw-bold text-uppercase">Nome do Fabricante</label>
-                    </div>
-                    <div class="form-floating mb-4">
-                        <input type="url" name="site" class="form-control bg-white shadow-none" id="new-site" placeholder="Site (opcional)">
-                        <label for="new-site" class="text-muted small fw-bold text-uppercase">Site (opcional)</label>
-                    </div>
-                    <div class="bg-light p-3 rounded-3 border">
-                        <div class="form-check form-switch m-0">
-                            <input class="form-check-input" type="checkbox" name="ativo" value="1" id="new-ativo" checked>
-                            <label class="form-check-label fw-bold text-secondary" for="new-ativo">Ativo no Sistema</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer bg-light border-0 py-3">
-                    <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
-                        <i class="fa-solid fa-plus me-2"></i>Criar Fabricante
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 @endsection

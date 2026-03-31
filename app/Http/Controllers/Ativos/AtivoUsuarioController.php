@@ -10,9 +10,31 @@ class AtivoUsuarioController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $usuarios = \App\Models\AtivoUsuario::with(['empresa', 'departamento'])->orderBy('nome')->get();
+        $query = \App\Models\AtivoUsuario::with(['empresa', 'departamento']);
+
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('nome', 'like', '%' . $request->search . '%')
+                  ->orWhere('cpf', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('ativo', $request->status);
+        }
+
+        if ($request->filled('empresa_id')) {
+            $query->where('empresa_id', $request->empresa_id);
+        }
+
+        if ($request->filled('departamento_id')) {
+            $query->where('departamento_id', $request->departamento_id);
+        }
+
+        $usuarios = $query->orderBy('nome')->paginate(15);
         $empresas = \App\Models\Empresa::where('ativo', true)
             ->orderBy('razao_social')
             ->get();

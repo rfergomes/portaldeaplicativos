@@ -40,6 +40,10 @@
                                             <a href="{{ route('agenda.colonias.acomodacoes.index', $col->id) }}"
                                                 class="badge text-bg-info rounded-pill text-decoration-none">
                                                 <i class="fa-solid fa-bed me-1"></i> {{ $col->acomodacoes_count }} Unidades
+                                                <div class="progress progress-sm my-1 mx-2">
+                                                    <div class="progress-bar bg-warning"
+                                                        style="width: {{ $col->acomodacoes_count }}%"></div>
+                                                </div>
                                             </a>
                                         </td>
                                         <td class="text-center">{{ $col->capacidade_total }} Pessoas</td>

@@ -18,6 +18,52 @@
         @endcan
     </div>
 
+    <!-- Filtros -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-3">
+            <form action="{{ route('ativos.usuarios.index') }}" method="GET" class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0 ps-0 shadow-none" placeholder="Nome, CPF ou E-mail..." value="{{ request('search') }}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select name="empresa_id" class="form-select shadow-none">
+                        <option value="">Todas as Empresas</option>
+                        @foreach($empresas as $emp)
+                            <option value="{{ $emp->id }}" {{ request('empresa_id') == $emp->id ? 'selected' : '' }}>{{ $emp->razao_social }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="departamento_id" class="form-select shadow-none">
+                        <option value="">Todos os Departamentos</option>
+                        @foreach($departamentos as $depto)
+                            <option value="{{ $depto->id }}" {{ request('departamento_id') == $depto->id ? 'selected' : '' }}>{{ $depto->nome }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="status" class="form-select shadow-none">
+                        <option value="">Todos os Status</option>
+                        <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Ativo</option>
+                        <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inativo</option>
+                    </select>
+                </div>
+                <div class="col-md-auto">
+                    <button type="submit" class="btn btn-primary shadow-sm"><i class="fa-solid fa-filter me-2"></i>Filtrar</button>
+                </div>
+                @if(request()->anyFilled(['search', 'empresa_id', 'departamento_id', 'status']))
+                <div class="col-md-auto">
+                    <a href="{{ route('ativos.usuarios.index') }}" class="btn btn-light text-muted"><i class="fa-solid fa-xmark me-2"></i>Limpar</a>
+                </div>
+                @endif
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabela -->
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -78,6 +124,12 @@
                     </tbody>
                 </table>
             </div>
+            
+            @if($usuarios->hasPages())
+            <div class="px-4 py-3 border-top">
+                {{ $usuarios->appends(request()->query())->links() }}
+            </div>
+            @endif
         </div>
     </div>
 </div>

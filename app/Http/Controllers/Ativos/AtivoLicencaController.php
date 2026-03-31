@@ -9,14 +9,30 @@ use Illuminate\Http\Request;
 
 class AtivoLicencaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $licencas = AtivoLicenca::with(['fabricante', 'fornecedor', 'aquisicao'])
-            ->withCount('equipamentos')
-            ->orderBy('nome')
-            ->paginate(15);
+        $query = AtivoLicenca::with(['fabricante', 'fornecedor', 'aquisicao'])
+            ->withCount('equipamentos');
+
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('nome', 'like', '%' . $request->search . '%')
+                  ->orWhere('chave', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('fabricante_id')) {
+            $query->where('fabricante_id', $request->fabricante_id);
+        }
+
+        if ($request->filled('tipo_licenca')) {
+            $query->where('tipo_licenca', $request->tipo_licenca);
+        }
+
+        $licencas = $query->orderBy('nome')->paginate(15);
+        $fabricantes = AtivoFabricante::where('ativo', true)->orderBy('nome')->get();
             
-        return view('ativos.licencas.index', compact('licencas'));
+        return view('ativos.licencas.index', compact('licencas', 'fabricantes'));
     }
 
     public function createAquisicao()

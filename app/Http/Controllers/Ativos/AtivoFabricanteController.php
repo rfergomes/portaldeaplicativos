@@ -10,9 +10,20 @@ class AtivoFabricanteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $fabricantes = \App\Models\AtivoFabricante::withCount('equipamentos')->orderBy('nome')->get();
+        $query = \App\Models\AtivoFabricante::withCount('equipamentos');
+
+        if ($request->filled('search')) {
+            $query->where('nome', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('status')) {
+            $query->where('ativo', $request->status);
+        }
+
+        $fabricantes = $query->orderBy('nome')->paginate(15);
+
         return view('ativos.fabricantes.index', compact('fabricantes'));
     }
 

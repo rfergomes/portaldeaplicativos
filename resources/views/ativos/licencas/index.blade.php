@@ -19,6 +19,43 @@
         </div>
     </div>
 
+    <!-- Filtros -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-3">
+            <form action="{{ route('ativos.licencas.index') }}" method="GET" class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0 ps-0 shadow-none" placeholder="Buscar por software ou chave..." value="{{ request('search') }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="fabricante_id" class="form-select shadow-none">
+                        <option value="">Todos os Fabricantes</option>
+                        @foreach($fabricantes as $fab)
+                            <option value="{{ $fab->id }}" {{ request('fabricante_id') == $fab->id ? 'selected' : '' }}>{{ $fab->nome }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="tipo_licenca" class="form-select shadow-none">
+                        <option value="">Todos os Tipos</option>
+                        <option value="vitalicia" {{ request('tipo_licenca') === 'vitalicia' ? 'selected' : '' }}>Vitalícia</option>
+                        <option value="assinatura" {{ request('tipo_licenca') === 'assinatura' ? 'selected' : '' }}>Assinatura</option>
+                    </select>
+                </div>
+                <div class="col-md-auto">
+                    <button type="submit" class="btn btn-primary shadow-sm"><i class="fa-solid fa-filter me-2"></i>Filtrar</button>
+                </div>
+                @if(request()->anyFilled(['search', 'fabricante_id', 'tipo_licenca']))
+                <div class="col-md-auto">
+                    <a href="{{ route('ativos.licencas.index') }}" class="btn btn-light text-muted"><i class="fa-solid fa-xmark me-2"></i>Limpar</a>
+                </div>
+                @endif
+            </form>
+        </div>
+    </div>
+
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -102,8 +139,8 @@
                 </table>
             </div>
             @if($licencas->hasPages())
-                <div class="card-footer bg-white border-0 py-3">
-                    {{ $licencas->links() }}
+                <div class="card-footer bg-white border-0 py-3 border-top">
+                    {{ $licencas->appends(request()->query())->links() }}
                 </div>
             @endif
         </div>

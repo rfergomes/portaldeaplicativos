@@ -20,7 +20,11 @@ class RegiaoController extends Controller
             ->orderBy('nome')
             ->paginate(15);
 
-        return view('regioes.index', compact('regioes', 'search'));
+        $totalEmpresas = \App\Models\Empresa::where('ativo', true)->count();
+        // Evitar divisão por zero se não houver empresas
+        $totalEmpresas = $totalEmpresas > 0 ? $totalEmpresas : 1;
+
+        return view('regioes.index', compact('regioes', 'search', 'totalEmpresas'));
     }
 
     public function store(Request $request)

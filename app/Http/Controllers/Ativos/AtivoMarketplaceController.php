@@ -7,9 +7,20 @@ use Illuminate\Http\Request;
 
 class AtivoMarketplaceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $marketplaces = \App\Models\AtivoMarketplace::orderBy('nome')->get();
+        $query = \App\Models\AtivoMarketplace::query();
+
+        if ($request->filled('search')) {
+            $query->where('nome', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('status')) {
+            $query->where('ativo', $request->status);
+        }
+
+        $marketplaces = $query->orderBy('nome')->paginate(15);
+
         return view('ativos.marketplaces.index', compact('marketplaces'));
     }
 

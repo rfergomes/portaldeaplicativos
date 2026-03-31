@@ -122,9 +122,13 @@
                                     </td>
                                     <td>{{ $empresa->cidade ?? '-' }}/{{ $empresa->estado ?? '-' }}</td>
                                     <td>
-                                        <span class="badge text-bg-info rounded-pill shadow-sm px-2">
+                                        <span class="badge text-bg-info rounded-pill shadow-sm px-3">
                                             <i class="fa-solid fa-users me-1"></i>
-                                            {{ $empresa->clientes_count }}
+                                            {{ $empresa->clientes_count }} Contato(s)
+                                            <div class="progress progress-sm my-1 mx-1">
+                                                <div class="progress-bar bg-warning"
+                                                    style="width: {{ $empresa->clientes_count }}%"></div>
+                                            </div>
                                         </span>
                                     </td>
                                     <td>
