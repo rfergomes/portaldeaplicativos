@@ -80,7 +80,7 @@
                                 <div class="d-flex align-items-center text-truncate">
                                     <i class="fa-solid fa-file-{{ str_contains($anexo->mime_type, 'pdf') ? 'pdf text-danger' : (str_contains($anexo->mime_type, 'image') ? 'image text-success' : 'lines text-secondary') }} fs-4 me-3"></i>
                                     <div>
-                                        <a href="{{ asset('storage/' . $anexo->caminho) }}" target="_blank" class="fw-bold text-decoration-none text-dark d-block text-truncate" style="max-width: 200px;" title="{{ $anexo->nome_original }}">
+                                        <a href="{{ route('ativos.anexos.download', [$anexo->id, Str::slug(pathinfo($anexo->nome_original, PATHINFO_FILENAME)) . '.' . pathinfo($anexo->nome_original, PATHINFO_EXTENSION)]) }}" target="_blank" class="fw-bold text-decoration-none text-dark d-block text-truncate" style="max-width: 200px;" title="{{ $anexo->nome_original }}">
                                             {{ $anexo->nome_original }}
                                         </a>
                                         <small class="text-muted">{{ number_format($anexo->tamanho / 1024, 2) }} KB</small>
