@@ -292,8 +292,12 @@
                 <div class="modal-body pt-4">
                     <!-- Step 1: Selecionar Ativos -->
                     <div id="step1">
-                        <p class="text-muted small mb-4">Selecione os ativos com status "Disponível" que deseja emprestar.</p>
+                        <p class="text-muted small mb-3">Selecione os ativos com status "Disponível" que deseja emprestar.</p>
                         
+                        <div class="mb-3">
+                            <input type="text" id="filtroTabelaMultipla" class="form-control form-control-sm" placeholder="Buscar por ID, Descrição ou Modelo...">
+                        </div>
+
                         <div class="table-responsive" style="max-height: 300px;">
                             <table class="table table-sm table-hover align-middle">
                                 <thead class="bg-light sticky-top">
@@ -377,8 +381,12 @@
                 <div class="modal-body pt-4">
                     <!-- Step 1: Selecionar NFs -->
                     <div id="step1NF">
-                        <p class="text-muted small mb-4">Selecione as notas fiscais contendo os equipamentos que deseja ceder.</p>
+                        <p class="text-muted small mb-3">Selecione as notas fiscais contendo os equipamentos que deseja ceder.</p>
                         
+                        <div class="mb-3">
+                            <input type="text" id="filtroTabelaNF" class="form-control form-control-sm" placeholder="Buscar por Número da NF, Fornecedor...">
+                        </div>
+
                         <div class="table-responsive" style="max-height: 300px;">
                             <table class="table table-sm table-hover align-middle">
                                 <thead class="bg-light sticky-top">
@@ -462,8 +470,25 @@ $(document).ready(function() {
 
     // Modal behavior handled on step transition
 
+    // Filtros de Tabela Modais
+    $('#filtroTabelaMultipla').on('keyup', function() {
+        let value = $(this).val().toLowerCase();
+        $('#step1 tbody tr').filter(function() {
+            if ($(this).find('td').length === 1) return;
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
+
+    $('#filtroTabelaNF').on('keyup', function() {
+        let value = $(this).val().toLowerCase();
+        $('#step1NF tbody tr').filter(function() {
+            if ($(this).find('td').length === 1) return;
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
+
     $('#checkAll').on('change', function() {
-        $('.equip-check').prop('checked', this.checked);
+        $('#step1 tbody tr:visible .equip-check').prop('checked', this.checked);
     });
 
     let currentStep = 1;
@@ -542,7 +567,7 @@ $(document).ready(function() {
     // --- NOVA CESSÃO POR NOTA FISCAL (AJAX) ---
 
     $('#checkAllNF').on('change', function() {
-        $('.nf-check').prop('checked', this.checked);
+        $('#step1NF tbody tr:visible .nf-check').prop('checked', this.checked);
     });
 
     let currentEquipamentosNF = [];
