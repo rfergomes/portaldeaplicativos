@@ -365,6 +365,88 @@
     </div>
 </div>
 
+<!-- Modal Nova Cessão por Nota Fiscal -->
+<div class="modal fade" id="modalNovaCessaoNotaFiscal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="titleModalNF">Cessão por NF: Selecionar Notas Fiscais</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formNovaCessaoNotaFiscal">
+                <div class="modal-body pt-4">
+                    <!-- Step 1: Selecionar NFs -->
+                    <div id="step1NF">
+                        <p class="text-muted small mb-4">Selecione as notas fiscais contendo os equipamentos que deseja ceder.</p>
+                        
+                        <div class="table-responsive" style="max-height: 300px;">
+                            <table class="table table-sm table-hover align-middle">
+                                <thead class="bg-light sticky-top">
+                                    <tr>
+                                        <th style="width: 40px;">
+                                            <input type="checkbox" class="form-check-input" id="checkAllNF">
+                                        </th>
+                                        <th>Número NF</th>
+                                        <th>Fornecedor</th>
+                                        <th>Itens Disponíveis</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($aquisicoesDisponiveis ?? [] as $aq)
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="nfs[]" value="{{ $aq->id }}" class="form-check-input nf-check">
+                                        </td>
+                                        <td class="fw-bold">{{ $aq->numero_nf ?? 'S/ Nota (ID: '.$aq->id.')' }}</td>
+                                        <td>{{ $aq->fornecedor->nome ?? '-' }}</td>
+                                        <td><span class="badge bg-success rounded-pill px-3">{{ $aq->equipamentos_count }} disponíveis</span></td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">Nenhuma nota fiscal com equipamentos disponíveis.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Informar Destino -->
+                    <div id="step2NF" style="display: none;">
+                        <h6 class="fw-bold mb-3 text-primary">Resumo: <span id="resumoItensNF">0</span> itens selecionados</h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label small fw-bold">Cessionário (Destino)</label>
+                                <select id="usuario_id_nf" class="form-select select2-nf" required>
+                                    <option value="">Selecione um destino...</option>
+                                    @foreach($usuarios as $user)
+                                        <option value="{{ $user->id }}">{{ $user->nome }} ({{ $user->empresa->razao_social ?? 'S/ Empresa' }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Data de Devolução Prevista (Opcional)</label>
+                                <input type="date" id="data_previsao_nf" class="form-control">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label small fw-bold">Observações</label>
+                                <textarea id="observacoes_nf" class="form-control" rows="3" placeholder="Notas adicionais sobre a cessão..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnNextNF">Avançar</button>
+                    <button type="button" class="btn btn-primary" id="btnPrevNF" style="display: none;">Voltar</button>
+                    <button type="submit" class="btn btn-success" id="btnSubmitNF" style="display: none;">Confirmar Cessão Lote</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <style>
     .x-small { font-size: 0.75rem; }
     .select2-container { width: 100% !important; }
