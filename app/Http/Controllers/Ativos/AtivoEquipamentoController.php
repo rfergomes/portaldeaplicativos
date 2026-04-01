@@ -205,4 +205,23 @@ class AtivoEquipamentoController extends Controller
 
         return $pdf->stream("termo_baixa_equipamento_{$equipamento->id}.pdf");
     }
+
+    public function uploadAnexo(Request $request, \App\Models\AtivoEquipamento $equipamento)
+    {
+        $request->validate([
+            'arquivo' => 'required|file|max:10240', // 10MB
+        ]);
+
+        $file = $request->file('arquivo');
+        $path = $file->store('ativos/anexos', 'public');
+
+        $equipamento->anexos()->create([
+            'caminho' => $path,
+            'nome_original' => $file->getClientOriginalName(),
+            'mime_type' => $file->getMimeType(),
+            'tamanho' => $file->getSize(),
+        ]);
+
+        return redirect()->back()->with('success', 'Documento anexado ao equipamento com sucesso!');
+    }
 }

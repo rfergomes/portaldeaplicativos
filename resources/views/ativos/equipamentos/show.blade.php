@@ -100,6 +100,54 @@
                 </div>
             </div>
 
+            <!-- ANEXOS -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-paperclip me-2 text-primary"></i>Anexos / Documentos</h5>
+                </div>
+                <div class="card-body pt-0">
+                    <ul class="list-group list-group-flush mb-3">
+                        @forelse($equipamento->anexos as $anexo)
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div class="d-flex align-items-center text-truncate pe-2">
+                                    <i class="fa-solid fa-file-pdf text-danger me-2 shadow-sm"></i>
+                                    <small class="fw-bold text-truncate" title="{{ $anexo->nome_original }}">{{ $anexo->nome_original }}</small>
+                                </div>
+                                <div class="btn-group btn-group-sm flex-shrink-0">
+                                    <a href="{{ route('ativos.anexos.download', $anexo->id) }}" target="_blank" class="btn btn-link text-primary p-0 me-2" title="Baixar/Visualizar">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <form action="{{ route('ativos.anexos.destroy', $anexo->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-link text-danger p-0" onclick="return confirm('Tem certeza que deseja excluir o anexo?')">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </li>
+                        @empty
+                            <li class="list-group-item text-center py-4 text-muted border-0">
+                                <i class="fa-solid fa-folder-open d-block mb-2 opacity-50 h4"></i>
+                                Nenhum formato digital anexado.
+                            </li>
+                        @endforelse
+                    </ul>
+
+                    <form action="{{ route('ativos.equipamentos.anexos.store', $equipamento->id) }}" method="POST" enctype="multipart/form-data" class="bg-light p-3 rounded-3 border border-dashed">
+                        @csrf
+                        <label class="form-label small fw-bold text-muted text-uppercase mb-2">Novo Documento</label>
+                        <div class="input-group input-group-sm">
+                            <input type="file" name="arquivo" class="form-control" required>
+                            <button class="btn btn-primary px-3 fw-bold" type="submit">
+                                <i class="fa-solid fa-upload me-1"></i> Anexar
+                            </button>
+                        </div>
+                        <div class="form-text x-small text-muted mt-2">Formatos aceitos: PDF, JPG, PNG (máx 10mb).</div>
+                    </form>
+                </div>
+            </div>
+
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white border-0 py-3">
                     <h5 class="mb-0 fw-bold"><i class="fa-solid fa-receipt me-2 text-primary"></i>Aquisição</h5>

@@ -170,6 +170,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('ativos')->name('ativos.')->middleware(['can:ativos.visualizar', 'uppercase.ativos'])->group(function () {
         Route::get('equipamentos/pdf/inventario', [AtivoEquipamentoController::class, 'gerarInventarioPdf'])->name('equipamentos.inventario.pdf');
         Route::get('equipamentos/{equipamento}/pdf/baixa', [AtivoEquipamentoController::class, 'pdfBaixa'])->name('equipamentos.pdf_baixa');
+        Route::post('equipamentos/{equipamento}/anexos', [AtivoEquipamentoController::class, 'uploadAnexo'])->name('equipamentos.anexos.store');
         Route::resource('equipamentos', \App\Http\Controllers\Ativos\AtivoEquipamentoController::class);
         Route::resource('movimentacoes', \App\Http\Controllers\Ativos\AtivoMovimentacaoController::class)->only(['index', 'store']);
         Route::resource('usuarios', \App\Http\Controllers\Ativos\AtivoUsuarioController::class);
