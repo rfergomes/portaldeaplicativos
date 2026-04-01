@@ -188,7 +188,7 @@ Route::middleware('auth')->group(function () {
         Route::get('cessoes/{cessao}/pdf', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'generatePdf'])->name('cessoes.pdf');
         Route::get('movimentacoes/{movimentacao}/pdf/devolucao', [\App\Http\Controllers\Ativos\AtivoMovimentacaoController::class, 'pdfDevolucao'])->name('devolucao.pdf');
         Route::post('cessoes/{cessao}/anexos', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'uploadAnexo'])->name('cessoes.anexos.store');
-        Route::get('anexos/{anexo}/download', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'downloadAnexo'])->name('anexos.download');
+        Route::get('anexos/{anexo}/download/{filename?}', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'downloadAnexo'])->name('anexos.download');
         Route::delete('anexos/{anexo}', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'destroyAnexo'])->name('anexos.destroy');
         
         // Novas rotas de Inventário e Licenças

@@ -175,7 +175,16 @@ class AtivoCessaoController extends Controller
             return redirect()->back()->with('error', 'Arquivo não encontrado no servidor.');
         }
 
-        return response()->download($fullPath, $anexo->nome_original);
+        // Usamos response()->file() para forçar a visualização inline no navegador (quando for PDF/imagem).
+        // Isso evita o erro do Windows baixar o arquivo como um UUID sem extensão.
+        $filename = str_replace(['"', ',', ';'], '_', $anexo->nome_original);
+        
+        $headers = [
+            'Content-Type' => $anexo->mime_type,
+            'Content-Disposition' => 'inline; filename="' . $filename . '"'
+        ];
+
+        return response()->file($fullPath, $headers);
     }
 
     public function destroyAnexo(\App\Models\AtivoAnexo $anexo)

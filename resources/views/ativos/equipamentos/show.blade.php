@@ -114,7 +114,7 @@
                                     <small class="fw-bold text-truncate" title="{{ $anexo->nome_original }}">{{ $anexo->nome_original }}</small>
                                 </div>
                                 <div class="btn-group btn-group-sm flex-shrink-0">
-                                    <a href="{{ route('ativos.anexos.download', $anexo->id) }}" target="_blank" class="btn btn-link text-primary p-0 me-2" title="Baixar/Visualizar">
+                                    <a href="{{ route('ativos.anexos.download', [$anexo->id, Str::slug(pathinfo($anexo->nome_original, PATHINFO_FILENAME)) . '.' . pathinfo($anexo->nome_original, PATHINFO_EXTENSION)]) }}" target="_blank" class="btn btn-link text-primary p-0 me-2" title="Baixar/Visualizar">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
                                     <form action="{{ route('ativos.anexos.destroy', $anexo->id) }}" method="POST" class="d-inline">
