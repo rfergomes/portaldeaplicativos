@@ -3,13 +3,16 @@
 @section('content')
 <div class="container-fluid py-4">
     <div class="row mb-4">
-        <div class="col-md-8">
+        <div class="col-md-6">
             <h1 class="h3 mb-0 text-gray-800">
                 <i class="fa-solid fa-file-signature me-2 text-primary"></i>Gerenciar Cessões
             </h1>
             <p class="text-muted">Gestão de termos de cessão, múltiplos itens e documentos assinados.</p>
         </div>
-        <div class="col-md-4 text-end">
+        <div class="col-md-6 text-end">
+             <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#modalNovaCessaoNotaFiscal">
+                <i class="fa-solid fa-file-invoice me-1"></i> Cessão por NF
+            </button>
              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovaCessaoMultipla">
                 <i class="fa-solid fa-plus me-1"></i> Nova Cessão Múltipla
             </button>
@@ -453,6 +456,110 @@ $(document).ready(function() {
             }
         });
     });
+
+    // --- NOVA CESSÃO POR NOTA FISCAL (AJAX) ---
+
+    $('#checkAllNF').on('change', function() {
+        $('.nf-check').prop('checked', this.checked);
+    });
+
+    let currentEquipamentosNF = [];
+
+    $('#btnNextNF').on('click', function() {
+        const selectedNFs = $('.nf-check:checked').map(function() { return this.value; }).get();
+        if (selectedNFs.length === 0) {
+            Swal.fire('Aviso', 'Selecione pelo menos uma nota fiscal.', 'warning');
+            return;
+        }
+
+        // Fazer requisição AJAX para pegar os equipamentos disponíveis dessas NFs
+        const btnNext = $(this);
+        btnNext.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i> Buscando...');
+
+        $.ajax({
+            url: "{{ route('ativos.aquisicoes.equipamentos_disponiveis') }}",
+            type: "GET",
+            data: { nfs: selectedNFs },
+            success: function(response) {
+                btnNext.prop('disabled', false).text('Avançar');
+                
+                if(response.success && response.equipamentos.length > 0) {
+                    currentEquipamentosNF = response.equipamentos.map(eq => eq.id);
+                    $('#resumoItensNF').text(response.equipamentos.length);
+
+                    $('#step1NF').hide();
+                    $('#step2NF').show();
+                    $('#btnNextNF').hide();
+                    $('#btnPrevNF').show();
+                    $('#btnSubmitNF').show();
+                    $('#titleModalNF').text('Cessão por NF: Validar Destino');
+
+                    if (!$('.select2-nf').hasClass('select2-hidden-accessible')) {
+                        $('.select2-nf').select2({
+                            theme: 'bootstrap-5',
+                            dropdownParent: $('#modalNovaCessaoNotaFiscal'),
+                            width: '100%'
+                        });
+                    }
+                } else {
+                    Swal.fire('Aviso', 'Nenhum equipamento disponível encontrado para as NFs selecionadas.', 'warning');
+                }
+            },
+            error: function(xhr) {
+                btnNext.prop('disabled', false).text('Avançar');
+                Swal.fire('Erro', 'Não foi possível buscar equipamentos.', 'error');
+            }
+        });
+    });
+
+    $('#btnPrevNF').on('click', function() {
+        $('#step2NF').hide();
+        $('#step1NF').show();
+        $('#btnNextNF').show();
+        $('#btnPrevNF').hide();
+        $('#btnSubmitNF').hide();
+        $('#titleModalNF').text('Cessão por NF: Selecionar Notas Fiscais');
+    });
+
+    $('#formNovaCessaoNotaFiscal').on('submit', function(e) {
+        e.preventDefault();
+        
+        const data = {
+            usuario_id: $('#usuario_id_nf').val(),
+            data_previsao_devolucao: $('#data_previsao_nf').val(),
+            observacoes: $('#observacoes_nf').val(),
+            equipamentos: currentEquipamentosNF, // Arrays do AJAX
+            _token: '{{ csrf_token() }}'
+        };
+
+        if (!data.usuario_id) {
+            Swal.fire('Erro', 'Selecione um cessionário.', 'error');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Processando Lote...',
+            text: 'Registrando termio único para os itens das NFs.',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        $.ajax({
+            url: "{{ route('ativos.cessoes.store') }}",
+            type: "POST",
+            data: data,
+            success: function(response) {
+                Swal.fire('Sucesso!', response.message, 'success').then(() => {
+                    window.open("{{ url('ativos/cessoes') }}/" + response.cessao_id + "/pdf", '_blank');
+                    location.reload();
+                });
+            },
+            error: function(xhr) {
+                Swal.fire('Erro', xhr.responseJSON?.message || 'Não foi possível processar a requisição.', 'error');
+            }
+        });
+    });
+
 });
 </script>
 @endpush

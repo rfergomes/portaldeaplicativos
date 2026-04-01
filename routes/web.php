@@ -176,6 +176,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('departamentos', \App\Http\Controllers\Ativos\AtivoDepartamentoController::class)->except(['show']);
         Route::resource('fabricantes', \App\Http\Controllers\Ativos\AtivoFabricanteController::class)->except(['show']);
         Route::resource('marketplaces', \App\Http\Controllers\Ativos\AtivoMarketplaceController::class)->except(['show']);
+        Route::get('aquisicoes/api/equipamentos-para-cessao', [\App\Http\Controllers\Ativos\AtivoAquisicaoController::class, 'getEquipamentosDisponiveisPorNfs'])->name('aquisicoes.equipamentos_disponiveis');
         Route::resource('aquisicoes', \App\Http\Controllers\Ativos\AtivoAquisicaoController::class);
         Route::post('aquisicoes/{aquisicao}/anexos', [\App\Http\Controllers\Ativos\AtivoAquisicaoController::class, 'uploadAnexo'])->name('aquisicoes.anexos.store');
         Route::resource('fornecedores', \App\Http\Controllers\Ativos\AtivoFornecedorController::class)->except(['show']);

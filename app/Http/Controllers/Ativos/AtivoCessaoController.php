@@ -7,6 +7,7 @@ use App\Models\AtivoCessao;
 use App\Models\AtivoEquipamento;
 use App\Models\AtivoMovimentacao;
 use App\Models\AtivoUsuario;
+use App\Models\AtivoAquisicao;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +48,17 @@ class AtivoCessaoController extends Controller
                                 ->whereDate('data_devolucao_prevista', '<', now())
                                 ->count();
 
-        return view('ativos.cessoes.index', compact('cessoes', 'usuarios', 'totalTermos', 'itensCedidos', 'cessionariosUnicos', 'devolucoesAtrasadas'));
+        $aquisicoesDisponiveis = AtivoAquisicao::with('fornecedor')
+            ->whereHas('equipamentos', function ($q) {
+                $q->where('status', 'disponivel');
+            })
+            ->withCount(['equipamentos' => function ($q) {
+                $q->where('status', 'disponivel');
+            }])
+            ->orderBy('data_aquisicao', 'desc')
+            ->get();
+
+        return view('ativos.cessoes.index', compact('cessoes', 'usuarios', 'totalTermos', 'itensCedidos', 'cessionariosUnicos', 'devolucoesAtrasadas', 'aquisicoesDisponiveis'));
     }
 
     public function store(Request $request)

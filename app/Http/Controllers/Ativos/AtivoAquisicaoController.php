@@ -249,4 +249,22 @@ class AtivoAquisicaoController extends Controller
 
         return redirect()->back()->with('success', 'Documento anexado à NF com sucesso!');
     }
+
+    public function getEquipamentosDisponiveisPorNfs(Request $request)
+    {
+        $validated = $request->validate([
+            'nfs' => 'required|array',
+            'nfs.*' => 'exists:ativo_aquisicoes,id',
+        ]);
+
+        $equipamentos = AtivoEquipamento::with('fabricante')
+            ->whereIn('aquisicao_id', $validated['nfs'])
+            ->where('status', 'disponivel')
+            ->get(['id', 'descricao', 'modelo', 'fabricante_id', 'aquisicao_id']);
+
+        return response()->json([
+            'success' => true,
+            'equipamentos' => $equipamentos
+        ]);
+    }
 }
