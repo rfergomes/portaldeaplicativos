@@ -202,13 +202,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('estacoes', AtivoEstacaoController::class)->only(['index', 'store', 'update', 'destroy']);
 
         // API endpoints
-        Route::get('api/estacoes', function (Illuminate\Http\Request $request) {
-            $query = \App\Models\AtivoEstacao::query();
-            if ($request->filled('departamento_id')) {
-                $query->where('departamento_id', $request->departamento_id);
-            }
-            return response()->json($query->orderBy('nome')->get(['id', 'nome']));
-        })->name('api.estacoes');
+        Route::get('api/estacoes', [AtivoEstacaoController::class, 'apiGetEstacoes'])->name('api.estacoes');
     });
 });
 

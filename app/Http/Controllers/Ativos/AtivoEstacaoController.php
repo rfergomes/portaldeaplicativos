@@ -135,4 +135,13 @@ class AtivoEstacaoController extends Controller
         $estacao->delete();
         return redirect()->back()->with('success', 'Estação de Trabalho excluída com sucesso!');
     }
+
+    public function apiGetEstacoes(Request $request)
+    {
+        $query = AtivoEstacao::query();
+        if ($request->filled('departamento_id')) {
+            $query->where('departamento_id', $request->departamento_id);
+        }
+        return response()->json($query->orderBy('nome')->get(['id', 'nome']));
+    }
 }

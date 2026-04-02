@@ -1,0 +1,1 @@
+﻿<?php require 'vendor/autoload.php'; \ = require_once 'bootstrap/app.php'; \ = \->make(Illuminate\Contracts\Console\Kernel::class); \->bootstrap(); try { \ = \App\Models\AtivoEstacao::query()->where('departamento_id', 1)->orderBy('nome')->get(['id', 'nome']); echo \->toJson(); } catch (\Exception \) { echo \->getMessage(); }
