@@ -198,6 +198,7 @@ Route::middleware('auth')->group(function () {
         Route::post('licencas/{equipamento}/vincular', [AtivoLicencaController::class, 'vincularEquipamento'])->name('licencas.vincular');
         Route::delete('licencas/{licenca}/{equipamento}/desvincular', [AtivoLicencaController::class, 'desvincularEquipamento'])->name('licencas.desvincular');
         
+        Route::get('estacoes/pdf', [AtivoEstacaoController::class, 'gerarPdf'])->name('estacoes.pdf');
         Route::resource('estacoes', AtivoEstacaoController::class)->only(['index', 'store', 'update', 'destroy']);
 
         // API endpoints

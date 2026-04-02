@@ -6,22 +6,99 @@ use App\Http\Controllers\Controller;
 use App\Models\AtivoEstacao;
 use App\Models\AtivoDepartamento;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AtivoEstacaoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $departamentos = AtivoDepartamento::with(['estacoes.equipamentos'])
-            ->where('ativo', true)
-            ->get();
+        $busca = $request->input('busca');
+        $status = $request->input('status');
+
+        $departamentosQuery = AtivoDepartamento::with(['estacoes' => function($q) use ($busca, $status) {
+            if ($busca) {
+                $q->where('nome', 'like', "%{$busca}%")
+                  ->orWhere('descricao', 'like', "%{$busca}%");
+            }
+            if ($status === 'vazia') {
+                $q->doesntHave('equipamentos');
+            } elseif ($status === 'ativa') {
+                $q->has('equipamentos');
+            }
+            $q->orderBy('nome', 'asc');
+        }, 'estacoes.equipamentos'])->where('ativo', true);
+
+        // Se houver filtro, mostrar apenas departamentos onde tenham estações
+        if ($busca || $status) {
+            $departamentosQuery->whereHas('estacoes', function($q) use ($busca, $status) {
+                if ($busca) {
+                    $q->where(function($sq) use ($busca) {
+                        $sq->where('nome', 'like', "%{$busca}%")
+                           ->orWhere('descricao', 'like', "%{$busca}%");
+                    });
+                }
+                if ($status === 'vazia') {
+                    $q->doesntHave('equipamentos');
+                } elseif ($status === 'ativa') {
+                    $q->has('equipamentos');
+                }
+            });
+        }
+
+        $departamentos = $departamentosQuery->orderBy('nome')->get();
             
-        // Estatísticas
+        // Estatísticas Globais
         $totalEstacoes = AtivoEstacao::count();
         $estacoesLivres = AtivoEstacao::doesntHave('equipamentos')->count();
         $totalDepartamentos = AtivoDepartamento::count();
         $equipamentosAlocados = \App\Models\AtivoEquipamento::whereNotNull('estacao_id')->count();
 
-        return view('ativos.estacoes.index', compact('departamentos', 'totalEstacoes', 'estacoesLivres', 'totalDepartamentos', 'equipamentosAlocados'));
+        // Se for request vazio de todos os departamentos (sem filtro). Mantemos original view, 
+        // mas as estações já virão ordenadas no ->with() em "asc" nome.
+
+        return view('ativos.estacoes.index', compact('departamentos', 'totalEstacoes', 'estacoesLivres', 'totalDepartamentos', 'equipamentosAlocados', 'busca', 'status'));
+    }
+
+    public function gerarPdf(Request $request)
+    {
+        $busca = $request->input('busca');
+        $status = $request->input('status');
+
+        $departamentosQuery = AtivoDepartamento::with(['estacoes' => function($q) use ($busca, $status) {
+            if ($busca) {
+                $q->where('nome', 'like', "%{$busca}%")
+                  ->orWhere('descricao', 'like', "%{$busca}%");
+            }
+            if ($status === 'vazia') {
+                $q->doesntHave('equipamentos');
+            } elseif ($status === 'ativa') {
+                $q->has('equipamentos');
+            }
+            $q->orderBy('nome', 'asc');
+        }, 'estacoes.equipamentos'])->where('ativo', true);
+
+        if ($busca || $status) {
+            $departamentosQuery->whereHas('estacoes', function($q) use ($busca, $status) {
+                if ($busca) {
+                    $q->where(function($sq) use ($busca) {
+                        $sq->where('nome', 'like', "%{$busca}%")
+                           ->orWhere('descricao', 'like', "%{$busca}%");
+                    });
+                }
+                if ($status === 'vazia') {
+                    $q->doesntHave('equipamentos');
+                } elseif ($status === 'ativa') {
+                    $q->has('equipamentos');
+                }
+            });
+        }
+
+        $departamentos = $departamentosQuery->orderBy('nome')->get();
+
+        $pdf = Pdf::loadView('ativos.estacoes.pdf', compact('departamentos', 'busca', 'status'))
+                  ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('relatorio_estacoes_de_trabalho_' . now()->format('Ymd_H_i') . '.pdf');
     }
 
     public function store(Request $request)
