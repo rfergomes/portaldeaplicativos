@@ -125,6 +125,9 @@ class AtivoMovimentacaoController extends Controller
                     break;
 
                 case 'transferencia':
+                    $status = 'em_uso';
+                    $tipoUso = null; // Limpa cessão/empréstimo anterior
+
                     $departamento = \App\Models\AtivoDepartamento::find($validated['destino_departamento_id']);
                     $estacao = isset($validated['destino_estacao_id'])
                         ? \App\Models\AtivoEstacao::find($validated['destino_estacao_id'])
@@ -132,6 +135,14 @@ class AtivoMovimentacaoController extends Controller
 
                     if ($estacao && $departamento) {
                         $localizacao = $departamento->nome . ' / ' . $estacao->nome;
+
+                        // REGRA: TI / ESTOQUE -> Disponível
+                        $deptoNome = strtoupper(trim($departamento->nome));
+                        $estacaoNome = strtoupper(trim($estacao->nome));
+
+                        if (($deptoNome === 'TI' || $deptoNome === 'TI - TECNOLOGIA DA INFORMAÇÃO') && $estacaoNome === 'ESTOQUE') {
+                            $status = 'disponivel';
+                        }
                     } elseif ($departamento) {
                         $localizacao = $departamento->nome;
                     } else {
