@@ -340,7 +340,7 @@
                         <div class="row g-3">
                             <div class="col-md-12">
                                 <label class="form-label small fw-bold">Cessionário (Destino)</label>
-                                <select id="usuario_id_multiplo" class="form-select select2-modal" required>
+                                <select id="usuario_id_multiplo" class="form-control select2-modal" required>
                                     <option value="">Selecione um destino...</option>
                                     @foreach($usuarios as $user)
                                         <option value="{{ $user->id }}">{{ $user->nome }} ({{ $user->empresa->razao_social ?? 'S/ Empresa' }})</option>
@@ -426,7 +426,7 @@
                         <div class="row g-3">
                             <div class="col-md-12">
                                 <label class="form-label small fw-bold">Cessionário (Destino)</label>
-                                <select id="usuario_id_nf" class="form-select select2-nf" required>
+                                <select id="usuario_id_nf" class="form-control select2-nf" required>
                                     <option value="">Selecione um destino...</option>
                                     @foreach($usuarios as $user)
                                         <option value="{{ $user->id }}">{{ $user->nome }} ({{ $user->empresa->razao_social ?? 'S/ Empresa' }})</option>

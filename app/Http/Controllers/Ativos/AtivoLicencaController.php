@@ -286,7 +286,7 @@ class AtivoLicencaController extends Controller
         $licenca = AtivoLicenca::findOrFail($request->licenca_id);
 
         // Verifica se já está vinculado
-        if ($equipamento->licencas()->where('ativo_licenca_id', $licenca->id)->exists()) {
+        if ($equipamento->licencas()->where('ativo_licencas.id', $licenca->id)->exists()) {
             return redirect()->back()->with('error', 'Esta licença já está vinculada a este equipamento.');
         }
 
