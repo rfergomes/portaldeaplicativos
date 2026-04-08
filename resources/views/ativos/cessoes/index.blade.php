@@ -505,14 +505,16 @@ $(document).ready(function() {
         $('#btnSubmit').show();
         $('.modal-title').text('Cessão Múltipla: Informar Destino');
 
-        // Initialize select2 only when step2 is visible to prevent duplicate/empty broken renders
-        if (!$('.select2-modal').hasClass('select2-hidden-accessible')) {
-            $('.select2-modal').select2({
-                theme: 'bootstrap-5',
-                dropdownParent: $('#modalNovaCessaoMultipla'),
-                width: '100%'
-            });
+        // Initialize select2 correctly only when step2 is visible to prevent duplicate/empty DOM bugs
+        if ($('#usuario_id_multiplo').hasClass('select2-hidden-accessible')) {
+            $('#usuario_id_multiplo').select2('destroy');
         }
+        $('#usuario_id_multiplo').select2({
+            theme: 'bootstrap-5',
+            dropdownParent: $('#modalNovaCessaoMultipla'),
+            width: '100%',
+            language: { noResults: function() { return "Nenhum cessionário encontrado"; } }
+        });
     });
 
     $('#btnPrev').on('click', function() {
@@ -601,13 +603,16 @@ $(document).ready(function() {
                     $('#btnSubmitNF').show();
                     $('#titleModalNF').text('Cessão por NF: Validar Destino');
 
-                    if (!$('.select2-nf').hasClass('select2-hidden-accessible')) {
-                        $('.select2-nf').select2({
-                            theme: 'bootstrap-5',
-                            dropdownParent: $('#modalNovaCessaoNotaFiscal'),
-                            width: '100%'
-                        });
+                    // Destruir e recriar previne bug do Select2 não ler `<option>` de divs ocultos
+                    if ($('#usuario_id_nf').hasClass('select2-hidden-accessible')) {
+                        $('#usuario_id_nf').select2('destroy');
                     }
+                    $('#usuario_id_nf').select2({
+                        theme: 'bootstrap-5',
+                        dropdownParent: $('#modalNovaCessaoNotaFiscal'),
+                        width: '100%',
+                        language: { noResults: function() { return "Nenhum cessionário encontrado"; } }
+                    });
                 } else {
                     Swal.fire('Aviso', 'Nenhum equipamento disponível encontrado para as NFs selecionadas.', 'warning');
                 }
