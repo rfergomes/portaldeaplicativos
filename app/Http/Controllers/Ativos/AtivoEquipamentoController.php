@@ -244,8 +244,6 @@ class AtivoEquipamentoController extends Controller
 
         $equipamentos = $query->orderBy('id', 'asc')->get();
 
-        file_put_contents('debug_pdf.txt', "Titulo: {$titulo}\nFiltro: {$filtro}\nCount: " . count($equipamentos));
-
         $pdf = Pdf::loadView('ativos.equipamentos.pdf_relatorio_geral', compact('equipamentos', 'titulo', 'filtro'))
             ->setPaper('a4', 'landscape');
 
