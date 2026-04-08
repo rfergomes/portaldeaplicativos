@@ -74,9 +74,9 @@
                 <img src="{{ public_path('img/logo.jpg') }}" alt="Logo" style="max-width: 150px;">
             </div>
         @endif
-        <div class="title">Inventário Físico de Equipamentos</div>
-        <div class="subtitle">Relatório de Conferência - Gerado em {{ now()->format('d/m/Y H:i') }}</div>
-        <div style="margin-top: 5px; font-weight: bold; color: #d9534f;">APENAS EQUIPAMENTOS DISPONÍVEIS NO ESTOQUE</div>
+        <div class="title">Inventário Físico Completo de Equipamentos</div>
+        <div class="subtitle">Relatório de Conferência Contábil - Gerado em {{ now()->format('d/m/Y H:i') }}</div>
+        <div style="margin-top: 5px; font-weight: bold; color: #5bc0de;">TODOS OS EQUIPAMENTOS DA EMPRESA</div>
     </div>
 
     @forelse($equipamentos as $groupKey => $itens)

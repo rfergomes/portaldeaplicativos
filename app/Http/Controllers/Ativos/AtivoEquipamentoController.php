@@ -158,36 +158,98 @@ class AtivoEquipamentoController extends Controller
         return redirect()->route('ativos.equipamentos.index')->with('success', 'Equipamento excluído com sucesso!');
     }
 
-    public function gerarInventarioPdf()
+    public function gerarInventarioPdf(Request $request)
     {
-        $equipamentosList = \App\Models\AtivoEquipamento::with(['aquisicao.fornecedor', 'fornecedor'])
-            ->where('status', 'disponivel')
-            ->get();
+        $filtro = $request->get('filtro', 'fisico');
+        
+        $queryBase = \App\Models\AtivoEquipamento::query();
+        
+        // Filtros recebidos do formulário de busca
+        if ($request->filled('identificador')) {
+            $search = $request->identificador;
+            $queryBase->where(function($q) use ($search) {
+                $q->where('id', $search)
+                  ->orWhere('descricao', 'like', "%{$search}%")
+                  ->orWhere('modelo', 'like', "%{$search}%")
+                  ->orWhere('numero_serie', 'like', "%{$search}%")
+                  ->orWhere('valor_nota', 'like', "%{$search}%")
+                  ->orWhereHas('movimentacoes', function($mq) use ($search) {
+                      $mq->where('tipo', 'cessao')
+                         ->whereHas('usuario', function($uq) use ($search) {
+                             $uq->where('nome', 'like', "%{$search}%");
+                         });
+                  });
+            });
+        }
+        
+        // Se a pessoa inseriu filtro de status (da tela principal), consideramos 
+        // apenas se o botão de relatório contínuo "todos" foi selecionado ou se é o inventário físico.
+        // Pois os botões Em Uso, Baixados já forçam um status.
+        if ($request->filled('status') && in_array($filtro, ['fisico', 'todos'])) {
+            $queryBase->where('status', $request->status);
+        }
 
-        $equipamentosList = $equipamentosList->sortBy(function($item) {
-            $date = $item->aquisicao ? $item->aquisicao->data_aquisicao : $item->data_compra;
-            return $date ? $date->format('Y-m-d') : '9999-12-31';
-        });
+        if ($filtro === 'fisico') {
+            // Inventário Físico Completo (Todos os equipamentos agrupados por NF/Data/Fornecedor)
+            $equipamentosList = clone $queryBase;
+            $equipamentosList = $equipamentosList->with(['aquisicao.fornecedor', 'fornecedor'])->get();
 
-        $equipamentos = $equipamentosList->groupBy(function($item) {
-            $dataStr = '';
-            if ($item->aquisicao && $item->aquisicao->data_aquisicao) {
-                $dataStr = $item->aquisicao->data_aquisicao->format('d/m/Y');
-            } elseif ($item->data_compra) {
-                $dataStr = $item->data_compra->format('d/m/Y');
-            }
-            $data = $dataStr ?: 'S/ Data';
-            
-            $nf = $item->aquisicao ? ($item->aquisicao->numero_nf ?: 'Sem NF') : ($item->valor_nota ?: 'Sem NF');
-            $forn = $item->aquisicao && $item->aquisicao->fornecedor ? $item->aquisicao->fornecedor->nome : ($item->fornecedor ? $item->fornecedor->nome : 'Fornecedor N/D');
-            
-            return $data . '::' . $nf . '::' . $forn;
-        });
+            $equipamentosList = $equipamentosList->sortBy(function($item) {
+                $date = $item->aquisicao ? $item->aquisicao->data_aquisicao : $item->data_compra;
+                return $date ? $date->format('Y-m-d') : '9999-12-31';
+            });
 
-        $pdf = Pdf::loadView('ativos.equipamentos.pdf_inventario', compact('equipamentos'))
-            ->setPaper('a4', 'portrait');
+            $equipamentos = $equipamentosList->groupBy(function($item) {
+                $dataStr = '';
+                if ($item->aquisicao && $item->aquisicao->data_aquisicao) {
+                    $dataStr = $item->aquisicao->data_aquisicao->format('d/m/Y');
+                } elseif ($item->data_compra) {
+                    $dataStr = $item->data_compra->format('d/m/Y');
+                }
+                $data = $dataStr ?: 'S/ Data';
+                
+                $nf = $item->aquisicao ? ($item->aquisicao->numero_nf ?: 'Sem NF') : ($item->valor_nota ?: 'Sem NF');
+                $forn = $item->aquisicao && $item->aquisicao->fornecedor ? $item->aquisicao->fornecedor->nome : ($item->fornecedor ? $item->fornecedor->nome : 'Fornecedor N/D');
+                
+                return $data . '::' . $nf . '::' . $forn;
+            });
 
-        return $pdf->stream('inventario_equipamentos_' . now()->format('d_m_Y') . '.pdf');
+            $pdf = Pdf::loadView('ativos.equipamentos.pdf_inventario', compact('equipamentos'))
+                ->setPaper('a4', 'portrait');
+
+            return $pdf->stream('inventario_fisico_equipamentos_' . now()->format('d_m_Y') . '.pdf');
+        }
+
+        $query = clone $queryBase;
+        $query->with(['fabricante', 'estacao.departamento', 'ultimaMovimentacao.usuario']);
+        $titulo = 'Relatório de Equipamentos';
+        
+        $filtroSeguro = strtolower(trim((string) $filtro));
+
+        if (strpos($filtroSeguro, 'todos') !== false) {
+            $titulo = 'Todos os Equipamentos (Lista Completa)';
+        } elseif (strpos($filtroSeguro, 'em_uso') !== false) {
+            $titulo = 'Equipamentos Em Uso';
+            $query->where('status', 'em_uso');
+        } elseif (strpos($filtroSeguro, 'manutencao') !== false || strpos($filtroSeguro, 'manutencac') !== false) {
+            $titulo = 'Equipamentos em Manutenção';
+            $query->where('status', 'manutencao');
+        } elseif (strpos($filtroSeguro, 'baixado') !== false) {
+            $titulo = 'Equipamentos Baixados';
+            $query->where('status', 'baixado');
+        } elseif (strpos($filtroSeguro, 'sem_atribuicao') !== false) {
+            $titulo = 'Equipamentos Disponíveis Sem Atribuição (Estoque Livre)';
+            $query->where('status', 'disponivel')->whereNull('estacao_id');
+        }
+
+        $equipamentos = $query->orderBy('id', 'asc')->get();
+
+        file_put_contents('debug_pdf.txt', "Titulo: {$titulo}\nFiltro: {$filtro}\nCount: " . count($equipamentos));
+
+        $pdf = Pdf::loadView('ativos.equipamentos.pdf_relatorio_geral', compact('equipamentos', 'titulo', 'filtro'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->stream('relatorio_equipamentos_' . $filtro . '_' . now()->format('d_m_Y') . '.pdf');
     }
 
     public function pdfBaixa(string $id)

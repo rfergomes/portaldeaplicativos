@@ -3,16 +3,29 @@
 @section('content')
 <div class="container-fluid py-4">
     <div class="row mb-4">
-        <div class="col-md-8">
+        <div class="col-md-6">
             <h1 class="h3 mb-0 text-gray-800">
                 <i class="fa-solid fa-laptop-code me-2 text-primary"></i>Controle de Equipamentos
             </h1>
             <p class="text-muted">Gerencie o inventário de hardware e dispositivos da empresa.</p>
         </div>
-        <div class="col-md-4 text-end">
-            <a href="{{ route('ativos.equipamentos.inventario.pdf') }}" class="btn btn-outline-danger shadow-sm me-2" target="_blank">
-                <i class="fa-solid fa-file-pdf me-2"></i>Gerar Inventário
-            </a>
+        <div class="col-md-6 text-end">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-outline-danger shadow-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-file-pdf me-2"></i>Relatórios PDF
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li><h6 class="dropdown-header">Inventário Contábil/Físico</h6></li>
+                    <li><a class="dropdown-item" href="{{ route('ativos.equipamentos.inventario.pdf', array_merge(request()->query(), ['filtro' => 'fisico'])) }}" target="_blank"><i class="fa-solid fa-boxes-stacked me-2 text-muted"></i>Inventário Físico Completo</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><h6 class="dropdown-header">Relatórios Gerenciais</h6></li>
+                    <li><a class="dropdown-item" href="{{ route('ativos.equipamentos.inventario.pdf', array_merge(request()->query(), ['filtro' => 'todos'])) }}" target="_blank"><i class="fa-solid fa-list me-2 text-muted"></i>Lista de Todos Equipamentos</a></li>
+                    <li><a class="dropdown-item" href="{{ route('ativos.equipamentos.inventario.pdf', array_merge(request()->query(), ['filtro' => 'sem_atribuicao'])) }}" target="_blank"><i class="fa-solid fa-box-open me-2 text-success"></i>Disponíveis (Estoque Livre)</a></li>
+                    <li><a class="dropdown-item" href="{{ route('ativos.equipamentos.inventario.pdf', array_merge(request()->query(), ['filtro' => 'em_uso'])) }}" target="_blank"><i class="fa-solid fa-laptop me-2 text-primary"></i>Equipamentos em Uso</a></li>
+                    <li><a class="dropdown-item" href="{{ route('ativos.equipamentos.inventario.pdf', array_merge(request()->query(), ['filtro' => 'manutencao'])) }}" target="_blank"><i class="fa-solid fa-screwdriver-wrench me-2 text-warning"></i>Equipamentos em Manutenção</a></li>
+                    <li><a class="dropdown-item" href="{{ route('ativos.equipamentos.inventario.pdf', array_merge(request()->query(), ['filtro' => 'baixado'])) }}" target="_blank"><i class="fa-solid fa-arrow-down me-2 text-danger"></i>Equipamentos Baixados</a></li>
+                </ul>
+            </div>
             @can('ativos.criar')
             <a href="{{ route('ativos.equipamentos.create') }}" class="btn btn-primary shadow-sm">
                 <i class="fa-solid fa-plus me-2"></i>Novo Equipamento

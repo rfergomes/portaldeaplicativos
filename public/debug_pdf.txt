@@ -1,0 +1,3 @@
+Titulo: Equipamentos Baixados
+Filtro: BAIXADO
+Count: 0
