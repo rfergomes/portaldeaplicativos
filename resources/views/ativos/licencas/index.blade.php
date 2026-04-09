@@ -172,7 +172,10 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="btn-group btn-group-sm">
-                                    <a href="{{ route('ativos.licencas.edit', $licenca->id) }}" class="btn btn-link text-primary p-0 me-2">
+                                    <a href="{{ route('ativos.licencas.show', $licenca->id) }}" class="btn btn-link text-info p-0 me-2" title="Visualizar Detalhes">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('ativos.licencas.edit', $licenca->id) }}" class="btn btn-link text-primary p-0 me-2" title="Editar">
                                         <i class="fa-solid fa-edit"></i>
                                     </a>
                                     <form action="{{ route('ativos.licencas.destroy', $licenca->id) }}" method="POST" class="d-inline">

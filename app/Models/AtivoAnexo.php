@@ -16,6 +16,7 @@ class AtivoAnexo extends Model
         'aquisicao_id',
         'movimentacao_id',
         'cessao_id',
+        'licenca_id',
         'caminho',
         'nome_original',
         'mime_type',
@@ -40,5 +41,10 @@ class AtivoAnexo extends Model
     public function cessao()
     {
         return $this->belongsTo(AtivoCessao::class, 'cessao_id');
+    }
+
+    public function licenca()
+    {
+        return $this->belongsTo(AtivoLicenca::class, 'licenca_id');
     }
 }

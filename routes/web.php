@@ -195,6 +195,7 @@ Route::middleware('auth')->group(function () {
         Route::get('licencas/aquisicao', [AtivoLicencaController::class, 'createAquisicao'])->name('licencas.create_aquisicao');
         Route::post('licencas/aquisicao', [AtivoLicencaController::class, 'storeAquisicao'])->name('licencas.store_aquisicao');
         Route::resource('licencas', AtivoLicencaController::class);
+        Route::post('licencas/{licenca}/anexos', [AtivoLicencaController::class, 'uploadAnexo'])->name('licencas.anexos.store');
         Route::post('licencas/{equipamento}/vincular', [AtivoLicencaController::class, 'vincularEquipamento'])->name('licencas.vincular');
         Route::delete('licencas/{licenca}/{equipamento}/desvincular', [AtivoLicencaController::class, 'desvincularEquipamento'])->name('licencas.desvincular');
         

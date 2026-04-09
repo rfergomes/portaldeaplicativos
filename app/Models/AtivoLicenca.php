@@ -65,6 +65,11 @@ class AtivoLicenca extends Model
                     ->withTimestamps();
     }
 
+    public function anexos()
+    {
+        return $this->hasMany(AtivoAnexo::class, 'licenca_id');
+    }
+
     public function getSeatsEmUsoAttribute()
     {
         return $this->equipamentos()->sum('quantidade');

@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\AtivoLicenca;
 use App\Models\AtivoFabricante;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AtivoLicencaController extends Controller
 {
     public function index(Request $request)
     {
         $query = AtivoLicenca::with(['fabricante', 'fornecedor', 'aquisicao'])
-            ->withSum('equipamentos as total_atribuido', 'quantidade');
+            ->withSum('equipamentos as total_atribuido', 'ativo_licenca_equipamento.quantidade');
 
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
@@ -280,6 +281,38 @@ class AtivoLicencaController extends Controller
         $licenca->delete();
 
         return redirect()->route('ativos.licencas.index')->with('success', 'Licença excluída com sucesso!');
+    }
+
+    public function show(AtivoLicenca $licenca)
+    {
+        $licenca->load(['fabricante', 'fornecedor', 'marketplace', 'aquisicao', 'equipamentos', 'anexos']);
+        
+        // Se a licença tiver uma aquisição, buscamos também os anexos da nota fiscal (aquisicao)
+        $anexosAquisicao = [];
+        if ($licenca->aquisicao) {
+            $anexosAquisicao = $licenca->aquisicao->anexos;
+        }
+
+        return view('ativos.licencas.show', compact('licenca', 'anexosAquisicao'));
+    }
+
+    public function uploadAnexo(Request $request, AtivoLicenca $licenca)
+    {
+        $request->validate([
+            'arquivo' => 'required|file|max:10240', // 10MB
+        ]);
+
+        $file = $request->file('arquivo');
+        $path = $file->store('ativos/anexos', 'public');
+
+        $licenca->anexos()->create([
+            'caminho' => $path,
+            'nome_original' => $file->getClientOriginalName(),
+            'mime_type' => $file->getMimeType(),
+            'tamanho' => $file->getSize(),
+        ]);
+
+        return redirect()->back()->with('success', 'Documento anexado à licença com sucesso!');
     }
 
     public function vincularEquipamento(Request $request, $equipamentoId)
