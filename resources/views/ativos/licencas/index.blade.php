@@ -160,12 +160,15 @@
                             </td>
                             <td>
                                 <div class="progress mb-1" style="height: 6px; width: 100px;">
-                                    @php $percent = ($licenca->equipamentos_count / $licenca->quantidade_seats) * 100; @endphp
+                                    @php 
+                                        $usado = $licenca->total_atribuido ?? 0;
+                                        $percent = ($usado / $licenca->quantidade_seats) * 100; 
+                                    @endphp
                                     <div class="progress-bar {{ $percent > 90 ? 'bg-danger' : 'bg-primary' }}" 
                                          role="progressbar" 
                                          style="width: {{ min($percent, 100) }}%"></div>
                                 </div>
-                                <small class="text-muted">{{ $licenca->equipamentos_count }} / {{ $licenca->quantidade_seats }} usado(s)</small>
+                                <small class="text-muted">{{ $usado }} / {{ $licenca->quantidade_seats }} usado(s)</small>
                             </td>
                             <td class="text-end pe-4">
                                 <div class="btn-group btn-group-sm">

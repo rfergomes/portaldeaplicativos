@@ -12,7 +12,7 @@ class AtivoLicencaController extends Controller
     public function index(Request $request)
     {
         $query = AtivoLicenca::with(['fabricante', 'fornecedor', 'aquisicao'])
-            ->withCount('equipamentos');
+            ->withSum('equipamentos as total_atribuido', 'quantidade');
 
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
