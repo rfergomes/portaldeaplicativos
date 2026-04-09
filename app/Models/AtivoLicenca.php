@@ -26,6 +26,8 @@ class AtivoLicenca extends Model
         'valor_total',
         'valor_frete',
         'quantidade_seats',
+        'categoria',
+        'modelo',
         'observacao',
     ];
 
@@ -59,7 +61,17 @@ class AtivoLicenca extends Model
     public function equipamentos()
     {
         return $this->belongsToMany(AtivoEquipamento::class, 'ativo_licenca_equipamento', 'licenca_id', 'equipamento_id')
-                    ->withPivot('atribuido_em')
+                    ->withPivot('atribuido_em', 'quantidade')
                     ->withTimestamps();
+    }
+
+    public function getSeatsEmUsoAttribute()
+    {
+        return $this->equipamentos()->sum('quantidade');
+    }
+
+    public function getSeatsDisponiveisAttribute()
+    {
+        return max(0, $this->quantidade_seats - $this->seats_em_uso);
     }
 }

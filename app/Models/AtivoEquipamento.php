@@ -54,7 +54,7 @@ class AtivoEquipamento extends Model
     public function licencas()
     {
         return $this->belongsToMany(AtivoLicenca::class, 'ativo_licenca_equipamento', 'equipamento_id', 'licenca_id')
-                    ->withPivot('atribuido_em')
+                    ->withPivot('atribuido_em', 'quantidade')
                     ->withTimestamps();
     }
 

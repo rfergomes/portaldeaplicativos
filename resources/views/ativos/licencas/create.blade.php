@@ -47,6 +47,30 @@
                                 <input type="text" name="chave" class="form-control @error('chave') is-invalid @enderror" value="{{ old('chave') }}" placeholder="XXXXX-XXXXX-XXXXX-XXXXX">
                                 @error('chave') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Categoria</label>
+                                <select name="categoria" class="form-select @error('categoria') is-invalid @enderror">
+                                    <option value="">Selecione...</option>
+                                    <option value="Software Proprietário" {{ old('categoria') == 'Software Proprietário' ? 'selected' : '' }}>Software Proprietário</option>
+                                    <option value="Software de Código Aberto (Open Source)" {{ old('categoria') == 'Software de Código Aberto (Open Source)' ? 'selected' : '' }}>Software de Código Aberto (Open Source)</option>
+                                    <option value="Software Livre (GNU/GPL)" {{ old('categoria') == 'Software Livre (GNU/GPL)' ? 'selected' : '' }}>Software Livre (GNU/GPL)</option>
+                                    <option value="Freeware" {{ old('categoria') == 'Freeware' ? 'selected' : '' }}>Freeware</option>
+                                    <option value="Shareware" {{ old('categoria') == 'Shareware' ? 'selected' : '' }}>Shareware</option>
+                                </select>
+                                @error('categoria') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Modelo de Licenciamento</label>
+                                <select name="modelo" class="form-select @error('modelo') is-invalid @enderror">
+                                    <option value="">Selecione...</option>
+                                    <option value="Por Dispositivo" {{ old('modelo') == 'Por Dispositivo' ? 'selected' : '' }}>Por Dispositivo</option>
+                                    <option value="Por Usuário (Nomeado/Simultâneo)" {{ old('modelo') == 'Por Usuário (Nomeado/Simultâneo)' ? 'selected' : '' }}>Por Usuário (Nomeado/Simultâneo)</option>
+                                    <option value="SaaS (Software as a Service)" {{ old('modelo') == 'SaaS (Software as a Service)' ? 'selected' : '' }}>SaaS (Software as a Service)</option>
+                                    <option value="Licença Perpétua" {{ old('modelo') == 'Licença Perpétua' ? 'selected' : '' }}>Licença Perpétua</option>
+                                    <option value="Licenciamento por Núcleo (Per Core)" {{ old('modelo') == 'Licenciamento por Núcleo (Per Core)' ? 'selected' : '' }}>Licenciamento por Núcleo (Per Core)</option>
+                                </select>
+                                @error('modelo') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold small">Tipo de Licença</label>
                                 <select name="tipo_licenca" class="form-select @error('tipo_licenca') is-invalid @enderror" required>

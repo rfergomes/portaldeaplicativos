@@ -39,7 +39,7 @@ class AtivoLicencaController extends Controller
             ->count();
         $custoSoftware = AtivoLicenca::sum('valor_total');
         $totalSeats = AtivoLicenca::sum('quantidade_seats');
-        $seatsEmUso = \Illuminate\Support\Facades\DB::table('ativo_licenca_equipamento')->count();
+        $seatsEmUso = \Illuminate\Support\Facades\DB::table('ativo_licenca_equipamento')->sum('quantidade');
 
         return view('ativos.licencas.index', compact('licencas', 'fabricantes', 'totalLicencas', 'licencasExpirando', 'custoSoftware', 'totalSeats', 'seatsEmUso'));
     }
@@ -100,6 +100,8 @@ class AtivoLicencaController extends Controller
             'itens.*.chave' => 'nullable|string|max:255',
             'itens.*.fabricante_id' => 'nullable|exists:ativo_fabricantes,id',
             'itens.*.tipo_licenca' => 'required|in:vitalicia,assinatura',
+            'itens.*.categoria' => 'nullable|string|max:255',
+            'itens.*.modelo' => 'nullable|string|max:255',
             'itens.*.data_validade' => 'nullable|date',
             'itens.*.quantidade_seats' => 'required|integer|min:1',
             'itens.*.valor_unitario' => 'required|numeric|min:0',
@@ -129,6 +131,8 @@ class AtivoLicencaController extends Controller
                     'chave' => $item['chave'] ?? null,
                     'fabricante_id' => $item['fabricante_id'] ?? null,
                     'tipo_licenca' => $item['tipo_licenca'],
+                    'categoria' => $item['categoria'] ?? null,
+                    'modelo' => $item['modelo'] ?? null,
                     'data_validade' => $item['data_validade'] ?? null,
                     'quantidade_seats' => $item['quantidade_seats'],
                     'observacao' => $item['observacao'] ?? null,
@@ -196,6 +200,8 @@ class AtivoLicencaController extends Controller
             'nome' => 'required|string|max:255',
             'chave' => 'nullable|string|max:255',
             'tipo_licenca' => 'required|in:vitalicia,assinatura',
+            'categoria' => 'nullable|string|max:255',
+            'modelo' => 'nullable|string|max:255',
             'data_validade' => 'nullable|date',
             'fabricante_id' => 'nullable|exists:ativo_fabricantes,id',
             'fornecedor_id' => 'nullable|exists:ativo_fornecedores,id',
@@ -279,23 +285,30 @@ class AtivoLicencaController extends Controller
     public function vincularEquipamento(Request $request, $equipamentoId)
     {
         $request->validate([
-            'licenca_id' => 'required|exists:ativo_licencas,id'
+            'licenca_id' => 'required|exists:ativo_licencas,id',
+            'quantidade' => 'required|integer|min:1'
         ]);
 
         $equipamento = \App\Models\AtivoEquipamento::findOrFail($equipamentoId);
         $licenca = AtivoLicenca::findOrFail($request->licenca_id);
+        $quantidadeSolicitada = $request->quantidade;
+
+        // Verifica seats disponíveis
+        if ($licenca->seats_disponiveis < $quantidadeSolicitada) {
+            return redirect()->back()->with('error', "Limite de ativações atingido. Disponível: {$licenca->seats_disponiveis}.");
+        }
 
         // Verifica se já está vinculado
-        if ($equipamento->licencas()->where('ativo_licencas.id', $licenca->id)->exists()) {
-            return redirect()->back()->with('error', 'Esta licença já está vinculada a este equipamento.');
-        }
+        $vinculoExistente = $equipamento->licencas()->where('ativo_licencas.id', $licenca->id)->first();
 
-        // Verifica seats
-        if ($licenca->equipamentos()->count() >= $licenca->quantidade_seats) {
-            return redirect()->back()->with('error', 'Limite de ativações (seats) atingido para esta licença.');
+        if ($vinculoExistente) {
+            // Se já existe, somamos a quantidade
+            $novaQuantidade = $vinculoExistente->pivot->quantidade + $quantidadeSolicitada;
+            $equipamento->licencas()->updateExistingPivot($licenca->id, ['quantidade' => $novaQuantidade]);
+        } else {
+            // Se não existe, criamos novo link
+            $equipamento->licencas()->attach($licenca->id, ['quantidade' => $quantidadeSolicitada]);
         }
-
-        $equipamento->licencas()->attach($licenca->id);
 
         return redirect()->back()->with('success', 'Licença vinculada com sucesso!');
     }

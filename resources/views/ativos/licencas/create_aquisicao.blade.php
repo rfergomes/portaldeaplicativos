@@ -152,8 +152,36 @@
                                             <option value="assinatura" {{ strtolower($item['tipo_licenca']) == 'assinatura' ? 'selected' : '' }}>Assinatura / Renovável</option>
                                             <option value="vitalicia" {{ strtolower($item['tipo_licenca']) == 'vitalicia' ? 'selected' : '' }}>Vitalícia / Permanente</option>
                                         </select>
-                                        <label class="text-muted small fw-bold">Tipo de Licença *</label>
+                                        <label class="text-muted small fw-bold">Tipo *</label>
                                         @error("itens.{$index}.tipo_licenca") <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <select name="itens[{{ $index }}][categoria]" class="form-select @error("itens.{$index}.categoria") is-invalid @enderror">
+                                            <option value="">Categoria...</option>
+                                            <option value="Software Proprietário" {{ ($item['categoria'] ?? '') == 'Software Proprietário' ? 'selected' : '' }}>Software Proprietário</option>
+                                            <option value="Software de Código Aberto (Open Source)" {{ ($item['categoria'] ?? '') == 'Software de Código Aberto (Open Source)' ? 'selected' : '' }}>Software de Código Aberto (Open Source)</option>
+                                            <option value="Software Livre (GNU/GPL)" {{ ($item['categoria'] ?? '') == 'Software Livre (GNU/GPL)' ? 'selected' : '' }}>Software Livre (GNU/GPL)</option>
+                                            <option value="Freeware" {{ ($item['categoria'] ?? '') == 'Freeware' ? 'selected' : '' }}>Freeware</option>
+                                            <option value="Shareware" {{ ($item['categoria'] ?? '') == 'Shareware' ? 'selected' : '' }}>Shareware</option>
+                                        </select>
+                                        <label class="text-muted small fw-bold">Categoria</label>
+                                        @error("itens.{$index}.categoria") <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <select name="itens[{{ $index }}][modelo]" class="form-select @error("itens.{$index}.modelo") is-invalid @enderror">
+                                            <option value="">Modelo...</option>
+                                            <option value="Por Dispositivo" {{ ($item['modelo'] ?? '') == 'Por Dispositivo' ? 'selected' : '' }}>Por Dispositivo</option>
+                                            <option value="Por Usuário (Nomeado/Simultâneo)" {{ ($item['modelo'] ?? '') == 'Por Usuário (Nomeado/Simultâneo)' ? 'selected' : '' }}>Por Usuário (Nomeado/Simultâneo)</option>
+                                            <option value="SaaS (Software as a Service)" {{ ($item['modelo'] ?? '') == 'SaaS (Software as a Service)' ? 'selected' : '' }}>SaaS (Software as a Service)</option>
+                                            <option value="Licença Perpétua" {{ ($item['modelo'] ?? '') == 'Licença Perpétua' ? 'selected' : '' }}>Licença Perpétua</option>
+                                            <option value="Licenciamento por Núcleo (Per Core)" {{ ($item['modelo'] ?? '') == 'Licenciamento por Núcleo (Per Core)' ? 'selected' : '' }}>Licenciamento por Núcleo (Per Core)</option>
+                                        </select>
+                                        <label class="text-muted small fw-bold">Modelo</label>
+                                        @error("itens.{$index}.modelo") <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -222,7 +250,33 @@
                                         <option value="assinatura">Assinatura / Renovável</option>
                                         <option value="vitalicia">Vitalícia / Permanente</option>
                                     </select>
-                                    <label class="text-muted small fw-bold">Tipo de Licença *</label>
+                                    <label class="text-muted small fw-bold">Tipo *</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <select name="itens[0][categoria]" class="form-select">
+                                        <option value="">Categoria...</option>
+                                        <option value="Software Proprietário">Software Proprietário</option>
+                                        <option value="Software de Código Aberto (Open Source)">Software de Código Aberto (Open Source)</option>
+                                        <option value="Software Livre (GNU/GPL)">Software Livre (GNU/GPL)</option>
+                                        <option value="Freeware">Freeware</option>
+                                        <option value="Shareware">Shareware</option>
+                                    </select>
+                                    <label class="text-muted small fw-bold">Categoria</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <select name="itens[0][modelo]" class="form-select">
+                                        <option value="">Modelo...</option>
+                                        <option value="Por Dispositivo">Por Dispositivo</option>
+                                        <option value="Por Usuário (Nomeado/Simultâneo)">Por Usuário (Nomeado/Simultâneo)</option>
+                                        <option value="SaaS (Software as a Service)">SaaS (Software as a Service)</option>
+                                        <option value="Licença Perpétua">Licença Perpétua</option>
+                                        <option value="Licenciamento por Núcleo (Per Core)">Licenciamento por Núcleo (Per Core)</option>
+                                    </select>
+                                    <label class="text-muted small fw-bold">Modelo</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -297,7 +351,33 @@
                         <option value="assinatura">Assinatura / Renovável</option>
                         <option value="vitalicia">Vitalícia / Permanente</option>
                     </select>
-                    <label class="text-muted small fw-bold">Tipo de Licença *</label>
+                    <label class="text-muted small fw-bold">Tipo *</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <select name="itens[__INDEX__][categoria]" class="form-select">
+                        <option value="">Categoria...</option>
+                        <option value="Software Proprietário">Software Proprietário</option>
+                        <option value="Software de Código Aberto (Open Source)">Software de Código Aberto (Open Source)</option>
+                        <option value="Software Livre (GNU/GPL)">Software Livre (GNU/GPL)</option>
+                        <option value="Freeware">Freeware</option>
+                        <option value="Shareware">Shareware</option>
+                    </select>
+                    <label class="text-muted small fw-bold">Categoria</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <select name="itens[__INDEX__][modelo]" class="form-select">
+                        <option value="">Modelo...</option>
+                        <option value="Por Dispositivo">Por Dispositivo</option>
+                        <option value="Por Usuário (Nomeado/Simultâneo)">Por Usuário (Nomeado/Simultâneo)</option>
+                        <option value="SaaS (Software as a Service)">SaaS (Software as a Service)</option>
+                        <option value="Licença Perpétua">Licença Perpétua</option>
+                        <option value="Licenciamento por Núcleo (Per Core)">Licenciamento por Núcleo (Per Core)</option>
+                    </select>
+                    <label class="text-muted small fw-bold">Modelo</label>
                 </div>
             </div>
             <div class="col-md-6">

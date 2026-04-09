@@ -81,9 +81,14 @@
                     <div class="list-group list-group-flush">
                         @forelse($equipamento->licencas as $lic)
                             <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="fw-bold small">{{ $lic->nome }}</div>
-                                    <div class="x-small text-muted">{{ $lic->chave ?? 'S/ Chave' }}</div>
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="fw-bold small">{{ $lic->nome }}</div>
+                                        <div class="x-small text-muted">{{ $lic->chave ?? 'S/ Chave' }}</div>
+                                    </div>
+                                    @if($lic->pivot->quantidade > 1)
+                                        <span class="badge bg-light text-dark border small me-2">x{{ $lic->pivot->quantidade }}</span>
+                                    @endif
                                 </div>
                                 <form action="{{ route('ativos.licencas.desvincular', [$lic->id, $equipamento->id]) }}" method="POST">
                                     @csrf
@@ -409,9 +414,16 @@
                     <select name="licenca_id" class="form-select" required>
                         <option value="">Selecione...</option>
                         @foreach(\App\Models\AtivoLicenca::orderBy('nome')->get() as $lic)
-                            <option value="{{ $lic->id }}">{{ $lic->nome }} ({{ $lic->chave }})</option>
+                            @if($lic->seats_disponiveis > 0)
+                                <option value="{{ $lic->id }}">{{ $lic->nome }} ({{ $lic->chave }}) - Disponível: {{ $lic->seats_disponiveis }}</option>
+                            @endif
                         @endforeach
                     </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Quantidade de Ativações / CALs</label>
+                    <input type="number" name="quantidade" class="form-control" value="1" min="1" required>
+                    <div class="form-text x-small text-muted mt-1">Geralmente use '1' para SO, ou quantidades maiores para seats de CALs/Cores.</div>
                 </div>
             </div>
             <div class="modal-footer bg-light border-0">
