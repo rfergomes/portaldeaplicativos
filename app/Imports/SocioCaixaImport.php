@@ -34,7 +34,7 @@ class SocioCaixaImport implements ToModel, WithUpserts
         }
 
         if (!$isCaixa) {
-            \Illuminate\Support\Facades\Log::debug("Linha pulada (não é CAIXA). Matrícula: {$row[2]}. Colunas testadas: " . implode(', ', $valoresEncontrados));
+            \Illuminate\Support\Facades\Log::info("Linha pulada (não é CAIXA). Matrícula: {$row[2]}. Colunas testadas: " . implode(', ', $valoresEncontrados));
             return null;
         }
 
