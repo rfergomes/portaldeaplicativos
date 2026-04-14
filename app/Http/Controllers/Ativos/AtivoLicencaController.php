@@ -13,7 +13,9 @@ class AtivoLicencaController extends Controller
     public function index(Request $request)
     {
         $query = AtivoLicenca::with(['fabricante', 'fornecedor', 'aquisicao'])
-            ->withSum('equipamentos as total_atribuido', 'ativo_licenca_equipamento.quantidade');
+            ->withSum(['equipamentos as total_atribuido' => function($q) {
+                $q->select(\Illuminate\Support\Facades\DB::raw('sum(quantidade)'));
+            }], 'quantidade');
 
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
@@ -332,7 +334,7 @@ class AtivoLicencaController extends Controller
         }
 
         // Verifica se já está vinculado
-        $vinculoExistente = $equipamento->licencas()->where('ativo_licencas.id', $licenca->id)->first();
+        $vinculoExistente = $equipamento->licencas()->wherePivot('licenca_id', $licenca->id)->first();
 
         if ($vinculoExistente) {
             // Se já existe, somamos a quantidade

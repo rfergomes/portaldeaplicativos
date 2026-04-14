@@ -87,8 +87,17 @@ class UpdateProtocolosStatus extends Command
                             continue;
                         }
 
-                        // Converte dd/mm/yyyy hh:mm:ss para formato MySQL
-                        $parsedDate = Carbon::createFromFormat('d/m/Y H:i:s', $dateTime)->format('Y-m-d H:i:s');
+                        // Converte a data da API para o formato MySQL de forma resiliente
+                        try {
+                            if (str_contains($dateTime, '/')) {
+                                $parsedDate = Carbon::createFromFormat('d/m/Y H:i:s', $dateTime)->format('Y-m-d H:i:s');
+                            } else {
+                                $parsedDate = Carbon::parse($dateTime)->format('Y-m-d H:i:s');
+                            }
+                        } catch (\Exception $e) {
+                            Log::debug("Data inválida recebida da AR-Online no envio #{$envio->id}: {$dateTime}");
+                            continue;
+                        }
 
                         $canalStatus = match (true) {
                             str_contains($label, 'lido') || str_contains($label, 'visualizado') => 'lido',
