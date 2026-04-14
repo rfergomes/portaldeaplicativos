@@ -17,6 +17,7 @@ use App\Http\Controllers\Agenda\AgendaInscricaoController;
 use App\Http\Controllers\Ativos\AtivoEquipamentoController;
 use App\Http\Controllers\Ativos\AtivoLicencaController;
 use App\Http\Controllers\Ativos\AtivoEstacaoController;
+use App\Http\Controllers\SocioCaixaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -183,6 +184,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('fornecedores', \App\Http\Controllers\Ativos\AtivoFornecedorController::class)->except(['show']);
 
         // Gestão de Cessões
+        Route::get('cessoes/pdf/relatorio', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'gerarRelatorioPdf'])->name('cessoes.relatorio.pdf');
         Route::get('cessoes', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'index'])->name('cessoes.index');
         Route::post('cessoes', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'store'])->name('cessoes.store');
         Route::get('cessoes/{cessao}/pdf', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'generatePdf'])->name('cessoes.pdf');
@@ -204,6 +206,16 @@ Route::middleware('auth')->group(function () {
 
         // API endpoints
         Route::get('api/estacoes', [AtivoEstacaoController::class, 'apiGetEstacoes'])->name('api.estacoes');
+    });
+
+    // Sócio Caixa
+    Route::prefix('socio-caixa')->name('socios-caixa.')->group(function () {
+        Route::get('/', [SocioCaixaController::class, 'index'])->name('index');
+        Route::get('/dashboard', [SocioCaixaController::class, 'dashboard'])->name('dashboard');
+        Route::post('/import', [SocioCaixaController::class, 'import'])->name('import');
+        Route::patch('/{socio}/toggle-payment', [SocioCaixaController::class, 'togglePayment'])->name('toggle-payment');
+        Route::patch('/{socio}/postpone', [SocioCaixaController::class, 'postpone'])->name('postpone');
+        Route::get('/{socio}', [SocioCaixaController::class, 'show'])->name('show');
     });
 });
 

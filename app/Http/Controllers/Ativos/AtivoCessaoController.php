@@ -61,6 +61,34 @@ class AtivoCessaoController extends Controller
         return view('ativos.cessoes.index', compact('cessoes', 'usuarios', 'totalTermos', 'itensCedidos', 'cessionariosUnicos', 'devolucoesAtrasadas', 'aquisicoesDisponiveis'));
     }
 
+    public function gerarRelatorioPdf(Request $request)
+    {
+        $query = AtivoCessao::with(['usuario', 'movimentacoes.equipamento']);
+
+        if ($request->filled('search')) {
+            $query->where('codigo_cessao', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('usuario_id')) {
+            $query->where('usuario_id', $request->usuario_id);
+        }
+
+        if ($request->filled('data_inicio')) {
+            $query->whereDate('data_cessao', '>=', $request->data_inicio);
+        }
+
+        if ($request->filled('data_fim')) {
+            $query->whereDate('data_cessao', '<=', $request->data_fim);
+        }
+
+        $cessoes = $query->orderBy('data_cessao', 'desc')->get();
+
+        $pdf = Pdf::loadView('ativos.cessoes.pdf_relatorio', compact('cessoes', 'request'))
+                  ->setPaper('a4', 'landscape');
+
+        return $pdf->stream('relatorio_cessoes.pdf');
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

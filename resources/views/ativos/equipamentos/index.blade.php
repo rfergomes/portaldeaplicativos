@@ -159,7 +159,13 @@
                             <td>
                                 <div>
                                     @if($equipamento->valor_nota)
-                                        <span class="badge bg-secondary-subtle text-secondary border mb-1" title="Nº Nota Fiscal"><i class="fa-solid fa-file-invoice me-1"></i>{{ $equipamento->valor_nota }}</span>
+                                        @if($equipamento->aquisicao_id)
+                                            <a href="{{ route('ativos.aquisicoes.show', $equipamento->aquisicao_id) }}" class="text-decoration-none" title="Ver Aquisição">
+                                                <span class="badge bg-primary-subtle text-primary border mb-1"><i class="fa-solid fa-file-invoice me-1"></i>{{ $equipamento->valor_nota }}</span>
+                                            </a>
+                                        @else
+                                            <span class="badge bg-secondary-subtle text-secondary border mb-1" title="Nº Nota Fiscal"><i class="fa-solid fa-file-invoice me-1"></i>{{ $equipamento->valor_nota }}</span>
+                                        @endif
                                     @else
                                         <span class="text-muted small mb-1 d-block">Sem Nota</span>
                                     @endif

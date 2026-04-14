@@ -10,10 +10,13 @@
             <p class="text-muted">Gestão de termos de cessão, múltiplos itens e documentos assinados.</p>
         </div>
         <div class="col-md-6 text-end">
-             <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#modalNovaCessaoNotaFiscal">
+             <a href="{{ route('ativos.cessoes.relatorio.pdf', request()->query()) }}" target="_blank" class="btn btn-outline-danger me-2 shadow-sm">
+                <i class="fa-solid fa-file-pdf me-1"></i> Relatório PDF
+            </a>
+             <button type="button" class="btn btn-outline-primary me-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNovaCessaoNotaFiscal">
                 <i class="fa-solid fa-file-invoice me-1"></i> Cessão por NF
             </button>
-             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovaCessaoMultipla">
+             <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNovaCessaoMultipla">
                 <i class="fa-solid fa-plus me-1"></i> Nova Cessão Múltipla
             </button>
         </div>
