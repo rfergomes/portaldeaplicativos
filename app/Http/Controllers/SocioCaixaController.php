@@ -50,7 +50,18 @@ class SocioCaixaController extends Controller
             $query->where('tipo_socio', $request->tipo);
         }
 
-        $socios = $query->orderBy('nome')->paginate(20)->appends($request->all());
+        $query->select('matricula', 'nome', 'tipo_socio')
+            ->selectRaw('COUNT(CASE WHEN pago = 1 THEN 1 END) as total_pagos')
+            ->selectRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) as total_abertos')
+            ->selectRaw('COUNT(CASE WHEN (pago = 0 AND postergado_ate > NOW()) THEN 1 END) as total_postergados')
+            // Pegamos o ID de qualquer um dos registros para manter compatibilidade com rotas se necessário,
+            // mas o ideal é usar a matrícula
+            ->selectRaw('MIN(id) as id') 
+            ->groupBy('matricula', 'nome', 'tipo_socio');
+
+        $socios = $query->orderBy('nome')
+                        ->paginate(20)
+                        ->appends($request->all());
         
         $anos = SocioCaixa::select('ano')->distinct()->orderBy('ano', 'desc')->pluck('ano');
         $tipos = SocioCaixa::select('tipo_socio')->distinct()->whereNotNull('tipo_socio')->orderBy('tipo_socio')->pluck('tipo_socio');
@@ -125,15 +136,19 @@ class SocioCaixaController extends Controller
             'motivo' => 'nullable|string'
         ]);
 
-        $socio->update([
-            'postergado_ate' => $request->postergado_ate,
-            'motivo_postergacao' => $request->motivo
-        ]);
+        // Atualiza todos os lançamentos em aberto desta matrícula
+        SocioCaixa::where('matricula', $socio->matricula)
+            ->where('pago', false)
+            ->update([
+                'postergado_ate' => $request->postergado_ate,
+                'motivo_postergacao' => $request->motivo
+            ]);
 
+        // Registra o histórico no registro "pai" (ou no que foi clicado)
         $socio->historico()->create([
             'user_id' => auth()->id(),
-            'acao' => 'postergar',
-            'observacao' => "Postergado até " . \Carbon\Carbon::parse($request->postergado_ate)->format('d/m/Y') . ". Motivo: " . ($request->motivo ?: 'N/D')
+            'acao' => 'postergar_coletivo',
+            'observacao' => "Postergação COLETIVA aplicada a todos os débitos até " . \Carbon\Carbon::parse($request->postergado_ate)->format('d/m/Y') . ". Motivo: " . ($request->motivo ?: 'N/D')
         ]);
 
         return response()->json(['success' => true]);

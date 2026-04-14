@@ -115,70 +115,53 @@
                         <tr class="table-light">
                             <th class="ps-3 border-0">Matrícula</th>
                             <th class="border-0">Nome do Sócio</th>
-                            <th class="border-0">Tipo</th>
-                            <th class="border-0 text-center">Referência</th>
-                            <th class="border-0">Valor</th>
-                            <th class="text-center border-0">Pago?</th>
-                            <th class="border-0">Operador / Status</th>
+                            <th class="border-0 text-center">Tipo</th>
+                            <th class="border-0 text-center">Quant. Pagas</th>
+                            <th class="border-0 text-center">Em Aberto</th>
+                            <th class="border-0 text-center">Postergadas</th>
                             <th class="text-end pe-3 border-0">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($socios as $socio)
-                        <tr class="{{ $socio->postergado_ate && $socio->postergado_ate > now() ? 'opacity-75 bg-light' : '' }}">
+                        <tr>
                             <td class="ps-3"><span class="badge bg-secondary-subtle text-secondary border border-secondary">{{ $socio->matricula }}</span></td>
                             <td>
                                 <span class="fw-bold text-dark">{{ $socio->nome }}</span>
-                                @if($socio->postergado_ate && $socio->postergado_ate > now())
-                                    <div class="small text-warning fw-bold">
-                                        <i class="fas fa-clock me-1"></i> Postergado até {{ $socio->postergado_ate->format('d/m') }}
-                                    </div>
-                                @endif
                             </td>
-                            <td><span class="small text-muted text-uppercase">{{ $socio->tipo_socio }}</span></td>
-                            <td class="text-center">{{ str_pad($socio->mes, 2, '0', STR_PAD_LEFT) }}/{{ $socio->ano }}</td>
-                            <td><span class="fw-semibold">R$ {{ number_format($socio->valor, 2, ',', '.') }}</span></td>
+                            <td class="text-center"><span class="small text-muted text-uppercase">{{ $socio->tipo_socio }}</span></td>
                             <td class="text-center">
-                                <div class="form-check form-switch d-inline-block">
-                                    <input class="form-check-input payment-toggle cursor-pointer" type="checkbox" 
-                                           data-id="{{ $socio->id }}"
-                                           data-ref="{{ str_pad($socio->mes, 2, '0', STR_PAD_LEFT) }}/{{ $socio->ano }}"
-                                           data-paid="{{ $socio->pago ? 'true' : 'false' }}"
-                                           style="width: 2.5em; height: 1.25em;"
-                                           {{ $socio->pago ? 'checked' : '' }}>
-                                </div>
+                                <span class="badge rounded-pill bg-success-subtle text-success px-3 border border-success">
+                                    {{ $socio->total_pagos }}
+                                </span>
                             </td>
-                            <td>
-                                <div id="pagto-{{ $socio->id }}" class="small">
-                                    @if($socio->pago)
-                                        <span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> PAGO</span>
-                                        @if($socio->usuarioBaixa)
-                                            <div class="text-muted" style="font-size:0.7rem;">Por: {{ $socio->usuarioBaixa->nickname ?: $socio->usuarioBaixa->name }}</div>
-                                        @endif
-                                    @else
-                                        <span class="text-danger fw-bold"><i class="fas fa-times-circle me-1"></i> EM ABERTO</span>
-                                    @endif
-                                </div>
+                            <td class="text-center">
+                                <span class="badge rounded-pill {{ $socio->total_abertos > 0 ? 'bg-danger-subtle text-danger border border-danger' : 'bg-light text-muted border' }} px-3">
+                                    {{ $socio->total_abertos }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill {{ $socio->total_postergados > 0 ? 'bg-warning-subtle text-warning border border-warning' : 'bg-light text-muted border' }} px-3">
+                                    {{ $socio->total_postergados }}
+                                </span>
                             </td>
                             <td class="text-end pe-3">
                                 <div class="btn-group">
-                                    <a href="{{ route('socios-caixa.show', $socio->id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3" title="Visualizar Lançamentos">
-                                        <i class="fas fa-external-link-alt me-1"></i> Detalhes
+                                    <a href="{{ route('socios-caixa.show', $socio->id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3" title="Gerenciar Lançamentos">
+                                        <i class="fas fa-list-check me-1"></i> Detalhes
                                     </a>
-                                    @if(!$socio->pago)
                                     <button type="button" class="btn btn-sm btn-outline-warning ms-1 rounded-pill btn-postpone" 
                                             data-id="{{ $socio->id }}" 
                                             data-nome="{{ $socio->nome }}"
-                                            title="Postergar Conferência">
+                                            title="Postergar todos os débitos">
                                         <i class="fas fa-clock"></i>
                                     </button>
-                                    @endif
                                 </div>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center py-5">
+                            <td colspan="7" class="text-center py-5">
                                 <div class="text-muted opacity-50">
                                     <i class="fas fa-search fa-3x mb-3"></i>
                                     <p class="mb-0 fs-5">Nenhum registro encontrado.</p>
