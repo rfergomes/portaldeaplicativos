@@ -22,18 +22,23 @@ class SocioCaixaImport implements ToModel, WithUpserts
         }
 
         // Tentar identificar se é um lançamento do tipo CAIXA em diferentes colunas possíveis
-        // (Isso resolve problemas se colunas forem inseridas/removidas na planilha)
         $isCaixa = false;
+        $valoresEncontrados = [];
         foreach ([$row[4] ?? '', $row[5] ?? '', $row[6] ?? '', $row[7] ?? ''] as $col) {
-            if (strtoupper(trim((string)$col)) === 'CAIXA') {
+            $val = strtoupper(trim((string)$col));
+            $valoresEncontrados[] = $val;
+            if ($val === 'CAIXA') {
                 $isCaixa = true;
                 break;
             }
         }
 
         if (!$isCaixa) {
+            \Illuminate\Support\Facades\Log::debug("Linha pulada (não é CAIXA). Matrícula: {$row[2]}. Colunas testadas: " . implode(', ', $valoresEncontrados));
             return null;
         }
+
+        \Illuminate\Support\Facades\Log::info("Importando linha: Matrícula {$row[2]}, Ano {$row[0]}, Mês {$row[1]}");
 
         $matricula = trim((string) $row[2]);
 
