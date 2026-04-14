@@ -57,7 +57,7 @@
     },
     "config": {
         "platform": {
-            "php": "8.2.12"
+            "php": "8.4.9"
         },
         "platform-check": false,
         "optimize-autoloader": true,
