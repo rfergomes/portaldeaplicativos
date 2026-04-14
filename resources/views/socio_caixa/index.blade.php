@@ -44,17 +44,6 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-2">
-                                <label class="small fw-bold text-secondary">Mês</label>
-                                <select name="mes" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    <option value="">Todos</option>
-                                    @foreach($meses as $mes)
-                                        <option value="{{ $mes }}" {{ request('mes') == $mes ? 'selected' : '' }}>
-                                            {{ str_pad($mes, 2, '0', STR_PAD_LEFT) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
                             <div class="col-md-3">
                                 <label class="small fw-bold text-secondary">Tipo de Sócio</label>
                                 <select name="tipo" class="form-select form-select-sm" onchange="this.form.submit()">
@@ -64,19 +53,11 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-2">
-                                <label class="small fw-bold text-secondary">Status Pagto.</label>
-                                <select name="pago" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    <option value="todos" {{ request('pago') == 'todos' ? 'selected' : '' }}>Todos</option>
-                                    <option value="0" {{ request('pago') == '0' ? 'selected' : '' }}>Em Aberto</option>
-                                    <option value="1" {{ request('pago') == '1' ? 'selected' : '' }}>Pago</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="small fw-bold text-secondary">Busca Rápida</label>
+                            <div class="col-md-7">
+                                <label class="small fw-bold text-secondary">Busca Rápida (Nome ou Matrícula)</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="text" name="nome" class="form-control" placeholder="Nome..." value="{{ request('nome') }}">
-                                    <button type="submit" class="btn btn-secondary"><i class="fas fa-search"></i></button>
+                                    <input type="text" name="nome" class="form-control" placeholder="Digite o nome ou a matrícula..." value="{{ request('nome') }}">
+                                    <button type="submit" class="btn btn-secondary pe-3 ps-3"><i class="fas fa-search me-1"></i> Buscar</button>
                                 </div>
                             </div>
                         </div>

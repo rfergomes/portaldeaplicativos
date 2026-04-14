@@ -11,34 +11,19 @@ class SocioCaixaController extends Controller
 {
     public function index(Request $request)
     {
+        // 1. Definir padrões se for a primeira vez no ano
+        if (!$request->has('ano')) {
+            $request->merge(['ano' => date('Y')]);
+        }
+        if (!$request->has('tipo')) {
+            $request->merge(['tipo' => 'SOCIO FABRICA-NORMAL']);
+        }
+
         $query = SocioCaixa::query();
 
-        // Filtro de Status (Default: Em Aberto - pago=0)
-        if (!$request->has('pago')) {
-            $request->merge(['pago' => '0']);
-        }
-
-        if ($request->filled('pago') && $request->pago !== 'todos') {
-            $query->where('pago', $request->pago == '1');
-        }
-
-        // Filtro de Postergados
-        // Default: Esconde os que estão com data futura
-        if ($request->pago == '0' && !$request->has('ver_postergados')) {
-            $query->where(function($q) {
-                $q->whereNull('postergado_ate')
-                  ->orWhere('postergado_ate', '<=', now());
-            });
-        } elseif ($request->has('ver_postergados')) {
-            $query->whereNotNull('postergado_ate')->where('postergado_ate', '>', now());
-        }
-
-        // Filtros encadeados (simplificados)
+        // Filtros encadeados (restaurados)
         if ($request->filled('ano')) {
             $query->where('ano', $request->ano);
-        }
-        if ($request->filled('mes')) {
-            $query->where('mes', $request->mes);
         }
         if ($request->filled('matricula')) {
             $query->where('matricula', 'like', '%' . $request->matricula . '%');
@@ -54,10 +39,16 @@ class SocioCaixaController extends Controller
             ->selectRaw('COUNT(CASE WHEN pago = 1 THEN 1 END) as total_pagos')
             ->selectRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) as total_abertos')
             ->selectRaw('COUNT(CASE WHEN (pago = 0 AND postergado_ate > NOW()) THEN 1 END) as total_postergados')
-            // Pegamos o ID de qualquer um dos registros para manter compatibilidade com rotas se necessário,
-            // mas o ideal é usar a matrícula
             ->selectRaw('MIN(id) as id') 
             ->groupBy('matricula', 'nome', 'tipo_socio');
+
+        // Aplicamos o filtro de "Apenas com lançamentos em aberto" por padrão
+        // A menos que o usuário queira ver APENAS os postergados (ou todos, mas o pedido foca em abertos)
+        if ($request->has('ver_postergados')) {
+            $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND postergado_ate > NOW()) THEN 1 END) > 0');
+        } else {
+            $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) > 0');
+        }
 
         $socios = $query->orderBy('nome')
                         ->paginate(20)
@@ -66,14 +57,7 @@ class SocioCaixaController extends Controller
         $anos = SocioCaixa::select('ano')->distinct()->orderBy('ano', 'desc')->pluck('ano');
         $tipos = SocioCaixa::select('tipo_socio')->distinct()->whereNotNull('tipo_socio')->orderBy('tipo_socio')->pluck('tipo_socio');
         
-        // Months for the selected year or all
-        $mesQuery = SocioCaixa::select('mes')->distinct();
-        if ($request->filled('ano')) {
-            $mesQuery->where('ano', $request->ano);
-        }
-        $meses = $mesQuery->orderBy('mes')->pluck('mes');
-
-        return view('socio_caixa.index', compact('socios', 'anos', 'meses', 'tipos'));
+        return view('socio_caixa.index', compact('socios', 'anos', 'tipos'));
     }
 
     public function dashboard(Request $request)
