@@ -16,30 +16,34 @@ class SocioCaixaImport implements ToModel, WithUpserts
     */
     public function model(array $row)
     {
-        // Pular cabeçalho ou linhas totalmente vazias
-        if ($row[0] === 'ANO' || empty($row[0]) || !isset($row[2]) || $row[0] === 'ANO') {
+        // Pular linhas totalmente vazias ou com matrícula ausente
+        if (empty($row[2]) || $row[0] === 'ANO' || $row[2] === 'MATRICULA') {
             return null;
         }
 
-        // Importar apenas lançamentos do tipo CAIXA (Agora no índice 6 devido à nova coluna 'Tipo' no índice 5)
-        $tipoPlanilha = strtoupper(trim((string) ($row[6] ?? '')));
-        if ($tipoPlanilha !== 'CAIXA') {
+        // Tentar identificar se é um lançamento do tipo CAIXA em diferentes colunas possíveis
+        // (Isso resolve problemas se colunas forem inseridas/removidas na planilha)
+        $isCaixa = false;
+        foreach ([$row[4] ?? '', $row[5] ?? '', $row[6] ?? '', $row[7] ?? ''] as $col) {
+            if (strtoupper(trim((string)$col)) === 'CAIXA') {
+                $isCaixa = true;
+                break;
+            }
+        }
+
+        if (!$isCaixa) {
             return null;
         }
 
-        // Garantir que a matrícula existe e remover vírgulas/pontos se necessário
         $matricula = trim((string) $row[2]);
-        if (empty($matricula)) {
-            return null;
-        }
 
         return new SocioCaixa([
-            'ano'            => (int) $row[0],
-            'mes'            => (int) $row[1],
+            'ano'            => (int) ($row[0] ?? 0),
+            'mes'            => (int) ($row[1] ?? 0),
             'matricula'      => $matricula,
             'nome'           => $row[3] ?? 'N/A',
-            'tipo_socio'     => $row[5] ?? null, // Coluna 'Tipo' (Ex: SOCIO FABRICA-NORMAL)
-            'valor'          => 0, // Valor padrão pois a planilha não possui coluna de valor numérico
+            'tipo_socio'     => $row[5] ?? ($row[4] ?? null), 
+            'valor'          => 0, 
             'pago'           => false,
             'data_pagamento' => null,
         ]);
