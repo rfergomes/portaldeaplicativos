@@ -141,12 +141,6 @@ class SocioCaixaController extends Controller
 
     public function import(Request $request)
     {
-        \Illuminate\Support\Facades\Log::info("Iniciando requisição de importação...", [
-            'has_file' => $request->hasFile('file'),
-            'file_name' => $request->hasFile('file') ? $request->file('file')->getClientOriginalName() : 'N/D',
-            'file_size' => $request->hasFile('file') ? $request->file('file')->getSize() : 0
-        ]);
-
         $request->validate([
             'file' => 'required|file'
         ]);
