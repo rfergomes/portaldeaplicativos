@@ -38,6 +38,35 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Registro de Ocorrências (NOVO) -->
+            <div class="card card-outline card-info shadow-sm mt-4 border-0">
+                <div class="card-header border-0 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold text-info mb-0"><i class="fas fa-comment-dots me-2"></i>Anotações / Atendimento</h5>
+                    <button class="btn btn-sm btn-info text-white rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalAddOcorrencia">
+                        <i class="fas fa-plus me-1"></i> Novo
+                    </button>
+                </div>
+                <div class="card-body p-3">
+                    <div class="timeline-container" style="max-height: 400px; overflow-y: auto;">
+                        @forelse($ocorrencias as $oc)
+                            <div class="border-start border-info border-3 ps-3 pb-3 position-relative mb-2">
+                                <div class="position-absolute bg-info rounded-circle" style="width: 12px; height: 12px; left: -8px; top: 5px;"></div>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="fw-bold text-dark">{{ $oc->user->name }}</small>
+                                    <small class="text-muted" style="font-size: 0.75rem;">{{ $oc->created_at->format('d/m/Y H:i') }}</small>
+                                </div>
+                                <p class="mb-0 small text-secondary bg-light p-2 rounded">{{ $oc->mensagem }}</p>
+                            </div>
+                        @empty
+                            <div class="text-center py-4 text-muted">
+                                <i class="fas fa-ghost fa-2x mb-2 opacity-50"></i>
+                                <p class="small mb-0">Nenhum registro de atendimento encontrado.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Todos os Lançamentos -->
@@ -129,13 +158,13 @@
     </div>
 </div>
 
-<!-- Modal de Observação -->
+<!-- Modal de Observação de Baixa -->
 <div class="modal fade" id="modalObservacao" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg border-0">
             <div class="modal-header border-0 pb-0 pt-4 px-4">
                 <h4 class="modal-title fw-bold" id="modalTitle">Título</h4>
-                <button type="button" class="btn-close" data-bs-modal="modal" onclick="fecharModal()"></button>
+                <button type="button" class="btn-close" onclick="fecharModal()"></button>
             </div>
             <div class="modal-body p-4">
                 <p id="modalDescription" class="mb-4 text-muted fs-6">Descrição...</p>
@@ -147,6 +176,28 @@
             <div class="modal-footer border-0 p-4 pt-0">
                 <button type="button" class="btn btn-light rounded-pill px-4" onclick="fecharModal()">Cancelar</button>
                 <button type="button" id="btnConfirmar" class="btn btn-primary rounded-pill px-4 fw-bold">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo Atendimento/Ocorrência -->
+<div class="modal fade" id="modalAddOcorrencia" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h4 class="modal-title fw-bold text-info"><i class="fas fa-edit me-2"></i>Nova Anotação de Atendimento</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="form-group">
+                    <label class="small fw-bold mb-2 text-uppercase text-secondary">Descreva o contato com o sócio</label>
+                    <textarea id="msgOcorrencia" class="form-control border-info-subtle" rows="4" placeholder="Ex: Sócio entrou em contato solicitando baixa, deixou telefone (11) 9...."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" id="btnSalvarOcorrencia" class="btn btn-info text-white rounded-pill px-4 fw-bold">Salvar Registro</button>
             </div>
         </div>
     </div>
@@ -240,6 +291,40 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.innerHTML = 'Confirmar';
         });
     });
+
+    // Lógica Ocorrências (NOVO)
+    const btnSalvarOc = document.getElementById('btnSalvarOcorrencia');
+    const msgOc = document.getElementById('msgOcorrencia');
+
+    if (btnSalvarOc) {
+        btnSalvarOc.addEventListener('click', function() {
+            const mensagem = msgOc.value;
+            if (mensagem.length < 3) {
+                Swal.fire('Atenção', 'Digite uma mensagem válida.', 'warning');
+                return;
+            }
+
+            btnSalvarOc.disabled = true;
+            btnSalvarOc.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+            axios.post('{{ route("socios-caixa.ocorrencias.store") }}', {
+                matricula: '{{ $socio->matricula }}',
+                mensagem: mensagem
+            }, {
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(response => {
+                if (response.data.success) {
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                Swal.fire('Erro', 'Erro ao salvar anotação.', 'error');
+                btnSalvarOc.disabled = false;
+                btnSalvarOc.innerHTML = 'Salvar Registro';
+            });
+        });
+    }
 });
 
 function fecharModal() {

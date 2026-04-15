@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SocioCaixa;
+use App\Models\SocioCaixaOcorrencia;
 use App\Imports\SocioCaixaImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -143,11 +144,27 @@ class SocioCaixaController extends Controller
         ]);
 
         try {
-            Excel::import(new SocioCaixaImport, $request->file('file'));
+            Excel::import(new \App\Imports\SocioCaixaImport, $request->file('file'));
             return redirect()->back()->with('success', 'Importação concluída com sucesso!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Erro na importação: ' . $e->getMessage());
         }
+    }
+
+    public function storeOcorrencia(Request $request)
+    {
+        $request->validate([
+            'matricula' => 'required|string',
+            'mensagem' => 'required|string|min:3'
+        ]);
+
+        SocioCaixaOcorrencia::create([
+            'matricula' => $request->matricula,
+            'user_id' => auth()->id(),
+            'mensagem' => $request->mensagem
+        ]);
+
+        return response()->json(['success' => true]);
     }
 
     public function togglePayment(Request $request, SocioCaixa $socio)
@@ -187,6 +204,12 @@ class SocioCaixaController extends Controller
             ->orderBy('mes', 'desc')
             ->get();
 
-        return view('socio_caixa.show', compact('socio', 'lancamentos'));
+        // Ocorrências/Atendimentos deste sócio
+        $ocorrencias = SocioCaixaOcorrencia::where('matricula', $socio->matricula)
+            ->with('user')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('socio_caixa.show', compact('socio', 'lancamentos', 'ocorrencias'));
     }
 }

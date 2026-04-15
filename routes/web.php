@@ -216,6 +216,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{socio}/toggle-payment', [SocioCaixaController::class, 'togglePayment'])->name('toggle-payment');
         Route::patch('/{socio}/postpone', [SocioCaixaController::class, 'postpone'])->name('postpone');
         Route::get('/{socio}', [SocioCaixaController::class, 'show'])->name('show');
+        Route::post('/ocorrencias', [SocioCaixaController::class, 'storeOcorrencia'])->name('ocorrencias.store');
     });
 });
 
