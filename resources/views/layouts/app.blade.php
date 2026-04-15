@@ -675,30 +675,32 @@
                         @endif
 
                         <!-- Mensalidades Group -->
-                        @php $isMensalidadesActive = request()->routeIs('socios-caixa.*'); @endphp
-                        <li class="nav-item {{ $isMensalidadesActive ? 'menu-open' : '' }}">
-                            <a href="#" class="nav-link {{ $isMensalidadesActive ? 'active' : '' }}">
-                                <i class="nav-icon fa-solid fa-file-invoice-dollar"></i>
-                                <p>
-                                    Mensalidades
-                                    <i class="nav-arrow fa-solid fa-angle-right"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ route('socios-caixa.index') }}" class="nav-link {{ request()->routeIs('socios-caixa.index') ? 'active' : '' }}">
-                                        <i class="nav-icon fas fa-list-ul"></i>
-                                        <p>Sócio Caixa</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('socios-caixa.dashboard') }}" class="nav-link {{ request()->routeIs('socios-caixa.dashboard') ? 'active' : '' }}">
-                                        <i class="nav-icon fas fa-chart-bar"></i>
-                                        <p>Estatísticas</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        @if(auth()->user()->temPermissao('socio_caixa.visualizar'))
+                            @php $isMensalidadesActive = request()->routeIs('socios-caixa.*'); @endphp
+                            <li class="nav-item {{ $isMensalidadesActive ? 'menu-open' : '' }}">
+                                <a href="#" class="nav-link {{ $isMensalidadesActive ? 'active' : '' }}">
+                                    <i class="nav-icon fa-solid fa-file-invoice-dollar"></i>
+                                    <p>
+                                        Mensalidades
+                                        <i class="nav-arrow fa-solid fa-angle-right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ route('socios-caixa.index') }}" class="nav-link {{ request()->routeIs('socios-caixa.index') ? 'active' : '' }}">
+                                            <i class="nav-icon fas fa-list-ul"></i>
+                                            <p>Sócio Caixa</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('socios-caixa.dashboard') }}" class="nav-link {{ request()->routeIs('socios-caixa.dashboard') ? 'active' : '' }}">
+                                            <i class="nav-icon fas fa-chart-bar"></i>
+                                            <p>Estatísticas</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endif
 
                         <!-- Cadastro -->
                         @if(auth()->user()->temPermissao('empresas.visualizar') || auth()->user()->temPermissao('regioes.visualizar'))

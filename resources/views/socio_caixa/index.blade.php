@@ -6,28 +6,30 @@
 <div class="container-fluid">
     <div class="row g-4">
         <!-- Import Card -->
-        <div class="col-md-5">
-            <div class="card card-outline card-primary shadow-sm h-100 border-0">
-                <div class="card-header border-0 pb-0">
-                    <h3 class="card-title fw-bold text-primary"><i class="fas fa-file-import me-2"></i>Importar Planilha</h3>
-                </div>
-                <form id="importForm" action="{{ route('socios-caixa.import') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="card-body">
-                        <div class="bg-light p-3 rounded mb-3 border border-primary-subtle">
-                            <small class="text-muted d-block mb-3">O sistema sincroniza automaticamente registros baseados em Matrícula, Ano e Mês (Upsert).</small>
-                            <div class="input-group">
-                                <input type="file" name="file" id="file" class="form-control" required>
-                                <button type="submit" id="btnImportar" class="btn btn-primary px-4 fw-bold"><i class="fas fa-upload me-2"></i>Importar</button>
+        @if(auth()->user()->temPermissao('socio_caixa.importar'))
+            <div class="col-md-5">
+                <div class="card card-outline card-primary shadow-sm h-100 border-0">
+                    <div class="card-header border-0 pb-0">
+                        <h3 class="card-title fw-bold text-primary"><i class="fas fa-file-import me-2"></i>Importar Planilha</h3>
+                    </div>
+                    <form id="importForm" action="{{ route('socios-caixa.import') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="card-body">
+                            <div class="bg-light p-3 rounded mb-3 border border-primary-subtle">
+                                <small class="text-muted d-block mb-3">O sistema sincroniza automaticamente registros baseados em Matrícula, Ano e Mês (Upsert).</small>
+                                <div class="input-group">
+                                    <input type="file" name="file" id="file" class="form-control" required>
+                                    <button type="submit" id="btnImportar" class="btn btn-primary px-4 fw-bold"><i class="fas fa-upload me-2"></i>Importar</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
-        </div>
+        @endif
 
         <!-- Filters Card -->
-        <div class="col-md-7">
+        <div class="col-md-{{ auth()->user()->temPermissao('socio_caixa.importar') ? '7' : '12' }}">
             <div class="card card-outline card-secondary shadow-sm h-100 border-0">
                 <div class="card-header border-0 pb-0">
                     <h3 class="card-title fw-bold"><i class="fas fa-filter me-2"></i>Filtros Avançados</h3>

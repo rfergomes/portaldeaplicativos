@@ -43,9 +43,11 @@
             <div class="card card-outline card-info shadow-sm mt-4 border-0">
                 <div class="card-header border-0 pb-0 d-flex justify-content-between align-items-center">
                     <h5 class="fw-bold text-info mb-0"><i class="fas fa-comment-dots me-2"></i>Anotações / Atendimento</h5>
-                    <button class="btn btn-sm btn-info text-white rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalAddOcorrencia">
-                        <i class="fas fa-plus me-1"></i> Novo
-                    </button>
+                    @if(auth()->user()->temPermissao('socio_caixa.ocorrencias'))
+                        <button class="btn btn-sm btn-info text-white rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalAddOcorrencia">
+                            <i class="fas fa-plus me-1"></i> Novo
+                        </button>
+                    @endif
                 </div>
                 <div class="card-body p-3">
                     <div class="timeline-container" style="max-height: 400px; overflow-y: auto;">
@@ -103,7 +105,8 @@
                                                    data-ref="{{ str_pad($item->mes, 2, '0', STR_PAD_LEFT) }}/{{ $item->ano }}"
                                                    data-paid="{{ $item->pago ? 'true' : 'false' }}"
                                                    style="width: 2.8em; height: 1.4em;"
-                                                   {{ $item->pago ? 'checked' : '' }}>
+                                                   {{ $item->pago ? 'checked' : '' }}
+                                                   {{ !auth()->user()->temPermissao('socio_caixa.gerenciar') ? 'disabled' : '' }}>
                                         </div>
                                     </td>
                                     <td>
