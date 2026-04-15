@@ -15,9 +15,6 @@ class SocioCaixaController extends Controller
         if (!$request->has('ano')) {
             $request->merge(['ano' => date('Y')]);
         }
-        if (!$request->has('tipo')) {
-            $request->merge(['tipo' => 'SOCIO FABRICA-NORMAL']);
-        }
 
         $query = SocioCaixa::query();
 
@@ -38,6 +35,7 @@ class SocioCaixaController extends Controller
         $query->select('matricula', 'nome', 'tipo_socio')
             ->selectRaw('COUNT(CASE WHEN pago = 1 THEN 1 END) as total_pagos')
             ->selectRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) as total_abertos')
+            ->selectRaw('SUM(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN valor ELSE 0 END) as valor_aberto')
             ->selectRaw('COUNT(CASE WHEN (pago = 0 AND postergado_ate > NOW()) THEN 1 END) as total_postergados')
             ->selectRaw('MIN(id) as id') 
             ->groupBy('matricula', 'nome', 'tipo_socio');

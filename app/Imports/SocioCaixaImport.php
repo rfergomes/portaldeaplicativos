@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithUpserts;
 
-class SocioCaixaImport implements ToModel, WithUpserts
+class SocioCaixaImport implements ToModel, WithUpserts, WithHeadingRow
 {
     /**
     * @param array $row
@@ -16,38 +16,33 @@ class SocioCaixaImport implements ToModel, WithUpserts
     */
     public function model(array $row)
     {
-        // Pular linhas totalmente vazias ou com matrícula ausente
-        if (empty($row[2]) || $row[0] === 'ANO' || $row[2] === 'MATRICULA') {
+        // O Maatwebsite Excel converte "MAT." para "mat" por padrão
+        $matricula = trim((string) ($row['mat'] ?? ''));
+
+        if (empty($matricula)) {
             return null;
         }
 
-        // Tentar identificar se é um lançamento do tipo CAIXA em diferentes colunas possíveis
-        $isCaixa = false;
-        $valoresEncontrados = [];
-        foreach ([$row[4] ?? '', $row[5] ?? '', $row[6] ?? '', $row[7] ?? ''] as $col) {
-            $val = strtoupper(trim((string)$col));
-            $valoresEncontrados[] = $val;
-            if ($val === 'CAIXA') {
-                $isCaixa = true;
-                break;
-            }
-        }
-
-        if (!$isCaixa) {
+        // Filtro para garantir que estamos importando apenas registros do tipo CAIXA
+        $tipoDesconto = strtoupper(trim((string)($row['tp_desconto'] ?? '')));
+        if ($tipoDesconto !== 'CAIXA') {
             return null;
         }
 
-        $matricula = trim((string) $row[2]);
+        // Determinar se está pago baseado na coluna STATUS ou na natureza da planilha
+        // Nas planilhas modelos: STATUS "Atrasado" para débitos e "Em Dia" para pagos
+        $status = strtoupper(trim((string)($row['status'] ?? '')));
+        $pago = ($status === 'EM DIA');
 
         return new SocioCaixa([
-            'ano'            => (int) ($row[0] ?? 0),
-            'mes'            => (int) ($row[1] ?? 0),
+            'ano'            => (int) ($row['ano'] ?? 0),
+            'mes'            => (int) ($row['mes'] ?? 0),
             'matricula'      => $matricula,
-            'nome'           => $row[3] ?? 'N/A',
-            'tipo_socio'     => $row[5] ?? ($row[4] ?? null), 
-            'valor'          => 0, 
-            'pago'           => false,
-            'data_pagamento' => null,
+            'nome'           => $row['nome'] ?? 'N/A',
+            'tipo_socio'     => $row['tp_socio'] ?? null,
+            'valor'          => (float) ($row['valor'] ?? 0),
+            'pago'           => $pago,
+            'data_pagamento' => $pago ? now() : null,
         ]);
     }
 

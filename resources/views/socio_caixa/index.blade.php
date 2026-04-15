@@ -99,6 +99,7 @@
                             <th class="border-0 text-center">Tipo</th>
                             <th class="border-0 text-center">Quant. Pagas</th>
                             <th class="border-0 text-center">Em Aberto</th>
+                            <th class="border-0 text-center">Valor Total</th>
                             <th class="border-0 text-center">Postergadas</th>
                             <th class="text-end pe-3 border-0">Ações</th>
                         </tr>
@@ -118,7 +119,12 @@
                             </td>
                             <td class="text-center">
                                 <span class="badge rounded-pill {{ $socio->total_abertos > 0 ? 'bg-danger-subtle text-danger border border-danger' : 'bg-light text-muted border' }} px-3">
-                                    {{ $socio->total_abertos }}
+                                     {{ $socio->total_abertos }}
+                                 </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="fw-bold {{ $socio->valor_aberto > 0 ? 'text-danger' : 'text-muted' }}">
+                                    R$ {{ number_format($socio->valor_aberto, 2, ',', '.') }}
                                 </span>
                             </td>
                             <td class="text-center">
