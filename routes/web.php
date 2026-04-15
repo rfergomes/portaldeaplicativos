@@ -18,7 +18,29 @@ use App\Http\Controllers\Ativos\AtivoEquipamentoController;
 use App\Http\Controllers\Ativos\AtivoLicencaController;
 use App\Http\Controllers\Ativos\AtivoEstacaoController;
 use App\Http\Controllers\SocioCaixaController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\PasswordChangeController;
+use App\Http\Controllers\Eventos\InvitationController;
+use App\Http\Controllers\Eventos\BatchController;
+use App\Http\Controllers\Cadastro\EmpresaController;
+use App\Http\Controllers\Cadastro\ClienteController;
+use App\Http\Controllers\Cadastro\TipoClienteController;
+use App\Http\Controllers\Cadastro\RegiaoController;
+use App\Http\Controllers\Protocolos\TipoProtocoloController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\PerfilController;
+use App\Http\Controllers\Admin\TokenDeptoController;
+use App\Http\Controllers\Ativos\AtivoMovimentacaoController;
+use App\Http\Controllers\Ativos\AtivoUsuarioController;
+use App\Http\Controllers\Ativos\AtivoDepartamentoController;
+use App\Http\Controllers\Ativos\AtivoFabricanteController;
+use App\Http\Controllers\Ativos\AtivoMarketplaceController;
+use App\Http\Controllers\Ativos\AtivoAquisicaoController;
+use App\Http\Controllers\Ativos\AtivoFornecedorController;
+use App\Http\Controllers\Ativos\AtivoCessaoController;
+use App\Models\Empresa;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,7 +84,7 @@ Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
     ->name('password.update');
 
 Route::middleware(['auth', 'force_password_change'])->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/eventos', [EventController::class, 'index'])->name('eventos.index')->middleware('can:eventos.visualizar');
     Route::post('/eventos', [EventController::class, 'store'])->name('eventos.store')->middleware('can:eventos.criar');
@@ -70,32 +92,32 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::get('/eventos/{evento}', [EventController::class, 'show'])->name('eventos.show')->middleware('can:eventos.visualizar');
     Route::patch('/eventos/{evento}/status', [EventController::class, 'toggleStatus'])->name('eventos.toggleStatus')->middleware('can:eventos.criar');
     Route::get('/eventos/{evento}/relatorio', [EventController::class, 'report'])->name('eventos.report')->middleware('can:eventos.relatorio');
-    Route::get('/eventos/convidados/{convite}', [App\Http\Controllers\Eventos\InvitationController::class, 'getConvidados'])->name('convites.getConvidados');
-    Route::post('/eventos/{evento}/convites', [App\Http\Controllers\Eventos\InvitationController::class, 'store'])->name('convites.store');
-    Route::delete('/convites/{convite}', [App\Http\Controllers\Eventos\InvitationController::class, 'destroy'])->name('convites.destroy');
-    Route::put('/convites/{convite}', [App\Http\Controllers\Eventos\InvitationController::class, 'update'])->name('convites.update');
-    Route::post('/convites/{convite}/convidados', [App\Http\Controllers\Eventos\InvitationController::class, 'storeConvidado'])->name('convidados.store');
-    Route::delete('/convidados/{convidado}', [App\Http\Controllers\Eventos\InvitationController::class, 'destroyConvidado'])->name('convidados.destroy');
-    Route::put('/convidados/{convidado}', [App\Http\Controllers\Eventos\InvitationController::class, 'updateConvidado'])->name('convidados.update');
+    Route::get('/eventos/convidados/{convite}', [InvitationController::class, 'getConvidados'])->name('convites.getConvidados');
+    Route::post('/eventos/{evento}/convites', [InvitationController::class, 'store'])->name('convites.store');
+    Route::delete('/convites/{convite}', [InvitationController::class, 'destroy'])->name('convites.destroy');
+    Route::put('/convites/{convite}', [InvitationController::class, 'update'])->name('convites.update');
+    Route::post('/convites/{convite}/convidados', [InvitationController::class, 'storeConvidado'])->name('convidados.store');
+    Route::delete('/convidados/{convidado}', [InvitationController::class, 'destroyConvidado'])->name('convidados.destroy');
+    Route::put('/convidados/{convidado}', [InvitationController::class, 'updateConvidado'])->name('convidados.update');
 
     // Lotes de Convite
-    Route::post('/eventos/{evento}/lotes', [App\Http\Controllers\Eventos\BatchController::class, 'store'])->name('lotes.store');
-    Route::put('/lotes/{lote}', [App\Http\Controllers\Eventos\BatchController::class, 'update'])->name('lotes.update');
-    Route::delete('/lotes/{lote}', [App\Http\Controllers\Eventos\BatchController::class, 'destroy'])->name('lotes.destroy');
+    Route::post('/eventos/{evento}/lotes', [BatchController::class, 'store'])->name('lotes.store');
+    Route::put('/lotes/{lote}', [BatchController::class, 'update'])->name('lotes.update');
+    Route::delete('/lotes/{lote}', [BatchController::class, 'destroy'])->name('lotes.destroy');
 
     // Cadastro de Empresas e Contatos (Clientes)
-    Route::resource('empresas', App\Http\Controllers\Cadastro\EmpresaController::class)->middleware('can:empresas.visualizar');
-    Route::resource('clientes', App\Http\Controllers\Cadastro\ClienteController::class)->middleware('can:clientes.visualizar');
-    Route::resource('tipos_clientes', App\Http\Controllers\Cadastro\TipoClienteController::class)->except(['create', 'show', 'edit'])->middleware('can:tipos_clientes.visualizar');
-    Route::resource('regioes', \App\Http\Controllers\Cadastro\RegiaoController::class)->parameters([
+    Route::resource('empresas', EmpresaController::class)->middleware('can:empresas.visualizar');
+    Route::resource('clientes', ClienteController::class)->middleware('can:clientes.visualizar');
+    Route::resource('tipos_clientes', TipoClienteController::class)->except(['create', 'show', 'edit'])->middleware('can:tipos_clientes.visualizar');
+    Route::resource('regioes', RegiaoController::class)->parameters([
         'regioes' => 'regiao'
     ])->middleware('can:regioes.visualizar');
 
     // Tipos de Protocolo
-    Route::get('/protocolos/tipos', [\App\Http\Controllers\Protocolos\TipoProtocoloController::class, 'index'])->name('protocolos.tipos.index');
-    Route::post('/protocolos/tipos', [\App\Http\Controllers\Protocolos\TipoProtocoloController::class, 'store'])->name('protocolos.tipos.store');
-    Route::put('/protocolos/tipos/{tipo}', [\App\Http\Controllers\Protocolos\TipoProtocoloController::class, 'update'])->name('protocolos.tipos.update');
-    Route::delete('/protocolos/tipos/{tipo}', [\App\Http\Controllers\Protocolos\TipoProtocoloController::class, 'destroy'])->name('protocolos.tipos.destroy');
+    Route::get('/protocolos/tipos', [TipoProtocoloController::class, 'index'])->name('protocolos.tipos.index');
+    Route::post('/protocolos/tipos', [TipoProtocoloController::class, 'store'])->name('protocolos.tipos.store');
+    Route::put('/protocolos/tipos/{tipo}', [TipoProtocoloController::class, 'update'])->name('protocolos.tipos.update');
+    Route::delete('/protocolos/tipos/{tipo}', [TipoProtocoloController::class, 'destroy'])->name('protocolos.tipos.destroy');
 
     // Protocolos e AR-Online
     Route::patch('/protocolos/{protocolo}/finalizar', [ProtocoloController::class, 'finalizar'])->name('protocolos.finalizar')->middleware('can:protocolos.finalizar');
@@ -107,26 +129,26 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     // AGENDA COLONIA
     Route::prefix('agenda')->name('agenda.')->group(function () {
         // Colônias e Acomodações
-        Route::resource('colonias', \App\Http\Controllers\Agenda\ColoniaController::class)->middleware(['can:colonias.visualizar', 'uppercase.agenda']);
-        Route::resource('colonias.acomodacoes', \App\Http\Controllers\Agenda\ColoniaAcomodacaoController::class)->shallow()->middleware(['can:acomodacoes.visualizar', 'uppercase.agenda']);
+        Route::resource('colonias', ColoniaController::class)->middleware(['can:colonias.visualizar', 'uppercase.agenda']);
+        Route::resource('colonias.acomodacoes', ColoniaAcomodacaoController::class)->shallow()->middleware(['can:acomodacoes.visualizar', 'uppercase.agenda']);
 
         // Períodos e Sorteios
-        Route::post('periodos/gerar', [\App\Http\Controllers\Agenda\AgendaPeriodoController::class, 'gerarSemanas'])->name('periodos.gerar')->middleware('can:periodos.gerarsemanas');
-        Route::resource('periodos', \App\Http\Controllers\Agenda\AgendaPeriodoController::class)->middleware('can:periodos.visualizar');
+        Route::post('periodos/gerar', [AgendaPeriodoController::class, 'gerarSemanas'])->name('periodos.gerar')->middleware('can:periodos.gerarsemanas');
+        Route::resource('periodos', AgendaPeriodoController::class)->middleware('can:periodos.visualizar');
 
         // Hóspedes
-        Route::resource('hospedes', \App\Http\Controllers\Agenda\AgendaHospedeController::class)->middleware('can:hospedes.visualizar');
+        Route::resource('hospedes', AgendaHospedeController::class)->middleware('can:hospedes.visualizar');
 
         // Reservas e App (Visão de Planilha será feita no index de reservas)
-        Route::post('reservas/{reserva}/promover', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'promoverVaga'])->name('reservas.promover')->middleware('can:reservas.promover');
-        Route::post('reservas/{reserva}/excluir', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'excluirComMotivo'])->name('reservas.excluir')->middleware('can:reservas.excluir');
-        Route::post('reservas/{reserva}/trocar', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'trocarAcomodacao'])->name('reservas.trocar')->middleware('can:reservas.visualizar');
-        Route::post('reservas/{reserva}/notificar-whatsapp', [\App\Http\Controllers\Agenda\AgendaReservaController::class, 'notificarWhatsApp'])
+        Route::post('reservas/{reserva}/promover', [AgendaReservaController::class, 'promoverVaga'])->name('reservas.promover')->middleware('can:reservas.promover');
+        Route::post('reservas/{reserva}/excluir', [AgendaReservaController::class, 'excluirComMotivo'])->name('reservas.excluir')->middleware('can:reservas.excluir');
+        Route::post('reservas/{reserva}/trocar', [AgendaReservaController::class, 'trocarAcomodacao'])->name('reservas.trocar')->middleware('can:reservas.visualizar');
+        Route::post('reservas/{reserva}/notificar-whatsapp', [AgendaReservaController::class, 'notificarWhatsApp'])
             ->name('reservas.notificar_whatsapp')
             ->middleware('can:reservas.visualizar');
-        Route::resource('reservas', \App\Http\Controllers\Agenda\AgendaReservaController::class)->middleware(['can:reservas.visualizar', 'uppercase.agenda']);
+        Route::resource('reservas', AgendaReservaController::class)->middleware(['can:reservas.visualizar', 'uppercase.agenda']);
         // Histórico de Exclusões de Reservas
-        Route::get('historico', [\App\Http\Controllers\Agenda\AgendaHistoricoController::class, 'index'])->name('historico.index');
+        Route::get('historico', [AgendaHistoricoController::class, 'index'])->name('historico.index');
 
         // Inscrições / Gerenciador de Sorteio (módulo opcional)
         Route::get('inscricoes/pdf/guia', [AgendaImpressaoController::class, 'gerarGuiaPreReserva'])->name('inscricoes.pdf.guia')->middleware('can:inscricoes.visualizar');
@@ -141,57 +163,57 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     });
 
     // Endpoint AJAX para buscar contatos da empresa
-    Route::get('/empresas/{empresa}/contatos', function (\App\Models\Empresa $empresa) {
+    Route::get('/empresas/{empresa}/contatos', function (Empresa $empresa) {
         return response()->json($empresa->clientes()->where('ativo', true)->get());
     })->name('empresas.contatos');
 
     // Administração
-    Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
+    Route::resource('users', UserController::class)
         ->except(['show'])
         ->middleware('can:usuarios.visualizar');
 
-    Route::resource('perfis', \App\Http\Controllers\Admin\PerfilController::class)
+    Route::resource('perfis', PerfilController::class)
         ->parameters(['perfis' => 'perfil'])
         ->except(['show'])
         ->middleware('can:usuarios.visualizar');
 
-    Route::resource('token-deptos', \App\Http\Controllers\Admin\TokenDeptoController::class)
+    Route::resource('token-deptos', TokenDeptoController::class)
         ->except(['create', 'show', 'edit'])
         ->middleware('can:administrar_usuarios');
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile.index');
-    Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
-    Route::put('/profile/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password.update');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
-    Route::get('/password/change', [App\Http\Controllers\Auth\PasswordChangeController::class, 'show'])->name('password.change');
-    Route::post('/password/change', [App\Http\Controllers\Auth\PasswordChangeController::class, 'update'])->name('password.change.update');
+    Route::get('/password/change', [PasswordChangeController::class, 'show'])->name('password.change');
+    Route::post('/password/change', [PasswordChangeController::class, 'update'])->name('password.change.update');
     // Módulo de Controle de Ativos (Ativos)
     Route::prefix('ativos')->name('ativos.')->middleware(['can:ativos.visualizar', 'uppercase.ativos'])->group(function () {
         Route::get('equipamentos/pdf/inventario', [AtivoEquipamentoController::class, 'gerarInventarioPdf'])->name('equipamentos.inventario.pdf');
         Route::get('equipamentos/{equipamento}/pdf/baixa', [AtivoEquipamentoController::class, 'pdfBaixa'])->name('equipamentos.pdf_baixa');
         Route::post('equipamentos/{equipamento}/anexos', [AtivoEquipamentoController::class, 'uploadAnexo'])->name('equipamentos.anexos.store');
-        Route::resource('equipamentos', \App\Http\Controllers\Ativos\AtivoEquipamentoController::class);
-        Route::resource('movimentacoes', \App\Http\Controllers\Ativos\AtivoMovimentacaoController::class)->only(['index', 'store']);
-        Route::resource('usuarios', \App\Http\Controllers\Ativos\AtivoUsuarioController::class);
-        Route::resource('departamentos', \App\Http\Controllers\Ativos\AtivoDepartamentoController::class)->except(['show']);
-        Route::resource('fabricantes', \App\Http\Controllers\Ativos\AtivoFabricanteController::class)->except(['show']);
-        Route::resource('marketplaces', \App\Http\Controllers\Ativos\AtivoMarketplaceController::class)->except(['show']);
-        Route::get('aquisicoes/api/equipamentos-para-cessao', [\App\Http\Controllers\Ativos\AtivoAquisicaoController::class, 'getEquipamentosDisponiveisPorNfs'])->name('aquisicoes.equipamentos_disponiveis');
-        Route::resource('aquisicoes', \App\Http\Controllers\Ativos\AtivoAquisicaoController::class);
-        Route::post('aquisicoes/{aquisicao}/anexos', [\App\Http\Controllers\Ativos\AtivoAquisicaoController::class, 'uploadAnexo'])->name('aquisicoes.anexos.store');
-        Route::resource('fornecedores', \App\Http\Controllers\Ativos\AtivoFornecedorController::class)->except(['show']);
+        Route::resource('equipamentos', AtivoEquipamentoController::class);
+        Route::resource('movimentacoes', AtivoMovimentacaoController::class)->only(['index', 'store']);
+        Route::resource('usuarios', AtivoUsuarioController::class);
+        Route::resource('departamentos', AtivoDepartamentoController::class)->except(['show']);
+        Route::resource('fabricantes', AtivoFabricanteController::class)->except(['show']);
+        Route::resource('marketplaces', AtivoMarketplaceController::class)->except(['show']);
+        Route::get('aquisicoes/api/equipamentos-para-cessao', [AtivoAquisicaoController::class, 'getEquipamentosDisponiveisPorNfs'])->name('aquisicoes.equipamentos_disponiveis');
+        Route::resource('aquisicoes', AtivoAquisicaoController::class);
+        Route::post('aquisicoes/{aquisicao}/anexos', [AtivoAquisicaoController::class, 'uploadAnexo'])->name('aquisicoes.anexos.store');
+        Route::resource('fornecedores', AtivoFornecedorController::class)->except(['show']);
 
         // Gestão de Cessões
-        Route::get('cessoes/pdf/relatorio', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'gerarRelatorioPdf'])->name('cessoes.relatorio.pdf');
-        Route::get('cessoes', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'index'])->name('cessoes.index');
-        Route::post('cessoes', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'store'])->name('cessoes.store');
-        Route::get('cessoes/{cessao}/pdf', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'generatePdf'])->name('cessoes.pdf');
-        Route::get('movimentacoes/{movimentacao}/pdf/devolucao', [\App\Http\Controllers\Ativos\AtivoMovimentacaoController::class, 'pdfDevolucao'])->name('devolucao.pdf');
-        Route::post('cessoes/{cessao}/anexos', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'uploadAnexo'])->name('cessoes.anexos.store');
-        Route::get('anexos/{anexo}/download/{filename?}', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'downloadAnexo'])->name('anexos.download');
-        Route::delete('anexos/{anexo}', [\App\Http\Controllers\Ativos\AtivoCessaoController::class, 'destroyAnexo'])->name('anexos.destroy');
+        Route::get('cessoes/pdf/relatorio', [AtivoCessaoController::class, 'gerarRelatorioPdf'])->name('cessoes.relatorio.pdf');
+        Route::get('cessoes', [AtivoCessaoController::class, 'index'])->name('cessoes.index');
+        Route::post('cessoes', [AtivoCessaoController::class, 'store'])->name('cessoes.store');
+        Route::get('cessoes/{cessao}/pdf', [AtivoCessaoController::class, 'generatePdf'])->name('cessoes.pdf');
+        Route::get('movimentacoes/{movimentacao}/pdf/devolucao', [AtivoMovimentacaoController::class, 'pdfDevolucao'])->name('devolucao.pdf');
+        Route::post('cessoes/{cessao}/anexos', [AtivoCessaoController::class, 'uploadAnexo'])->name('cessoes.anexos.store');
+        Route::get('anexos/{anexo}/download/{filename?}', [AtivoCessaoController::class, 'downloadAnexo'])->name('anexos.download');
+        Route::delete('anexos/{anexo}', [AtivoCessaoController::class, 'destroyAnexo'])->name('anexos.destroy');
         
         // Novas rotas de Inventário e Licenças
         Route::get('licencas/aquisicao', [AtivoLicencaController::class, 'createAquisicao'])->name('licencas.create_aquisicao');
@@ -237,7 +259,7 @@ Route::post('/_deploy/opcache-reset', function () {
 
 Route::get('/_health', function () {
     try {
-        \DB::connection()->getPdo();
+        DB::connection()->getPdo();
         return response()->json(['status' => 'ok'], 200);
     } catch (\Throwable $e) {
         return response()->json(['status' => 'error'], 500);
