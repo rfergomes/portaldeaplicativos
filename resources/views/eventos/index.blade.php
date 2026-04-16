@@ -2,6 +2,22 @@
 
 @section('title', 'Controle de Eventos')
 
+@push('styles')
+<style>
+    /* Permite que o dropdown ultrapasse os limites da tabela responsiva */
+    .table-responsive {
+        overflow: visible !important;
+    }
+    
+    @media (max-width: 991.98px) {
+        .table-responsive {
+            overflow-x: auto !important;
+            padding-bottom: 60px; /* Espaço para o dropdown em telas pequenas */
+        }
+    }
+</style>
+@endpush
+
 @section('content')
     <div class="row">
         <div class="col-12 col-sm-6 col-md-3">
@@ -121,7 +137,7 @@
 
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                                data-bs-toggle="dropdown" title="Relatório PDF">
+                                                data-bs-toggle="dropdown" data-bs-boundary="viewport" title="Relatório PDF">
                                                 <i class="fa-solid fa-file-pdf"></i>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
@@ -214,7 +230,7 @@
 
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                                data-bs-toggle="dropdown" title="Relatório PDF">
+                                                data-bs-toggle="dropdown" data-bs-boundary="viewport" title="Relatório PDF">
                                                 <i class="fa-solid fa-file-pdf"></i>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
