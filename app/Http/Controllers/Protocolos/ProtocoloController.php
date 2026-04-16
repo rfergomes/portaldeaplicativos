@@ -63,7 +63,7 @@ class ProtocoloController extends Controller
             $query->where('status', $status);
         }
 
-        $protocolos = $query->orderByDesc('created_at')->paginate(20)->withQueryString();
+        $protocolos = $query->orderByDesc('created_at')->paginate(20)->appends($request->all());
 
         // Calcular Métricas para os Cards (respeitando filtros de mês/ano, mas não de status)
         $metricsQuery = Protocolo::query();

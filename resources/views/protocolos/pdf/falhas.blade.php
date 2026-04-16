@@ -94,7 +94,7 @@
     @endif
 
     <div class="footer">
-        Gerado pelo Portal de Aplicativos em {{ date('d/m/Y H:i:s') }} - <span class="page-number"></span>
+        Gerado pelo Portal de Aplicativos em {{ date('d/m/Y H:i:s') }} - TI Químicos Unificados<span class="page-number"></span>
     </div>
 
 </body>
