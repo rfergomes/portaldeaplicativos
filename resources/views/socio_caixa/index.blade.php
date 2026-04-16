@@ -55,10 +55,19 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-7">
+                            <div class="col-md-2">
+                                <label class="small fw-bold text-secondary">Min. em Aberto</label>
+                                <select name="min_abertos" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="0">Qualquer</option>
+                                    @for($i=1; $i<=12; $i++)
+                                        <option value="{{ $i }}" {{ request('min_abertos') == $i ? 'selected' : '' }}>{{ $i }}+ meses</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="col-md-5">
                                 <label class="small fw-bold text-secondary">Busca Rápida (Nome ou Matrícula)</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="text" name="nome" class="form-control" placeholder="Digite o nome ou a matrícula..." value="{{ request('nome') }}">
+                                    <input type="text" name="nome" class="form-control" placeholder="Digite o nome..." value="{{ request('nome') }}">
                                     <button type="submit" class="btn btn-secondary pe-3 ps-3"><i class="fas fa-search me-1"></i> Buscar</button>
                                 </div>
                             </div>

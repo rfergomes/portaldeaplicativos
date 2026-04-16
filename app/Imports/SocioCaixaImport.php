@@ -40,6 +40,7 @@ class SocioCaixaImport implements ToModel, WithUpserts, WithHeadingRow
             'matricula'      => $matricula,
             'nome'           => $row['nome'] ?? 'N/A',
             'tipo_socio'     => $row['tp_socio'] ?? null,
+            'cod_emp'        => $row['cod_emp'] ?? null,
             'valor'          => (float) ($row['valor'] ?? 0),
             'pago'           => $pago,
             'data_pagamento' => $pago ? now() : null,

@@ -41,12 +41,15 @@ class SocioCaixaController extends Controller
             ->selectRaw('MIN(id) as id') 
             ->groupBy('matricula', 'nome', 'tipo_socio');
 
-        // Aplicamos o filtro de "Apenas com lançamentos em aberto" por padrão
-        // A menos que o usuário queira ver APENAS os postergados (ou todos, mas o pedido foca em abertos)
+        // Filtro de quantidade mínima em aberto
+        $minAbertos = $request->input('min_abertos', 0);
+        
         if ($request->has('ver_postergados')) {
             $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND postergado_ate > NOW()) THEN 1 END) > 0');
         } else {
-            $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) > 0');
+            // Se min_abertos não foi informado, mantemos o padrão de mostrar quem tem pelo menos 1 (para ser um "Painel de Pendências")
+            $threshold = $minAbertos > 0 ? $minAbertos : 1;
+            $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) >= ?', [$threshold]);
         }
 
         $socios = $query->orderBy('nome')
@@ -210,6 +213,12 @@ class SocioCaixaController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        return view('socio_caixa.show', compact('socio', 'lancamentos', 'ocorrencias'));
+        // Buscar empresa pelo cod_emp (campo empresa_erp na tabela empresas)
+        $empresa = null;
+        if ($socio->cod_emp) {
+            $empresa = \App\Models\Empresa::where('empresa_erp', $socio->cod_emp)->first();
+        }
+
+        return view('socio_caixa.show', compact('socio', 'lancamentos', 'ocorrencias', 'empresa'));
     }
 }

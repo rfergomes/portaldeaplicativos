@@ -15,6 +15,7 @@ class SocioCaixa extends Model
         'mes',
         'nome',
         'tipo_socio',
+        'cod_emp',
         'cpf',
         'valor',
         'pago',

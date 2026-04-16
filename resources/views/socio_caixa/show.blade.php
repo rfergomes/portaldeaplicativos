@@ -19,9 +19,15 @@
                     
                     <div class="mt-4">
                         <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                            <span class="text-muted"><i class="fas fa-building me-2"></i>Empresa/Tipo:</span>
+                            <span class="text-muted"><i class="fas fa-building me-2"></i>Tipo:</span>
                             <span class="fw-bold">{{ $socio->tipo_socio ?: 'Não informado' }}</span>
                         </div>
+                        @if($empresa)
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span class="text-muted"><i class="fas fa-industry me-2"></i>Empresa ERP:</span>
+                            <span class="fw-bold text-primary text-end" style="max-width: 60%; font-size: 0.85rem;">{{ $empresa->razao_social }}</span>
+                        </div>
+                        @endif
                         <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
                             <span class="text-muted"><i class="fas fa-calendar-alt me-2"></i>Lançamentos:</span>
                             <span class="badge bg-light text-dark border">{{ $lancamentos->count() }} meses</span>
