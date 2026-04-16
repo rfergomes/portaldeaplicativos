@@ -120,6 +120,7 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::delete('/protocolos/tipos/{tipo}', [TipoProtocoloController::class, 'destroy'])->name('protocolos.tipos.destroy');
 
     // Protocolos e AR-Online
+    Route::get('/protocolos/pdf/falhas', [ProtocoloController::class, 'relatorioFalhas'])->name('protocolos.pdf.falhas')->middleware('can:protocolos.visualizar');
     Route::patch('/protocolos/{protocolo}/finalizar', [ProtocoloController::class, 'finalizar'])->name('protocolos.finalizar')->middleware('can:protocolos.finalizar');
     Route::get('/protocolos/{protocolo}/comprovante/{envio}', [ProtocoloController::class, 'baixarComprovante'])->name('protocolos.comprovante')->middleware('can:protocolos.visualizar');
     Route::get('/protocolos/{protocolo}/laudo/{envio}', [ProtocoloController::class, 'baixarLaudoPericial'])->name('protocolos.laudo')->middleware('can:protocolos.visualizar');

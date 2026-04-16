@@ -335,4 +335,47 @@ class ProtocoloController extends Controller
             'Content-Disposition' => 'inline; filename="laudo.pdf"',
         ]);
     }
+
+    public function relatorioFalhas(Request $request)
+    {
+        $mes = $request->input('mes', \Carbon\Carbon::now()->month);
+        $ano = $request->input('ano', \Carbon\Carbon::now()->year);
+        $termo = $request->input('termo', '');
+
+        $query = \App\Models\ProtocoloEnvio::with([
+            'protocolo.empresa', 
+            'destinatario'
+        ])->where('status', 'falha');
+
+        if ($termo) {
+            $query->whereHas('protocolo', function($q) use ($termo) {
+                $q->where('referencia_documento', 'like', "%{$termo}%")
+                  ->orWhere('assunto', 'like', "%{$termo}%")
+                  ->orWhereHas('empresa', function($qEmp) use ($termo) {
+                      $qEmp->where('razao_social', 'like', "%{$termo}%");
+                  });
+            })->orWhereHas('destinatario', function($qDest) use ($termo) {
+                $qDest->where('email', 'like', "%{$termo}%")
+                      ->orWhere('nome', 'like', "%{$termo}%");
+            });
+        }
+
+        if ($mes) {
+            $query->whereMonth('created_at', $mes);
+        }
+
+        if ($ano) {
+            $query->whereYear('created_at', $ano);
+        }
+
+        $falhas = $query->orderBy('created_at', 'desc')->get();
+
+        ini_set('memory_limit', '512M');
+        set_time_limit(120);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('protocolos.pdf.falhas', compact('falhas', 'mes', 'ano', 'termo'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->stream('relatorio_falhas.pdf');
+    }
 }

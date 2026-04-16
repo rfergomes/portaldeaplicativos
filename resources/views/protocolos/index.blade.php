@@ -126,6 +126,9 @@
                             title="Limpar Filtros">
                             <i class="fa-solid fa-eraser text-muted"></i>
                         </a>
+                        <a href="{{ route('protocolos.pdf.falhas', request()->all()) }}" target="_blank" class="btn btn-danger btn-sm shadow-sm" title="Relatório de Falhas PDF">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </a>
                     </div>
                 </form>
             </div>
