@@ -19,6 +19,10 @@ class LegacySocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
      */
     public function model(array $row)
     {
+        if (app()->runningInConsole()) {
+            \Log::info('Import Row Content: ' . json_encode($row));
+        }
+        
         $lancamentoId = trim((string) ($row['id'] ?? ''));
 
         if (empty($lancamentoId)) {
