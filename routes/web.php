@@ -18,6 +18,7 @@ use App\Http\Controllers\Ativos\AtivoEquipamentoController;
 use App\Http\Controllers\Ativos\AtivoLicencaController;
 use App\Http\Controllers\Ativos\AtivoEstacaoController;
 use App\Http\Controllers\SocioCaixaController;
+use App\Http\Controllers\SocioFolhaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\PasswordChangeController;
 use App\Http\Controllers\Eventos\InvitationController;
@@ -240,6 +241,16 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{socio}/postpone', [SocioCaixaController::class, 'postpone'])->name('postpone')->middleware('can:socio_caixa.gerenciar');
         Route::get('/{socio}', [SocioCaixaController::class, 'show'])->name('show')->middleware('can:socio_caixa.visualizar');
         Route::post('/ocorrencias', [SocioCaixaController::class, 'storeOcorrencia'])->name('ocorrencias.store')->middleware('can:socio_caixa.ocorrencias');
+    });
+
+    // Sócio Folha
+    Route::prefix('socio-folha')->name('socios-folha.')->group(function () {
+        Route::get('/', [SocioFolhaController::class, 'index'])->name('index'); // ->middleware('can:socio_folha.visualizar');
+        Route::post('/import', [SocioFolhaController::class, 'import'])->name('import'); // ->middleware('can:socio_folha.importar');
+        Route::patch('/{socio}/toggle-situacao', [SocioFolhaController::class, 'toggleSituacao'])->name('toggle-situacao');
+        Route::patch('/{socio}/toggle-lista', [SocioFolhaController::class, 'toggleLista'])->name('toggle-lista');
+        Route::patch('/{socio}/toggle-baixa', [SocioFolhaController::class, 'toggleBaixa'])->name('toggle-baixa');
+        Route::get('/empresas-por-regiao/{regiao_id}', [SocioFolhaController::class, 'getEmpresasPorRegiao'])->name('empresas-por-regiao');
     });
 });
 

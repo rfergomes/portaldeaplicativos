@@ -674,14 +674,14 @@
                         </li>
                         @endif
 
-                        <!-- Mensalidades Group -->
+                        <!-- Arrecadação Group -->
                         @if(auth()->user()->temPermissao('socio_caixa.visualizar'))
-                            @php $isMensalidadesActive = request()->routeIs('socios-caixa.*'); @endphp
-                            <li class="nav-item {{ $isMensalidadesActive ? 'menu-open' : '' }}">
-                                <a href="#" class="nav-link {{ $isMensalidadesActive ? 'active' : '' }}">
+                            @php $isArrecadacaoActive = request()->routeIs('socios-caixa.*') || request()->routeIs('socios-folha.*') || request()->routeIs('arrecadacao.*'); @endphp
+                            <li class="nav-item {{ $isArrecadacaoActive ? 'menu-open' : '' }}">
+                                <a href="#" class="nav-link {{ $isArrecadacaoActive ? 'active' : '' }}">
                                     <i class="nav-icon fa-solid fa-file-invoice-dollar"></i>
                                     <p>
-                                        Mensalidades
+                                        Arrecadação
                                         <i class="nav-arrow fa-solid fa-angle-right"></i>
                                     </p>
                                 </a>
@@ -693,9 +693,27 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
+                                        <a href="{{ route('socios-folha.index') }}" class="nav-link {{ request()->routeIs('socios-folha.index') ? 'active' : '' }}">
+                                            <i class="nav-icon fas fa-users"></i>
+                                            <p>Sócio Folha</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link disabled text-muted" title="Implantação Futura">
+                                            <i class="nav-icon fas fa-hand-holding-dollar"></i>
+                                            <p>Contribuições <small>(Em breve)</small></p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link disabled text-muted" title="Implantação Futura">
+                                            <i class="nav-icon fas fa-upload"></i>
+                                            <p>Importação <small>(Em breve)</small></p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a href="{{ route('socios-caixa.dashboard') }}" class="nav-link {{ request()->routeIs('socios-caixa.dashboard') ? 'active' : '' }}">
                                             <i class="nav-icon fas fa-chart-bar"></i>
-                                            <p>Estatísticas</p>
+                                            <p>Dashboard</p>
                                         </a>
                                     </li>
                                 </ul>

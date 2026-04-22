@@ -1,0 +1,12 @@
+
+> dev
+> vite --host 127.0.0.1 --port 5173
+
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m1222[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+
+  [31m[1mLARAVEL[22m 10.50.2[39m  [2mplugin[22m [1mv1.3.0[22m
+
+  [32m➜[39m  [1mAPP_URL[22m: [36mlocalhost[39m
