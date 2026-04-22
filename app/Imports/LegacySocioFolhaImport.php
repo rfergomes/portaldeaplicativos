@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithUpserts;
 
-class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
+class LegacySocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
 {
     /**
      * @param array $row
@@ -42,7 +42,7 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
         $razaoSocial = trim((string) ($row['razao_social'] ?? 'Nova Empresa Importada'));
 
         if (empty($codErp) && empty($cnpj)) {
-            return null; // Sem identificação de empresa, pula a linha
+            return null;
         }
 
         $empresa = Empresa::where('empresa_erp', $codErp)
@@ -59,15 +59,13 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
             ]);
         }
 
-        // Processar datas usando PhpSpreadsheet shared date helpers
-        // Processar datas usando PhpSpreadsheet shared date helpers
         $dataVencimento = null;
-        if (!empty($row['dt_vencto'])) {
+        if (!empty($row['vencimento'])) {
             try {
-                if (is_numeric($row['dt_vencto'])) {
-                    $dataVencimento = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['dt_vencto'])->format('Y-m-d');
+                if (is_numeric($row['vencimento'])) {
+                    $dataVencimento = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['vencimento'])->format('Y-m-d');
                 } else {
-                    $dataVencimento = Carbon::createFromFormat('d/m/Y', $row['dt_vencto'])->format('Y-m-d');
+                    $dataVencimento = Carbon::parse(str_replace('/', '-', $row['vencimento']))->format('Y-m-d');
                 }
             } catch (\Exception $e) {
                 $dataVencimento = null;
@@ -75,12 +73,12 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
         }
 
         $dataAutenticacao = null;
-        if (!empty($row['dt_autent'])) {
+        if (!empty($row['autenticacao'])) {
             try {
-                if (is_numeric($row['dt_autent'])) {
-                    $dataAutenticacao = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['dt_autent'])->format('Y-m-d');
+                if (is_numeric($row['autenticacao'])) {
+                    $dataAutenticacao = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['autenticacao'])->format('Y-m-d');
                 } else {
-                    $dataAutenticacao = Carbon::createFromFormat('d/m/Y', $row['dt_autent'])->format('Y-m-d');
+                    $dataAutenticacao = Carbon::parse(str_replace('/', '-', $row['autenticacao']))->format('Y-m-d');
                 }
             } catch (\Exception $e) {
                 $dataAutenticacao = null;
@@ -89,6 +87,32 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
 
         $situacao = strtoupper(trim((string) ($row['situacao'] ?? 'ABERTO')));
 
+        $dataLista = null;
+        if (!empty($row['lista_data'])) {
+            try {
+                if (is_numeric($row['lista_data'])) {
+                    $dataLista = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['lista_data']);
+                } else {
+                    $dataLista = Carbon::parse(str_replace('/', '-', $row['lista_data']));
+                }
+            } catch (\Exception $e) {
+                $dataLista = null;
+            }
+        }
+
+        $dataBaixa = null;
+        if (!empty($row['baixa_data'])) {
+            try {
+                if (is_numeric($row['baixa_data'])) {
+                    $dataBaixa = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['baixa_data']);
+                } else {
+                    $dataBaixa = Carbon::parse(str_replace('/', '-', $row['baixa_data']));
+                }
+            } catch (\Exception $e) {
+                $dataBaixa = null;
+            }
+        }
+
         return new SocioFolha([
             'lancamento_id'     => $lancamentoId,
             'empresa_id'        => $empresa->id,
@@ -96,13 +120,15 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
             'ano'               => (int) ($row['ano'] ?? 0),
             'mes'               => (int) ($row['mes'] ?? 0),
             'data_vencimento'   => $dataVencimento,
-            'valor_mensalidade' => (float) ($row['vl_mens'] ?? 0),
+            'valor_mensalidade' => (float) ($row['valor'] ?? 0),
             'situacao'          => $situacao,
             'data_autenticacao' => $dataAutenticacao,
             'multa'             => isset($row['multa']) ? (float) $row['multa'] : null,
             'total'             => isset($row['total']) ? (float) $row['total'] : null,
-            'vl_credit'         => isset($row['vl_credit']) ? (float) $row['vl_credit'] : null,
+            'vl_credit'         => isset($row['creditado']) ? (float) $row['creditado'] : null,
             'origem'            => $row['origem'] ?? null,
+            'data_lista'        => $dataLista,
+            'data_baixa'        => $dataBaixa,
         ]);
     }
 
