@@ -121,6 +121,54 @@
         </div>
     </div>
 
+    <!-- KPI Row: Sócio Folha (Arrecadação) -->
+    <h5 class="mb-3 fw-bold text-secondary border-bottom pb-2">Arrecadação - Sócio Folha (Mês Atual)</h5>
+    <div class="row g-3 mb-4">
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-white text-dark shadow-sm border border-secondary-subtle">
+                <div class="inner">
+                    <h3 class="metric-value">{{ $kpisFolha->total_lancamentos }}</h3>
+                    <p class="metric-label text-muted">Lançamentos Emitidos</p>
+                    <small class="d-block text-secondary mt-1">Em {{ $kpisFolha->empresas_cobertas }} Empresas</small>
+                </div>
+                <div class="small-box-icon"><i class="fa-solid fa-file-invoice-dollar text-muted opacity-25"></i></div>
+                <a href="{{ route('socios-folha.index') }}" class="small-box-footer link-dark text-decoration-none d-block text-center border-top">
+                    Gerenciar Lançamentos <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-white text-dark shadow-sm border border-info-subtle">
+                <div class="inner">
+                    <h3 class="metric-value text-info">{{ $kpisFolha->perc_listas_recebidas }}<sup style="font-size: 20px">%</sup></h3>
+                    <p class="metric-label text-muted">Listas Recebidas</p>
+                </div>
+                <div class="small-box-icon"><i class="fa-solid fa-list-check text-info opacity-25"></i></div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-white text-dark shadow-sm border border-warning-subtle">
+                <div class="inner">
+                    <h3 class="metric-value text-warning">{{ $kpisFolha->gargalo_abaco }}<sup style="font-size: 20px">%</sup></h3>
+                    <p class="metric-label text-muted">Aguardando Digitação (ABACO)</p>
+                </div>
+                <div class="small-box-icon"><i class="fa-solid fa-keyboard text-warning opacity-25"></i></div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-white text-dark shadow-sm border border-danger-subtle">
+                <div class="inner">
+                    <h3 class="metric-value text-danger">{{ $kpisFolha->taxa_inadimplencia }}<sup style="font-size: 20px">%</sup></h3>
+                    <p class="metric-label text-muted">Inadimplência (Vencidos)</p>
+                </div>
+                <div class="small-box-icon"><i class="fa-solid fa-triangle-exclamation text-danger opacity-25"></i></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content Row -->
     <div class="row g-4">
         <!-- Chart Column -->

@@ -6,12 +6,26 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SocioFolha extends Model
+{
     protected $table = 'socios_folha';
 
     protected $fillable = [
-        'lancamento_id', 'empresa_id', 'regiao_id', 'ano', 'mes', 'data_vencimento',
-        'valor_mensalidade', 'situacao', 'data_autenticacao', 'multa', 'total',
-        'vl_credit', 'origem', 'data_lista', 'data_baixa', 'valor_pago'
+        'lancamento_id',
+        'empresa_id',
+        'regiao_id',
+        'ano',
+        'mes',
+        'data_vencimento',
+        'valor_mensalidade',
+        'situacao',
+        'data_autenticacao',
+        'multa',
+        'total',
+        'vl_credit',
+        'origem',
+        'data_lista',
+        'data_baixa',
+        'valor_pago'
     ];
 
     protected $casts = [

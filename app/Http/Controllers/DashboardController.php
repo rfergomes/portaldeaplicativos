@@ -78,6 +78,41 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // KPIs Sócio Folha
+        $totalMensalidadesMesAtual = \App\Models\SocioFolha::whereMonth('data_vencimento', $now->month)
+            ->whereYear('data_vencimento', $now->year)
+            ->count();
+
+        $empresasComLancamentos = \App\Models\SocioFolha::whereMonth('data_vencimento', $now->month)
+            ->whereYear('data_vencimento', $now->year)
+            ->distinct('empresa_id')
+            ->count('empresa_id');
+
+        $listasRecebidas = \App\Models\SocioFolha::whereMonth('data_vencimento', $now->month)
+            ->whereYear('data_vencimento', $now->year)
+            ->whereNotNull('data_lista')
+            ->count();
+
+        $gargaloAbaco = \App\Models\SocioFolha::whereMonth('data_vencimento', $now->month)
+            ->whereYear('data_vencimento', $now->year)
+            ->whereNotNull('data_lista')
+            ->whereNull('data_baixa')
+            ->count();
+
+        $inadimplencia = \App\Models\SocioFolha::whereMonth('data_vencimento', $now->month)
+            ->whereYear('data_vencimento', $now->year)
+            ->where('situacao', 'ABERTO')
+            ->where('data_vencimento', '<', $now->startOfDay())
+            ->count();
+
+        $kpisFolha = (object) [
+            'total_lancamentos' => $totalMensalidadesMesAtual,
+            'empresas_cobertas' => $empresasComLancamentos,
+            'perc_listas_recebidas' => $totalMensalidadesMesAtual > 0 ? round(($listasRecebidas / $totalMensalidadesMesAtual) * 100, 1) : 0,
+            'gargalo_abaco' => $totalMensalidadesMesAtual > 0 ? round(($gargaloAbaco / $totalMensalidadesMesAtual) * 100, 1) : 0,
+            'taxa_inadimplencia' => $totalMensalidadesMesAtual > 0 ? round(($inadimplencia / $totalMensalidadesMesAtual) * 100, 1) : 0,
+        ];
+
         return view('dashboard', compact(
             'totalEventosMes',
             'totalEmpresas',
@@ -87,7 +122,8 @@ class DashboardController extends Controller
             'reservasPorColonia',
             'alertasVencidos',
             'protocolosRecentes',
-            'eventosFuturos'
+            'eventosFuturos',
+            'kpisFolha'
         ));
     }
 }

@@ -7,6 +7,8 @@ use App\Imports\SocioFolhaImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 
+class SocioFolhaController extends Controller
+{
     public function index(Request $request)
     {
         $query = SocioFolha::with(['empresa', 'regiao']);
