@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithUpserts;
 
-class LegacySocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
+class LegacySocioFolhaImport implements ToModel, WithUpserts
 {
     /**
      * @param array $row
@@ -19,31 +19,39 @@ class LegacySocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
      */
     public function model(array $row)
     {
-        if (app()->runningInConsole()) {
-            \Log::info('Import Row Content: ' . json_encode($row));
+        // Pula a linha de cabeçalho (se for o caso)
+        if ($row[0] === 'ID' || $row[0] === 'id') {
+            return null;
         }
-        
-        $lancamentoId = trim((string) ($row['id'] ?? ''));
 
-        if (empty($lancamentoId)) {
+        $lancamentoId = trim((string) ($row[0] ?? ''));
+
+        if (empty($lancamentoId) || !is_numeric($lancamentoId)) {
             return null;
         }
 
         // Determinar a região
-        $regiaoNome = trim((string) ($row['regiao'] ?? ''));
+        // Coluna 4: REGIÃO
+        $regiaoNome = trim((string) ($row[4] ?? ''));
         $regiaoId = null;
         if (!empty($regiaoNome)) {
-            $regiao = Regiao::firstOrCreate(
-                ['nome' => $regiaoNome],
-                ['ativo' => true]
-            );
-            $regiaoId = $regiao->id;
+            // Se for número, podemos tentar buscar pelo ID ou nome mapeado
+            if (is_numeric($regiaoNome)) {
+                $regiaoId = (int)$regiaoNome;
+            } else {
+                $regiao = Regiao::firstOrCreate(
+                    ['nome' => $regiaoNome],
+                    ['ativo' => true]
+                );
+                $regiaoId = $regiao->id;
+            }
         }
 
-        // Determinar ou criar a empresa baseada no Código ERP (Cód) e CNPJ
-        $codErp = trim((string) ($row['cod'] ?? ''));
-        $cnpj = trim((string) ($row['cnpj'] ?? ''));
-        $razaoSocial = trim((string) ($row['razao_social'] ?? 'Nova Empresa Importada'));
+        // Determinar ou criar a empresa
+        // Coluna 1: CÓD, Coluna 2: RAZÃO SOCIAL, Coluna 3: CNPJ
+        $codErp = trim((string) ($row[1] ?? ''));
+        $razaoSocial = trim((string) ($row[2] ?? 'Nova Empresa Importada'));
+        $cnpj = trim((string) ($row[3] ?? ''));
 
         if (empty($codErp) && empty($cnpj)) {
             return null;
@@ -63,54 +71,58 @@ class LegacySocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
             ]);
         }
 
+        // Coluna 10: VENCIMENTO
         $dataVencimento = null;
-        if (!empty($row['vencimento'])) {
+        if (!empty($row[10])) {
             try {
-                if (is_numeric($row['vencimento'])) {
-                    $dataVencimento = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['vencimento'])->format('Y-m-d');
+                if (is_numeric($row[10])) {
+                    $dataVencimento = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[10])->format('Y-m-d');
                 } else {
-                    $dataVencimento = Carbon::parse(str_replace('/', '-', $row['vencimento']))->format('Y-m-d');
+                    $dataVencimento = Carbon::parse(str_replace('/', '-', $row[10]))->format('Y-m-d');
                 }
             } catch (\Exception $e) {
                 $dataVencimento = null;
             }
         }
 
+        // Coluna 13: AUTENTICAÇÃO
         $dataAutenticacao = null;
-        if (!empty($row['autenticacao'])) {
+        if (!empty($row[13])) {
             try {
-                if (is_numeric($row['autenticacao'])) {
-                    $dataAutenticacao = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['autenticacao'])->format('Y-m-d');
+                if (is_numeric($row[13])) {
+                    $dataAutenticacao = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[13])->format('Y-m-d');
                 } else {
-                    $dataAutenticacao = Carbon::parse(str_replace('/', '-', $row['autenticacao']))->format('Y-m-d');
+                    $dataAutenticacao = Carbon::parse(str_replace('/', '-', $row[13]))->format('Y-m-d');
                 }
             } catch (\Exception $e) {
                 $dataAutenticacao = null;
             }
         }
 
-        $situacao = strtoupper(trim((string) ($row['situacao'] ?? 'ABERTO')));
+        $situacao = strtoupper(trim((string) ($row[12] ?? 'ABERTO')));
 
+        // Coluna 19: LISTA_DATA
         $dataLista = null;
-        if (!empty($row['lista_data'])) {
+        if (!empty($row[19])) {
             try {
-                if (is_numeric($row['lista_data'])) {
-                    $dataLista = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['lista_data']);
+                if (is_numeric($row[19])) {
+                    $dataLista = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[19]);
                 } else {
-                    $dataLista = Carbon::parse(str_replace('/', '-', $row['lista_data']));
+                    $dataLista = Carbon::parse(str_replace('/', '-', $row[19]));
                 }
             } catch (\Exception $e) {
                 $dataLista = null;
             }
         }
 
+        // Coluna 21: BAIXA_DATA
         $dataBaixa = null;
-        if (!empty($row['baixa_data'])) {
+        if (!empty($row[21])) {
             try {
-                if (is_numeric($row['baixa_data'])) {
-                    $dataBaixa = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['baixa_data']);
+                if (is_numeric($row[21])) {
+                    $dataBaixa = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[21]);
                 } else {
-                    $dataBaixa = Carbon::parse(str_replace('/', '-', $row['baixa_data']));
+                    $dataBaixa = Carbon::parse(str_replace('/', '-', $row[21]));
                 }
             } catch (\Exception $e) {
                 $dataBaixa = null;
@@ -121,16 +133,16 @@ class LegacySocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
             'lancamento_id'     => $lancamentoId,
             'empresa_id'        => $empresa->id,
             'regiao_id'         => $regiaoId,
-            'ano'               => (int) ($row['ano'] ?? 0),
-            'mes'               => (int) ($row['mes'] ?? 0),
+            'ano'               => (int) ($row[8] ?? 0),
+            'mes'               => (int) ($row[9] ?? 0),
             'data_vencimento'   => $dataVencimento,
-            'valor_mensalidade' => (float) ($row['valor'] ?? 0),
+            'valor_mensalidade' => (float) ($row[11] ?? 0),
             'situacao'          => $situacao,
             'data_autenticacao' => $dataAutenticacao,
-            'multa'             => isset($row['multa']) ? (float) $row['multa'] : null,
-            'total'             => isset($row['total']) ? (float) $row['total'] : null,
-            'vl_credit'         => isset($row['creditado']) ? (float) $row['creditado'] : null,
-            'origem'            => $row['origem'] ?? null,
+            'multa'             => isset($row[14]) ? (float) $row[14] : null,
+            'total'             => isset($row[15]) ? (float) $row[15] : null,
+            'vl_credit'         => isset($row[16]) ? (float) $row[16] : null,
+            'origem'            => $row[17] ?? null,
             'data_lista'        => $dataLista,
             'data_baixa'        => $dataBaixa,
         ]);

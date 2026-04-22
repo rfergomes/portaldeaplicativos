@@ -63,7 +63,8 @@ class ImportSocioFolhaGoogleSheets extends Command
                 $this->info("Importação concluída com sucesso!");
 
                 // Limpa o arquivo temporário
-                Storage::delete($tempFile);
+                // Storage::delete($tempFile);
+                $this->info("Arquivo mantido em: " . $filePath);
             } else {
                 $this->error("Falha ao baixar o arquivo. Status: " . $response->status());
             }
