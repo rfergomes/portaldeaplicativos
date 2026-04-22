@@ -7,10 +7,20 @@ use App\Models\Regiao;
 use App\Models\SocioFolha;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithUpserts;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class LegacySocioFolhaImport implements ToModel, WithUpserts
+class LegacySocioFolhaImport implements WithMultipleSheets
+{
+    public function sheets(): array
+    {
+        return [
+            'Dados' => new LegacySocioFolhaDataImport(),
+        ];
+    }
+}
+
+class LegacySocioFolhaDataImport implements ToModel, WithUpserts
 {
     /**
      * @param array $row
@@ -19,8 +29,8 @@ class LegacySocioFolhaImport implements ToModel, WithUpserts
      */
     public function model(array $row)
     {
-        // Pula a linha de cabeçalho (se for o caso)
-        if ($row[0] === 'ID' || $row[0] === 'id') {
+        // Pula a linha de cabeçalho
+        if (isset($row[0]) && (strtoupper((string)$row[0]) === 'ID')) {
             return null;
         }
 
@@ -30,25 +40,19 @@ class LegacySocioFolhaImport implements ToModel, WithUpserts
             return null;
         }
 
-        // Determinar a região
-        // Coluna 4: REGIÃO
-        $regiaoNome = trim((string) ($row[4] ?? ''));
+        // Determinar a região (Coluna 4)
+        $regiaoVal = trim((string) ($row[4] ?? ''));
         $regiaoId = null;
-        if (!empty($regiaoNome)) {
-            // Se for número, podemos tentar buscar pelo ID ou nome mapeado
-            if (is_numeric($regiaoNome)) {
-                $regiaoId = (int)$regiaoNome;
+        if (!empty($regiaoVal)) {
+            if (is_numeric($regiaoVal)) {
+                $regiaoId = (int)$regiaoVal;
             } else {
-                $regiao = Regiao::firstOrCreate(
-                    ['nome' => $regiaoNome],
-                    ['ativo' => true]
-                );
+                $regiao = Regiao::firstOrCreate(['nome' => $regiaoVal], ['ativo' => true]);
                 $regiaoId = $regiao->id;
             }
         }
 
-        // Determinar ou criar a empresa
-        // Coluna 1: CÓD, Coluna 2: RAZÃO SOCIAL, Coluna 3: CNPJ
+        // Empresa (Cód: 1, Razão: 2, CNPJ: 3)
         $codErp = trim((string) ($row[1] ?? ''));
         $razaoSocial = trim((string) ($row[2] ?? 'Nova Empresa Importada'));
         $cnpj = trim((string) ($row[3] ?? ''));
@@ -71,63 +75,11 @@ class LegacySocioFolhaImport implements ToModel, WithUpserts
             ]);
         }
 
-        // Coluna 10: VENCIMENTO
-        $dataVencimento = null;
-        if (!empty($row[10])) {
-            try {
-                if (is_numeric($row[10])) {
-                    $dataVencimento = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[10])->format('Y-m-d');
-                } else {
-                    $dataVencimento = Carbon::parse(str_replace('/', '-', $row[10]))->format('Y-m-d');
-                }
-            } catch (\Exception $e) {
-                $dataVencimento = null;
-            }
-        }
-
-        // Coluna 13: AUTENTICAÇÃO
-        $dataAutenticacao = null;
-        if (!empty($row[13])) {
-            try {
-                if (is_numeric($row[13])) {
-                    $dataAutenticacao = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[13])->format('Y-m-d');
-                } else {
-                    $dataAutenticacao = Carbon::parse(str_replace('/', '-', $row[13]))->format('Y-m-d');
-                }
-            } catch (\Exception $e) {
-                $dataAutenticacao = null;
-            }
-        }
-
-        $situacao = strtoupper(trim((string) ($row[12] ?? 'ABERTO')));
-
-        // Coluna 19: LISTA_DATA
-        $dataLista = null;
-        if (!empty($row[19])) {
-            try {
-                if (is_numeric($row[19])) {
-                    $dataLista = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[19]);
-                } else {
-                    $dataLista = Carbon::parse(str_replace('/', '-', $row[19]));
-                }
-            } catch (\Exception $e) {
-                $dataLista = null;
-            }
-        }
-
-        // Coluna 21: BAIXA_DATA
-        $dataBaixa = null;
-        if (!empty($row[21])) {
-            try {
-                if (is_numeric($row[21])) {
-                    $dataBaixa = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[21]);
-                } else {
-                    $dataBaixa = Carbon::parse(str_replace('/', '-', $row[21]));
-                }
-            } catch (\Exception $e) {
-                $dataBaixa = null;
-            }
-        }
+        // Datas
+        $dataVencimento = $this->parseDate($row[10] ?? null);
+        $dataAutenticacao = $this->parseDate($row[13] ?? null);
+        $dataLista = $this->parseDate($row[19] ?? null);
+        $dataBaixa = $this->parseDate($row[21] ?? null);
 
         return new SocioFolha([
             'lancamento_id'     => $lancamentoId,
@@ -135,10 +87,10 @@ class LegacySocioFolhaImport implements ToModel, WithUpserts
             'regiao_id'         => $regiaoId,
             'ano'               => (int) ($row[8] ?? 0),
             'mes'               => (int) ($row[9] ?? 0),
-            'data_vencimento'   => $dataVencimento,
+            'data_vencimento'   => $dataVencimento ? $dataVencimento->format('Y-m-d') : null,
             'valor_mensalidade' => (float) ($row[11] ?? 0),
-            'situacao'          => $situacao,
-            'data_autenticacao' => $dataAutenticacao,
+            'situacao'          => strtoupper(trim((string) ($row[12] ?? 'ABERTO'))),
+            'data_autenticacao' => $dataAutenticacao ? $dataAutenticacao->format('Y-m-d') : null,
             'multa'             => isset($row[14]) ? (float) $row[14] : null,
             'total'             => isset($row[15]) ? (float) $row[15] : null,
             'vl_credit'         => isset($row[16]) ? (float) $row[16] : null,
@@ -148,9 +100,19 @@ class LegacySocioFolhaImport implements ToModel, WithUpserts
         ]);
     }
 
-    /**
-     * @return string|array
-     */
+    private function parseDate($value)
+    {
+        if (empty($value)) return null;
+        try {
+            if (is_numeric($value)) {
+                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value);
+            }
+            return Carbon::parse(str_replace('/', '-', $value));
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
     public function uniqueBy()
     {
         return 'lancamento_id';
