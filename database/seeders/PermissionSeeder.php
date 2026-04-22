@@ -27,6 +27,7 @@ class PermissionSeeder extends Seeder
             'usuarios' => ['Visualizar', 'Criar', 'Editar', 'Excluir', 'Administrar'],
             'ativos' => ['Visualizar', 'Criar', 'Editar', 'Excluir'],
             'socio_caixa' => ['Visualizar', 'Importar', 'Gerenciar', 'Ocorrencias'],
+            'socio_folha' => ['Visualizar', 'Importar', 'Gerenciar'],
         ];
 
         $allPermissionIds = [];
@@ -59,7 +60,8 @@ class PermissionSeeder extends Seeder
                   ->orWhere('chave', 'like', '%.criar')
                   ->orWhere('chave', 'like', '%.editar')
                   ->orWhere('chave', 'like', '%.notificar_whatsapp')
-                  ->orWhere('chave', 'like', 'socio_caixa.%');
+                  ->orWhere('chave', 'like', 'socio_caixa.%')
+                  ->orWhere('chave', 'like', 'socio_folha.%');
             })
             ->where('chave', 'not like', 'usuarios.%') // Não permite gerenciar usuários
             ->where('chave', 'not like', 'ativos.%')  // NÃO permite gerenciar ativos automaticamente

@@ -245,11 +245,11 @@ Route::middleware('auth')->group(function () {
 
     // Sócio Folha
     Route::prefix('socio-folha')->name('socios-folha.')->group(function () {
-        Route::get('/', [SocioFolhaController::class, 'index'])->name('index'); // ->middleware('can:socio_folha.visualizar');
-        Route::post('/import', [SocioFolhaController::class, 'import'])->name('import'); // ->middleware('can:socio_folha.importar');
-        Route::patch('/{socio}/toggle-situacao', [SocioFolhaController::class, 'toggleSituacao'])->name('toggle-situacao');
-        Route::patch('/{socio}/toggle-lista', [SocioFolhaController::class, 'toggleLista'])->name('toggle-lista');
-        Route::patch('/{socio}/toggle-baixa', [SocioFolhaController::class, 'toggleBaixa'])->name('toggle-baixa');
+        Route::get('/', [SocioFolhaController::class, 'index'])->name('index')->middleware('can:socio_folha.visualizar');
+        Route::post('/import', [SocioFolhaController::class, 'import'])->name('import')->middleware('can:socio_folha.importar');
+        Route::patch('/{socio}/toggle-situacao', [SocioFolhaController::class, 'toggleSituacao'])->name('toggle-situacao')->middleware('can:socio_folha.gerenciar');
+        Route::patch('/{socio}/toggle-lista', [SocioFolhaController::class, 'toggleLista'])->name('toggle-lista')->middleware('can:socio_folha.gerenciar');
+        Route::patch('/{socio}/toggle-baixa', [SocioFolhaController::class, 'toggleBaixa'])->name('toggle-baixa')->middleware('can:socio_folha.gerenciar');
         Route::get('/empresas-por-regiao/{regiao_id}', [SocioFolhaController::class, 'getEmpresasPorRegiao'])->name('empresas-por-regiao');
     });
 });
