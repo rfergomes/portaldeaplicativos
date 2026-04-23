@@ -45,7 +45,11 @@ class LegacySocioFolhaDataImport implements ToModel, WithUpserts
         $regiaoId = null;
         if (!empty($regiaoVal)) {
             if (is_numeric($regiaoVal)) {
-                $regiaoId = (int)$regiaoVal;
+                // Tenta buscar pela area_adm (mapeamento oficial do seeder)
+                $regiao = Regiao::where('area_adm', $regiaoVal)->first();
+                if ($regiao) {
+                    $regiaoId = $regiao->id;
+                }
             } else {
                 $regiao = Regiao::firstOrCreate(['nome' => $regiaoVal], ['ativo' => true]);
                 $regiaoId = $regiao->id;

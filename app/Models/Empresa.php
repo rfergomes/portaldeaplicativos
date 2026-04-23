@@ -44,5 +44,10 @@ class Empresa extends Model
     {
         return $this->hasMany(Cliente::class);
     }
+
+    public function socioFolha()
+    {
+        return $this->hasMany(SocioFolha::class);
+    }
 }
 

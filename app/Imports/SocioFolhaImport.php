@@ -21,7 +21,7 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
     {
         $lancamentoId = trim((string) ($row['id'] ?? ''));
 
-        if (empty($lancamentoId)) {
+        if (empty($lancamentoId) || !is_numeric($lancamentoId)) {
             return null;
         }
 
@@ -29,11 +29,19 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
         $regiaoNome = trim((string) ($row['regiao'] ?? ''));
         $regiaoId = null;
         if (!empty($regiaoNome)) {
-            $regiao = Regiao::firstOrCreate(
-                ['nome' => $regiaoNome],
-                ['ativo' => true]
-            );
-            $regiaoId = $regiao->id;
+            if (is_numeric($regiaoNome)) {
+                // Tenta buscar pela area_adm (mapeamento oficial do seeder)
+                $regiao = Regiao::where('area_adm', $regiaoNome)->first();
+                if ($regiao) {
+                    $regiaoId = $regiao->id;
+                }
+            } else {
+                $regiao = Regiao::firstOrCreate(
+                    ['nome' => $regiaoNome],
+                    ['ativo' => true]
+                );
+                $regiaoId = $regiao->id;
+            }
         }
 
         // Determinar ou criar a empresa baseada no Código ERP (Cód) e CNPJ
@@ -93,8 +101,8 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
             'lancamento_id'     => $lancamentoId,
             'empresa_id'        => $empresa->id,
             'regiao_id'         => $regiaoId,
-            'ano'               => (int) ($row['ano'] ?? 0),
-            'mes'               => (int) ($row['mes'] ?? 0),
+            'ano'               => is_numeric($row['ano'] ?? null) ? (int) $row['ano'] : 0,
+            'mes'               => is_numeric($row['mes'] ?? null) ? (int) $row['mes'] : 0,
             'data_vencimento'   => $dataVencimento,
             'valor_mensalidade' => (float) ($row['vl_mens'] ?? 0),
             'situacao'          => $situacao,

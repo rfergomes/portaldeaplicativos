@@ -11,27 +11,34 @@ class SocioFolhaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = SocioFolha::with(['empresa', 'regiao']);
+        // Se nenhum filtro principal for passado, assumimos o ano atual como padrão inicial
+        if (!$request->has('ano') && !$request->has('regiao_id') && !$request->has('empresa_id')) {
+            $request->merge(['ano' => date('Y')]);
+        }
+
+        $query = SocioFolha::with(['empresa', 'regiao'])
+            ->join('empresas', 'socios_folha.empresa_id', '=', 'empresas.id')
+            ->select('socios_folha.*');
 
         if ($request->filled('regiao_id')) {
-            $query->where('regiao_id', $request->regiao_id);
+            $query->where('socios_folha.regiao_id', $request->regiao_id);
         }
 
         if ($request->filled('empresa_id')) {
-            $query->where('empresa_id', $request->empresa_id);
+            $query->where('socios_folha.empresa_id', $request->empresa_id);
         }
 
         if ($request->filled('ano')) {
-            $query->where('ano', $request->ano);
+            $query->where('socios_folha.ano', $request->ano);
         }
 
         if ($request->filled('mes')) {
-            $query->where('mes', $request->mes);
+            $query->where('socios_folha.mes', $request->mes);
         }
 
-        $sociosFolha = $query->orderBy('ano', 'desc')
-                             ->orderBy('mes', 'desc')
-                             ->orderBy('data_vencimento', 'asc')
+        $sociosFolha = $query->orderBy('socios_folha.ano', 'desc')
+                             ->orderBy('socios_folha.mes', 'desc')
+                             ->orderBy('empresas.razao_social', 'asc')
                              ->paginate(20)
                              ->appends($request->all());
 
@@ -39,7 +46,12 @@ class SocioFolhaController extends Controller
         $anos = SocioFolha::select('ano')->distinct()->orderBy('ano', 'desc')->pluck('ano');
         $meses = SocioFolha::select('mes')->distinct()->orderBy('mes', 'asc')->pluck('mes');
 
-        return view('socio_folha.index', compact('sociosFolha', 'regioes', 'anos', 'meses'));
+        // Carrega todas as empresas que possuem registros em Sócio Folha
+        $empresas = \App\Models\Empresa::whereHas('socioFolha')
+            ->orderBy('razao_social')
+            ->get(['id', 'razao_social']);
+
+        return view('socio_folha.index', compact('sociosFolha', 'regioes', 'anos', 'meses', 'empresas'));
     }
 
     public function import(Request $request)
@@ -133,10 +145,15 @@ class SocioFolhaController extends Controller
 
     public function getEmpresasPorRegiao($regiao_id)
     {
-        $empresas = \App\Models\Empresa::where('regiao_id', $regiao_id)
-                                       ->where('ativo', true)
-                                       ->orderBy('razao_social')
-                                       ->get(['id', 'razao_social', 'empresa_erp']);
+        $query = \App\Models\Empresa::whereHas('socioFolha')
+                                     ->where('ativo', true)
+                                     ->orderBy('razao_social');
+
+        if ($regiao_id !== 'all') {
+            $query->where('regiao_id', $regiao_id);
+        }
+
+        $empresas = $query->get(['id', 'razao_social', 'empresa_erp']);
         return response()->json($empresas);
     }
 }

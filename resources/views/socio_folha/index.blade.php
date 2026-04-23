@@ -55,6 +55,13 @@
                                     <select name="empresa_id" id="empresaSelect" class="form-select form-select-sm"
                                         onchange="this.form.submit()">
                                         <option value="">TODOS</option>
+                                        @if(!request('regiao_id'))
+                                            @foreach($empresas as $empresa)
+                                                <option value="{{ $empresa->id }}" {{ request('empresa_id') == $empresa->id ? 'selected' : '' }}>
+                                                    {{ $empresa->razao_social }}
+                                                </option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                 </div>
                                 <div class="col-md-2">
@@ -76,7 +83,8 @@
                                                 $mesNome = \Carbon\Carbon::create()->month($mes)->locale('pt_BR')->monthName;
                                             @endphp
                                             <option value="{{ $mes }}" {{ request('mes') == $mes ? 'selected' : '' }}>
-                                                {{ str_pad($mes, 2, '0', STR_PAD_LEFT) }} - {{ ucfirst($mesNome) }}</option>
+                                                {{ str_pad($mes, 2, '0', STR_PAD_LEFT) }} - {{ ucfirst($mesNome) }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -125,8 +133,9 @@
                                             class="small fw-bold text-muted">{{ $socio->regiao->nome ?? 'N/A' }}</span></td>
                                     <td>
                                         <div class="fw-bold text-dark">{{ $socio->empresa->razao_social ?? 'N/A' }}</div>
-                                        <div class="small text-muted">CNPJ/Cód:
-                                            {{ $socio->empresa->cnpj ?? $socio->empresa->empresa_erp }}</div>
+                                        <div class="small text-muted">
+                                            {{ $socio->empresa->cnpj ?? $socio->empresa->empresa_erp }}
+                                        </div>
                                     </td>
                                     <td class="text-center">
                                         <span
@@ -242,24 +251,22 @@
             function loadEmpresas() {
                 const regiaoId = document.getElementById('regiaoSelect').value;
                 const empresaSelect = document.getElementById('empresaSelect');
+                const selectedEmpresa = '{{ request("empresa_id") }}';
 
-                // Clear
-                empresaSelect.innerHTML = '<option value="">TODOS</option>';
+                const apiId = regiaoId || 'all';
 
-                if (regiaoId) {
-                    axios.get(`/socio-folha/empresas-por-regiao/${regiaoId}`)
-                        .then(res => {
-                            const empresas = res.data;
-                            const selectedEmpresa = '{{ request("empresa_id") }}';
-                            empresas.forEach(emp => {
-                                const option = document.createElement('option');
-                                option.value = emp.id;
-                                option.textContent = emp.razao_social;
-                                if (selectedEmpresa == emp.id) option.selected = true;
-                                empresaSelect.appendChild(option);
-                            });
+                axios.get(`/socio-folha/empresas-por-regiao/${apiId}`)
+                    .then(res => {
+                        const empresas = res.data;
+                        empresaSelect.innerHTML = '<option value="">TODOS</option>';
+                        empresas.forEach(emp => {
+                            const option = document.createElement('option');
+                            option.value = emp.id;
+                            option.textContent = emp.razao_social;
+                            if (selectedEmpresa == emp.id) option.selected = true;
+                            empresaSelect.appendChild(option);
                         });
-                }
+                    });
             }
 
             document.addEventListener('DOMContentLoaded', function () {
