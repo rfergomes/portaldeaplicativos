@@ -45,7 +45,7 @@
         <p>A CEDENTE entrega neste ato à CESSIONÁRIA, os seguintes equipamentos em perfeito estado de funcionamento e conservação:</p>
         
         <div class="item-list">
-            @foreach($cessao->movimentacoes as $mov)
+            @foreach($cessao->movimentacoes->where('tipo', 'cessao') as $mov)
             <div class="item">
                 01 {{ $mov->equipamento->descricao }} {{ $mov->equipamento->modelo }} 
                 (N/S: {{ $mov->equipamento->numero_serie ?? 'N/A' }}) - 
@@ -69,7 +69,7 @@
 
     <div class="section">
         <div class="section-title">CLÁUSULA QUARTA - DA DEVOLUÇÃO</div>
-        <p>Os equipamentos deverão ser devolvidos à CEDENTE ao término do vínculo de trabalho ou a qualquer momento mediante solicitação, nas mesmas condições em que foram recebidos, ressalvado o desgaste natural pelo uso. A data de devolução prevista é {{ $cessao->movimentacoes->max('data_previsao_devolucao') ? $cessao->movimentacoes->max('data_previsao_devolucao')->format('d/m/Y') : 'Prazo Indeterminado' }}.</p>
+        <p>Os equipamentos deverão ser devolvidos à CEDENTE ao término do vínculo de trabalho ou a qualquer momento mediante solicitação, nas mesmas condições em que foram recebidos, ressalvado o desgaste natural pelo uso. A data de devolução prevista é {{ $cessao->movimentacoes->where('tipo', 'cessao')->max('data_previsao_devolucao') ? $cessao->movimentacoes->where('tipo', 'cessao')->max('data_previsao_devolucao')->format('d/m/Y') : 'Prazo Indeterminado' }}.</p>
     </div>
 
     <div class="section">

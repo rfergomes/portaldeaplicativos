@@ -207,16 +207,31 @@
                                     <tr style="font-size: 0.7rem;" class="text-muted text-uppercase">
                                         <th class="ps-3">Patrimônio / ID</th>
                                         <th>Descrição</th>
-                                        <th class="pe-3">Marca/Modelo</th>
+                                        <th>Marca/Modelo</th>
+                                        <th class="pe-3 text-center">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($cessao->movimentacoes as $mov)
+                                    @foreach($cessao->movimentacoes->where('tipo', 'cessao') as $mov)
+                                    @php
+                                        $devolvido = $cessao->movimentacoes->where('tipo', 'devolucao')->where('equipamento_id', $mov->equipamento_id)->first();
+                                    @endphp
                                     <tr>
                                         <td class="ps-3"><span class="badge text-bg-light border">#{{ optional($mov->equipamento)->id }}</span></td>
                                         <td class="small fw-bold">{{ optional($mov->equipamento)->descricao ?? 'Equipamento Removido' }}</td>
-                                        <td class="small text-muted pe-3">
+                                        <td class="small text-muted">
                                             {{ optional(optional($mov->equipamento)->fabricante)->nome ?? '-' }} / {{ optional($mov->equipamento)->modelo ?? '-' }}
+                                        </td>
+                                        <td class="pe-3 text-center">
+                                            @if($devolvido)
+                                                <span class="badge bg-secondary opacity-75" title="Devolvido em {{ $devolvido->data_movimentacao->format('d/m/Y') }}">
+                                                    <i class="fa-solid fa-arrow-rotate-left me-1"></i>Devolvido
+                                                </span>
+                                            @else
+                                                <span class="badge bg-success">
+                                                    <i class="fa-solid fa-check me-1"></i>Em Uso
+                                                </span>
+                                            @endif
                                         </td>
                                     </tr>
                                     @endforeach
@@ -407,14 +422,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($aquisicoesDisponiveis ?? [] as $aq)
+                                    @forelse($aquisicoesDisponiveis ?? [] as $aquisicao)
                                     <tr>
                                         <td>
-                                            <input type="checkbox" name="nfs[]" value="{{ $aq->id }}" class="form-check-input nf-check">
+                                            <input type="checkbox" name="nfs[]" value="{{ data_get($aquisicao, 'id') }}" class="form-check-input nf-check">
                                         </td>
-                                        <td class="fw-bold">{{ $aq->numero_nf ?? 'S/ Nota (ID: '.$aq->id.')' }}</td>
-                                        <td>{{ $aq->fornecedor->nome ?? '-' }}</td>
-                                        <td><span class="badge bg-success rounded-pill px-3">{{ $aq->equipamentos_count }} disponíveis</span></td>
+                                        <td class="fw-bold">{{ data_get($aquisicao, 'numero_nf') ?? 'S/ Nota (ID: '.data_get($aquisicao, 'id').')' }}</td>
+                                        <td>{{ data_get($aquisicao, 'fornecedor.nome') ?? '-' }}</td>
+                                        <td><span class="badge bg-success rounded-pill px-3">{{ data_get($aquisicao, 'equipamentos_count', 0) }} disponíveis</span></td>
                                     </tr>
                                     @empty
                                     <tr>
@@ -744,14 +759,16 @@ $(document).ready(function() {
 
         // Buscar itens da cessão do modal de detalhes
         const modalDetalhes = $('#modalDetalhes' + cessaoId);
-        const itens = modalDetalhes.find('.card-body table tbody tr');
+        const itens = modalDetalhes.find('.card-body:first table tbody tr');
 
         itens.each(function() {
             const id = $(this).find('td:first .badge').text().replace('#', '');
             const descricao = $(this).find('td:nth-child(2)').text();
             const modelo = $(this).find('td:nth-child(3)').text();
+            const status = $(this).find('td:nth-child(4)').text().trim();
             
-            if (descricao !== 'Equipamento Removido') {
+            // Só adicionar se não estiver "Removido" e NÃO estiver "Devolvido"
+            if (descricao !== 'Equipamento Removido' && !status.includes('Devolvido')) {
                 $('#tabelaItensDevolucao tbody').append(`
                     <tr>
                         <td><input type="checkbox" name="equipamentos[]" value="${id}" class="form-check-input item-devolucao-check" checked></td>
