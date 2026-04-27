@@ -212,6 +212,8 @@ Route::middleware('auth')->group(function () {
         Route::get('cessoes', [AtivoCessaoController::class, 'index'])->name('cessoes.index');
         Route::post('cessoes', [AtivoCessaoController::class, 'store'])->name('cessoes.store');
         Route::get('cessoes/{cessao}/pdf', [AtivoCessaoController::class, 'generatePdf'])->name('cessoes.pdf');
+        Route::get('cessoes/{cessao}/pdf-devolucao', [AtivoCessaoController::class, 'generatePdfDevolucao'])->name('cessoes.pdf_devolucao');
+        Route::post('cessoes/{cessao}/devolver', [AtivoCessaoController::class, 'processarDevolucao'])->name('cessoes.devolver');
         Route::get('movimentacoes/{movimentacao}/pdf/devolucao', [AtivoMovimentacaoController::class, 'pdfDevolucao'])->name('devolucao.pdf');
         Route::post('cessoes/{cessao}/anexos', [AtivoCessaoController::class, 'uploadAnexo'])->name('cessoes.anexos.store');
         Route::get('anexos/{anexo}/download/{filename?}', [AtivoCessaoController::class, 'downloadAnexo'])->name('anexos.download');

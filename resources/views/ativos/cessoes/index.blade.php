@@ -276,6 +276,10 @@
                 </div>
             </div>
             <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-outline-danger px-4 fw-bold me-auto" 
+                        onclick="abrirModalDevolucao({{ $cessao->id }}, '{{ $cessao->codigo_cessao }}')">
+                    <i class="fa-solid fa-rotate-left me-1"></i> Registrar Devolução
+                </button>
                 <button type="button" class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
@@ -452,6 +456,54 @@
                     <button type="button" class="btn btn-primary" id="btnNextNF">Avançar</button>
                     <button type="button" class="btn btn-primary" id="btnPrevNF" style="display: none;">Voltar</button>
                     <button type="submit" class="btn btn-success" id="btnSubmitNF" style="display: none;">Confirmar Cessão Lote</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Registrar Devolução -->
+<div class="modal fade" id="modalDevolucaoCessao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title fw-bold">Registrar Devolução: <span id="devolucaoCodigoCessao"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formRegistrarDevolucao">
+                <input type="hidden" id="devolucaoCessaoId">
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-3">Selecione os itens que estão sendo devolvidos neste momento.</p>
+                    
+                    <div class="table-responsive mb-4" style="max-height: 300px;">
+                        <table class="table table-sm table-hover align-middle" id="tabelaItensDevolucao">
+                            <thead class="bg-light sticky-top">
+                                <tr>
+                                    <th style="width: 40px;">
+                                        <input type="checkbox" class="form-check-input" id="checkAllDevolucao">
+                                    </th>
+                                    <th>Patrimônio</th>
+                                    <th>Descrição</th>
+                                    <th>Modelo</th>
+                                    <th>Status Atual</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Itens carregados via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Observações de Recebimento</label>
+                        <textarea id="observacoes_devolucao" class="form-control" rows="3" placeholder="Ex: Equipamento em perfeito estado, com carregador..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger" id="btnSubmitDevolucao">
+                        <i class="fa-solid fa-check me-1"></i> Confirmar Devolução e Gerar Termo
+                    </button>
                 </div>
             </form>
         </div>
@@ -671,6 +723,96 @@ $(document).ready(function() {
             },
             error: function(xhr) {
                 Swal.fire('Erro', xhr.responseJSON?.message || 'Não foi possível processar a requisição.', 'error');
+            }
+        });
+    });
+
+    // --- DEVOLUÇÃO DE CESSÃO ---
+
+    window.abrirModalDevolucao = function(cessaoId, codigoCessao) {
+        // Fechar modal de detalhes se estiver aberto
+        const modalDetalhesEl = document.getElementById('modalDetalhes' + cessaoId);
+        const modalDetalhesInstance = bootstrap.Modal.getInstance(modalDetalhesEl);
+        if (modalDetalhesInstance) {
+            modalDetalhesInstance.hide();
+        }
+        
+        $('#devolucaoCessaoId').val(cessaoId);
+        $('#devolucaoCodigoCessao').text(codigoCessao);
+        $('#tabelaItensDevolucao tbody').empty();
+        $('#checkAllDevolucao').prop('checked', true);
+
+        // Buscar itens da cessão do modal de detalhes
+        const modalDetalhes = $('#modalDetalhes' + cessaoId);
+        const itens = modalDetalhes.find('.card-body table tbody tr');
+
+        itens.each(function() {
+            const id = $(this).find('td:first .badge').text().replace('#', '');
+            const descricao = $(this).find('td:nth-child(2)').text();
+            const modelo = $(this).find('td:nth-child(3)').text();
+            
+            if (descricao !== 'Equipamento Removido') {
+                $('#tabelaItensDevolucao tbody').append(`
+                    <tr>
+                        <td><input type="checkbox" name="equipamentos[]" value="${id}" class="form-check-input item-devolucao-check" checked></td>
+                        <td><span class="badge text-bg-light border">#${id}</span></td>
+                        <td class="small fw-bold">${descricao}</td>
+                        <td class="small text-muted">${modelo}</td>
+                        <td><span class="badge bg-success">Em Uso</span></td>
+                    </tr>
+                `);
+            }
+        });
+
+        if ($('#tabelaItensDevolucao tbody tr').length === 0) {
+             $('#tabelaItensDevolucao tbody').append('<tr><td colspan="5" class="text-center py-3 text-muted">Todos os itens já foram devolvidos ou removidos.</td></tr>');
+             $('#btnSubmitDevolucao').prop('disabled', true);
+        } else {
+             $('#btnSubmitDevolucao').prop('disabled', false);
+        }
+
+        const modalDevolucao = new bootstrap.Modal(document.getElementById('modalDevolucaoCessao'));
+        modalDevolucao.show();
+    };
+
+    $('#checkAllDevolucao').on('change', function() {
+        $('.item-devolucao-check').prop('checked', this.checked);
+    });
+
+    $('#formRegistrarDevolucao').on('submit', function(e) {
+        e.preventDefault();
+        
+        const cessaoId = $('#devolucaoCessaoId').val();
+        const equipamentos = $('.item-devolucao-check:checked').map(function() { return this.value; }).get();
+
+        if (equipamentos.length === 0) {
+            Swal.fire('Aviso', 'Selecione pelo menos um equipamento para devolver.', 'warning');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Registrando Devolução...',
+            text: 'Aguarde enquanto processamos o retorno dos itens.',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        $.ajax({
+            url: `/ativos/cessoes/${cessaoId}/devolver`,
+            type: "POST",
+            data: {
+                equipamentos: equipamentos,
+                observacoes: $('#observacoes_devolucao').val(),
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                Swal.fire('Sucesso!', response.message, 'success').then(() => {
+                    window.open(`/ativos/cessoes/${cessaoId}/pdf-devolucao`, '_blank');
+                    location.reload();
+                });
+            },
+            error: function(xhr) {
+                Swal.fire('Erro', 'Não foi possível registrar a devolução.', 'error');
             }
         });
     });

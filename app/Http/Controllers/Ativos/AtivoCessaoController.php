@@ -174,6 +174,80 @@ class AtivoCessaoController extends Controller
         return $pdf->stream($filename);
     }
 
+    public function processarDevolucao(Request $request, AtivoCessao $cessao)
+    {
+        $validated = $request->validate([
+            'equipamentos' => 'required|array',
+            'equipamentos.*' => 'exists:ativo_equipamentos,id',
+            'observacoes' => 'nullable|string',
+        ]);
+
+        return DB::transaction(function () use ($validated, $cessao) {
+            foreach ($validated['equipamentos'] as $equipId) {
+                $equipamento = AtivoEquipamento::lockForUpdate()->findOrFail($equipId);
+                
+                $origem = $equipamento->localizacao_atual;
+
+                // Registrar Movimentação de Devolução
+                AtivoMovimentacao::create([
+                    'equipamento_id' => $equipamento->id,
+                    'usuario_id' => $cessao->usuario_id,
+                    'tipo' => 'devolucao',
+                    'data_movimentacao' => now(),
+                    'responsavel_id' => auth()->id(),
+                    'cessao_id' => $cessao->id,
+                    'origem' => $origem,
+                    'destino' => 'Estoque',
+                    'observacao' => $validated['observacoes'] ?? 'Devolução via Termo de Cessão',
+                ]);
+
+                // Atualizar Equipamento
+                $equipamento->update([
+                    'status' => 'disponivel',
+                    'tipo_uso' => null,
+                    'localizacao_atual' => 'Estoque',
+                    'data_devolucao_prevista' => null,
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Devolução registrada com sucesso!',
+                'cessao_id' => $cessao->id
+            ]);
+        });
+    }
+
+    public function generatePdfDevolucao(AtivoCessao $cessao, Request $request)
+    {
+        $cessao->load(['usuario']);
+        
+        // Buscar movimentações de devolução recentes (ou todas desta cessão)
+        // Se quisermos apenas as que acabaram de ser feitas, poderíamos filtrar pela data
+        // Mas geralmente o usuário quer o termo da devolução atual.
+        $movimentacoes = AtivoMovimentacao::with('equipamento')
+            ->where('cessao_id', $cessao->id)
+            ->where('tipo', 'devolucao')
+            ->whereDate('data_movimentacao', now()->toDateString())
+            ->get();
+
+        if ($movimentacoes->isEmpty()) {
+            // Se não houver hoje, tenta pegar as últimas devoluções desta cessão
+            $movimentacoes = AtivoMovimentacao::with('equipamento')
+                ->where('cessao_id', $cessao->id)
+                ->where('tipo', 'devolucao')
+                ->orderBy('data_movimentacao', 'desc')
+                ->limit(10) // Pega as mais recentes
+                ->get();
+        }
+
+        $pdf = Pdf::loadView('ativos.cessoes.pdf_devolucao_cessao', compact('cessao', 'movimentacoes'));
+        
+        $filename = 'termo_devolucao_' . $cessao->codigo_cessao . '_' . now()->format('dmY') . '.pdf';
+        
+        return $pdf->stream($filename);
+    }
+
     public function uploadAnexo(Request $request, AtivoCessao $cessao)
     {
         $request->validate([
