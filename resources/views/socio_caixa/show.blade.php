@@ -28,6 +28,17 @@
                             <span class="fw-bold text-primary text-end" style="max-width: 60%; font-size: 0.85rem;">{{ $empresa->razao_social }}</span>
                         </div>
                         @endif
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom align-items-center">
+                            <span class="text-muted"><i class="fas fa-phone me-2"></i>Telefone:</span>
+                            <div class="text-end">
+                                <span class="fw-bold d-block" id="displayTelefone">{{ $socio->telefone ?: 'Não cadastrado' }}</span>
+                                @if(auth()->user()->temPermissao('socio_caixa.gerenciar'))
+                                    <button class="btn btn-link btn-sm p-0 text-info text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalTelefone">
+                                        <small><i class="fas fa-edit me-1"></i>{{ $socio->telefone ? 'Alterar' : 'Cadastrar' }}</small>
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
                         <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
                             <span class="text-muted"><i class="fas fa-calendar-alt me-2"></i>Lançamentos:</span>
                             <span class="badge bg-light text-dark border">{{ $lancamentos->count() }} meses</span>
@@ -39,6 +50,11 @@
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-0 pb-4">
+                    @if(auth()->user()->temPermissao('socio_caixa.gerenciar'))
+                        <button class="btn btn-success w-100 rounded-pill mb-3 py-2 fw-bold shadow-sm" id="btnWhatsapp">
+                            <i class="fab fa-whatsapp me-2"></i> Avisar Mensalidades
+                        </button>
+                    @endif
                     <a href="{{ route('socios-caixa.index') }}" class="btn btn-outline-secondary w-100 rounded-pill">
                         <i class="fas fa-arrow-left me-2"></i> Voltar à Lista Geral
                     </a>
@@ -212,6 +228,30 @@
     </div>
 </div>
 
+<!-- Modal Editar Telefone -->
+<div class="modal fade" id="modalTelefone" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h4 class="modal-title fw-bold text-primary"><i class="fas fa-phone-alt me-2"></i>Cadastro de Telefone</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="form-group">
+                    <label class="small fw-bold mb-2 text-uppercase text-secondary">Número do WhatsApp (com DDD)</label>
+                    <input type="text" id="inputTelefone" class="form-control border-primary-subtle" 
+                           placeholder="Ex: 19991234567" value="{{ $socio->telefone }}">
+                    <small class="text-muted mt-1 d-block">Somente números, incluindo o DDD.</small>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnSalvarTelefone" class="btn btn-primary rounded-pill px-4 fw-bold">Salvar Telefone</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
 .bg-gray-100 { background-color: #f8f9fa; }
 .border-dashed { border-style: dashed !important; }
@@ -331,6 +371,97 @@ document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire('Erro', 'Erro ao salvar anotação.', 'error');
                 btnSalvarOc.disabled = false;
                 btnSalvarOc.innerHTML = 'Salvar Registro';
+            });
+        });
+    }
+
+    // Lógica Telefone
+    const btnSalvarTel = document.getElementById('btnSalvarTelefone');
+    const inputTel = document.getElementById('inputTelefone');
+
+    if (btnSalvarTel) {
+        btnSalvarTel.addEventListener('click', function() {
+            const telefone = inputTel.value.replace(/\D/g, '');
+            if (telefone.length < 10) {
+                Swal.fire('Atenção', 'Digite um telefone válido com DDD.', 'warning');
+                return;
+            }
+
+            btnSalvarTel.disabled = true;
+            btnSalvarTel.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+            axios.patch('{{ route("socios-caixa.update-telefone", $socio->id) }}', {
+                telefone: telefone
+            }, {
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(response => {
+                if (response.data.success) {
+                    Swal.fire('Sucesso', 'Telefone atualizado!', 'success').then(() => {
+                        window.location.reload();
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire('Erro', 'Erro ao salvar telefone.', 'error');
+                btnSalvarTel.disabled = false;
+                btnSalvarTel.innerHTML = 'Salvar Telefone';
+            });
+        });
+    }
+
+    // Lógica Enviar WhatsApp
+    const btnWhatsapp = document.getElementById('btnWhatsapp');
+    if (btnWhatsapp) {
+        btnWhatsapp.addEventListener('click', function() {
+            const temTelefone = '{{ $socio->telefone }}';
+            
+            if (!temTelefone) {
+                Swal.fire({
+                    title: 'Telefone Ausente',
+                    text: 'Você precisa cadastrar um telefone antes de enviar o WhatsApp.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Cadastrar Agora',
+                    cancelButtonText: 'Depois'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        new bootstrap.Modal(document.getElementById('modalTelefone')).show();
+                    }
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Enviar Notificação?',
+                text: "Será enviado um aviso de mensalidades em aberto para o número {{ $socio->telefone }}.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#198754',
+                confirmButtonText: 'Sim, enviar!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    btnWhatsapp.disabled = true;
+                    btnWhatsapp.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+
+                    axios.post('{{ route("socios-caixa.enviar-whatsapp", $socio->id) }}', {}, {
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                    })
+                    .then(response => {
+                        if (response.data.success) {
+                            Swal.fire('Enviado!', 'A mensagem foi enfileirada para envio.', 'success').then(() => {
+                                window.location.reload();
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        const msg = error.response?.data?.message || 'Erro ao enviar WhatsApp.';
+                        Swal.fire('Erro', msg, 'error');
+                        btnWhatsapp.disabled = false;
+                        btnWhatsapp.innerHTML = '<i class="fab fa-whatsapp me-2"></i> Avisar Mensalidades';
+                    });
+                }
             });
         });
     }

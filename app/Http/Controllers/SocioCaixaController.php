@@ -221,4 +221,60 @@ class SocioCaixaController extends Controller
 
         return view('socio_caixa.show', compact('socio', 'lancamentos', 'ocorrencias', 'empresa'));
     }
+
+    public function updateTelefone(Request $request, SocioCaixa $socio)
+    {
+        $request->validate([
+            'telefone' => 'required|string|min:10'
+        ]);
+
+        SocioCaixa::where('matricula', $socio->matricula)->update([
+            'telefone' => $request->telefone
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function enviarWhatsapp(Request $request, SocioCaixa $socio)
+    {
+        if (empty($socio->telefone)) {
+            return response()->json(['success' => false, 'message' => 'Telefone não cadastrado.'], 422);
+        }
+
+        $abertos = SocioCaixa::where('matricula', $socio->matricula)
+            ->where('pago', false)
+            ->where(function($q) {
+                $q->whereNull('postergado_ate')
+                  ->orWhere('postergado_ate', '<=', now());
+            })
+            ->orderBy('ano')
+            ->orderBy('mes')
+            ->get();
+
+        if ($abertos->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'Nenhuma mensalidade em aberto para notificar.'], 422);
+        }
+
+        $competencias = $abertos->map(function($item) {
+            return str_pad($item->mes, 2, '0', STR_PAD_LEFT) . '/' . $item->ano;
+        })->implode(', ');
+
+        $userName = auth()->user()->nickname ?: auth()->user()->name;
+
+        // Despachar Job para API Kwik
+        \App\Jobs\SendKwikNotificationJob::dispatch(
+            $socio->telefone,
+            'aviso_mensalidade_caixa',
+            [$socio->nome, $userName, $competencias]
+        );
+
+        // Registrar no histórico de ocorrências (Anotações / Atendimento)
+        SocioCaixaOcorrencia::create([
+            'matricula' => $socio->matricula,
+            'user_id' => auth()->id(),
+            'mensagem' => "[WHATSAPP] Aviso de mensalidade enviado para {$socio->telefone}. Competências: {$competencias}"
+        ]);
+
+        return response()->json(['success' => true]);
+    }
 }
