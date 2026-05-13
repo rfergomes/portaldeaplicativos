@@ -53,8 +53,8 @@ class SendArOnlineEmailJob implements ShouldQueue
             return;
         }
 
-        $baseUrl = env('AR_ONLINE_BASE_URL', 'https://api.ar-online.com.br');
-        $token = env('AR_ONLINE_TOKEN');
+        $baseUrl = config('services.ar_online.base_url', 'https://api.ar-online.com.br');
+        $token = config('services.ar_online.token');
         
         if ($this->senderId) {
             $user = \App\Models\User::with('tokenDepto')->find($this->senderId);

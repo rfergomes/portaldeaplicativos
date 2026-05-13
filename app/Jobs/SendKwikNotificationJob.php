@@ -57,9 +57,9 @@ class SendKwikNotificationJob implements ShouldQueue
             $telefoneLimpo = '+55' . $telefoneLimpo;
         }
 
-        $token = env('KWIK_API_TOKEN');
-        $agentEmail = env('KWIK_AGENT_EMAIL');
-        $fromNumber = env('KWIK_FROM_NUMBER');
+        $token = config('services.kwik.token');
+        $agentEmail = config('services.kwik.agent_email');
+        $fromNumber = config('services.kwik.from_number');
         
         // Fallback para token de departamento se necessário
         if ($this->senderId) {

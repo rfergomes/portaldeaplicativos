@@ -36,4 +36,10 @@ return [
         'token' => env('AR_ONLINE_TOKEN'),
     ],
 
+    'kwik' => [
+        'token' => env('KWIK_API_TOKEN'),
+        'agent_email' => env('KWIK_AGENT_EMAIL'),
+        'from_number' => env('KWIK_FROM_NUMBER'),
+    ],
+
 ];
