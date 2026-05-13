@@ -126,6 +126,7 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::get('/protocolos/{protocolo}/comprovante/{envio}', [ProtocoloController::class, 'baixarComprovante'])->name('protocolos.comprovante')->middleware('can:protocolos.visualizar');
     Route::get('/protocolos/{protocolo}/laudo/{envio}', [ProtocoloController::class, 'baixarLaudoPericial'])->name('protocolos.laudo')->middleware('can:protocolos.visualizar');
     Route::get('/protocolos/{protocolo}/sync', [ProtocoloController::class, 'syncStatus'])->name('protocolos.syncStatus')->middleware('can:protocolos.sincronizar');
+    Route::get('/protocolos/{protocolo}/anexos/{anexo}/download', [ProtocoloController::class, 'baixarAnexo'])->name('protocolos.anexos.download')->middleware('can:protocolos.visualizar');
     Route::resource('/protocolos', ProtocoloController::class)->middleware('can:protocolos.visualizar');
 
     // AGENDA COLONIA

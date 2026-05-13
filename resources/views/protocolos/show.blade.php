@@ -76,7 +76,7 @@
                 </div>
 
                 <!-- Corpo do Protocolo -->
-                <div class="card card-outline card-secondary shadow-sm">
+                <div class="card card-outline card-secondary shadow-sm mb-4">
                     <div class="card-header border-0">
                         <h6 class="card-title fw-bold m-0"><i class="fa-solid fa-align-left me-2"></i>Corpo</h6>
                     </div>
@@ -84,6 +84,42 @@
                         {!! $protocolo->corpo !!}
                     </div>
                 </div>
+
+                <!-- Anexos do Protocolo -->
+                @if($protocolo->anexos->isNotEmpty())
+                    <div class="card card-outline card-warning shadow-sm">
+                        <div class="card-header border-0">
+                            <h6 class="card-title fw-bold m-0"><i class="fa-solid fa-paperclip me-2"></i>Anexos do Documento</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                @foreach($protocolo->anexos as $anexo)
+                                    <a href="{{ route('protocolos.anexos.download', [$protocolo, $anexo]) }}" 
+                                       class="list-group-item list-group-item-action d-flex align-items-center justify-content-between py-3">
+                                        <div class="d-flex align-items-center">
+                                            @php
+                                                $ext = strtolower(pathinfo($anexo->nome_original, PATHINFO_EXTENSION));
+                                                $icon = match($ext) {
+                                                    'pdf' => 'fa-file-pdf text-danger',
+                                                    'doc', 'docx' => 'fa-file-word text-primary',
+                                                    'xls', 'xlsx' => 'fa-file-excel text-success',
+                                                    'png', 'jpg', 'jpeg' => 'fa-file-image text-warning',
+                                                    default => 'fa-file text-secondary'
+                                                };
+                                            @endphp
+                                            <i class="fa-solid {{ $icon }} fa-lg me-3"></i>
+                                            <div>
+                                                <div class="fw-bold small mb-0">{{ $anexo->nome_original }}</div>
+                                                <small class="text-muted">{{ number_format($anexo->tamanho_bytes / 1024 / 1024, 2) }} MB</small>
+                                            </div>
+                                        </div>
+                                        <i class="fa-solid fa-download text-muted"></i>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <!-- COLUNA DIREITA: Timeline por Destinatário -->

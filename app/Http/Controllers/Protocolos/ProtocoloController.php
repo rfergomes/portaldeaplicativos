@@ -198,6 +198,7 @@ class ProtocoloController extends Controller
             'usuario',
             'destinatarios.envios',
             'comprovante',
+            'anexos',
         ]);
 
         return view('protocolos.show', compact('protocolo'));
@@ -311,9 +312,12 @@ class ProtocoloController extends Controller
             return back()->with('error', 'Comprovante ainda não disponível ou a API não retornou o PDF base64.');
         }
 
+        $safeName = \Illuminate\Support\Str::slug($envio->destinatario->nome ?? 'comprovante');
+        $fileName = "comprovante_{$safeName}_{$envio->id_email_externo}.pdf";
+
         return response(base64_decode($base64), 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="comprovante.pdf"',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ]);
     }
 
@@ -330,9 +334,12 @@ class ProtocoloController extends Controller
 
         $pdf = $client->getLaudoPdf($envio->id_email_externo);
 
+        $safeName = \Illuminate\Support\Str::slug($envio->destinatario->nome ?? 'laudo');
+        $fileName = "laudo_{$safeName}_{$envio->id_email_externo}.pdf";
+
         return response($pdf, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="laudo.pdf"',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ]);
     }
 
@@ -377,5 +384,21 @@ class ProtocoloController extends Controller
             ->setPaper('a4', 'landscape');
 
         return $pdf->stream('relatorio_falhas.pdf');
+    }
+
+    public function baixarAnexo(Protocolo $protocolo, \App\Models\ProtocoloAnexo $anexo)
+    {
+        // Garantir que o anexo pertence ao protocolo
+        if ($anexo->protocolo_id !== $protocolo->id) {
+            abort(403);
+        }
+
+        if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($anexo->caminho_armazenado)) {
+            return back()->with('error', 'Arquivo não encontrado no servidor.');
+        }
+
+        $fullPath = \Illuminate\Support\Facades\Storage::disk('local')->path($anexo->caminho_armazenado);
+
+        return response()->download($fullPath, $anexo->nome_original);
     }
 }
