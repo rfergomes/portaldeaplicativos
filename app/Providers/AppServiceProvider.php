@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -44,5 +46,15 @@ class AppServiceProvider extends ServiceProvider
         }
 
         view()->share('appVersion', $appVersion);
+
+        RateLimiter::for('aronline-api', function (object $job) {
+            // 0.5 req/s = 30 req/minute
+            return Limit::perMinute(30);
+        });
+
+        RateLimiter::for('kwik-api', function (object $job) {
+            // Safe limit for Kwik if not specified, using same as AR Online for consistency unless informed otherwise
+            return Limit::perMinute(60);
+        });
     }
 }

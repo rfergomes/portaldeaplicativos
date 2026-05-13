@@ -265,7 +265,8 @@ class SocioCaixaController extends Controller
         \App\Jobs\SendKwikNotificationJob::dispatch(
             $socio->telefone,
             'aviso_mensalidade_caixa',
-            [$socio->nome, $userName, $competencias]
+            [$socio->nome, $userName, $competencias],
+            auth()->id()
         );
 
         // Registrar no histórico de ocorrências (Anotações / Atendimento)

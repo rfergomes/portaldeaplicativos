@@ -22,7 +22,7 @@ class AlertarEmprestimosAtrasados extends Command
      *
      * @var string
      */
-    protected $description = 'Dispara notificações via Kwik para empréstimos de equipamentos em atraso';
+    protected $description = 'Dispara notificações via WhatsApp (Kwik/AR Online) para empréstimos em atraso';
 
     /**
      * Execute the console command.

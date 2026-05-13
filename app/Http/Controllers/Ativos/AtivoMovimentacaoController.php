@@ -213,7 +213,8 @@ class AtivoMovimentacaoController extends Controller
                     dispatch(new \App\Jobs\SendKwikNotificationJob(
                         $usuario->telefone,
                         'equipamento_retirada',
-                        [$nomeUsuario, $descricaoEquip, $acessoriosText, $dataDevolucaoTexto]
+                        [$nomeUsuario, $descricaoEquip, $acessoriosText, $dataDevolucaoTexto],
+                        auth()->id()
                     ));
                 }
             } elseif ($validated['tipo'] === 'devolucao' && $ultimaMovimentacao) {
@@ -228,7 +229,8 @@ class AtivoMovimentacaoController extends Controller
                         dispatch(new \App\Jobs\SendKwikNotificationJob(
                             $usuarioAntigo->telefone,
                             'equipamento_devolucao',
-                            [$nomeUsuario, $descricaoEquip, $dataDevolucao, $horaDevolucao]
+                            [$nomeUsuario, $descricaoEquip, $dataDevolucao, $horaDevolucao],
+                            auth()->id()
                         ));
                     }
                 } elseif ($ultimaMovimentacao->tipo === 'cessao') {

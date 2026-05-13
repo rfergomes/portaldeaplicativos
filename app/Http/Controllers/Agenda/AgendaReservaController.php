@@ -366,33 +366,17 @@ class AgendaReservaController extends Controller
         $nomeColonia = $reserva->colonia->nome;
         $semanaReserva = $reserva->periodo ? $reserva->periodo->descricao : 'sua reserva';
 
-        $token = env('KWIK_API_TOKEN');
-        $agentEmail = env('KWIK_AGENT_EMAIL');
-        $fromNumber = env('KWIK_FROM_NUMBER');
-
-        if (empty($token) || empty($agentEmail) || empty($fromNumber)) {
-            return response()->json(['success' => false, 'message' => 'Configurações da API do WhatsApp ausentes no servidor.'], 500);
-        }
-
         try {
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
-                'Authorization' => 'Token ' . $token,
-                'Content-Type'  => 'application/json'
-            ])->post('https://kwik.app.br/api/api/public/v1/notification/', [
-                'agent_email' => $agentEmail,
-                'from'        => $fromNumber,
-                'to'          => $telefone,
-                'template'    => 'colonia_reserva',
-                'body'        => [$primeiroNome, $semanaReserva, $nomeColonia]
-            ]);
+            \App\Jobs\SendKwikNotificationJob::dispatch(
+                $reserva->hospede->telefone,
+                'colonia_reserva',
+                [$primeiroNome, $semanaReserva, $nomeColonia],
+                auth()->id()
+            );
 
-            if ($response->successful() || $response->status() == 201) {
-                return response()->json(['success' => true, 'message' => 'Notificação enviada com sucesso!']);
-            } else {
-                return response()->json(['success' => false, 'message' => 'Erro na API do WhatsApp: ' . $response->body()], 400);
-            }
+            return response()->json(['success' => true, 'message' => 'Notificação enviada com sucesso!']);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Falha ao conectar com a API: ' . $e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => 'Falha ao enfileirar notificação: ' . $e->getMessage()], 500);
         }
     }
     /**
