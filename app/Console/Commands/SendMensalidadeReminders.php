@@ -48,13 +48,13 @@ class SendMensalidadeReminders extends Command
         $this->info(" - Faltando 5 dias: {$date5}");
         $this->info(" - Faltando 1 dia: {$date1}");
 
-        // Busca registros da folha a vencer nesses dias específicos e que não estejam pagos
+        // Busca registros da folha a vencer nesses dias específicos e que estejam abertos
         $reminders = SocioFolha::with(['empresa.clientes' => function ($query) {
             $query->where('ativo', true)
                   ->whereNotNull('email')
                   ->where('email', '!=', '');
         }])
-        ->where('situacao', '!=', 'PAGO')
+        ->where('situacao', 'ABERTO')
         ->whereIn('data_vencimento', [$date10, $date5, $date1])
         ->get();
 

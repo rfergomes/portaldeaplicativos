@@ -121,7 +121,7 @@
 
         <div class="footer">
             <p>Este é um e-mail automático enviado pelo Portal de Aplicativos. Por favor, não responda.</p>
-            <p>&copy; {{ date('Y') }} Portal de Aplicativos - Todos os direitos reservados.</p>
+            <p>&copy; {{ date('Y') }} Portal de Aplicativos - Químicos Unificados Campinas. Todos os direitos reservados.</p>
         </div>
     </div>
 </body>
