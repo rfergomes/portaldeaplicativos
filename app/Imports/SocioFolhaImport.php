@@ -69,7 +69,7 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
 
         // Processar datas usando PhpSpreadsheet shared date helpers
         $dataVencimento = null;
-        $vencimentoRaw = $row['dt_vencto'] ?? $row['vencimento'] ?? null;
+        $vencimentoRaw = $row['dt_vencto'] ?? $row['vencimento'] ?? $row['dtvencto'] ?? null;
         if (!empty($vencimentoRaw)) {
             try {
                 if (is_numeric($vencimentoRaw)) {
@@ -87,7 +87,7 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
         }
 
         $dataAutenticacao = null;
-        $autenticacaoRaw = $row['dt_autent'] ?? $row['autenticacao'] ?? null;
+        $autenticacaoRaw = $row['dt_autent'] ?? $row['autenticacao'] ?? $row['dtautent'] ?? null;
         if (!empty($autenticacaoRaw)) {
             try {
                 if (is_numeric($autenticacaoRaw)) {
@@ -105,8 +105,8 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
         }
 
         $situacao = strtoupper(trim((string) ($row['situacao'] ?? 'ABERTO')));
-        $valorMensalidade = $row['vl_mens'] ?? $row['valor'] ?? 0;
-        $vlCredit = $row['vl_credit'] ?? $row['creditado'] ?? null;
+        $valorMensalidade = $row['vl_mens'] ?? $row['valor'] ?? $row['vlmens'] ?? 0;
+        $vlCredit = $row['vl_credit'] ?? $row['creditado'] ?? $row['vlcredit'] ?? null;
 
         return new SocioFolha([
             'lancamento_id'     => $lancamentoId,
