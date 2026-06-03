@@ -50,7 +50,10 @@ class EmpresaController extends Controller
             'cidade' => 'nullable|string|max:255',
             'estado' => 'nullable|string|size:2',
             'categoria' => 'nullable|string|max:255',
+            'ativo' => 'nullable|boolean',
         ]);
+
+        $data['ativo'] = $request->boolean('ativo', true);
 
         // Padronização para Caixa Alta
         $data['razao_social'] = mb_strtoupper($data['razao_social']);
@@ -84,7 +87,10 @@ class EmpresaController extends Controller
             'cidade' => 'nullable|string|max:255',
             'estado' => 'nullable|string|size:2',
             'categoria' => 'nullable|string|max:255',
+            'ativo' => 'nullable|boolean',
         ]);
+
+        $data['ativo'] = $request->boolean('ativo');
 
         // Padronização para Caixa Alta
         $data['razao_social'] = mb_strtoupper($data['razao_social']);

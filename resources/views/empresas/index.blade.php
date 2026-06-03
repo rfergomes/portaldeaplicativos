@@ -263,6 +263,16 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <div class="bg-light p-3 rounded-3 border">
+                                    <div class="form-check form-switch m-0">
+                                        <input class="form-check-input" type="checkbox" name="ativo" value="1" id="new_ativo" checked>
+                                        <label class="form-check-label fw-bold text-secondary" for="new_ativo">Empresa Ativa no Sistema</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -347,6 +357,16 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <div class="bg-light p-3 rounded-3 border">
+                                    <div class="form-check form-switch m-0">
+                                        <input class="form-check-input" type="checkbox" name="ativo" value="1" id="edit_ativo">
+                                        <label class="form-check-label fw-bold text-secondary" for="edit_ativo">Empresa Ativa no Sistema</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -399,6 +419,7 @@
                 document.getElementById('edit_cidade').value = empresa.cidade || '';
                 document.getElementById('edit_estado').value = empresa.estado || '';
                 document.getElementById('edit_categoria').value = empresa.categoria || '';
+                document.getElementById('edit_ativo').checked = empresa.ativo == 1;
 
                 document.getElementById('formEditarEmpresa').action = `/empresas/${empresa.id}`;
 
