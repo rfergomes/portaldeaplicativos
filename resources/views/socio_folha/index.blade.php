@@ -227,6 +227,8 @@
                     <button type="button" id="btnConfirmarPagamento"
                         class="btn btn-success rounded-pill px-4 fw-bold">Confirmar</button>
                 </div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal Histórico de Envios -->
