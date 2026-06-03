@@ -397,7 +397,7 @@ class ProtocoloController extends Controller
             return back()->with('error', 'Arquivo não encontrado no servidor.');
         }
 
-        $fullPath = \Illuminate\Support\Facades\Storage::disk('local')->path($anexo->caminho_armazenado);
+        $fullPath = storage_path('app/' . $anexo->caminho_armazenado);
 
         return response()->download($fullPath, $anexo->nome_original);
     }

@@ -68,14 +68,18 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
         }
 
         // Processar datas usando PhpSpreadsheet shared date helpers
-        // Processar datas usando PhpSpreadsheet shared date helpers
         $dataVencimento = null;
-        if (!empty($row['dt_vencto'])) {
+        $vencimentoRaw = $row['dt_vencto'] ?? $row['vencimento'] ?? null;
+        if (!empty($vencimentoRaw)) {
             try {
-                if (is_numeric($row['dt_vencto'])) {
-                    $dataVencimento = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['dt_vencto'])->format('Y-m-d');
+                if (is_numeric($vencimentoRaw)) {
+                    $dataVencimento = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($vencimentoRaw)->format('Y-m-d');
                 } else {
-                    $dataVencimento = Carbon::createFromFormat('d/m/Y', $row['dt_vencto'])->format('Y-m-d');
+                    try {
+                        $dataVencimento = Carbon::createFromFormat('d/m/Y', $vencimentoRaw)->format('Y-m-d');
+                    } catch (\Exception $ex) {
+                        $dataVencimento = Carbon::parse(str_replace('/', '-', $vencimentoRaw))->format('Y-m-d');
+                    }
                 }
             } catch (\Exception $e) {
                 $dataVencimento = null;
@@ -83,12 +87,17 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
         }
 
         $dataAutenticacao = null;
-        if (!empty($row['dt_autent'])) {
+        $autenticacaoRaw = $row['dt_autent'] ?? $row['autenticacao'] ?? null;
+        if (!empty($autenticacaoRaw)) {
             try {
-                if (is_numeric($row['dt_autent'])) {
-                    $dataAutenticacao = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['dt_autent'])->format('Y-m-d');
+                if (is_numeric($autenticacaoRaw)) {
+                    $dataAutenticacao = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($autenticacaoRaw)->format('Y-m-d');
                 } else {
-                    $dataAutenticacao = Carbon::createFromFormat('d/m/Y', $row['dt_autent'])->format('Y-m-d');
+                    try {
+                        $dataAutenticacao = Carbon::createFromFormat('d/m/Y', $autenticacaoRaw)->format('Y-m-d');
+                    } catch (\Exception $ex) {
+                        $dataAutenticacao = Carbon::parse(str_replace('/', '-', $autenticacaoRaw))->format('Y-m-d');
+                    }
                 }
             } catch (\Exception $e) {
                 $dataAutenticacao = null;
@@ -96,6 +105,8 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
         }
 
         $situacao = strtoupper(trim((string) ($row['situacao'] ?? 'ABERTO')));
+        $valorMensalidade = $row['vl_mens'] ?? $row['valor'] ?? 0;
+        $vlCredit = $row['vl_credit'] ?? $row['creditado'] ?? null;
 
         return new SocioFolha([
             'lancamento_id'     => $lancamentoId,
@@ -104,12 +115,12 @@ class SocioFolhaImport implements ToModel, WithUpserts, WithHeadingRow
             'ano'               => is_numeric($row['ano'] ?? null) ? (int) $row['ano'] : 0,
             'mes'               => is_numeric($row['mes'] ?? null) ? (int) $row['mes'] : 0,
             'data_vencimento'   => $dataVencimento,
-            'valor_mensalidade' => (float) ($row['vl_mens'] ?? 0),
+            'valor_mensalidade' => (float) $valorMensalidade,
             'situacao'          => $situacao,
             'data_autenticacao' => $dataAutenticacao,
             'multa'             => isset($row['multa']) ? (float) $row['multa'] : null,
             'total'             => isset($row['total']) ? (float) $row['total'] : null,
-            'vl_credit'         => isset($row['vl_credit']) ? (float) $row['vl_credit'] : null,
+            'vl_credit'         => $vlCredit !== null ? (float) $vlCredit : null,
             'origem'            => $row['origem'] ?? null,
         ]);
     }
