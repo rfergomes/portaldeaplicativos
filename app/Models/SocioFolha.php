@@ -54,4 +54,9 @@ class SocioFolha extends Model
     {
         return $this->hasMany(SocioFolhaHistorico::class, 'socio_folha_id');
     }
+
+    public function emailHistoricos()
+    {
+        return $this->hasMany(SocioFolhaEmailHistorico::class, 'socio_folha_id');
+    }
 }

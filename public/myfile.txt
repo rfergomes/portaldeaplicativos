@@ -1,0 +1,3 @@
+# Log de Webhooks SMTP Locaweb
+[06/03/2026 13:30:38] bounce_description: O endereco de email especificado nao existe	bounce_code: 5.1.1	sender: Contato@info.quimicosunificados.campinas.br	to: CLICIA.JUNQUEIRA@fmc.com	subject: Lembrete: Vencimento de Mensalidade Associativa em 10 dias	x_smtplw: 2
+[06/03/2026 13:30:38] sender: Contato@info.quimicosunificados.campinas.br	to: rodrigo.chagas@granadeiro.com.br	subject: Lembrete: Vencimento de Mensalidade Associativa em 10 dias	x_smtplw: 1	opened at: 2026-06-03T13:30:00-03:00

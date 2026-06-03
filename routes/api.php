@@ -19,3 +19,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/webhooks/aronline', [\App\Http\Controllers\Api\ArOnlineWebhookController::class, 'handle']);
+
+Route::post('/webhooks/smtp/bounces', [\App\Http\Controllers\Api\SmtpWebhookController::class, 'handleBounce']);
+Route::post('/webhooks/smtp/openings', [\App\Http\Controllers\Api\SmtpWebhookController::class, 'handleOpening']);

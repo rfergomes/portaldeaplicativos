@@ -123,7 +123,8 @@
                                 <th class="border-0 text-end">Valor (R$)</th>
                                 <th class="border-0 text-center">Situação</th>
                                 <th class="border-0 text-center">Lista (Recebida)</th>
-                                <th class="border-0 text-center pe-3">Baixa (Ábaco)</th>
+                                <th class="border-0 text-center">Baixa (Ábaco)</th>
+                                <th class="border-0 text-center pe-3">Lembretes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -168,17 +169,23 @@
                                                 title="{{ $socio->data_lista ? 'Confirmado em ' . $socio->data_lista->format('d/m/Y H:i') : 'Pendente' }}">
                                         </div>
                                     </td>
-                                    <td class="text-center pe-3">
+                                    <td class="text-center">
                                         <div class="form-check form-switch d-flex justify-content-center">
                                             <input class="form-check-input switch-baixa cursor-pointer" type="checkbox"
                                                 data-id="{{ $socio->id }}" {{ $socio->data_baixa ? 'checked' : '' }}
                                                 title="{{ $socio->data_baixa ? 'Confirmado em ' . $socio->data_baixa->format('d/m/Y H:i') : 'Pendente' }}">
                                         </div>
                                     </td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-link text-primary btn-historico p-0"
+                                            data-id="{{ $socio->id }}" title="Histórico de Envios">
+                                            <i class="fas fa-envelope-open-text fa-lg"></i>
+                                        </button>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-5">
+                                    <td colspan="9" class="text-center py-5">
                                         <div class="text-muted opacity-50">
                                             <i class="fas fa-folder-open fa-3x mb-3"></i>
                                             <p class="mb-0 fs-5">Nenhum lançamento importado.</p>
@@ -219,6 +226,41 @@
                     <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" id="btnConfirmarPagamento"
                         class="btn btn-success rounded-pill px-4 fw-bold">Confirmar</button>
+                </div>
+    </div>
+
+    <!-- Modal Histórico de Envios -->
+    <div class="modal fade" id="modalHistorico" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header border-0 pb-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-primary"><i class="fas fa-envelope-open-text me-2"></i>Histórico de E-mails Enviados</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="table-responsive">
+                        <table class="table align-middle premium-table">
+                            <thead>
+                                <tr class="table-light">
+                                    <th>Contato</th>
+                                    <th>Destinatário</th>
+                                    <th class="text-center">Tipo</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Enviado Em</th>
+                                    <th>Ações/Detalhes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historicoTableBody">
+                                <!-- Preenchido via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="historicoEmptyState" class="text-center py-4 d-none">
+                        <span class="text-muted"><i class="fas fa-info-circle me-1"></i>Nenhum e-mail enviado para este lançamento.</span>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Fechar</button>
                 </div>
             </div>
         </div>
@@ -366,6 +408,95 @@
                             this.checked = originalState; // revert
                             Swal.fire('Erro', 'Falha ao atualizar baixa.', 'error');
                         });
+                    });
+                });
+
+                // Modal de Histórico
+                const modalHistoricoObj = new bootstrap.Modal(document.getElementById('modalHistorico'));
+                const historicoTableBody = document.getElementById('historicoTableBody');
+                const historicoEmptyState = document.getElementById('historicoEmptyState');
+
+                document.querySelectorAll('.btn-historico').forEach(btn => {
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const socioId = this.dataset.id;
+                        
+                        historicoTableBody.innerHTML = '<tr><td colspan="6" class="text-center"><span class="spinner-border spinner-border-sm me-2"></span>Carregando...</td></tr>';
+                        historicoEmptyState.classList.add('d-none');
+                        modalHistoricoObj.show();
+
+                        axios.get(`/socio-folha/${socioId}/email-historico`)
+                            .then(res => {
+                                const emails = res.data;
+                                historicoTableBody.innerHTML = '';
+                                
+                                if (emails.length === 0) {
+                                    historicoEmptyState.classList.remove('d-none');
+                                    return;
+                                }
+
+                                emails.forEach(email => {
+                                    const tr = document.createElement('tr');
+                                    
+                                    const contatoName = email.cliente ? email.cliente.nome : 'Contato Removido';
+                                    
+                                    let statusBadge = '';
+                                    if (email.status === 'ENVIADO') {
+                                        statusBadge = '<span class="badge bg-secondary-subtle text-secondary border border-secondary">Enviado</span>';
+                                    } else if (email.status === 'ABERTO') {
+                                        const openedTime = email.opened_at ? new Date(email.opened_at).toLocaleString('pt-BR') : '';
+                                        statusBadge = `<span class="badge bg-success-subtle text-success border border-success" title="Aberto em: ${openedTime}">Aberto</span>`;
+                                    } else if (email.status === 'BOUNCE') {
+                                        statusBadge = '<span class="badge bg-danger-subtle text-danger border border-danger">Bounce</span>';
+                                    }
+
+                                    let tipoEnvioLabel = '';
+                                    if (email.tipo_envio === '10_dias') tipoEnvioLabel = '10 Dias';
+                                    else if (email.tipo_envio === '5_dias') tipoEnvioLabel = '5 Dias';
+                                    else if (email.tipo_envio === '1_dia') tipoEnvioLabel = '1 Dia';
+                                    else tipoEnvioLabel = email.tipo_envio;
+
+                                    const sentDate = new Date(email.created_at).toLocaleString('pt-BR');
+
+                                    let actionContent = '';
+                                    if (email.status === 'BOUNCE') {
+                                        const bounceMsg = (email.bounce_description || 'Erro desconhecido').replace(/"/g, '&quot;');
+                                        actionContent = `<button class="btn btn-sm btn-outline-danger btn-bounce-detail" data-code="${email.bounce_code}" data-desc="${bounceMsg}"><i class="fas fa-exclamation-circle"></i> Ver Erro</button>`;
+                                    } else if (email.status === 'ABERTO' && email.opened_at) {
+                                        const openedTime = new Date(email.opened_at).toLocaleString('pt-BR');
+                                        actionContent = `<small class="text-success"><i class="fas fa-check-double me-1"></i>Aberto em ${openedTime}</small>`;
+                                    } else {
+                                        actionContent = '<small class="text-muted">-</small>';
+                                    }
+
+                                    tr.innerHTML = `
+                                        <td><strong>${contatoName}</strong></td>
+                                        <td><code>${email.email_destinatario}</code></td>
+                                        <td class="text-center"><span class="badge bg-light text-dark border">${tipoEnvioLabel}</span></td>
+                                        <td class="text-center">${statusBadge}</td>
+                                        <td class="text-center"><small>${sentDate}</small></td>
+                                        <td>${actionContent}</td>
+                                    `;
+                                    historicoTableBody.appendChild(tr);
+                                });
+
+                                document.querySelectorAll('.btn-bounce-detail').forEach(bounceBtn => {
+                                    bounceBtn.addEventListener('click', function() {
+                                        const code = this.dataset.code || 'N/A';
+                                        const desc = this.dataset.desc;
+                                        Swal.fire({
+                                            title: `Detalhes da Falha (Erro ${code})`,
+                                            text: desc,
+                                            icon: 'error',
+                                            confirmButtonText: 'Fechar',
+                                            confirmButtonColor: '#e53e3e'
+                                        });
+                                    });
+                                });
+                            })
+                            .catch(err => {
+                                historicoTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger"><i class="fas fa-exclamation-triangle me-1"></i>Erro ao carregar histórico.</td></tr>';
+                            });
                     });
                 });
             });

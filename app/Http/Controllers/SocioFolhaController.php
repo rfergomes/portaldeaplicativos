@@ -156,4 +156,14 @@ class SocioFolhaController extends Controller
         $empresas = $query->get(['id', 'razao_social', 'empresa_erp']);
         return response()->json($empresas);
     }
+
+    public function getEmailHistorico(SocioFolha $socio)
+    {
+        $historico = $socio->emailHistoricos()
+            ->with('cliente')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($historico);
+    }
 }
