@@ -61,7 +61,6 @@
         <a href="{{ route('demandas.index') }}" class="text-decoration-none text-muted">
             <i class="fa-solid fa-arrow-left me-1"></i> Voltar ao Painel
         </a>
-        <h1 class="h3 mb-0 text-slate-800 fw-bold mt-2">Criar Nova Demanda</h1>
     </div>
 
     <div class="row">

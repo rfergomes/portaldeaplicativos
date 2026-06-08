@@ -27,7 +27,6 @@
         <a href="{{ route('demandas.show', $demanda) }}" class="text-decoration-none text-muted">
             <i class="fa-solid fa-arrow-left me-1"></i> Voltar aos Detalhes
         </a>
-        <h1 class="h3 mb-0 text-slate-800 fw-bold mt-2">Editar Demanda</h1>
     </div>
 
     <div class="row">

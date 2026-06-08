@@ -78,7 +78,6 @@
             <a href="{{ route('demandas.index') }}" class="text-decoration-none text-muted">
                 <i class="fa-solid fa-arrow-left me-1"></i> Voltar ao Painel
             </a>
-            <h1 class="h3 mb-0 text-slate-800 fw-bold mt-2">Detalhamento da Demanda</h1>
         </div>
         <div class="d-flex gap-2">
             @if(auth()->user()->temPermissao('demandas.gerenciar') || $demanda->criador_id === auth()->id())

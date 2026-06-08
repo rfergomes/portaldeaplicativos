@@ -55,7 +55,6 @@
     <!-- Header Page -->
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div>
-            <h1 class="h3 mb-0 text-slate-800 fw-bold">Painel de Demandas</h1>
             <p class="text-muted mb-0">Gerencie, acompanhe e delege tarefas para usuários internos e contatos externos.</p>
         </div>
         <a href="{{ route('demandas.create') }}" class="btn btn-premium px-4 py-2 shadow-sm">
