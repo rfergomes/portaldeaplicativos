@@ -220,7 +220,7 @@
                         <!-- Lista de Itens -->
                         <div class="list-group list-group-flush">
                             @foreach($checklistItems as $item)
-                                <div class="list-group-item d-flex align-items-center py-3 px-4 checklist-item" onclick="toggleItem({{ $item->id }}, this)">
+                                <div class="list-group-item d-flex align-items-center py-3 px-4 checklist-item">
                                     <div class="form-check me-2">
                                         <input class="form-check-input check-item-checkbox" type="checkbox" data-id="{{ $item->id }}" id="item_check_{{ $item->id }}" {{ $item->concluido ? 'checked' : '' }} style="cursor: pointer;">
                                     </div>
@@ -546,13 +546,23 @@
             });
         });
 
-        // AJAX: Marcar/Desmarcar Checklist
-        function toggleItem(id, element) {
-            var checkbox = $(element).find('.check-item-checkbox');
-            var label = $(element).find('.check-item-label');
-            var isChecked = !checkbox.prop('checked'); // Inverte porque o clique dispara antes da mudança do estado visual no input
+        // Clique na linha do checklist
+        $('.checklist-item').on('click', function(e) {
+            // Se clicar no checkbox ou no label, deixa o comportamento padrão do navegador acontecer
+            if ($(e.target).closest('.form-check').length > 0 || $(e.target).is('label')) {
+                return;
+            }
+            
+            var checkbox = $(this).find('.check-item-checkbox');
+            checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
+        });
 
-            checkbox.prop('checked', isChecked);
+        // AJAX: Marcar/Desmarcar Checklist
+        $('.check-item-checkbox').on('change', function() {
+            var checkbox = $(this);
+            var isChecked = checkbox.prop('checked');
+            var id = checkbox.data('id');
+            var label = checkbox.closest('.checklist-item').find('.check-item-label');
 
             $.ajax({
                 url: "{{ route('demandas.index') }}/" + "{{ $demanda->id }}" + "/checklists/" + id + "/toggle",
@@ -594,6 +604,6 @@
                     });
                 }
             });
-        }
+        });
     </script>
 @endpush
