@@ -95,8 +95,22 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <div class="small"><i
-                                                        class="fa-solid fa-envelope me-1 text-muted"></i>{{ $contato->email ?? '-' }}
+                                                <div class="small">
+                                                    <i class="fa-solid fa-envelope me-1 text-muted"></i>
+                                                    @if($contato->email_valido)
+                                                        {{ $contato->email ?? '-' }}
+                                                    @else
+                                                        <span class="text-danger text-decoration-line-through fw-bold" 
+                                                              title="Bounce: {{ $contato->email_bounce_code }} - {{ $contato->email_bounce_description }}"
+                                                              data-bs-toggle="tooltip">
+                                                            {{ $contato->email ?? '-' }}
+                                                        </span>
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger ms-1 small px-2 py-1" 
+                                                              title="Erro: {{ $contato->email_bounce_description }}"
+                                                              data-bs-toggle="tooltip">
+                                                            Bounce
+                                                        </span>
+                                                    @endif
                                                 </div>
                                                 <div class="small"><i
                                                         class="fa-solid fa-phone me-1 text-muted"></i>{{ $contato->telefone ?? '-' }}
@@ -225,6 +239,16 @@
                             <label class="form-label fw-bold">Email</label>
                             <input type="email" name="email" id="edit_contato_email" class="form-control">
                         </div>
+                        <div class="mb-3 form-check form-switch p-0 ps-5" id="div_edit_email_valido" style="display: none;">
+                            <input class="form-check-input" type="checkbox" name="email_valido" id="edit_email_valido" value="1">
+                            <label class="form-check-label fw-bold text-success" for="edit_email_valido">
+                                <i class="fa-solid fa-circle-check me-1"></i> E-mail Ativo / Válido
+                            </label>
+                            <div class="form-text text-danger mt-2 small" id="edit_email_bounce_warning" style="display: none;">
+                                <i class="fa-solid fa-circle-exclamation me-1"></i>
+                                Este e-mail foi marcado como Bounce: <strong id="span_bounce_desc"></strong>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -237,12 +261,47 @@
 
     @push('scripts')
         <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Initialize tooltips
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl)
+                });
+
+                // Add change/input listener to email input in Edit modal to auto-check 'email_valido'
+                document.getElementById('edit_contato_email').addEventListener('input', function() {
+                    const warningBounce = document.getElementById('edit_email_bounce_warning');
+                    warningBounce.style.display = 'none';
+                    document.getElementById('edit_email_valido').checked = true;
+                });
+            });
+
             function editContato(contato) {
                 document.getElementById('edit_tipo_cliente_id').value = contato.tipo_cliente_id;
                 document.getElementById('edit_contato_nome').value = contato.nome;
                 document.getElementById('edit_contato_documento').value = contato.documento || '';
                 document.getElementById('edit_contato_telefone').value = contato.telefone || '';
                 document.getElementById('edit_contato_email').value = contato.email || '';
+
+                const divEmailValido = document.getElementById('div_edit_email_valido');
+                const checkboxEmailValido = document.getElementById('edit_email_valido');
+                const warningBounce = document.getElementById('edit_email_bounce_warning');
+                const spanBounceDesc = document.getElementById('span_bounce_desc');
+
+                if (contato.email) {
+                    divEmailValido.style.display = 'block';
+                    checkboxEmailValido.checked = !!contato.email_valido;
+                    
+                    if (!contato.email_valido) {
+                        warningBounce.style.display = 'block';
+                        spanBounceDesc.textContent = (contato.email_bounce_code || '') + ' - ' + (contato.email_bounce_description || 'Erro de entrega');
+                    } else {
+                        warningBounce.style.display = 'none';
+                    }
+                } else {
+                    divEmailValido.style.display = 'none';
+                    warningBounce.style.display = 'none';
+                }
 
                 document.getElementById('formEditarContato').action = `/clientes/${contato.id}`;
 

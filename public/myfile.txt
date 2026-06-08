@@ -1,3 +1,9 @@
 # Log de Webhooks SMTP Locaweb
 [06/03/2026 13:30:38] bounce_description: O endereco de email especificado nao existe	bounce_code: 5.1.1	sender: Contato@info.quimicosunificados.campinas.br	to: CLICIA.JUNQUEIRA@fmc.com	subject: Lembrete: Vencimento de Mensalidade Associativa em 10 dias	x_smtplw: 2
 [06/03/2026 13:30:38] sender: Contato@info.quimicosunificados.campinas.br	to: rodrigo.chagas@granadeiro.com.br	subject: Lembrete: Vencimento de Mensalidade Associativa em 10 dias	x_smtplw: 1	opened at: 2026-06-03T13:30:00-03:00
+[06/08/2026 08:38:30] bounce_description: O endereco de email especificado nao existe	bounce_code: 5.1.1	sender: 	to: test_bounce@example.com	subject: 	x_smtplw: 999
+[06/08/2026 08:39:04] bounce_description: O endereco de email especificado nao existe	bounce_code: 5.1.1	sender: 	to: test_bounce@example.com	subject: 	x_smtplw: 999
+[06/08/2026 08:39:40] bounce_description: O endereco de email especificado nao existe	bounce_code: 5.1.1	sender: 	to: test_bounce@example.com	subject: 	x_smtplw: 999
+[06/08/2026 08:40:18] bounce_description: O endereco de email especificado nao existe	bounce_code: 5.1.1	sender: 	to: test_bounce@example.com	subject: 	x_smtplw: 999
+[06/08/2026 08:40:45] bounce_description: O endereco de email especificado nao existe	bounce_code: 5.1.1	sender: 	to: test_bounce@example.com	subject: 	x_smtplw: 999
+[06/08/2026 08:41:38] bounce_description: O endereco de email especificado nao existe	bounce_code: 5.1.1	sender: 	to: test_bounce@example.com	subject: 	x_smtplw: 999

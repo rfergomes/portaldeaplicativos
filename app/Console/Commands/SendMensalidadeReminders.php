@@ -54,6 +54,7 @@ class SendMensalidadeReminders extends Command
         })
         ->with(['empresa.clientes' => function ($query) {
             $query->where('ativo', true)
+                  ->where('email_valido', true)
                   ->whereNotNull('email')
                   ->where('email', '!=', '');
         }])

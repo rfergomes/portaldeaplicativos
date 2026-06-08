@@ -21,6 +21,14 @@ class Cliente extends Model
         'cidade',
         'estado',
         'ativo',
+        'email_valido',
+        'email_bounce_code',
+        'email_bounce_description',
+    ];
+
+    protected $casts = [
+        'ativo' => 'boolean',
+        'email_valido' => 'boolean',
     ];
 
     public function empresa()

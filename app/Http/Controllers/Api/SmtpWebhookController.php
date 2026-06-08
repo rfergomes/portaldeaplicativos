@@ -26,6 +26,7 @@ class SmtpWebhookController extends Controller
         $this->writeToTxtLog("bounce_description: $bounceDescription\tbounce_code: $bounceCode\tsender: $sender\tto: $to\tsubject: $subject\tx_smtplw: $xSmtplw");
 
         // Atualiza a tabela de histórico no banco de dados se o x-smtplw for um ID válido
+        $historico = null;
         if (!empty($xSmtplw) && is_numeric($xSmtplw)) {
             $historico = SocioFolhaEmailHistorico::find($xSmtplw);
             if ($historico) {
@@ -40,6 +41,17 @@ class SmtpWebhookController extends Controller
             }
         } else {
             Log::warning("SMTP Webhook: Recebido bounce com x-smtplw inválido ou ausente: '$xSmtplw'");
+        }
+
+        // Desativa o e-mail nos contatos associados ao destinatário
+        $emailDestinatario = !empty($to) ? $to : ($historico->email_destinatario ?? null);
+        if (!empty($emailDestinatario)) {
+            \App\Models\Cliente::where('email', $emailDestinatario)->update([
+                'email_valido' => false,
+                'email_bounce_code' => $bounceCode,
+                'email_bounce_description' => $bounceDescription,
+            ]);
+            Log::info("SMTP Webhook: Todos os contatos com e-mail '{$emailDestinatario}' foram marcados como bounce/inválidos (Código: $bounceCode).");
         }
 
         // Retorna status 200 OK com texto 'OK'

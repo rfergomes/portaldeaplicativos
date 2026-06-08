@@ -43,6 +43,7 @@ class ClienteController extends Controller
             'telefone' => 'nullable|string|max:20',
             'cidade' => 'nullable|string|max:255',
             'estado' => 'nullable|string|size:2',
+            'email_valido' => 'nullable|boolean',
         ]);
 
         // Padronização para Caixa Alta
@@ -51,6 +52,20 @@ class ClienteController extends Controller
             $data['cidade'] = mb_strtoupper($data['cidade']);
         if (isset($data['estado']))
             $data['estado'] = mb_strtoupper($data['estado']);
+
+        // Se o e-mail foi alterado, reseta o status de bounce
+        if (strtolower(trim($cliente->email ?? '')) !== strtolower(trim($data['email'] ?? ''))) {
+            $data['email_valido'] = true;
+            $data['email_bounce_code'] = null;
+            $data['email_bounce_description'] = null;
+        } else {
+            // Caso contrário, respeita o valor enviado pelo formulário (checkbox)
+            $data['email_valido'] = $request->boolean('email_valido');
+            if ($data['email_valido']) {
+                $data['email_bounce_code'] = null;
+                $data['email_bounce_description'] = null;
+            }
+        }
 
         $cliente->update($data);
 
