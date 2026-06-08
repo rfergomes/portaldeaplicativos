@@ -119,7 +119,7 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::post('/demandas/{demanda}/devolutiva', [DemandaController::class, 'devolutiva'])->name('demandas.devolutiva');
     Route::post('/demandas/{demanda}/reencaminhar', [DemandaController::class, 'reencaminhar'])->name('demandas.reencaminhar');
     Route::post('/demandas/{demanda}/checklists/{checklist}/toggle', [DemandaController::class, 'toggleChecklist'])->name('demandas.checklists.toggle');
-    Route::resource('demandas', DemandaController::class)->middleware('can:demandas.visualizar');
+    Route::resource('demandas', DemandaController::class);
 
     // Tipos de Protocolo
     Route::get('/protocolos/tipos', [TipoProtocoloController::class, 'index'])->name('protocolos.tipos.index');
