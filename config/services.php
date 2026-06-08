@@ -40,6 +40,7 @@ return [
         'token' => env('KWIK_API_TOKEN'),
         'agent_email' => env('KWIK_AGENT_EMAIL'),
         'from_number' => env('KWIK_FROM_NUMBER'),
+        'template_demanda' => env('KWIK_TEMPLATE_DEMANDA', 'nova_demanda_externa'),
     ],
 
 ];

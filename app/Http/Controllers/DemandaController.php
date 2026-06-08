@@ -137,9 +137,6 @@ class DemandaController extends Controller
 
             // Controle de leitura inicial pelo responsável
             $lida = false;
-            if ($request->tipo_responsavel === 'usuario' && $request->responsavel_usuario_id == auth()->id()) {
-                $lida = true;
-            }
 
             $demanda = Demanda::create([
                 'titulo' => $request->titulo,
@@ -192,7 +189,7 @@ class DemandaController extends Controller
 
                 SendKwikNotificationJob::dispatch(
                     $demanda->responsavel_telefone,
-                    'nova_demanda_externa',
+                    config('services.kwik.template_demanda', 'nova_demanda_externa'),
                     [
                         $demanda->responsavel_nome, // {{1}} - Responsável
                         $criadorName,                 // {{2}} - Criador
@@ -393,7 +390,7 @@ class DemandaController extends Controller
 
                 SendKwikNotificationJob::dispatch(
                     $demanda->responsavel_telefone,
-                    'nova_demanda_externa',
+                    config('services.kwik.template_demanda', 'nova_demanda_externa'),
                     [
                         $demanda->responsavel_nome, // {{1}} - Responsável
                         $criadorName,                 // {{2}} - Criador
