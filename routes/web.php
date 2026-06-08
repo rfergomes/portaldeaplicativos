@@ -39,6 +39,7 @@ use App\Http\Controllers\Ativos\AtivoMarketplaceController;
 use App\Http\Controllers\Ativos\AtivoAquisicaoController;
 use App\Http\Controllers\Ativos\AtivoFornecedorController;
 use App\Http\Controllers\Ativos\AtivoCessaoController;
+use App\Http\Controllers\DemandaController;
 use App\Models\Empresa;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -113,6 +114,12 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::resource('regioes', RegiaoController::class)->parameters([
         'regioes' => 'regiao'
     ])->middleware('can:regioes.visualizar');
+
+    // Controle de Demandas (To-Do Delegável)
+    Route::post('/demandas/{demanda}/devolutiva', [DemandaController::class, 'devolutiva'])->name('demandas.devolutiva');
+    Route::post('/demandas/{demanda}/reencaminhar', [DemandaController::class, 'reencaminhar'])->name('demandas.reencaminhar');
+    Route::post('/demandas/{demanda}/checklists/{checklist}/toggle', [DemandaController::class, 'toggleChecklist'])->name('demandas.checklists.toggle');
+    Route::resource('demandas', DemandaController::class)->middleware('can:demandas.visualizar');
 
     // Tipos de Protocolo
     Route::get('/protocolos/tipos', [TipoProtocoloController::class, 'index'])->name('protocolos.tipos.index');

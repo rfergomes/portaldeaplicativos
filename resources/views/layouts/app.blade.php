@@ -368,11 +368,51 @@
                         </div>
                     </li>
 
-                    <!-- Notificações -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
+                    <!-- Notificações de Demandas -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center position-relative" href="#" data-bs-toggle="dropdown">
                             <i class="fa-regular fa-bell"></i>
+                            @if(isset($demandasAlertasCount) && $demandasAlertasCount > 0)
+                                <span class="badge rounded-pill bg-danger position-absolute top-1 translate-middle-y" style="font-size: 0.65rem; right: -2px; padding: 0.25em 0.5em;">
+                                    {{ $demandasAlertasCount }}
+                                </span>
+                            @endif
                         </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow dropdown-user-premium" style="min-width: 300px; padding: 0;">
+                            <li class="user-header-new" style="padding: 12px 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                                <h6 class="m-0 font-weight-bold" style="font-size: 0.85rem; color: #1e293b;">
+                                    <i class="fa-solid fa-bell text-primary me-2"></i> Notificações de Demandas
+                                </h6>
+                            </li>
+                            <div style="max-height: 250px; overflow-y: auto;">
+                                @if(isset($demandasAlertasCount) && $demandasAlertasCount > 0)
+                                    @foreach($demandasAlertasList as $alerta)
+                                        <li>
+                                            <a href="{{ $alerta['url'] }}" class="dropdown-item py-2 border-bottom" style="font-size: 0.8rem; white-space: normal; transition: all 0.2s;">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="me-2 mt-1">
+                                                        <i class="{{ $alerta['icone'] }} fs-5"></i>
+                                                    </div>
+                                                    <div>
+                                                        <strong class="d-block text-slate-800" style="font-size: 0.8rem;">{{ $alerta['titulo'] }}</strong>
+                                                        <span class="text-muted" style="font-size: 0.75rem;">{{ $alerta['mensagem'] }}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                @else
+                                    <li class="p-3 text-center text-muted" style="font-size: 0.8rem;">
+                                        Nenhuma notificação pendente.
+                                    </li>
+                                @endif
+                            </div>
+                            <li class="text-center py-2" style="background: #f8fafc; border-top: 1px solid #e2e8f0;">
+                                <a href="{{ route('demandas.index') }}" class="text-decoration-none" style="font-size: 0.75rem; font-weight: 600; color: #033c5a;">
+                                    <i class="fa-solid fa-list me-1"></i> Ver Todas as Demandas
+                                </a>
+                            </li>
+                        </ul>
                     </li>
 
                     <!-- Color Mode Toggler -->
@@ -491,6 +531,14 @@
                                 class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                                 <i class="nav-icon fa-solid fa-gauge-high"></i>
                                 <p>Dashboard</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('demandas.index') }}"
+                                class="nav-link {{ request()->routeIs('demandas.*') ? 'active' : '' }}">
+                                <i class="nav-icon fa-solid fa-list-check"></i>
+                                <p>Demandas</p>
                             </a>
                         </li>
 

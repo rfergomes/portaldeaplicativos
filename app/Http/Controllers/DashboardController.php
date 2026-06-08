@@ -113,6 +113,29 @@ class DashboardController extends Controller
             'taxa_inadimplencia' => $totalMensalidadesMesAtual > 0 ? round(($inadimplencia / $totalMensalidadesMesAtual) * 100, 1) : 0,
         ];
 
+        // Demandas Alertas
+        $novasDemandasCount = 0;
+        $demandasExpirando = collect();
+        $userId = auth()->id();
+        $novasDemandasCount = \App\Models\Demanda::where('status', \App\Models\Demanda::STATUS_ABERTA)
+            ->where('tipo_responsavel', 'usuario')
+            ->where('responsavel_usuario_id', $userId)
+            ->where('lida_pelo_responsavel', false)
+            ->count();
+
+        $demandasExpirando = \App\Models\Demanda::whereIn('status', [\App\Models\Demanda::STATUS_ABERTA, \App\Models\Demanda::STATUS_AGUARDANDO])
+            ->whereNotNull('prazo')
+            ->where('prazo', '>=', now())
+            ->where('prazo', '<=', now()->addHours(24))
+            ->where(function($q) use ($userId) {
+                $q->where('criador_id', $userId)
+                  ->orWhere(function($sub) use ($userId) {
+                      $sub->where('tipo_responsavel', 'usuario')
+                          ->where('responsavel_usuario_id', $userId);
+                  });
+            })
+            ->get();
+
         return view('dashboard', compact(
             'totalEventosMes',
             'totalEmpresas',
@@ -123,7 +146,9 @@ class DashboardController extends Controller
             'alertasVencidos',
             'protocolosRecentes',
             'eventosFuturos',
-            'kpisFolha'
+            'kpisFolha',
+            'novasDemandasCount',
+            'demandasExpirando'
         ));
     }
 }

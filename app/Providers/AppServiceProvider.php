@@ -56,5 +56,68 @@ class AppServiceProvider extends ServiceProvider
             // Safe limit for Kwik if not specified, using same as AR Online for consistency unless informed otherwise
             return Limit::perMinute(60);
         });
+
+        // View Composer para carregar notificações de demandas no topo da tela (layouts.app)
+        view()->composer('layouts.app', function ($view) {
+            if (auth()->check()) {
+                $userId = auth()->id();
+
+                // 1. Novas demandas não lidas atribuídas ao usuário logado
+                $novasDemandas = \App\Models\Demanda::where('status', \App\Models\Demanda::STATUS_ABERTA)
+                    ->where('tipo_responsavel', 'usuario')
+                    ->where('responsavel_usuario_id', $userId)
+                    ->where('lida_pelo_responsavel', false)
+                    ->get();
+
+                // 2. Demandas do usuário (criadas ou atribuídas) expirando em menos de 24 horas
+                $expirandoDemandas = \App\Models\Demanda::whereIn('status', [\App\Models\Demanda::STATUS_ABERTA, \App\Models\Demanda::STATUS_AGUARDANDO])
+                    ->whereNotNull('prazo')
+                    ->where('prazo', '>=', now())
+                    ->where('prazo', '<=', now()->addHours(24))
+                    ->where(function($q) use ($userId) {
+                        $q->where('criador_id', $userId)
+                          ->orWhere(function($sub) use ($userId) {
+                              $sub->where('tipo_responsavel', 'usuario')
+                                  ->where('responsavel_usuario_id', $userId);
+                          });
+                    })
+                    ->get();
+
+                // Montar array unificado de notificações/alertas
+                $alertas = [];
+
+                foreach ($novasDemandas as $d) {
+                    $alertas[] = [
+                        'id' => $d->id,
+                        'tipo' => 'nova',
+                        'icone' => 'fa-solid fa-plus-circle text-primary',
+                        'titulo' => 'Nova Demanda Atribuída',
+                        'mensagem' => \Illuminate\Support\Str::limit($d->titulo, 30),
+                        'url' => route('demandas.show', $d->id),
+                    ];
+                }
+
+                foreach ($expirandoDemandas as $d) {
+                    $alertas[] = [
+                        'id' => $d->id,
+                        'tipo' => 'expirando',
+                        'icone' => 'fa-solid fa-triangle-exclamation text-warning',
+                        'titulo' => 'Prazo Próximo do Fim',
+                        'mensagem' => \Illuminate\Support\Str::limit($d->titulo, 30),
+                        'url' => route('demandas.show', $d->id),
+                    ];
+                }
+
+                $view->with([
+                    'demandasAlertasCount' => count($alertas),
+                    'demandasAlertasList' => $alertas
+                ]);
+            } else {
+                $view->with([
+                    'demandasAlertasCount' => 0,
+                    'demandasAlertasList' => []
+                ]);
+            }
+        });
     }
 }

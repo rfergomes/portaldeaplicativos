@@ -62,6 +62,34 @@
 @endpush
 
 @section('content')
+    @if((isset($novasDemandasCount) && $novasDemandasCount > 0) || (isset($demandasExpirando) && $demandasExpirando->count() > 0))
+        <div class="row g-3 mb-3">
+            <div class="col-12">
+                @if($novasDemandasCount > 0)
+                    <div class="alert alert-info alert-dismissible fade show shadow-sm d-flex align-items-center mb-2" role="alert">
+                        <i class="fa-solid fa-circle-info fs-5 me-3"></i>
+                        <div>
+                            Você tem <strong>{{ $novasDemandasCount }}</strong> {{ $novasDemandasCount == 1 ? 'nova demanda atribuída' : 'novas demandas atribuídas' }} a você.
+                            <a href="{{ route('demandas.index', ['visao' => 'minhas', 'status' => 'aberta']) }}" class="alert-link ms-2">Visualizar minhas demandas</a>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if($demandasExpirando->count() > 0)
+                    <div class="alert alert-warning alert-dismissible fade show shadow-sm d-flex align-items-center mb-0" role="alert">
+                        <i class="fa-solid fa-triangle-exclamation fs-5 me-3"></i>
+                        <div>
+                            Atenção! Você possui <strong>{{ $demandasExpirando->count() }}</strong> {{ $demandasExpirando->count() == 1 ? 'demanda com prazo expirando' : 'demandas com prazos expirando' }} em menos de 24 horas.
+                            <a href="{{ route('demandas.index', ['status' => 'vencidas']) }}" class="alert-link ms-2">Verificar prazos</a>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+
     <!-- KPI Row -->
     <div class="row g-3 mb-4">
         <div class="col-lg-3 col-6">
