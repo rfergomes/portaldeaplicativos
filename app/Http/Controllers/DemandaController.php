@@ -103,10 +103,6 @@ class DemandaController extends Controller
 
     public function create()
     {
-        if (!auth()->user()->temPermissao('demandas.criar')) {
-            abort(403, 'Acesso não autorizado.');
-        }
-
         $usuarios = User::orderBy('name')->get();
         $clientes = Cliente::where('ativo', true)->orderBy('nome')->get();
 
@@ -115,10 +111,6 @@ class DemandaController extends Controller
 
     public function store(Request $request)
     {
-        if (!auth()->user()->temPermissao('demandas.criar')) {
-            abort(403, 'Acesso não autorizado.');
-        }
-
         $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'required|string',
@@ -250,10 +242,6 @@ class DemandaController extends Controller
 
     public function edit(Demanda $demanda)
     {
-        if (!auth()->user()->temPermissao('demandas.criar')) {
-            abort(403);
-        }
-
         // Apenas criador ou gestor edita
         if (!auth()->user()->temPermissao('demandas.gerenciar') && $demanda->criador_id !== auth()->id()) {
             abort(403, 'Acesso não autorizado.');
@@ -267,10 +255,6 @@ class DemandaController extends Controller
 
     public function update(Request $request, Demanda $demanda)
     {
-        if (!auth()->user()->temPermissao('demandas.criar')) {
-            abort(403);
-        }
-
         if (!auth()->user()->temPermissao('demandas.gerenciar') && $demanda->criador_id !== auth()->id()) {
             abort(403, 'Acesso não autorizado.');
         }
