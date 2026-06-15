@@ -8,6 +8,11 @@
     
     <title>@yield('title', 'Portal de Aplicativos') | Químicos Unificados</title>
 
+    <!-- Favicon -->
+    <link rel="icon" href="https://quimicosunificados.com.br/arquivos/2016/10/cropped-logo-header-32x32.png" sizes="32x32" />
+    <link rel="icon" href="https://quimicosunificados.com.br/arquivos/2016/10/cropped-logo-header-192x192.png" sizes="192x192" />
+    <link rel="apple-touch-icon-precomposed" href="https://quimicosunificados.com.br/arquivos/2016/10/cropped-logo-header-180x180.png" />
+
     <!-- SEO Meta Tags -->
     <meta name="description" content="@yield('meta_description', 'Portal de Aplicativos - Sistema de Gestão Interna para Colônias e Protocolos.')">
     <meta name="keywords" content="@yield('meta_keywords', 'gestão, colônias, reservas, protocolos, portal, aplicativos')">
