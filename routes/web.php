@@ -267,6 +267,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/pdf/pendentes-lista-baixa', [SocioFolhaController::class, 'exportPendentesListaBaixaPdf'])->name('pdf.pendentes_lista_baixa')->middleware('can:socio_folha.visualizar');
         Route::get('/pdf/empresa/{empresa_id}', [SocioFolhaController::class, 'exportEmpresaDebitosPdf'])->name('pdf.empresa')->middleware('can:socio_folha.visualizar');
         Route::get('/{socio}/email-historico', [SocioFolhaController::class, 'getEmailHistorico'])->name('email-historico')->middleware('can:socio_folha.visualizar');
+        Route::get('/{socio}/historico-alteracoes', [SocioFolhaController::class, 'getHistoricoAlteracoes'])->name('historico-alteracoes')->middleware('can:socio_folha.visualizar');
     });
 });
 

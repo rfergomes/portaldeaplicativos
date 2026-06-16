@@ -179,6 +179,19 @@ class SocioFolhaController extends Controller
         return response()->json($historico);
     }
 
+    public function getHistoricoAlteracoes(SocioFolha $socio)
+    {
+        // Carrega o sócio com empresa, região e o histórico com o usuário responsável
+        $socio->load(['empresa', 'regiao', 'historico.user']);
+        
+        $historico = $socio->historico()->with('user')->orderBy('created_at', 'desc')->get();
+
+        return response()->json([
+            'socio' => $socio,
+            'historico' => $historico
+        ]);
+    }
+
     public function exportPendentesPdf(Request $request)
     {
         $query = SocioFolha::with(['empresa', 'regiao'])

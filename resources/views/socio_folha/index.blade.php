@@ -198,6 +198,10 @@
                                     </td>
                                     <td class="text-center pe-3">
                                         <div class="d-flex justify-content-center gap-1">
+                                            <button class="btn btn-sm btn-outline-info rounded-pill btn-historico-alteracoes px-2"
+                                                data-id="{{ $socio->id }}" title="Ver Detalhes e Alterações">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
                                             <button class="btn btn-sm btn-outline-primary rounded-pill btn-historico px-2"
                                                 data-id="{{ $socio->id }}" title="Histórico de Envios">
                                                 <i class="fas fa-envelope-open-text"></i>
@@ -284,6 +288,67 @@
                     </div>
                     <div id="historicoEmptyState" class="text-center py-4 d-none">
                         <span class="text-muted"><i class="fas fa-info-circle me-1"></i>Nenhum e-mail enviado para este lançamento.</span>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes e Alterações -->
+    <div class="modal fade" id="modalAlteracoes" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header border-0 pb-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-info"><i class="fas fa-history me-2"></i>Detalhes e Histórico de Alterações</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Detalhes Rápidos -->
+                    <div class="bg-light p-3 rounded mb-4 border border-info-subtle">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">Empresa:</small>
+                                <strong id="detalheEmpresa">-</strong>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">Região:</small>
+                                <strong id="detalheRegiao">-</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Ref (Mês/Ano):</small>
+                                <strong id="detalheRef">-</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Vencimento:</small>
+                                <strong id="detalheVencimento">-</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Valor (R$):</small>
+                                <strong id="detalheValor" class="text-danger">-</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mb-3">Histórico de Alterações</h6>
+                    <div class="table-responsive">
+                        <table class="table align-middle premium-table">
+                            <thead>
+                                <tr class="table-light">
+                                    <th>Data / Hora</th>
+                                    <th>Usuário Responsável</th>
+                                    <th>Ação Realizada</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alteracoesTableBody">
+                                <!-- Preenchido via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="alteracoesEmptyState" class="text-center py-4 d-none">
+                        <span class="text-muted"><i class="fas fa-info-circle me-1"></i>Nenhum registro de alteração encontrado.</span>
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-4 pt-0">
@@ -432,7 +497,61 @@
                     });
                 });
 
-                // Modal de Histórico
+                // Modal Histórico de Alterações
+                const modalAlteracoesObj = new bootstrap.Modal(document.getElementById('modalAlteracoes'));
+                const alteracoesTableBody = document.getElementById('alteracoesTableBody');
+                const alteracoesEmptyState = document.getElementById('alteracoesEmptyState');
+
+                document.querySelectorAll('.btn-historico-alteracoes').forEach(btn => {
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const socioId = this.dataset.id;
+                        
+                        alteracoesTableBody.innerHTML = '<tr><td colspan="3" class="text-center"><span class="spinner-border spinner-border-sm me-2"></span>Carregando...</td></tr>';
+                        alteracoesEmptyState.classList.add('d-none');
+                        modalAlteracoesObj.show();
+
+                        axios.get(`/socio-folha/${socioId}/historico-alteracoes`)
+                            .then(res => {
+                                const data = res.data;
+                                const socio = data.socio;
+                                const historicos = data.historico;
+
+                                // Povoar cabeçalho
+                                document.getElementById('detalheEmpresa').textContent = socio.empresa ? socio.empresa.razao_social : '-';
+                                document.getElementById('detalheRegiao').textContent = socio.regiao ? socio.regiao.nome : '-';
+                                document.getElementById('detalheRef').textContent = `${String(socio.mes).padStart(2, '0')}/${socio.ano}`;
+                                document.getElementById('detalheVencimento').textContent = socio.data_vencimento ? new Date(socio.data_vencimento).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : '-';
+                                document.getElementById('detalheValor').textContent = parseFloat(socio.valor_mensalidade).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+                                alteracoesTableBody.innerHTML = '';
+                                
+                                if (historicos.length === 0) {
+                                    alteracoesEmptyState.classList.remove('d-none');
+                                    return;
+                                }
+
+                                historicos.forEach(hist => {
+                                    const tr = document.createElement('tr');
+                                    const dataHora = new Date(hist.created_at).toLocaleString('pt-BR');
+                                    const usuario = hist.user ? hist.user.name : 'Sistema/Desconhecido';
+                                    const acaoHtml = `<strong>${hist.acao}</strong><br><small class="text-muted">${hist.detalhes || ''}</small>`;
+
+                                    tr.innerHTML = `
+                                        <td><small>${dataHora}</small></td>
+                                        <td>${usuario}</td>
+                                        <td>${acaoHtml}</td>
+                                    `;
+                                    alteracoesTableBody.appendChild(tr);
+                                });
+                            })
+                            .catch(err => {
+                                alteracoesTableBody.innerHTML = '<tr><td colspan="3" class="text-center text-danger"><i class="fas fa-exclamation-triangle me-1"></i>Erro ao carregar histórico de alterações.</td></tr>';
+                            });
+                    });
+                });
+
+                // Modal de E-mails
                 const modalHistoricoObj = new bootstrap.Modal(document.getElementById('modalHistorico'));
                 const historicoTableBody = document.getElementById('historicoTableBody');
                 const historicoEmptyState = document.getElementById('historicoEmptyState');
