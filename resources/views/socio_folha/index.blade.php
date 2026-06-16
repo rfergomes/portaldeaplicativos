@@ -91,12 +91,12 @@
                                 </div>
                             </div>
                             
-                            <div class="d-flex justify-content-between align-items-center me-2 mt-2 pt-3 border-top">
+                            <div class="d-flex justify-content-between align-items-center ms-2 mt-2 pt-2 border-top">
                                 <div>
-                                    <span class="badge bg-success-subtle text-success border border-success me-2 px-3 py-2">
+                                    <span class="badge bg-success-subtle text-success border border-success mx-2 px-3 py-2">
                                         PAGOS: {{ $totalPagoCount ?? 0 }} (R$ {{ number_format($totalPagoValor ?? 0, 2, ',', '.') }})
                                     </span>
-                                    <span class="badge bg-danger-subtle text-danger border border-danger px-3 py-2">
+                                    <span class="badge bg-danger-subtle text-danger border border-danger mx-2 px-3 py-2">
                                         PENDENTES: {{ $totalPendenteCount ?? 0 }} (R$ {{ number_format($totalPendenteValor ?? 0, 2, ',', '.') }})
                                     </span>
                                 </div>
