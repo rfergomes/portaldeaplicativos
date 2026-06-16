@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\DemandaHistorico;
+use App\Models\Demanda;
 use App\Models\ProtocoloEnvio;
 use Carbon\Carbon;
 
