@@ -175,6 +175,7 @@
                 <div class="inner">
                     <h3 class="metric-value text-info">{{ $kpisFolha->perc_listas_recebidas }}<sup style="font-size: 20px">%</sup></h3>
                     <p class="metric-label text-muted">Listas Recebidas</p>
+                    <small class="d-block text-secondary mt-1">{{ $kpisFolha->listas_recebidas_abs }} de {{ $kpisFolha->total_lancamentos }}</small>
                 </div>
                 <div class="small-box-icon"><i class="fa-solid fa-list-check text-info opacity-25"></i></div>
             </div>
@@ -185,6 +186,7 @@
                 <div class="inner">
                     <h3 class="metric-value text-warning">{{ $kpisFolha->gargalo_abaco }}<sup style="font-size: 20px">%</sup></h3>
                     <p class="metric-label text-muted">Aguardando Digitação (ABACO)</p>
+                    <small class="d-block text-secondary mt-1">{{ $kpisFolha->gargalo_abaco_abs }} do total de envios</small>
                 </div>
                 <div class="small-box-icon"><i class="fa-solid fa-keyboard text-warning opacity-25"></i></div>
             </div>
@@ -195,6 +197,7 @@
                 <div class="inner">
                     <h3 class="metric-value text-danger">{{ $kpisFolha->taxa_inadimplencia }}<sup style="font-size: 20px">%</sup></h3>
                     <p class="metric-label text-muted">Inadimplência (Vencidos)</p>
+                    <small class="d-block text-secondary mt-1">{{ $kpisFolha->inadimplencia_abs }} pendentes do total</small>
                 </div>
                 <div class="small-box-icon"><i class="fa-solid fa-triangle-exclamation text-danger opacity-25"></i></div>
             </div>

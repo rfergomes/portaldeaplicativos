@@ -143,8 +143,11 @@ class DashboardController extends Controller
         $kpisFolha = (object) [
             'total_lancamentos' => $totalMensalidadesMesAtual,
             'empresas_cobertas' => $empresasComLancamentos,
+            'listas_recebidas_abs' => $listasRecebidas,
             'perc_listas_recebidas' => $totalMensalidadesMesAtual > 0 ? round(($listasRecebidas / $totalMensalidadesMesAtual) * 100, 1) : 0,
+            'gargalo_abaco_abs' => $gargaloAbaco,
             'gargalo_abaco' => $totalMensalidadesMesAtual > 0 ? round(($gargaloAbaco / $totalMensalidadesMesAtual) * 100, 1) : 0,
+            'inadimplencia_abs' => $inadimplencia,
             'taxa_inadimplencia' => $totalMensalidadesMesAtual > 0 ? round(($inadimplencia / $totalMensalidadesMesAtual) * 100, 1) : 0,
         ];
 

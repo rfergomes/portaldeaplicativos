@@ -97,8 +97,9 @@
                         <thead class="bg-light">
                             <tr>
                                 <th class="border-0 px-4">Usuário</th>
-                                <th class="border-0 text-center">Demandas Resolvidas</th>
-                                <th class="border-0 text-center">Protocolos Enviados</th>
+                                <th class="border-0 text-center">Demandas</th>
+                                <th class="border-0 text-center">Protocolos</th>
+                                <th class="border-0 text-center">Baixas/Listas</th>
                                 <th class="border-0 text-end px-4">Total Entregas</th>
                             </tr>
                         </thead>
@@ -111,6 +112,7 @@
                                     </td>
                                     <td class="text-center text-primary fw-bold">{{ $prod['demandas_resolvidas'] }}</td>
                                     <td class="text-center text-info fw-bold">{{ $prod['protocolos_enviados'] }}</td>
+                                    <td class="text-center text-warning fw-bold">{{ $prod['acoes_financeiras'] }}</td>
                                     <td class="text-end px-4 fw-bold fs-5 text-success">{{ $prod['total_entregas'] }}</td>
                                 </tr>
                             @endforeach

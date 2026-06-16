@@ -43,8 +43,11 @@ class ProductivityService
                 ->whereBetween('created_at', [$inicio, $fim])
                 ->count();
 
-            // Ações financeiras (pode ser expandido lendo SocioCaixaHistorico)
-            $acoesFinanceiras = 0; // Placeholder por enquanto
+            // Ações financeiras (Baixas de listagens)
+            $acoesFinanceiras = \App\Models\SocioFolhaHistorico::where('user_id', $user->id)
+                ->whereIn('acao', ['marcou_lista_ok', 'marcou_baixa_ok'])
+                ->whereBetween('created_at', [$inicio, $fim])
+                ->count();
 
             if ($demandasResolvidas > 0 || $protocolosEnviados > 0 || $acoesFinanceiras > 0) {
                 $extrato[] = [
@@ -68,16 +71,34 @@ class ProductivityService
     }
 
     /**
-     * Dados para o gráfico de Burn-down de um usuário ou equipe (Hoje)
+     * Dados para o gráfico de Burn-down de um usuário (Hoje)
      */
     public function getBurndownHoje($userId = null)
     {
-        // Esta lógica deve cruzar as demandas atribuídas vs demandas resolvidas no dia
-        // Implementação simplificada:
+        if (!$userId) return null;
+
+        $hoje = Carbon::today();
+
+        // Demandas que o usuário resolveu HOJE
+        $entregue = DemandaHistorico::where('user_id', $userId)
+            ->where('acao', 'devolutiva')
+            ->where('descricao', 'LIKE', '%EXECUTADA%')
+            ->whereDate('created_at', $hoje)
+            ->count();
+
+        // Demandas que ainda estão abertas/aguardando na fila deste usuário
+        $pendente = Demanda::where('tipo_responsavel', 'usuario')
+            ->where('responsavel_usuario_id', $userId)
+            ->whereIn('status', [Demanda::STATUS_ABERTA, Demanda::STATUS_AGUARDANDO])
+            ->count();
+
+        // A carga diária dele (o que tinha + o que já fez)
+        $demandado = $pendente + $entregue;
+
         return [
-            'demandado' => 10,
-            'entregue' => 7,
-            'pendente' => 3
+            'demandado' => $demandado,
+            'entregue' => $entregue,
+            'pendente' => $pendente
         ];
     }
 }
