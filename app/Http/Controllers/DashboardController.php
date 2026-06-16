@@ -11,13 +11,48 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
+use App\Services\DashboardManagerService;
+use App\Services\ProductivityService;
+
 class DashboardController extends Controller
 {
+    protected $dashboardService;
+    protected $productivityService;
+
+    public function __construct(DashboardManagerService $dashboardService, ProductivityService $productivityService)
+    {
+        $this->dashboardService = $dashboardService;
+        $this->productivityService = $productivityService;
+    }
+
     public function index()
     {
         $now = Carbon::now();
+        $user = auth()->user();
 
-        // Totais (KPIs)
+        // Dados Híbridos do Dashboard
+        $macroData = null;
+        if ($user->temPermissao('dashboard.ceo.view')) {
+            $macroData = [
+                'receitas' => $this->dashboardService->getTermometroReceitasMesAtual(),
+                'vazao_demandas' => $this->dashboardService->getVazaoDemandasSemana(),
+                'tendencia' => $this->dashboardService->getTendenciaVolume12Meses(),
+                'distribuicao' => $this->dashboardService->getDistribuicaoCargaHoje(),
+            ];
+        }
+
+        $produtividadeData = null;
+        if ($user->temPermissao('dashboard.manager.view') || $user->temPermissao('dashboard.ceo.view')) {
+            // Se for gerente mas não CEO, poderia passar um array com IDs da equipe. 
+            // Como default, vamos passar null (todos) e depois refinar.
+            $produtividadeData = [
+                'extrato' => $this->productivityService->getExtratoProdutividade()
+            ];
+        }
+
+        $burndownData = $this->productivityService->getBurndownHoje($user->id);
+
+        // Totais (KPIs) Antigos mantidos para compatibilidade com a view antiga
         $totalEventosMes = Evento::whereMonth('data_inicio', $now->month)
             ->whereYear('data_inicio', $now->year)
             ->count();
@@ -148,7 +183,10 @@ class DashboardController extends Controller
             'eventosFuturos',
             'kpisFolha',
             'novasDemandasCount',
-            'demandasExpirando'
+            'demandasExpirando',
+            'macroData',
+            'produtividadeData',
+            'burndownData'
         ));
     }
 }

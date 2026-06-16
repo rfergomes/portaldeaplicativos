@@ -90,6 +90,10 @@
         </div>
     @endif
 
+    <!-- Nova Visão Híbrida (Macro/Produtividade) -->
+    @include('dashboard.produtividade')
+
+    <h5 class="mb-3 fw-bold text-secondary border-bottom pb-2 mt-4"><i class="fa-solid fa-list-check me-2"></i>Indicadores Operacionais</h5>
     <!-- KPI Row -->
     <div class="row g-3 mb-4">
         <div class="col-lg-3 col-6">

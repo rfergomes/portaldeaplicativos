@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(DashboardPermissionsSeeder::class);
+        
         // 1. Criar Permissões
         $permissoes = [
             ['chave' => 'ver_eventos', 'nome' => 'Visualizar Eventos', 'descricao' => 'Permite ver a lista de eventos'],
