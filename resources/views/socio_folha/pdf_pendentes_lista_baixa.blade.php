@@ -43,11 +43,17 @@
                     </td>
                     <td>{{ $p->regiao->nome ?? 'N/A' }}</td>
                     <td class="text-center">{{ str_pad($p->mes, 2, '0', STR_PAD_LEFT) }}/{{ $p->ano }}</td>
-                    <td class="text-center" style="color: {{ $p->data_lista ? '#28a745' : '#dc3545' }}">
-                        {{ $p->data_lista ? 'OK (' . $p->data_lista->format('d/m/Y') . ')' : 'PENDENTE' }}
+                    @php
+                        $hasLista = !empty($p->data_lista) && $p->data_lista !== '0000-00-00 00:00:00';
+                        $hasBaixa = !empty($p->data_baixa) && $p->data_baixa !== '0000-00-00 00:00:00';
+                        $dataListaFmt = $hasLista ? (\Carbon\Carbon::parse($p->data_lista)->format('d/m/Y')) : '';
+                        $dataBaixaFmt = $hasBaixa ? (\Carbon\Carbon::parse($p->data_baixa)->format('d/m/Y')) : '';
+                    @endphp
+                    <td class="text-center" style="color: {{ $hasLista ? '#28a745' : '#dc3545' }}">
+                        {{ $hasLista ? 'OK (' . $dataListaFmt . ')' : 'PENDENTE' }}
                     </td>
-                    <td class="text-center" style="color: {{ $p->data_baixa ? '#28a745' : '#dc3545' }}">
-                        {{ $p->data_baixa ? 'OK (' . $p->data_baixa->format('d/m/Y') . ')' : 'PENDENTE' }}
+                    <td class="text-center" style="color: {{ $hasBaixa ? '#28a745' : '#dc3545' }}">
+                        {{ $hasBaixa ? 'OK (' . $dataBaixaFmt . ')' : 'PENDENTE' }}
                     </td>
                     <td class="text-right">R$ {{ number_format($p->valor_mensalidade, 2, ',', '.') }}</td>
                 </tr>

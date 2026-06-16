@@ -229,6 +229,9 @@ class SocioFolhaController extends Controller
 
     public function exportPendentesListaBaixaPdf(Request $request)
     {
+        ini_set('memory_limit', '512M');
+        set_time_limit(300);
+
         $query = SocioFolha::with(['empresa', 'regiao'])
             ->join('empresas', 'socios_folha.empresa_id', '=', 'empresas.id')
             ->select('socios_folha.*')
