@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\DemandaHistorico;
+use App\Models\SocioFolhaHistorico;
+use App\Models\SocioCaixaHistorico;
 use App\Models\Demanda;
 use App\Models\ProtocoloEnvio;
 use Carbon\Carbon;
@@ -44,11 +46,19 @@ class ProductivityService
                 ->whereBetween('created_at', [$inicio, $fim])
                 ->count();
 
-            // Ações financeiras (Baixas de listagens)
-            $acoesFinanceiras = \App\Models\SocioFolhaHistorico::where('user_id', $user->id)
+            // Ações financeiras (Baixas de listagens Sócio Folha)
+            $acoesFolha = \App\Models\SocioFolhaHistorico::where('user_id', $user->id)
                 ->whereIn('acao', ['marcou_lista_ok', 'marcou_baixa_ok'])
                 ->whereBetween('created_at', [$inicio, $fim])
                 ->count();
+
+            // Ações financeiras (Baixas manuais Sócio Caixa)
+            $acoesCaixa = \App\Models\SocioCaixaHistorico::where('user_id', $user->id)
+                ->where('acao', 'baixa')
+                ->whereBetween('created_at', [$inicio, $fim])
+                ->count();
+
+            $acoesFinanceiras = $acoesFolha + $acoesCaixa;
 
             if ($demandasResolvidas > 0 || $protocolosEnviados > 0 || $acoesFinanceiras > 0) {
                 $extrato[] = [
