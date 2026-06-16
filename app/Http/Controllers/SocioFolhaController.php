@@ -12,6 +12,9 @@ class SocioFolhaController extends Controller
 {
     public function index(Request $request)
     {
+        // Salva a URL atual na sessão
+        session(['socio_folha_url' => request()->fullUrl()]);
+
         // Se nenhum filtro principal for passado, assumimos o ano atual como padrão inicial
         if (!$request->has('ano') && !$request->has('regiao_id') && !$request->has('empresa_id')) {
             $request->merge(['ano' => date('Y')]);
@@ -222,5 +225,39 @@ class SocioFolhaController extends Controller
                   ->setPaper('a4', 'portrait');
                   
         return $pdf->stream('debitos_empresa_' . $empresa_id . '.pdf');
+    }
+
+    public function exportPendentesListaBaixaPdf(Request $request)
+    {
+        $query = SocioFolha::with(['empresa', 'regiao'])
+            ->join('empresas', 'socios_folha.empresa_id', '=', 'empresas.id')
+            ->select('socios_folha.*')
+            ->where(function($q) {
+                $q->whereNull('socios_folha.data_lista')
+                  ->orWhereNull('socios_folha.data_baixa');
+            });
+
+        if ($request->filled('regiao_id')) {
+            $query->where('socios_folha.regiao_id', $request->regiao_id);
+        }
+        if ($request->filled('empresa_id')) {
+            $query->where('socios_folha.empresa_id', $request->empresa_id);
+        }
+        if ($request->filled('ano')) {
+            $query->where('socios_folha.ano', $request->ano);
+        }
+        if ($request->filled('mes')) {
+            $query->where('socios_folha.mes', $request->mes);
+        }
+
+        $pendentes = $query->orderBy('empresas.razao_social', 'asc')
+                           ->orderBy('socios_folha.ano', 'asc')
+                           ->orderBy('socios_folha.mes', 'asc')
+                           ->get();
+
+        $pdf = Pdf::loadView('socio_folha.pdf_pendentes_lista_baixa', compact('pendentes', 'request'))
+                  ->setPaper('a4', 'landscape');
+                  
+        return $pdf->stream('relatorio_pendentes_lista_baixa.pdf');
     }
 }

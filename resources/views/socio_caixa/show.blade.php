@@ -55,7 +55,7 @@
                             <i class="fab fa-whatsapp me-2"></i> Avisar Mensalidades
                         </button>
                     @endif
-                    <a href="{{ route('socios-caixa.index') }}" class="btn btn-outline-secondary w-100 rounded-pill">
+                    <a href="{{ session('socio_caixa_url', route('socios-caixa.index')) }}" class="btn btn-outline-secondary w-100 rounded-pill">
                         <i class="fas fa-arrow-left me-2"></i> Voltar à Lista Geral
                     </a>
                 </div>

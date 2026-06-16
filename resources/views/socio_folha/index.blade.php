@@ -91,7 +91,7 @@
                                 </div>
                             </div>
                             
-                            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <div class="d-flex justify-content-between align-items-center me-2 mt-2 pt-3 border-top">
                                 <div>
                                     <span class="badge bg-success-subtle text-success border border-success me-2 px-3 py-2">
                                         PAGOS: {{ $totalPagoCount ?? 0 }} (R$ {{ number_format($totalPagoValor ?? 0, 2, ',', '.') }})
@@ -100,9 +100,12 @@
                                         PENDENTES: {{ $totalPendenteCount ?? 0 }} (R$ {{ number_format($totalPendenteValor ?? 0, 2, ',', '.') }})
                                     </span>
                                 </div>
-                                <div>
+                                <div class="d-flex gap-2">
                                     <a href="{{ route('socios-folha.pdf.pendentes', request()->all()) }}" target="_blank" class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3">
-                                        <i class="fas fa-file-pdf me-1"></i> Exportar Pendentes
+                                        <i class="fas fa-file-pdf me-1"></i> Exportar Débitos
+                                    </a>
+                                    <a href="{{ route('socios-folha.pdf.pendentes_lista_baixa', request()->all()) }}" target="_blank" class="btn btn-sm btn-outline-warning fw-bold rounded-pill px-3">
+                                        <i class="fas fa-file-pdf me-1"></i> Lista/Baixa Pendentes
                                     </a>
                                 </div>
                             </div>
@@ -397,10 +400,7 @@
                             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
                         }).then(res => {
                             if (res.data.success) {
-                                Toast.fire({
-                                    icon: 'success',
-                                    title: 'Status da Lista atualizado!'
-                                });
+                                window.location.reload();
                             }
                         }).catch(err => {
                             this.checked = originalState; // revert
@@ -420,10 +420,7 @@
                             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
                         }).then(res => {
                             if (res.data.success) {
-                                Toast.fire({
-                                    icon: 'success',
-                                    title: 'Baixa no ERP atualizada!'
-                                });
+                                window.location.reload();
                             } else {
                                 this.checked = originalState; // revert
                                 Swal.fire('Atenção', res.data.message, 'warning');

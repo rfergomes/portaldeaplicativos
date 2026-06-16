@@ -12,6 +12,9 @@ class SocioCaixaController extends Controller
 {
     public function index(Request $request)
     {
+        // Salva a URL atual na sessão para o botão voltar
+        session(['socio_caixa_url' => request()->fullUrl()]);
+        
         // 1. Definir padrões se for a primeira vez
         if (!$request->has('min_abertos')) {
             $request->merge(['min_abertos' => 2]);
