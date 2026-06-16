@@ -39,7 +39,7 @@ class ProductivityService
                 ->count();
 
             // Conta quantos protocolos o usuário enviou
-            $protocolosEnviados = ProtocoloEnvio::where('remetente_id', $user->id)
+            $protocolosEnviados = \App\Models\Protocolo::where('user_id', $user->id)
                 ->whereBetween('created_at', [$inicio, $fim])
                 ->count();
 
