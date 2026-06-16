@@ -88,6 +88,23 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                                <div>
+                                    <span class="badge bg-success-subtle text-success border border-success me-2 px-3 py-2">
+                                        PAGOS: {{ $totalPagoCount ?? 0 }} (R$ {{ number_format($totalPagoValor ?? 0, 2, ',', '.') }})
+                                    </span>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger px-3 py-2">
+                                        PENDENTES: {{ $totalPendenteCount ?? 0 }} (R$ {{ number_format($totalPendenteValor ?? 0, 2, ',', '.') }})
+                                    </span>
+                                </div>
+                                <div>
+                                    <a href="{{ route('socios-folha.pdf.pendentes', request()->all()) }}" target="_blank" class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3">
+                                        <i class="fas fa-file-pdf me-1"></i> Exportar Pendentes
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -124,7 +141,7 @@
                                 <th class="border-0 text-center">Situação</th>
                                 <th class="border-0 text-center">Lista (Recebida)</th>
                                 <th class="border-0 text-center">Baixa (Ábaco)</th>
-                                <th class="border-0 text-center pe-3">Lembretes</th>
+                                <th class="border-0 text-center pe-3">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -177,10 +194,15 @@
                                         </div>
                                     </td>
                                     <td class="text-center pe-3">
-                                        <button class="btn btn-sm btn-link text-primary btn-historico p-0"
-                                            data-id="{{ $socio->id }}" title="Histórico de Envios">
-                                            <i class="fas fa-envelope-open-text fa-lg"></i>
-                                        </button>
+                                        <div class="d-flex justify-content-center gap-1">
+                                            <button class="btn btn-sm btn-outline-primary rounded-pill btn-historico px-2"
+                                                data-id="{{ $socio->id }}" title="Histórico de Envios">
+                                                <i class="fas fa-envelope-open-text"></i>
+                                            </button>
+                                            <a href="{{ route('socios-folha.pdf.empresa', $socio->empresa_id) }}" target="_blank" class="btn btn-sm btn-outline-danger rounded-pill px-2" title="Exportar Débitos da Empresa (Aberto)">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty

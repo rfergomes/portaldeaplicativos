@@ -112,6 +112,7 @@
                             <th class="border-0 text-center">Em Aberto</th>
                             <th class="border-0 text-center">Valor Total</th>
                             <th class="border-0 text-center">Postergadas</th>
+                            <th class="border-0 text-center">Contatos</th>
                             <th class="text-end pe-3 border-0">Ações</th>
                         </tr>
                     </thead>
@@ -141,6 +142,11 @@
                             <td class="text-center">
                                 <span class="badge rounded-pill {{ $socio->total_postergados > 0 ? 'bg-warning-subtle text-warning border border-warning' : 'bg-light text-muted border' }} px-3">
                                     {{ $socio->total_postergados }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill {{ $socio->qtde_contatos > 0 ? 'bg-info-subtle text-info border border-info' : 'bg-light text-muted border' }} px-3">
+                                    <i class="fab fa-whatsapp me-1"></i>{{ $socio->qtde_contatos ?? 0 }}
                                 </span>
                             </td>
                             <td class="text-end pe-3">

@@ -263,6 +263,8 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{socio}/toggle-lista', [SocioFolhaController::class, 'toggleLista'])->name('toggle-lista')->middleware('can:socio_folha.gerenciar');
         Route::patch('/{socio}/toggle-baixa', [SocioFolhaController::class, 'toggleBaixa'])->name('toggle-baixa')->middleware('can:socio_folha.gerenciar');
         Route::get('/empresas-por-regiao/{regiao_id}', [SocioFolhaController::class, 'getEmpresasPorRegiao'])->name('empresas-por-regiao');
+        Route::get('/pdf/pendentes', [SocioFolhaController::class, 'exportPendentesPdf'])->name('pdf.pendentes')->middleware('can:socio_folha.visualizar');
+        Route::get('/pdf/empresa/{empresa_id}', [SocioFolhaController::class, 'exportEmpresaDebitosPdf'])->name('pdf.empresa')->middleware('can:socio_folha.visualizar');
         Route::get('/{socio}/email-historico', [SocioFolhaController::class, 'getEmailHistorico'])->name('email-historico')->middleware('can:socio_folha.visualizar');
     });
 });

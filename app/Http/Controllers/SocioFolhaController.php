@@ -6,6 +6,7 @@ use App\Models\SocioFolha;
 use App\Imports\SocioFolhaImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SocioFolhaController extends Controller
 {
@@ -36,6 +37,14 @@ class SocioFolhaController extends Controller
             $query->where('socios_folha.mes', $request->mes);
         }
 
+        // Clone da query para calcular totais
+        $queryTotais = clone $query;
+        $totalPagoCount = (clone $queryTotais)->where('socios_folha.situacao', 'PAGO')->count();
+        $totalPagoValor = (clone $queryTotais)->where('socios_folha.situacao', 'PAGO')->sum('socios_folha.valor_mensalidade');
+        
+        $totalPendenteCount = (clone $queryTotais)->where('socios_folha.situacao', '!=', 'PAGO')->count();
+        $totalPendenteValor = (clone $queryTotais)->where('socios_folha.situacao', '!=', 'PAGO')->sum('socios_folha.valor_mensalidade');
+
         $sociosFolha = $query->orderBy('socios_folha.ano', 'desc')
                              ->orderBy('socios_folha.mes', 'desc')
                              ->orderBy('empresas.razao_social', 'asc')
@@ -51,7 +60,7 @@ class SocioFolhaController extends Controller
             ->orderBy('razao_social')
             ->get(['id', 'razao_social']);
 
-        return view('socio_folha.index', compact('sociosFolha', 'regioes', 'anos', 'meses', 'empresas'));
+        return view('socio_folha.index', compact('sociosFolha', 'regioes', 'anos', 'meses', 'empresas', 'totalPagoCount', 'totalPagoValor', 'totalPendenteCount', 'totalPendenteValor'));
     }
 
     public function import(Request $request)
@@ -165,5 +174,53 @@ class SocioFolhaController extends Controller
             ->get();
 
         return response()->json($historico);
+    }
+
+    public function exportPendentesPdf(Request $request)
+    {
+        $query = SocioFolha::with(['empresa', 'regiao'])
+            ->join('empresas', 'socios_folha.empresa_id', '=', 'empresas.id')
+            ->select('socios_folha.*')
+            ->where('socios_folha.situacao', '!=', 'PAGO');
+
+        if ($request->filled('regiao_id')) {
+            $query->where('socios_folha.regiao_id', $request->regiao_id);
+        }
+        if ($request->filled('empresa_id')) {
+            $query->where('socios_folha.empresa_id', $request->empresa_id);
+        }
+        if ($request->filled('ano')) {
+            $query->where('socios_folha.ano', $request->ano);
+        }
+        if ($request->filled('mes')) {
+            $query->where('socios_folha.mes', $request->mes);
+        }
+
+        $pendentes = $query->orderBy('empresas.razao_social', 'asc')
+                           ->orderBy('socios_folha.ano', 'asc')
+                           ->orderBy('socios_folha.mes', 'asc')
+                           ->get();
+
+        $pdf = Pdf::loadView('socio_folha.pdf_pendentes', compact('pendentes', 'request'))
+                  ->setPaper('a4', 'landscape');
+                  
+        return $pdf->stream('relatorio_pendentes_folha.pdf');
+    }
+
+    public function exportEmpresaDebitosPdf(Request $request, $empresa_id)
+    {
+        $empresa = \App\Models\Empresa::findOrFail($empresa_id);
+        
+        $debitos = SocioFolha::with('regiao')
+            ->where('empresa_id', $empresa_id)
+            ->where('situacao', '!=', 'PAGO')
+            ->orderBy('ano', 'asc')
+            ->orderBy('mes', 'asc')
+            ->get();
+
+        $pdf = Pdf::loadView('socio_folha.pdf_empresa', compact('empresa', 'debitos'))
+                  ->setPaper('a4', 'portrait');
+                  
+        return $pdf->stream('debitos_empresa_' . $empresa_id . '.pdf');
     }
 }

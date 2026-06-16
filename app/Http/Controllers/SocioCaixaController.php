@@ -12,9 +12,9 @@ class SocioCaixaController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Definir padrões se for a primeira vez no ano
-        if (!$request->has('ano')) {
-            $request->merge(['ano' => date('Y')]);
+        // 1. Definir padrões se for a primeira vez
+        if (!$request->has('min_abertos')) {
+            $request->merge(['min_abertos' => 2]);
         }
 
         $query = SocioCaixa::query();
@@ -39,10 +39,11 @@ class SocioCaixaController extends Controller
             ->selectRaw('SUM(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN valor ELSE 0 END) as valor_aberto')
             ->selectRaw('COUNT(CASE WHEN (pago = 0 AND postergado_ate > NOW()) THEN 1 END) as total_postergados')
             ->selectRaw('MIN(id) as id') 
+            ->selectSub(\App\Models\SocioCaixaOcorrencia::whereColumn('matricula', 'socio_caixas.matricula')->where('mensagem', 'LIKE', '[WHATSAPP]%')->selectRaw('COUNT(*)'), 'qtde_contatos')
             ->groupBy('matricula', 'nome', 'tipo_socio');
 
         // Filtro de quantidade mínima em aberto
-        $minAbertos = $request->input('min_abertos', 0);
+        $minAbertos = $request->input('min_abertos', 2);
         
         if ($request->has('ver_postergados')) {
             $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND postergado_ate > NOW()) THEN 1 END) > 0');
