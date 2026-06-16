@@ -84,13 +84,14 @@
     </div>
     @endif
 
-    @if(isset($produtividadeData) && count($produtividadeData['extrato']) > 0)
+    @if(isset($produtividadeData))
     <div class="col-lg-8">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-white border-0 py-3 d-flex align-items-center">
                 <h5 class="card-title mb-0 fw-bold text-dark">Ranking de Entregas (Mês)</h5>
             </div>
             <div class="card-body p-0">
+                @if(count($produtividadeData['extrato']) > 0)
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
@@ -116,6 +117,12 @@
                         </tbody>
                     </table>
                 </div>
+                @else
+                <div class="p-5 text-center text-muted">
+                    <i class="fa-solid fa-trophy fa-3x mb-3 opacity-25"></i>
+                    <p class="mb-0">Aguardando entregas da equipe neste mês para gerar o ranking.</p>
+                </div>
+                @endif
             </div>
         </div>
     </div>
