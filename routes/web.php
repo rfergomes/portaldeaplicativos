@@ -255,6 +255,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/ocorrencias', [SocioCaixaController::class, 'storeOcorrencia'])->name('ocorrencias.store')->middleware('can:socio_caixa.ocorrencias');
     });
 
+    Route::get('/run-permissions-seeder', function() {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'DashboardPermissionsSeeder']);
+        return 'Seeder executado! O perfil Administrador agora deve ter acesso ao Dashboard Macro. <a href="/dashboard">Voltar ao Dashboard</a>';
+    });
+
     // Sócio Folha
     Route::prefix('socio-folha')->name('socios-folha.')->group(function () {
         Route::get('/', [SocioFolhaController::class, 'index'])->name('index')->middleware('can:socio_folha.visualizar');

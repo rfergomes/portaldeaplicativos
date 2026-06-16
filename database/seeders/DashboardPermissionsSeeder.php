@@ -34,10 +34,10 @@ class DashboardPermissionsSeeder extends Seeder
                 ['nome' => $permData['nome'], 'descricao' => $permData['descricao']]
             );
 
-            // Se for CEO view, adicionar ao Administrador
-            if ($permData['chave'] === 'dashboard.ceo.view') {
-                $perfilAdmin = Perfil::where('nome', 'Administrador')->first();
-                if ($perfilAdmin && !$perfilAdmin->permissoes->contains($permissao->id)) {
+            // Se for CEO view ou Manager view, adicionar aos perfis de Administração
+            $perfisAdmin = Perfil::where('nome', 'like', '%Admin%')->get();
+            foreach ($perfisAdmin as $perfilAdmin) {
+                if (!$perfilAdmin->permissoes->contains($permissao->id)) {
                     $perfilAdmin->permissoes()->attach($permissao->id);
                 }
             }
