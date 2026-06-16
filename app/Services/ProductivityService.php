@@ -33,7 +33,8 @@ class ProductivityService
         foreach ($users as $user) {
             // Conta quantas demandas este usuário moveu para 'executada'
             $demandasResolvidas = DemandaHistorico::where('user_id', $user->id)
-                ->where('acao', 'LIKE', '%executada%') // assumindo que a string da acao contém a palavra executada ou alterou status para executada
+                ->where('acao', 'devolutiva') 
+                ->where('descricao', 'LIKE', '%EXECUTADA%')
                 ->whereBetween('created_at', [$inicio, $fim])
                 ->count();
 
