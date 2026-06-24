@@ -267,4 +267,74 @@ class AtivoAquisicaoController extends Controller
             'equipamentos' => $equipamentos
         ]);
     }
+
+    public function devolverFornecedor(Request $request, AtivoAquisicao $aquisicao)
+    {
+        $validated = $request->validate([
+            'justificativa' => 'required|string',
+        ]);
+
+        return DB::transaction(function () use ($validated, $aquisicao) {
+            $equipamentos = $aquisicao->equipamentos()->lockForUpdate()->get();
+
+            if ($equipamentos->isEmpty()) {
+                return redirect()->back()->with('error', 'Esta aquisição não possui equipamentos cadastrados.');
+            }
+
+            foreach ($equipamentos as $equipamento) {
+                // If equipment is em_uso, check for active assignment and reverse it
+                if ($equipamento->status === 'em_uso') {
+                    // Find active cessao from movements
+                    $activeMovement = \App\Models\AtivoMovimentacao::where('equipamento_id', $equipamento->id)
+                        ->where('tipo', 'cessao')
+                        ->orderBy('data_movimentacao', 'desc')
+                        ->first();
+
+                    if ($activeMovement) {
+                        // 1. Log devolução movement (estorno da cessão)
+                        \App\Models\AtivoMovimentacao::create([
+                            'equipamento_id' => $equipamento->id,
+                            'usuario_id' => $activeMovement->usuario_id,
+                            'tipo' => 'devolucao',
+                            'data_movimentacao' => now(),
+                            'responsavel_id' => auth()->id(),
+                            'cessao_id' => $activeMovement->cessao_id,
+                            'origem' => $equipamento->localizacao_atual,
+                            'destino' => 'Estoque',
+                            'observacao' => 'Estorno automático de cessão devido à devolução da NF. Justificativa: ' . $validated['justificativa'],
+                        ]);
+                    }
+                }
+
+                // 2. Log baixa movement (devolução ao fornecedor)
+                \App\Models\AtivoMovimentacao::create([
+                    'equipamento_id' => $equipamento->id,
+                    'usuario_id' => null,
+                    'tipo' => 'baixa',
+                    'data_movimentacao' => now(),
+                    'responsavel_id' => auth()->id(),
+                    'cessao_id' => null,
+                    'origem' => $equipamento->status === 'em_uso' ? 'Estoque' : $equipamento->localizacao_atual,
+                    'destino' => 'Fornecedor',
+                    'observacao' => 'Devolução da NF/Compra. Justificativa: ' . $validated['justificativa'],
+                ]);
+
+                // 3. Mark asset as written-off (baixado)
+                $equipamento->update([
+                    'status' => 'baixado',
+                    'tipo_uso' => null,
+                    'localizacao_atual' => 'Devolvido ao Fornecedor',
+                    'data_devolucao_prevista' => null,
+                ]);
+            }
+
+            // Update original Fiscal Note record/observations
+            $originalObs = $aquisicao->observacao ? $aquisicao->observacao . "\n" : "";
+            $aquisicao->update([
+                'observacao' => $originalObs . "[NF DEVOLVIDA AO FORNECEDOR EM " . now()->format('d/m/Y H:i') . "] Justificativa: " . $validated['justificativa'],
+            ]);
+
+            return redirect()->back()->with('success', 'Processo de compra desfeito. Todos os produtos foram estornados e devolvidos ao fornecedor!');
+        });
+    }
 }

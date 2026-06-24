@@ -295,6 +295,10 @@
                         onclick="abrirModalDevolucao({{ $cessao->id }}, '{{ $cessao->codigo_cessao }}')">
                     <i class="fa-solid fa-rotate-left me-1"></i> Registrar Devolução
                 </button>
+                <button type="button" class="btn btn-danger px-4 fw-bold me-auto ms-2" 
+                        onclick="abrirModalReversao({{ $cessao->id }}, '{{ $cessao->codigo_cessao }}')">
+                    <i class="fa-solid fa-ban me-1"></i> Estornar & Devolver (Rejeição)
+                </button>
                 <button type="button" class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
@@ -518,6 +522,52 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-danger" id="btnSubmitDevolucao">
                         <i class="fa-solid fa-check me-1"></i> Confirmar Devolução e Gerar Termo
+                    </button>
+                </div>
+            </form>
+</div>
+
+<!-- Modal Registrar Reversão/Rejeição -->
+<div class="modal fade" id="modalReversaoCessao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title fw-bold">Estornar Cessão e Devolver (Rejeição): <span id="reversaoCodigoCessao"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formRegistrarReversao">
+                <input type="hidden" id="reversaoCessaoId">
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-3">Estes itens serão estornados da cessão e marcados como devolvidos ao fornecedor (baixados).</p>
+                    
+                    <div class="table-responsive mb-4" style="max-height: 300px;">
+                        <table class="table table-sm table-hover align-middle" id="tabelaItensReversao">
+                            <thead class="bg-light sticky-top">
+                                <tr>
+                                    <th style="width: 40px;">
+                                        <input type="checkbox" class="form-check-input" id="checkAllReversao">
+                                    </th>
+                                    <th>Patrimônio</th>
+                                    <th>Descrição</th>
+                                    <th>Modelo</th>
+                                    <th>Status Atual</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Itens carregados via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Motivo da Rejeição / Devolução</label>
+                        <textarea id="observacoes_reversao" class="form-control" rows="3" placeholder="Ex: Produto veio com defeito ou não condiz com as especificações..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger" id="btnSubmitReversao">
+                        <i class="fa-solid fa-ban me-1"></i> Confirmar Estorno e Baixa
                     </button>
                 </div>
             </form>
@@ -830,6 +880,97 @@ $(document).ready(function() {
             },
             error: function(xhr) {
                 Swal.fire('Erro', 'Não foi possível registrar a devolução.', 'error');
+            }
+        });
+    });
+
+    // --- ESTORNO / REVERSÃO DE CESSÃO ---
+
+    window.abrirModalReversao = function(cessaoId, codigoCessao) {
+        // Fechar modal de detalhes se estiver aberto
+        const modalDetalhesEl = document.getElementById('modalDetalhes' + cessaoId);
+        const modalDetalhesInstance = bootstrap.Modal.getInstance(modalDetalhesEl);
+        if (modalDetalhesInstance) {
+            modalDetalhesInstance.hide();
+        }
+        
+        $('#reversaoCessaoId').val(cessaoId);
+        $('#reversaoCodigoCessao').text(codigoCessao);
+        $('#tabelaItensReversao tbody').empty();
+        $('#checkAllReversao').prop('checked', true);
+
+        // Buscar itens da cessão do modal de detalhes
+        const modalDetalhes = $('#modalDetalhes' + cessaoId);
+        const itens = modalDetalhes.find('.card-body:first table tbody tr');
+
+        itens.each(function() {
+            const id = $(this).find('td:first .badge').text().replace('#', '');
+            const descricao = $(this).find('td:nth-child(2)').text();
+            const modelo = $(this).find('td:nth-child(3)').text();
+            const status = $(this).find('td:nth-child(4)').text().trim();
+            
+            // Só adicionar se não estiver "Removido" e NÃO estiver "Devolvido"
+            if (descricao !== 'Equipamento Removido' && !status.includes('Devolvido')) {
+                $('#tabelaItensReversao tbody').append(`
+                    <tr>
+                        <td><input type="checkbox" name="equipamentos[]" value="${id}" class="form-check-input item-reversao-check" checked></td>
+                        <td><span class="badge text-bg-light border">#${id}</span></td>
+                        <td class="small fw-bold">${descricao}</td>
+                        <td class="small text-muted">${modelo}</td>
+                        <td><span class="badge bg-success">Em Uso</span></td>
+                    </tr>
+                `);
+            }
+        });
+
+        if ($('#tabelaItensReversao tbody tr').length === 0) {
+             $('#tabelaItensReversao tbody').append('<tr><td colspan="5" class="text-center py-3 text-muted">Todos os itens já foram devolvidos ou removidos.</td></tr>');
+             $('#btnSubmitReversao').prop('disabled', true);
+        } else {
+             $('#btnSubmitReversao').prop('disabled', false);
+        }
+
+        const modalReversao = new bootstrap.Modal(document.getElementById('modalReversaoCessao'));
+        modalReversao.show();
+    };
+
+    $('#checkAllReversao').on('change', function() {
+        $('.item-reversao-check').prop('checked', this.checked);
+    });
+
+    $('#formRegistrarReversao').on('submit', function(e) {
+        e.preventDefault();
+        
+        const cessaoId = $('#reversaoCessaoId').val();
+        const equipamentos = $('.item-reversao-check:checked').map(function() { return this.value; }).get();
+
+        if (equipamentos.length === 0) {
+            Swal.fire('Aviso', 'Selecione pelo menos um equipamento para estornar.', 'warning');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Registrando Estorno e Devolução...',
+            text: 'Aguarde enquanto processamos o estorno do termo de cessão.',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        $.ajax({
+            url: `/ativos/cessoes/${cessaoId}/reverter`,
+            type: "POST",
+            data: {
+                equipamentos: equipamentos,
+                observacoes: $('#observacoes_reversao').val(),
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                Swal.fire('Sucesso!', response.message, 'success').then(() => {
+                    location.reload();
+                });
+            },
+            error: function(xhr) {
+                Swal.fire('Erro', xhr.responseJSON?.message || 'Não foi possível registrar o estorno da cessão.', 'error');
             }
         });
     });

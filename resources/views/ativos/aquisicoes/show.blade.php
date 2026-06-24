@@ -61,9 +61,16 @@
                     @if($aquisicao->observacao)
                         <div class="mt-4 p-3 bg-light rounded border">
                             <span class="text-muted fw-bold d-block mb-1">Observações:</span>
-                            <p class="small m-0 text-dark">{{ $aquisicao->observacao }}</p>
+                            <p class="small m-0 text-dark" style="white-space: pre-line;">{{ $aquisicao->observacao }}</p>
                         </div>
                     @endif
+
+                    @can('ativos.excluir')
+                        <hr class="my-4">
+                        <button type="button" class="btn btn-danger w-100 fw-bold" data-bs-toggle="modal" data-bs-target="#modalDevolverCompra">
+                            <i class="fa-solid fa-ban me-2"></i>Devolver Compra (NF)
+                        </button>
+                    @endcan
                 </div>
             </div>
 
@@ -168,6 +175,39 @@
                     <i class="fa-solid fa-info-circle me-1"></i> Esses equipamentos já estão listados no Inventário Geral. Qualquer edição neles (ex: colocar Número de Série), deve ser feita através do módulo "Meu Patrimônio > Equipamentos".
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Devolução Compra -->
+<div class="modal fade" id="modalDevolverCompra" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title fw-bold">Desfazer Compra e Devolver NF</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('ativos.aquisicoes.devolver_fornecedor', $aquisicao->id) }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-3">
+                        Esta ação irá:
+                        <br>1. <strong>Estornar qualquer cessão ativa</strong> dos equipamentos desta Nota Fiscal.
+                        <br>2. Registrar a movimentação de devolução/baixa de todos os itens.
+                        <br>3. Alterar o status de todos os equipamentos para <strong>Baixado</strong>.
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Justificativa da Devolução</label>
+                        <textarea name="justificativa" class="form-control" rows="3" required placeholder="Ex: Equipamentos vieram com defeito físico, recusados no recebimento..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger fw-bold">
+                        <i class="fa-solid fa-check me-1"></i>Confirmar Devolução
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

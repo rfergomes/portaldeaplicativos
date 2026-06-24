@@ -212,7 +212,75 @@ class AtivoCessaoController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Devolução registrada com sucesso!',
+                'message' => 'Devolução processada com sucesso!'
+            ]);
+        });
+    }
+
+    public function reverterCessao(Request $request, AtivoCessao $cessao)
+    {
+        $validated = $request->validate([
+            'equipamentos' => 'required|array',
+            'equipamentos.*' => 'exists:ativo_equipamentos,id',
+            'observacoes' => 'nullable|string',
+        ]);
+
+        return DB::transaction(function () use ($validated, $cessao) {
+            foreach ($validated['equipamentos'] as $equipId) {
+                // Check if active assignment exists in movements
+                $exists = AtivoMovimentacao::where('equipamento_id', $equipId)
+                    ->where('cessao_id', $cessao->id)
+                    ->where('tipo', 'cessao')
+                    ->exists();
+
+                if (!$exists) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Cessão não encontrada para o equipamento ID {$equipId}."
+                    ], 422);
+                }
+
+                $equipamento = AtivoEquipamento::lockForUpdate()->findOrFail($equipId);
+                $origem = $equipamento->localizacao_atual;
+
+                // 1. Log devolução movement (estorno da cessão)
+                AtivoMovimentacao::create([
+                    'equipamento_id' => $equipamento->id,
+                    'usuario_id' => $cessao->usuario_id,
+                    'tipo' => 'devolucao',
+                    'data_movimentacao' => now(),
+                    'responsavel_id' => auth()->id(),
+                    'cessao_id' => $cessao->id,
+                    'origem' => $origem,
+                    'destino' => 'Estoque',
+                    'observacao' => $validated['observacoes'] ?? 'Estorno de cessão por rejeição',
+                ]);
+
+                // 2. Log baixa movement (devolução ao fornecedor)
+                AtivoMovimentacao::create([
+                    'equipamento_id' => $equipamento->id,
+                    'usuario_id' => null,
+                    'tipo' => 'baixa',
+                    'data_movimentacao' => now(),
+                    'responsavel_id' => auth()->id(),
+                    'cessao_id' => null,
+                    'origem' => 'Estoque',
+                    'destino' => 'Fornecedor',
+                    'observacao' => 'Devolução ao fornecedor - Rejeição do produto',
+                ]);
+
+                // 3. Mark asset as written-off (baixado)
+                $equipamento->update([
+                    'status' => 'baixado',
+                    'tipo_uso' => null,
+                    'localizacao_atual' => 'Devolvido ao Fornecedor',
+                    'data_devolucao_prevista' => null,
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cessão estornada e produtos devolvidos ao fornecedor com sucesso!',
                 'cessao_id' => $cessao->id
             ]);
         });

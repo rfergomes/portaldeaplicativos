@@ -264,6 +264,7 @@
                                                 'devolucao' => 'bg-success text-white',
                                                 'manutencao' => 'bg-warning text-dark',
                                                 'transferencia' => 'bg-secondary text-white',
+                                                'baixa' => 'bg-danger text-white',
                                             ];
                                             $badgeClass = $tipoClasses[$mov->tipo] ?? 'bg-light';
                                         @endphp

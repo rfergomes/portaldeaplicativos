@@ -213,6 +213,7 @@ Route::middleware('auth')->group(function () {
         Route::get('aquisicoes/api/equipamentos-para-cessao', [AtivoAquisicaoController::class, 'getEquipamentosDisponiveisPorNfs'])->name('aquisicoes.equipamentos_disponiveis');
         Route::resource('aquisicoes', AtivoAquisicaoController::class);
         Route::post('aquisicoes/{aquisicao}/anexos', [AtivoAquisicaoController::class, 'uploadAnexo'])->name('aquisicoes.anexos.store');
+        Route::post('aquisicoes/{aquisicao}/devolver-fornecedor', [AtivoAquisicaoController::class, 'devolverFornecedor'])->name('aquisicoes.devolver_fornecedor');
         Route::resource('fornecedores', AtivoFornecedorController::class)->except(['show']);
 
         // Gestão de Cessões
@@ -222,6 +223,7 @@ Route::middleware('auth')->group(function () {
         Route::get('cessoes/{cessao}/pdf', [AtivoCessaoController::class, 'generatePdf'])->name('cessoes.pdf');
         Route::get('cessoes/{cessao}/pdf-devolucao', [AtivoCessaoController::class, 'generatePdfDevolucao'])->name('cessoes.pdf_devolucao');
         Route::post('cessoes/{cessao}/devolver', [AtivoCessaoController::class, 'processarDevolucao'])->name('cessoes.devolver');
+        Route::post('cessoes/{cessao}/reverter', [AtivoCessaoController::class, 'reverterCessao'])->name('cessoes.reverter');
         Route::get('movimentacoes/{movimentacao}/pdf/devolucao', [AtivoMovimentacaoController::class, 'pdfDevolucao'])->name('devolucao.pdf');
         Route::post('cessoes/{cessao}/anexos', [AtivoCessaoController::class, 'uploadAnexo'])->name('cessoes.anexos.store');
         Route::get('anexos/{anexo}/download/{filename?}', [AtivoCessaoController::class, 'downloadAnexo'])->name('anexos.download');
