@@ -40,7 +40,7 @@
                     <form action="{{ route('socios-folha.index') }}" method="GET" id="filterForm">
                         <div class="card-body">
                             <div class="row g-2">
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="small fw-bold text-secondary">Região</label>
                                     <select name="regiao_id" id="regiaoSelect" class="form-select form-select-sm"
                                         onchange="loadEmpresas(); this.form.submit()">
@@ -50,7 +50,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="small fw-bold text-secondary">Empresa</label>
                                     <select name="empresa_id" id="empresaSelect" class="form-select form-select-sm"
                                         onchange="this.form.submit()">
@@ -64,7 +64,7 @@
                                         @endif
                                     </select>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-1">
                                     <label class="small fw-bold text-secondary">Ano</label>
                                     <select name="ano" class="form-select form-select-sm" onchange="this.form.submit()">
                                         <option value="">TODOS</option>
@@ -74,7 +74,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="small fw-bold text-secondary">Mês</label>
                                     <select name="mes" class="form-select form-select-sm" onchange="this.form.submit()">
                                         <option value="">TODOS</option>
@@ -86,6 +86,22 @@
                                                 {{ str_pad($mes, 2, '0', STR_PAD_LEFT) }} - {{ ucfirst($mesNome) }}
                                             </option>
                                         @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="small fw-bold text-secondary">Situação</label>
+                                    <select name="situacao" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="">TODOS</option>
+                                        <option value="ABERTO" {{ request('situacao') == 'ABERTO' ? 'selected' : '' }}>ABERTO</option>
+                                        <option value="PAGO" {{ request('situacao') == 'PAGO' ? 'selected' : '' }}>PAGO</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="small fw-bold text-secondary">Lista e Baixa</label>
+                                    <select name="lista_baixa" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="">TODOS</option>
+                                        <option value="ENTREGUE" {{ request('lista_baixa') == 'ENTREGUE' ? 'selected' : '' }}>ENTREGUE</option>
+                                        <option value="PENDENTE" {{ request('lista_baixa') == 'PENDENTE' ? 'selected' : '' }}>PENDENTE</option>
                                     </select>
                                 </div>
                                 </div>

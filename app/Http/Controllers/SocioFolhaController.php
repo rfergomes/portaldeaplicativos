@@ -40,6 +40,26 @@ class SocioFolhaController extends Controller
             $query->where('socios_folha.mes', $request->mes);
         }
 
+        if ($request->filled('situacao')) {
+            if ($request->situacao === 'PAGO') {
+                $query->where('socios_folha.situacao', 'PAGO');
+            } elseif ($request->situacao === 'ABERTO') {
+                $query->where('socios_folha.situacao', '!=', 'PAGO');
+            }
+        }
+
+        if ($request->filled('lista_baixa')) {
+            if ($request->lista_baixa === 'ENTREGUE') {
+                $query->whereNotNull('socios_folha.data_lista')
+                      ->whereNotNull('socios_folha.data_baixa');
+            } elseif ($request->lista_baixa === 'PENDENTE') {
+                $query->where(function($q) {
+                    $q->whereNull('socios_folha.data_lista')
+                      ->orWhereNull('socios_folha.data_baixa');
+                });
+            }
+        }
+
         // Clone da query para calcular totais
         $queryTotais = clone $query;
         $totalPagoCount = (clone $queryTotais)->where('socios_folha.situacao', 'PAGO')->count();
@@ -212,6 +232,18 @@ class SocioFolhaController extends Controller
             $query->where('socios_folha.mes', $request->mes);
         }
 
+        if ($request->filled('lista_baixa')) {
+            if ($request->lista_baixa === 'ENTREGUE') {
+                $query->whereNotNull('socios_folha.data_lista')
+                      ->whereNotNull('socios_folha.data_baixa');
+            } elseif ($request->lista_baixa === 'PENDENTE') {
+                $query->where(function($q) {
+                    $q->whereNull('socios_folha.data_lista')
+                      ->orWhereNull('socios_folha.data_baixa');
+                });
+            }
+        }
+
         $pendentes = $query->orderBy('empresas.razao_social', 'asc')
                            ->orderBy('socios_folha.ano', 'asc')
                            ->orderBy('socios_folha.mes', 'asc')
@@ -264,6 +296,14 @@ class SocioFolhaController extends Controller
         }
         if ($request->filled('mes')) {
             $query->where('socios_folha.mes', $request->mes);
+        }
+
+        if ($request->filled('situacao')) {
+            if ($request->situacao === 'PAGO') {
+                $query->where('socios_folha.situacao', 'PAGO');
+            } elseif ($request->situacao === 'ABERTO') {
+                $query->where('socios_folha.situacao', '!=', 'PAGO');
+            }
         }
 
         $pendentes = $query->orderBy('empresas.razao_social', 'asc')
