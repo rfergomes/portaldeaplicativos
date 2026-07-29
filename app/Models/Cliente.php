@@ -40,5 +40,10 @@ class Cliente extends Model
     {
         return $this->belongsTo(TipoCliente::class, 'tipo_cliente_id');
     }
+
+    public function temBounce(): bool
+    {
+        return $this->email_valido === false || !empty($this->email_bounce_code);
+    }
 }
 

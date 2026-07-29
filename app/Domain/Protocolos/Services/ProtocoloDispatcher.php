@@ -48,6 +48,27 @@ class ProtocoloDispatcher
     {
         $enviados = 0;
 
+        // ---- Verificação de Bounce Prévia ----
+        $cliente = $destinatario->cliente_id
+            ? \App\Models\Cliente::find($destinatario->cliente_id)
+            : \App\Models\Cliente::where('email', $destinatario->email)->first();
+
+        if ($cliente && $cliente->temBounce()) {
+            $bounceInfo = $cliente->email_bounce_code ? " (Código: {$cliente->email_bounce_code})" : "";
+            Log::warning("ProtocoloDispatcher: Envio cancelado para {$destinatario->email} devido a bounce prévio{$bounceInfo}");
+
+            ProtocoloEnvio::create([
+                'protocolo_id' => $protocolo->id,
+                'destinatario_id' => $destinatario->id,
+                'canal' => 'email',
+                'status' => 'falha',
+                'ultima_resposta' => "Envio cancelado: E-mail marcado como bounce prévio{$bounceInfo}",
+                'token_usado' => $token,
+            ]);
+
+            return 0;
+        }
+
         // ---- Envio por E-mail ----
         try {
             $whatsappPayload = null;

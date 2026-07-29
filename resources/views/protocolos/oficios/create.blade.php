@@ -166,14 +166,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 data.empresas.forEach(emp => {
-                    const contatosHtml = emp.contatos.map(c => `
-                        <div class="form-check">
-                            <input class="form-check-input check-contato" type="checkbox" name="contatos[]" value="${c.id}" id="c-${c.id}">
-                            <label class="form-check-label" for="c-${c.id}">
-                                <strong>${c.nome}</strong> (${c.email})
-                            </label>
-                        </div>
-                    `).join('');
+                    const contatosHtml = emp.contatos.map(c => {
+                        const isBounce = c.tem_bounce || c.email_valido === false || !!c.email_bounce_code;
+                        const bounceBadge = isBounce
+                            ? ` <span class="badge bg-danger rounded-pill ms-1" style="font-size: 0.7rem;" title="${c.email_bounce_description || 'Bounce registrado'}">Bounce</span>`
+                            : '';
+                        const emailDisplay = isBounce
+                            ? `<span class="text-danger text-decoration-line-through">${c.email}</span>`
+                            : c.email;
+
+                        return `
+                            <div class="form-check">
+                                <input class="form-check-input check-contato ${isBounce ? 'is-bounce' : ''}" type="checkbox" name="contatos[]" value="${c.id}" id="c-${c.id}">
+                                <label class="form-check-label" for="c-${c.id}">
+                                    <strong>${c.nome}</strong> (${emailDisplay})${bounceBadge}
+                                </label>
+                            </div>
+                        `;
+                    }).join('');
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -204,7 +214,9 @@ document.addEventListener('DOMContentLoaded', function () {
             chkEmp.addEventListener('change', function () {
                 const tr = this.closest('tr');
                 tr.querySelectorAll('.check-contato').forEach(chk => {
-                    chk.checked = this.checked;
+                    if (!chk.classList.contains('is-bounce')) {
+                        chk.checked = this.checked;
+                    }
                 });
                 atualizarContador();
             });
@@ -235,13 +247,16 @@ document.addEventListener('DOMContentLoaded', function () {
     checkSelecionarTodos.addEventListener('change', function () {
         const isChecked = this.checked;
         document.querySelectorAll('.check-empresa').forEach(chk => chk.checked = isChecked);
-        document.querySelectorAll('.check-contato').forEach(chk => chk.checked = isChecked);
+        document.querySelectorAll('.check-contato').forEach(chk => {
+            if (!chk.classList.contains('is-bounce')) {
+                chk.checked = isChecked;
+            }
+        });
         atualizarContador();
     });
 
-    filtroRegiao.addEventListener('change', carregarEmpresas);
-    filtroCategoria.addEventListener('change', carregarEmpresas);
-    filtroAtivas.addEventListener('change', carregarEmpresas);
+    $('#filtro-regiao, #filtro-categoria').on('change select2:select select2:clear', carregarEmpresas);
+    $('#filtro-ativas').on('change', carregarEmpresas);
     filtroTermo.addEventListener('input', function () {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(carregarEmpresas, 400);
@@ -249,8 +264,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const selectTipoProtocolo = document.getElementById('select-tipo-protocolo');
     if (selectTipoProtocolo) {
-        selectTipoProtocolo.addEventListener('change', function () {
+        $(selectTipoProtocolo).on('change select2:select', function () {
             const opt = this.options[this.selectedIndex];
+            if (!opt) return;
             const assunto = opt.getAttribute('data-assunto');
             const mensagem = opt.getAttribute('data-mensagem');
 

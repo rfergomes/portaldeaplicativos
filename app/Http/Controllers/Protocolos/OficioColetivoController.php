@@ -182,6 +182,9 @@ class OficioColetivoController extends Controller
                     'telefone' => $c->telefone,
                     'ativo' => (bool)$c->ativo,
                     'email_valido' => (bool)$c->email_valido,
+                    'email_bounce_code' => $c->email_bounce_code,
+                    'email_bounce_description' => $c->email_bounce_description,
+                    'tem_bounce' => $c->temBounce(),
                 ];
             });
 
