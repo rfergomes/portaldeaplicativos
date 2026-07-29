@@ -33,7 +33,7 @@ return [
 
     'ar_online' => [
         'base_url' => env('AR_ONLINE_BASE_URL', 'https://api.ar-online.com.br'),
-        'token' => env('AR_ONLINE_TOKEN'),
+        'token' => env('AR_ONLINE_TOKEN') ?: env('AR_ONLINE_API_TOKEN'),
     ],
 
     'kwik' => [

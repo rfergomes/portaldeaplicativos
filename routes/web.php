@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Eventos\EventController;
 use App\Http\Controllers\Protocolos\ProtocoloController;
+use App\Http\Controllers\Protocolos\OficioColetivoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Agenda\ColoniaController;
 use App\Http\Controllers\Agenda\ColoniaAcomodacaoController;
@@ -126,6 +127,14 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::post('/protocolos/tipos', [TipoProtocoloController::class, 'store'])->name('protocolos.tipos.store');
     Route::put('/protocolos/tipos/{tipo}', [TipoProtocoloController::class, 'update'])->name('protocolos.tipos.update');
     Route::delete('/protocolos/tipos/{tipo}', [TipoProtocoloController::class, 'destroy'])->name('protocolos.tipos.destroy');
+
+    // Ofícios Coletivos
+    Route::get('/protocolos/oficios', [OficioColetivoController::class, 'index'])->name('protocolos.oficios.index')->middleware('can:protocolos.visualizar');
+    Route::get('/protocolos/oficios/criar', [OficioColetivoController::class, 'create'])->name('protocolos.oficios.create')->middleware('can:protocolos.criar');
+    Route::post('/protocolos/oficios', [OficioColetivoController::class, 'store'])->name('protocolos.oficios.store')->middleware('can:protocolos.criar');
+    Route::get('/protocolos/oficios/api/empresas-filtradas', [OficioColetivoController::class, 'getEmpresasFiltradas'])->name('protocolos.oficios.api.empresas')->middleware('can:protocolos.visualizar');
+    Route::get('/protocolos/oficios/{protocolo}', [OficioColetivoController::class, 'show'])->name('protocolos.oficios.show')->middleware('can:protocolos.visualizar');
+    Route::post('/protocolos/oficios/{protocolo}/disparar-lote', [OficioColetivoController::class, 'dispararLote'])->name('protocolos.oficios.dispararLote')->middleware('can:protocolos.criar');
 
     // Protocolos e AR-Online
     Route::get('/protocolos/pdf/falhas', [ProtocoloController::class, 'relatorioFalhas'])->name('protocolos.pdf.falhas')->middleware('can:protocolos.visualizar');

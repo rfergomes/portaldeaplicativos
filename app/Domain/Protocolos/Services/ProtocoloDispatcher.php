@@ -77,9 +77,11 @@ class ProtocoloDispatcher
             $assuntoMsg = $protocolo->assunto;
             $corpoMsg = $protocolo->corpo;
 
+            $empresaNome = $destinatario->empresa ? $destinatario->empresa->razao_social : ($protocolo->empresa ? $protocolo->empresa->razao_social : '');
+
             $replaceVars = [
                 '{nome_contato}' => $destinatario->nome,
-                '{empresa}' => $protocolo->empresa ? $protocolo->empresa->razao_social : '',
+                '{empresa}' => $empresaNome,
                 '{whatsapp}' => $destinatario->telefone ?? '',
                 '{email}' => $destinatario->email,
             ];

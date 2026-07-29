@@ -223,12 +223,21 @@ class ProtocoloController extends Controller
             try {
                 $statusData = $client->getFullStatus($envio->id_email_externo);
 
-                // Prioridade de status: lido > entregue > enviado > falha
-                $prioridades = ['lido' => 4, 'entregue' => 3, 'enviado' => 2, 'falha' => 1, 'processado' => 0];
+                // Prioridade de status: lido > entregue > falha > enviado > processado
+                $prioridades = ['lido' => 4, 'entregue' => 3, 'falha' => 2, 'enviado' => 1, 'processado' => 0];
                 $statusAtualPeso = $prioridades[$envio->status] ?? 0;
                 $novoStatus = $envio->status;
                 $dataEntrega = $envio->entregue_em;
                 $dataLeitura = $envio->lido_em;
+
+                // Verifica status de nível superior da resposta
+                $topStatus = strtolower($statusData['statusEmail'] ?? $statusData['status'] ?? '');
+                if (str_contains($topStatus, 'falha') || str_contains($topStatus, 'erro') || str_contains($topStatus, 'bounced') || str_contains($topStatus, 'rejected') || str_contains($topStatus, 'não entregue') || str_contains($topStatus, 'nao entregue')) {
+                    if (!in_array($novoStatus, ['entregue', 'lido'])) {
+                        $novoStatus = 'falha';
+                        $statusAtualPeso = $prioridades['falha'];
+                    }
+                }
 
                 $statusFull = $statusData['statusFull'] ?? [];
 
@@ -245,13 +254,21 @@ class ProtocoloController extends Controller
                         }
 
                         // Converte dd/mm/yyyy hh:mm:ss para formato MySQL
-                        $parsedDate = \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $dateTime)->format('Y-m-d H:i:s');
+                        try {
+                            if (str_contains($dateTime, '/')) {
+                                $parsedDate = \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $dateTime)->format('Y-m-d H:i:s');
+                            } else {
+                                $parsedDate = \Carbon\Carbon::parse($dateTime)->format('Y-m-d H:i:s');
+                            }
+                        } catch (\Exception $e) {
+                            continue;
+                        }
 
                         $canalStatus = match (true) {
                             str_contains($label, 'lido') || str_contains($label, 'visualizado') => 'lido',
                             str_contains($label, 'entregue') => 'entregue',
+                            str_contains($label, 'falha') || str_contains($label, 'erro') || str_contains($label, 'bounced') || str_contains($label, 'rejected') || str_contains($label, 'não entregue') || str_contains($label, 'nao entregue') => 'falha',
                             str_contains($label, 'enviado') => 'enviado',
-                            str_contains($label, 'falha') => 'falha',
                             default => 'processado'
                         };
 
@@ -269,7 +286,7 @@ class ProtocoloController extends Controller
                             $dataLeitura = $parsedDate;
                             // Se foi lido, obrigatoriamente foi entregue antes
                             if (!$dataEntrega) {
-                                $dataEntrega = clone $parsedDate; // usa a mesma data no pior caso
+                                $dataEntrega = $parsedDate;
                             }
                         }
                     }
@@ -348,22 +365,38 @@ class ProtocoloController extends Controller
         $mes = $request->input('mes', \Carbon\Carbon::now()->month);
         $ano = $request->input('ano', \Carbon\Carbon::now()->year);
         $termo = $request->input('termo', '');
+        $statusEnvio = $request->input('status_envio', '');
 
         $query = \App\Models\ProtocoloEnvio::with([
-            'protocolo.empresa', 
-            'destinatario'
-        ])->where('status', 'falha');
+            'protocolo.empresa',
+            'destinatario.empresa'
+        ]);
+
+        if ($statusEnvio) {
+            if ($statusEnvio === 'sucesso') {
+                $query->whereIn('status', ['lido', 'entregue', 'sucesso']);
+            } else {
+                $query->where('status', $statusEnvio);
+            }
+        }
 
         if ($termo) {
-            $query->whereHas('protocolo', function($q) use ($termo) {
-                $q->where('referencia_documento', 'like', "%{$termo}%")
-                  ->orWhere('assunto', 'like', "%{$termo}%")
-                  ->orWhereHas('empresa', function($qEmp) use ($termo) {
-                      $qEmp->where('razao_social', 'like', "%{$termo}%");
-                  });
-            })->orWhereHas('destinatario', function($qDest) use ($termo) {
-                $qDest->where('email', 'like', "%{$termo}%")
-                      ->orWhere('nome', 'like', "%{$termo}%");
+            $query->where(function ($q) use ($termo) {
+                $q->whereHas('protocolo', function ($qProto) use ($termo) {
+                    $qProto->where('referencia_documento', 'like', "%{$termo}%")
+                        ->orWhere('assunto', 'like', "%{$termo}%")
+                        ->orWhereHas('empresa', function ($qEmp) use ($termo) {
+                            $qEmp->where('razao_social', 'like', "%{$termo}%")
+                                ->orWhere('nome_fantasia', 'like', "%{$termo}%");
+                        });
+                })->orWhereHas('destinatario', function ($qDest) use ($termo) {
+                    $qDest->where('email', 'like', "%{$termo}%")
+                        ->orWhere('nome', 'like', "%{$termo}%")
+                        ->orWhereHas('empresa', function ($qEmp) use ($termo) {
+                            $qEmp->where('razao_social', 'like', "%{$termo}%")
+                                ->orWhere('nome_fantasia', 'like', "%{$termo}%");
+                        });
+                });
             });
         }
 
@@ -380,10 +413,10 @@ class ProtocoloController extends Controller
         ini_set('memory_limit', '512M');
         set_time_limit(120);
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('protocolos.pdf.falhas', compact('falhas', 'mes', 'ano', 'termo'))
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('protocolos.pdf.falhas', compact('falhas', 'mes', 'ano', 'termo', 'statusEnvio'))
             ->setPaper('a4', 'landscape');
 
-        return $pdf->stream('relatorio_falhas.pdf');
+        return $pdf->stream('relatorio_protocolos.pdf');
     }
 
     public function baixarAnexo(Protocolo $protocolo, \App\Models\ProtocoloAnexo $anexo)

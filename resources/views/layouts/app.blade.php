@@ -560,9 +560,16 @@
                         @if(auth()->user()->temPermissao('protocolos.visualizar'))
                             <li class="nav-item">
                                 <a href="{{ route('protocolos.index') }}"
-                                    class="nav-link {{ request()->routeIs('protocolos.*') ? 'active' : '' }}">
+                                    class="nav-link {{ (request()->routeIs('protocolos.*') && !request()->routeIs('protocolos.oficios.*') && !request()->routeIs('protocolos.tipos.*')) ? 'active' : '' }}">
                                     <i class="nav-icon fa-solid fa-file-signature"></i>
                                     <p>Protocolos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('protocolos.oficios.index') }}"
+                                    class="nav-link {{ request()->routeIs('protocolos.oficios.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fa-solid fa-mail-bulk"></i>
+                                    <p>Envio Coletivo (Ofícios)</p>
                                 </a>
                             </li>
                         @endif

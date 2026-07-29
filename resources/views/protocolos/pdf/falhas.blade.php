@@ -2,11 +2,26 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Relatório de Envio de Protocolos com Falha</title>
+    <title>Relatório de Envio de Protocolos</title>
+    @php
+        $temaCor = match($statusEnvio) {
+            'falha' => '#dc3545',
+            'sucesso' => '#198754',
+            'enviado' => '#0d6efd',
+            default => '#033c5a',
+        };
+
+        $tituloRelatorio = match($statusEnvio) {
+            'falha' => 'Envios com Falha - Protocolos',
+            'sucesso' => 'Envios Concluídos com Sucesso - Protocolos',
+            'enviado' => 'Envios Realizados - Protocolos',
+            default => 'Relatório Geral de Envio de Protocolos',
+        };
+    @endphp
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10pt; color: #333; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #dc3545; padding-bottom: 10px; }
-        .title { font-size: 18pt; font-weight: bold; margin: 0; color: #dc3545; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid {{ $temaCor }}; padding-bottom: 10px; }
+        .title { font-size: 18pt; font-weight: bold; margin: 0; color: {{ $temaCor }}; }
         .subtitle { font-size: 11pt; color: #666; margin-top: 5px; }
         .filters { font-size: 9pt; background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #ddd; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 9pt; }
@@ -15,7 +30,11 @@
         tr:nth-child(even) { background-color: #f9f9f9; }
         .text-center { text-align: center; }
         .text-right { text-align: right; }
-        .badge { display: inline-block; padding: 3px 6px; border-radius: 4px; font-size: 8pt; font-weight: bold; color: white; background-color: #dc3545; }
+        .badge { display: inline-block; padding: 3px 6px; border-radius: 4px; font-size: 8pt; font-weight: bold; color: white; }
+        .badge-sucesso { background-color: #198754; }
+        .badge-enviado { background-color: #0d6efd; }
+        .badge-falha { background-color: #dc3545; }
+        .badge-pendente { background-color: #ffc107; color: #212529; }
         .small-text { font-size: 8pt; color: #666; }
         .footer { margin-top: 30px; text-align: center; font-size: 8pt; color: #999; border-top: 1px solid #eee; padding-top: 10px; position: fixed; bottom: 0; width: 100%; }
         .page-number:before { content: "Página " counter(page); }
@@ -24,32 +43,33 @@
 <body>
 
     <div class="header">
-        <h1 class="title">Envios com Falha - Protocolos</h1>
-        <div class="subtitle">Relatório Analítico de Rastreamento Automático</div>
+        <h1 class="title">{{ $tituloRelatorio }}</h1>
+        <div class="subtitle">Relatório Analítico de Rastreamento Automático - AR-Online</div>
     </div>
 
     <div class="filters">
         <strong>Filtros aplicados:</strong><br>
-        Mês/Ano: {{ $mes ? \Carbon\Carbon::create()->month($mes)->locale('pt_BR')->translatedFormat('F') : 'Todos' }}/{{ $ano ?: 'Todos' }}
-        @if($termo) | Termo: "{{ $termo }}" @endif
+        Mês/Ano: <strong>{{ $mes ? \Carbon\Carbon::create()->month((int)$mes)->locale('pt_BR')->translatedFormat('F') : 'Todos' }}/{{ $ano ?: 'Todos' }}</strong>
+        | Status: <strong>{{ $statusEnvio ? ucfirst($statusEnvio) : 'Todos' }}</strong>
+        @if($termo) | Termo: <strong>"{{ $termo }}"</strong> @endif
         <br>
-        Total de falhas encontradas: <strong>{{ $falhas->count() }}</strong>
+        Total de envios encontrados: <strong>{{ $falhas->count() }}</strong>
     </div>
 
     @if($falhas->isEmpty())
         <div style="text-align: center; margin-top: 50px; color: #999;">
-            Nenhuma falha de envio foi encontrada com os filtros selecionados.
+            Nenhum registro de envio foi encontrado com os filtros selecionados.
         </div>
     @else
         <table>
             <thead>
                 <tr>
-                    <th style="width: 8%;">Data</th>
+                    <th style="width: 10%;">Data/Hora</th>
                     <th style="width: 8%;">Prot. ID</th>
-                    <th style="width: 20%;">Assunto</th>
+                    <th style="width: 22%;">Assunto / Referência</th>
                     <th style="width: 25%;">Empresa</th>
-                    <th style="width: 24%;">Contato Geração/Falha</th>
-                    <th style="width: 15%;">Motivo/Status</th>
+                    <th style="width: 23%;">Contato Destinatário</th>
+                    <th style="width: 12%; text-align: center;">Status Envio</th>
                 </tr>
             </thead>
             <tbody>
@@ -57,35 +77,41 @@
                     @php
                         $protocolo = $envio->protocolo;
                         $dest = $envio->destinatario;
+                        $empresaNome = $dest?->empresa?->razao_social ?? $protocolo?->empresa?->razao_social ?? '—';
                     @endphp
                     <tr>
-                        <td class="text-center">{{ $envio->created_at->format('d/m/Y') }}<br><span class="small-text">{{ $envio->created_at->format('H:i') }}</span></td>
+                        <td class="text-center">
+                            {{ $envio->created_at->format('d/m/Y') }}<br>
+                            <span class="small-text">{{ $envio->created_at->format('H:i') }}</span>
+                        </td>
                         <td class="text-center">#{{ $protocolo->id }}</td>
                         <td>
                             <strong>{{ \Illuminate\Support\Str::limit($protocolo->assunto, 40) }}</strong>
-                            <div class="small-text pb-1">{{ $protocolo->referencia_documento }}</div>
+                            @if($protocolo->referencia_documento)
+                                <div class="small-text">{{ $protocolo->referencia_documento }}</div>
+                            @endif
                         </td>
-                        <td>{{ $protocolo->empresa ? \Illuminate\Support\Str::limit($protocolo->empresa->razao_social, 45) : '—' }}</td>
+                        <td>{{ \Illuminate\Support\Str::limit($empresaNome, 45) }}</td>
                         <td>
                             <strong>{{ $dest ? $dest->nome : 'Desconhecido' }}</strong><br>
                             <span class="small-text">{{ $dest ? $dest->email : '—' }}</span>
                         </td>
                         <td class="text-center">
-                            @php
-                                $msgErro = 'Falha no servidor';
-                                if($envio->ultima_resposta) {
-                                    $resp = json_decode($envio->ultima_resposta, true);
-                                    if(isset($resp['statusFull']['email']) && is_array($resp['statusFull']['email'])) {
-                                        foreach($resp['statusFull']['email'] as $st) {
-                                           if(stripos($st['label'] ?? '', 'falha') !== false) {
-                                               $msgErro = $st['label'];
-                                               break;
-                                           }
-                                        }
-                                    }
-                                }
-                            @endphp
-                            <span class="badge">FALHA</span>
+                            @match($envio->status)
+                                @case('lido')
+                                @case('entregue')
+                                @case('sucesso')
+                                    <span class="badge badge-sucesso">{{ strtoupper($envio->status) }}</span>
+                                    @break
+                                @case('enviado')
+                                    <span class="badge badge-enviado">ENVIADO</span>
+                                    @break
+                                @case('falha')
+                                    <span class="badge badge-falha">FALHA</span>
+                                    @break
+                                @default
+                                    <span class="badge badge-pendente">{{ strtoupper($envio->status) }}</span>
+                            @endmatch
                         </td>
                     </tr>
                 @endforeach

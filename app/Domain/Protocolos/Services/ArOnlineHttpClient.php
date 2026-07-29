@@ -108,6 +108,11 @@ class ArOnlineHttpClient implements ArOnlineClient
 
     private function decode($response, string $contexto): array
     {
+        if ($response->status() === 401) {
+            \Illuminate\Support\Facades\Log::error("AR-Online API: Token de autorização inválido ou expirado (HTTP 401 Unauthorized) ao consultar {$contexto}.");
+            throw new RuntimeException("Erro ao consultar {$contexto}: HTTP 401 Unauthorized - Token da AR-Online inválido ou expirado.");
+        }
+
         if (!$response->successful()) {
             throw new RuntimeException("Erro ao consultar {$contexto}: " . $response->body());
         }

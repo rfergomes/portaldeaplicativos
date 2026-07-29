@@ -11,6 +11,8 @@ class ProtocoloDestinatario extends Model
 
     protected $fillable = [
         'protocolo_id',
+        'empresa_id',
+        'cliente_id',
         'nome',
         'email',
         'telefone',
@@ -27,6 +29,16 @@ class ProtocoloDestinatario extends Model
     public function protocolo()
     {
         return $this->belongsTo(Protocolo::class);
+    }
+
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class);
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class);
     }
 
     public function envios()

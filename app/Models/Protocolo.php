@@ -18,6 +18,7 @@ class Protocolo extends Model
         'assunto',
         'corpo',
         'canal',
+        'tipo_escopo',
         'status',
         'referencia_documento',
         'agendado_para',

@@ -66,12 +66,21 @@ class UpdateProtocolosStatus extends Command
 
                 $statusData = $client->getFullStatus($envio->id_email_externo);
 
-                // Prioridade de status: lido > entregue > enviado > falha
-                $prioridades = ['lido' => 4, 'entregue' => 3, 'enviado' => 2, 'falha' => 1, 'processado' => 0];
+                // Prioridade de status: lido > entregue > falha > enviado > processado
+                $prioridades = ['lido' => 4, 'entregue' => 3, 'falha' => 2, 'enviado' => 1, 'processado' => 0];
                 $statusAtualPeso = $prioridades[$envio->status] ?? 0;
                 $novoStatus = $envio->status;
                 $dataEntrega = $envio->entregue_em ? clone $envio->entregue_em : null;
                 $dataLeitura = $envio->lido_em ? clone $envio->lido_em : null;
+
+                // Verifica status de nível superior da resposta
+                $topStatus = strtolower($statusData['statusEmail'] ?? $statusData['status'] ?? '');
+                if (str_contains($topStatus, 'falha') || str_contains($topStatus, 'erro') || str_contains($topStatus, 'bounced') || str_contains($topStatus, 'rejected') || str_contains($topStatus, 'não entregue') || str_contains($topStatus, 'nao entregue')) {
+                    if (!in_array($novoStatus, ['entregue', 'lido'])) {
+                        $novoStatus = 'falha';
+                        $statusAtualPeso = $prioridades['falha'];
+                    }
+                }
 
                 $statusFull = $statusData['statusFull'] ?? [];
 
@@ -102,8 +111,8 @@ class UpdateProtocolosStatus extends Command
                         $canalStatus = match (true) {
                             str_contains($label, 'lido') || str_contains($label, 'visualizado') => 'lido',
                             str_contains($label, 'entregue') => 'entregue',
+                            str_contains($label, 'falha') || str_contains($label, 'erro') || str_contains($label, 'bounced') || str_contains($label, 'rejected') || str_contains($label, 'não entregue') || str_contains($label, 'nao entregue') => 'falha',
                             str_contains($label, 'enviado') => 'enviado',
-                            str_contains($label, 'falha') => 'falha',
                             default => 'processado'
                         };
 
@@ -147,6 +156,12 @@ class UpdateProtocolosStatus extends Command
             } catch (\Throwable $e) {
                 $errorStr = $e->getMessage();
                 Log::warning("Falha ao atualizar status do envio #{$envio->id}: " . $errorStr);
+
+                if (str_contains($errorStr, '401') || str_contains(strtolower($errorStr), 'unauthorized')) {
+                    $this->error("Erro de Autenticação na AR-Online (HTTP 401). Verifique o token no .env ou cadastro do usuário.");
+                    $falhas++;
+                    continue;
+                }
 
                 // Extrai o JSON contido na mensagem de erro (Ex: "Erro ao consultar status completo: {"message":"Registro não encontrado"}")
                 $apiMessage = 'Falha na comunicação com a AR-Online.';
