@@ -44,6 +44,7 @@
                                 <label class="form-label fw-bold">Região</label>
                                 <select class="form-select" id="filtro-regiao">
                                     <option value="">Todas as Regiões</option>
+                                    <option value="sem_regiao">Sem Região / Não Definido</option>
                                     @foreach($regioes as $regiao)
                                         <option value="{{ $regiao->id }}">{{ $regiao->nome }}</option>
                                     @endforeach
@@ -92,10 +93,10 @@
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Tipo de Protocolo</label>
-                                <select name="tipo_protocolo_id" class="form-select">
+                                <select name="tipo_protocolo_id" class="form-select" id="select-tipo-protocolo">
                                     <option value="">Nenhum / Padrão</option>
                                     @foreach($tiposProtocolo as $tipo)
-                                        <option value="{{ $tipo->id }}">{{ $tipo->nome }}</option>
+                                        <option value="{{ $tipo->id }}" data-assunto="{{ $tipo->assunto }}" data-mensagem="{{ $tipo->mensagem }}">{{ $tipo->nome }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -245,6 +246,25 @@ document.addEventListener('DOMContentLoaded', function () {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(carregarEmpresas, 400);
     });
+
+    const selectTipoProtocolo = document.getElementById('select-tipo-protocolo');
+    if (selectTipoProtocolo) {
+        selectTipoProtocolo.addEventListener('change', function () {
+            const opt = this.options[this.selectedIndex];
+            const assunto = opt.getAttribute('data-assunto');
+            const mensagem = opt.getAttribute('data-mensagem');
+
+            const inputAssunto = document.querySelector('input[name="assunto"]');
+            const textareaCorpo = document.querySelector('textarea[name="corpo"]');
+
+            if (assunto && inputAssunto) {
+                inputAssunto.value = assunto;
+            }
+            if (mensagem && textareaCorpo) {
+                textareaCorpo.value = mensagem;
+            }
+        });
+    }
 
     carregarEmpresas();
 });

@@ -70,7 +70,7 @@
                                                     required>
                                                     <option value="">— SELECIONE UM TIPO —</option>
                                                     @foreach($tiposProtocolo as $tipo)
-                                                        <option value="{{ $tipo->id }}" {{ old('tipo_protocolo_id') == $tipo->id ? 'selected' : '' }}>
+                                                        <option value="{{ $tipo->id }}" data-assunto="{{ $tipo->assunto }}" data-mensagem="{{ $tipo->mensagem }}" {{ old('tipo_protocolo_id') == $tipo->id ? 'selected' : '' }}>
                                                             {{ $tipo->nome }}
                                                         </option>
                                                     @endforeach
@@ -476,6 +476,13 @@
                         .always(function () {
                             btnPuxar.html('<i class="fa-solid fa-cloud-arrow-down"></i>').removeAttr('disabled');
                         });
+                $('#inputTipo').on('change', function () {
+                    const opt = $(this).find('option:selected');
+                    const assunto = opt.data('assunto');
+                    const mensagem = opt.data('mensagem');
+
+                    if (assunto) $('input[name="assunto"]').val(assunto);
+                    if (mensagem) $('textarea[name="corpo"]').val(mensagem);
                 });
             });
         </script>

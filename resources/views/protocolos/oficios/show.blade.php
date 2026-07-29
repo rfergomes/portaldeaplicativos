@@ -189,6 +189,7 @@
                             <label class="form-label fw-bold small">Região</label>
                             <select class="form-select form-select-sm" id="modal-filtro-regiao">
                                 <option value="">Todas as Regiões</option>
+                                <option value="sem_regiao">Sem Região / Não Definido</option>
                                 @foreach($regioes as $regiao)
                                     <option value="{{ $regiao->id }}">{{ $regiao->nome }}</option>
                                 @endforeach

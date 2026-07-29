@@ -122,8 +122,14 @@ class OficioColetivoController extends Controller
             $query->where('ativo', true);
         }
 
-        if ($regiaoId) {
-            $query->where('regiao_id', $regiaoId);
+        if ($regiaoId !== null && $regiaoId !== '') {
+            if ($regiaoId === 'sem_regiao' || $regiaoId === '0') {
+                $query->where(function ($q) {
+                    $q->whereNull('regiao_id')->orWhere('regiao_id', 0);
+                });
+            } else {
+                $query->where('regiao_id', $regiaoId);
+            }
         }
 
         if ($categoria) {
