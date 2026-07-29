@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Relatório de Envio de Protocolos</title>
+    <title>Relatório Analítico de Protocolos e Ofícios</title>
     @php
         $temaCor = match($statusEnvio) {
             'falha' => '#dc3545',
@@ -12,31 +12,49 @@
         };
 
         $tituloRelatorio = match($statusEnvio) {
-            'falha' => 'Envios com Falha - Protocolos',
-            'sucesso' => 'Envios Concluídos com Sucesso - Protocolos',
-            'enviado' => 'Envios Realizados - Protocolos',
-            default => 'Relatório Geral de Envio de Protocolos',
+            'falha' => 'Relatório de Envios com Falha',
+            'sucesso' => 'Relatório de Envios Concluídos (Sucesso / Entregues)',
+            'enviado' => 'Relatório de Envios Realizados',
+            default => 'Relatório Analítico Geral de Protocolos e Ofícios',
         };
     @endphp
     <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10pt; color: #333; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid {{ $temaCor }}; padding-bottom: 10px; }
-        .title { font-size: 18pt; font-weight: bold; margin: 0; color: {{ $temaCor }}; }
-        .subtitle { font-size: 11pt; color: #666; margin-top: 5px; }
-        .filters { font-size: 9pt; background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #ddd; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 9pt; }
-        th, td { border: 1px solid #ddd; padding: 8px 6px; text-align: left; vertical-align: middle; }
-        th { background-color: #f1f1f1; font-weight: bold; color: #444; border-bottom: 2px solid #ccc; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 9pt; color: #333; }
+        .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid {{ $temaCor }}; padding-bottom: 8px; }
+        .title { font-size: 16pt; font-weight: bold; margin: 0; color: {{ $temaCor }}; }
+        .subtitle { font-size: 10pt; color: #666; margin-top: 4px; }
+        
+        /* Summary Grid Cards */
+        .summary-container { width: 100%; margin-bottom: 15px; }
+        .summary-card { float: left; width: 23%; padding: 8px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 5px; text-align: center; margin-right: 2%; }
+        .summary-card:last-child { margin-right: 0; }
+        .summary-title { font-size: 8pt; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 4px; }
+        .summary-value { font-size: 14pt; font-weight: bold; }
+        .val-total { color: #033c5a; }
+        .val-sucesso { color: #198754; }
+        .val-enviado { color: #0d6efd; }
+        .val-falha { color: #dc3545; }
+
+        .clear { clear: both; }
+
+        .filters { font-size: 8.5pt; background: #f1f5f9; padding: 8px 12px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #cbd5e1; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 8.5pt; }
+        th, td { border: 1px solid #cbd5e1; padding: 6px 5px; text-align: left; vertical-align: middle; }
+        th { background-color: #e2e8f0; font-weight: bold; color: #1e293b; border-bottom: 2px solid #94a3b8; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        
         .text-center { text-align: center; }
         .text-right { text-align: right; }
-        .badge { display: inline-block; padding: 3px 6px; border-radius: 4px; font-size: 8pt; font-weight: bold; color: white; }
+        .badge { display: inline-block; padding: 3px 6px; border-radius: 4px; font-size: 7.5pt; font-weight: bold; color: white; }
         .badge-sucesso { background-color: #198754; }
         .badge-enviado { background-color: #0d6efd; }
         .badge-falha { background-color: #dc3545; }
         .badge-pendente { background-color: #ffc107; color: #212529; }
-        .small-text { font-size: 8pt; color: #666; }
-        .footer { margin-top: 30px; text-align: center; font-size: 8pt; color: #999; border-top: 1px solid #eee; padding-top: 10px; position: fixed; bottom: 0; width: 100%; }
+        .badge-escopo { background-color: #64748b; font-size: 7pt; }
+
+        .small-text { font-size: 7.5pt; color: #64748b; }
+        .footer { margin-top: 25px; text-align: center; font-size: 8pt; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 8px; position: fixed; bottom: 0; width: 100%; }
         .page-number:before { content: "Página " counter(page); }
     </style>
 </head>
@@ -44,20 +62,49 @@
 
     <div class="header">
         <h1 class="title">{{ $tituloRelatorio }}</h1>
-        <div class="subtitle">Relatório Analítico de Rastreamento Automático - AR-Online</div>
+        <div class="subtitle">Relatório Operacional e Jurídico de Rastreamento AR-Online</div>
     </div>
 
+    <!-- Cards de Métricas -->
+    <div class="summary-container">
+        <div class="summary-card">
+            <div class="summary-title">Total Geral</div>
+            <div class="summary-value val-total">{{ number_format($totalGeral, 0, ',', '.') }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-title">Entregues / Lidos</div>
+            <div class="summary-value val-sucesso">{{ number_format($totalSucesso, 0, ',', '.') }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-title">Enviados</div>
+            <div class="summary-value val-enviado">{{ number_format($totalEnviados, 0, ',', '.') }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-title">Com Falhas</div>
+            <div class="summary-value val-falha">{{ number_format($totalFalhas, 0, ',', '.') }}</div>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <!-- Filtros Aplicados -->
     <div class="filters">
-        <strong>Filtros aplicados:</strong><br>
-        Mês/Ano: <strong>{{ $mes ? \Carbon\Carbon::create()->month((int)$mes)->locale('pt_BR')->translatedFormat('F') : 'Todos' }}/{{ $ano ?: 'Todos' }}</strong>
-        | Status: <strong>{{ $statusEnvio ? ucfirst($statusEnvio) : 'Todos' }}</strong>
+        <strong>Filtros aplicados ao relatório:</strong><br>
+        @if($data)
+            Data Específica: <strong>{{ \Carbon\Carbon::parse(str_replace('/', '-', $data))->format('d/m/Y') }}</strong> |
+        @elseif($dataInicio || $dataFim)
+            Período: <strong>{{ $dataInicio ? \Carbon\Carbon::parse(str_replace('/', '-', $dataInicio))->format('d/m/Y') : 'Início' }} até {{ $dataFim ? \Carbon\Carbon::parse(str_replace('/', '-', $dataFim))->format('d/m/Y') : 'Atual' }}</strong> |
+        @else
+            Mês/Ano: <strong>{{ $mes ? \Carbon\Carbon::create()->month((int)$mes)->locale('pt_BR')->translatedFormat('F') : 'Todos' }}/{{ $ano ?: 'Todos' }}</strong> |
+        @endif
+
+        Status: <strong>{{ $statusEnvio ? ucfirst($statusEnvio) : 'Todos' }}</strong> |
+        Escopo: <strong>{{ $tipoEscopo ? ucfirst($tipoEscopo) : 'Todos' }}</strong>
+        @if($tipoProtocoloNome) | Tipo: <strong>{{ $tipoProtocoloNome }}</strong> @endif
         @if($termo) | Termo: <strong>"{{ $termo }}"</strong> @endif
-        <br>
-        Total de envios encontrados: <strong>{{ $falhas->count() }}</strong>
     </div>
 
     @if($falhas->isEmpty())
-        <div style="text-align: center; margin-top: 50px; color: #999;">
+        <div style="text-align: center; margin-top: 50px; color: #94a3b8; font-size: 11pt;">
             Nenhum registro de envio foi encontrado com os filtros selecionados.
         </div>
     @else
@@ -65,11 +112,12 @@
             <thead>
                 <tr>
                     <th style="width: 10%;">Data/Hora</th>
-                    <th style="width: 8%;">Prot. ID</th>
-                    <th style="width: 22%;">Assunto / Referência</th>
-                    <th style="width: 25%;">Empresa</th>
-                    <th style="width: 23%;">Contato Destinatário</th>
-                    <th style="width: 12%; text-align: center;">Status Envio</th>
+                    <th style="width: 7%;">ID</th>
+                    <th style="width: 13%;">Tipo / Escopo</th>
+                    <th style="width: 25%;">Assunto / Referência</th>
+                    <th style="width: 23%;">Empresa</th>
+                    <th style="width: 14%;">Contato Destinatário</th>
+                    <th style="width: 8%; text-align: center;">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -78,6 +126,7 @@
                         $protocolo = $envio->protocolo;
                         $dest = $envio->destinatario;
                         $empresaNome = $dest?->empresa?->razao_social ?? $protocolo?->empresa?->razao_social ?? '—';
+                        $cidade = $dest?->empresa?->cidade ?? $protocolo?->empresa?->cidade;
                     @endphp
                     <tr>
                         <td class="text-center">
@@ -86,15 +135,24 @@
                         </td>
                         <td class="text-center">#{{ $protocolo->id }}</td>
                         <td>
-                            <strong>{{ \Illuminate\Support\Str::limit($protocolo->assunto, 40) }}</strong>
+                            <strong>{{ $protocolo->tipo->nome ?? 'Padrão' }}</strong><br>
+                            <span class="badge badge-escopo">{{ strtoupper($protocolo->tipo_escopo ?? 'INDIVIDUAL') }}</span>
+                        </td>
+                        <td>
+                            <strong>{{ \Illuminate\Support\Str::limit($protocolo->assunto, 45) }}</strong>
                             @if($protocolo->referencia_documento)
                                 <div class="small-text">{{ $protocolo->referencia_documento }}</div>
                             @endif
                         </td>
-                        <td>{{ \Illuminate\Support\Str::limit($empresaNome, 45) }}</td>
                         <td>
-                            <strong>{{ $dest ? $dest->nome : 'Desconhecido' }}</strong><br>
-                            <span class="small-text">{{ $dest ? $dest->email : '—' }}</span>
+                            {{ \Illuminate\Support\Str::limit($empresaNome, 45) }}
+                            @if($cidade)
+                                <br><span class="small-text">{{ $cidade }}</span>
+                            @endif
+                        </td>
+                        <td>
+                            <strong>{{ $dest ? \Illuminate\Support\Str::limit($dest->nome, 25) : 'Desconhecido' }}</strong><br>
+                            <span class="small-text">{{ $dest ? \Illuminate\Support\Str::limit($dest->email, 28) : '—' }}</span>
                         </td>
                         <td class="text-center">
                             @switch($envio->status)

@@ -29,13 +29,31 @@ class OficioColetivoController extends Controller
 
     public function index(Request $request): View
     {
+        $data = $request->input('data', '');
         $mes = $request->input('mes', Carbon::now()->month);
         $ano = $request->input('ano', Carbon::now()->year);
+        $tipoProtocoloId = $request->input('tipo_protocolo_id', '');
         $status = $request->input('status_envio', '');
         $termo = $request->input('termo', '');
 
         $query = Protocolo::with(['tipo', 'destinatarios.empresa', 'usuario'])
             ->where('tipo_escopo', 'coletivo');
+
+        if ($data) {
+            $dtFormatted = \Carbon\Carbon::parse(str_replace('/', '-', $data))->format('Y-m-d');
+            $query->whereDate('created_at', $dtFormatted);
+        } else {
+            if ($mes) {
+                $query->whereMonth('created_at', $mes);
+            }
+            if ($ano) {
+                $query->whereYear('created_at', $ano);
+            }
+        }
+
+        if ($tipoProtocoloId) {
+            $query->where('tipo_protocolo_id', $tipoProtocoloId);
+        }
 
         if ($termo) {
             $query->where(function ($q) use ($termo) {
@@ -52,14 +70,6 @@ class OficioColetivoController extends Controller
             });
         }
 
-        if ($mes) {
-            $query->whereMonth('created_at', $mes);
-        }
-
-        if ($ano) {
-            $query->whereYear('created_at', $ano);
-        }
-
         if ($status) {
             $query->where('status', $status);
         }
@@ -68,8 +78,16 @@ class OficioColetivoController extends Controller
 
         // Métricas
         $metricsQuery = Protocolo::where('tipo_escopo', 'coletivo');
-        if ($mes) $metricsQuery->whereMonth('created_at', $mes);
-        if ($ano) $metricsQuery->whereYear('created_at', $ano);
+        if ($data) {
+            $dtFormatted = \Carbon\Carbon::parse(str_replace('/', '-', $data))->format('Y-m-d');
+            $metricsQuery->whereDate('created_at', $dtFormatted);
+        } else {
+            if ($mes) $metricsQuery->whereMonth('created_at', $mes);
+            if ($ano) $metricsQuery->whereYear('created_at', $ano);
+        }
+        if ($tipoProtocoloId) {
+            $metricsQuery->where('tipo_protocolo_id', $tipoProtocoloId);
+        }
 
         $metrics = $metricsQuery->select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
@@ -81,16 +99,21 @@ class OficioColetivoController extends Controller
         $totalEnviados = ($metrics['enviado'] ?? 0) + ($metrics['queued'] ?? 0) + ($metrics['pendente'] ?? 0);
         $totalFalhas = $metrics['falha'] ?? 0;
 
+        $tiposProtocolo = TipoProtocolo::where('ativo', true)->orderBy('nome')->get();
+
         return view('protocolos.oficios.index', compact(
             'oficios',
+            'data',
             'mes',
             'ano',
+            'tipoProtocoloId',
             'status',
             'termo',
             'totalGeral',
             'totalSucesso',
             'totalEnviados',
-            'totalFalhas'
+            'totalFalhas',
+            'tiposProtocolo'
         ));
     }
 
@@ -260,7 +283,7 @@ class OficioColetivoController extends Controller
             ->with('success', "Ofício Coletivo disparado com sucesso para {$clientes->count()} destinatários.");
     }
 
-    public function show(Protocolo $protocolo): View
+    public function show(Protocolo $protocolo): View|RedirectResponse
     {
         if ($protocolo->tipo_escopo !== 'coletivo') {
             return redirect()->route('protocolos.show', $protocolo->id);

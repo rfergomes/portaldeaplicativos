@@ -86,6 +86,21 @@
                         </div>
                     </div>
                     <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted mb-1">Data Específica</label>
+                        <input type="date" name="data" class="form-control form-control-sm" value="{{ request('data', $data ?? '') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted mb-1">Tipo de Protocolo</label>
+                        <select name="tipo_protocolo_id" class="form-select form-select-sm">
+                            <option value="">Todos</option>
+                            @foreach($tiposProtocolo as $tipo)
+                                <option value="{{ $tipo->id }}" {{ request('tipo_protocolo_id', $tipoProtocoloId ?? '') == $tipo->id ? 'selected' : '' }}>
+                                    {{ $tipo->nome }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-1">
                         <label class="form-label small fw-bold text-muted mb-1">Mês</label>
                         <select name="mes" class="form-select form-select-sm">
                             <option value="">Todos</option>
@@ -96,7 +111,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <label class="form-label small fw-bold text-muted mb-1">Ano</label>
                         <select name="ano" class="form-select form-select-sm">
                             <option value="">Todos</option>
@@ -108,28 +123,25 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label small fw-bold text-muted mb-1">Status do Envio</label>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold text-muted mb-1">Status</label>
                         <select name="status_envio" class="form-select form-select-sm">
                             <option value="">Todos</option>
-                            <option value="sucesso" {{ request('status_envio') == 'sucesso' ? 'selected' : '' }}>Sucesso
-                            </option>
-                            <option value="enviado" {{ request('status_envio') == 'enviado' ? 'selected' : '' }}>Enviado
-                            </option>
-                            <option value="pendente" {{ request('status_envio') == 'pendente' ? 'selected' : '' }}>Pendente
-                            </option>
+                            <option value="sucesso" {{ request('status_envio') == 'sucesso' ? 'selected' : '' }}>Sucesso</option>
+                            <option value="enviado" {{ request('status_envio') == 'enviado' ? 'selected' : '' }}>Enviado</option>
+                            <option value="pendente" {{ request('status_envio') == 'pendente' ? 'selected' : '' }}>Pendente</option>
                             <option value="falha" {{ request('status_envio') == 'falha' ? 'selected' : '' }}>Falha</option>
                         </select>
                     </div>
-                    <div class="col-md-2 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary btn-sm flex-grow-1 shadow-sm">
+                    <div class="col-md-2 d-flex gap-1">
+                        <button type="submit" class="btn btn-primary btn-sm flex-grow-1 shadow-sm" title="Filtrar">
                             <i class="fa-solid fa-filter me-1"></i> Filtrar
                         </button>
                         <a href="{{ route('protocolos.index') }}" class="btn btn-light border btn-sm shadow-sm"
                             title="Limpar Filtros">
                             <i class="fa-solid fa-eraser text-muted"></i>
                         </a>
-                        <a href="{{ route('protocolos.pdf.falhas', request()->all()) }}" target="_blank" class="btn btn-danger btn-sm shadow-sm" title="Relatório de Falhas PDF">
+                        <a href="{{ route('protocolos.pdf.falhas', array_merge(request()->all(), ['tipo_escopo' => 'individual'])) }}" target="_blank" class="btn btn-danger btn-sm shadow-sm" title="Exportar Relatório PDF Analítico">
                             <i class="fa-solid fa-file-pdf"></i>
                         </a>
                     </div>

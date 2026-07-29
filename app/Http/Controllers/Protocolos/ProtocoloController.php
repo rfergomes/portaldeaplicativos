@@ -23,12 +23,30 @@ class ProtocoloController extends Controller
 
     public function index(Request $request): View
     {
+        $data = $request->input('data', '');
         $mes = $request->input('mes', \Carbon\Carbon::now()->month);
         $ano = $request->input('ano', \Carbon\Carbon::now()->year);
+        $tipoProtocoloId = $request->input('tipo_protocolo_id', '');
         $status = $request->input('status_envio', '');
         $termo = $request->input('termo', '');
 
         $query = Protocolo::with(['empresa', 'tipo', 'destinatarios', 'usuario']);
+
+        if ($data) {
+            $dtFormatted = \Carbon\Carbon::parse(str_replace('/', '-', $data))->format('Y-m-d');
+            $query->whereDate('created_at', $dtFormatted);
+        } else {
+            if ($mes) {
+                $query->whereMonth('created_at', $mes);
+            }
+            if ($ano) {
+                $query->whereYear('created_at', $ano);
+            }
+        }
+
+        if ($tipoProtocoloId) {
+            $query->where('tipo_protocolo_id', $tipoProtocoloId);
+        }
 
         if ($termo) {
             $query->where(function ($q) use ($termo) {
@@ -51,26 +69,24 @@ class ProtocoloController extends Controller
             });
         }
 
-        if ($mes) {
-            $query->whereMonth('created_at', $mes);
-        }
-
-        if ($ano) {
-            $query->whereYear('created_at', $ano);
-        }
-
         if ($status) {
             $query->where('status', $status);
         }
 
         $protocolos = $query->orderByDesc('created_at')->paginate(20)->appends($request->all());
 
-        // Calcular Métricas para os Cards (respeitando filtros de mês/ano, mas não de status)
+        // Calcular Métricas para os Cards
         $metricsQuery = Protocolo::query();
-        if ($mes)
-            $metricsQuery->whereMonth('created_at', $mes);
-        if ($ano)
-            $metricsQuery->whereYear('created_at', $ano);
+        if ($data) {
+            $dtFormatted = \Carbon\Carbon::parse(str_replace('/', '-', $data))->format('Y-m-d');
+            $metricsQuery->whereDate('created_at', $dtFormatted);
+        } else {
+            if ($mes) $metricsQuery->whereMonth('created_at', $mes);
+            if ($ano) $metricsQuery->whereYear('created_at', $ano);
+        }
+        if ($tipoProtocoloId) {
+            $metricsQuery->where('tipo_protocolo_id', $tipoProtocoloId);
+        }
         if ($termo) {
             $metricsQuery->where(function ($q) use ($termo) {
                 $q->where('referencia_documento', 'like', "%{$termo}%")
@@ -85,7 +101,6 @@ class ProtocoloController extends Controller
 
         $totalGeral = array_sum($metrics);
 
-        // Somatório inteligente para o card de Sucesso (engloba status novos e legados)
         $totalSucesso = ($metrics['sucesso'] ?? 0)
             + ($metrics['lido'] ?? 0)
             + ($metrics['entregue'] ?? 0)
@@ -94,16 +109,21 @@ class ProtocoloController extends Controller
         $totalEnviados = ($metrics['enviado'] ?? 0) + ($metrics['queued'] ?? 0) + ($metrics['pendente'] ?? 0);
         $totalFalhas = $metrics['falha'] ?? 0;
 
+        $tiposProtocolo = TipoProtocolo::where('ativo', true)->orderBy('nome')->get();
+
         return view('protocolos.index', compact(
             'protocolos',
+            'data',
             'mes',
             'ano',
+            'tipoProtocoloId',
             'status',
             'termo',
             'totalGeral',
             'totalSucesso',
             'totalEnviados',
-            'totalFalhas'
+            'totalFalhas',
+            'tiposProtocolo'
         ));
     }
 
@@ -362,17 +382,57 @@ class ProtocoloController extends Controller
 
     public function relatorioFalhas(Request $request)
     {
-        $mes = $request->input('mes', \Carbon\Carbon::now()->month);
-        $ano = $request->input('ano', \Carbon\Carbon::now()->year);
-        $termo = $request->input('termo', '');
-        $statusEnvio = $request->input('status_envio', '');
+        $data = $request->input('data');
+        $dataInicio = $request->input('data_inicio');
+        $dataFim = $request->input('data_fim');
+        $mes = $request->input('mes');
+        $ano = $request->input('ano');
+        $tipoProtocoloId = $request->input('tipo_protocolo_id');
+        $tipoEscopo = $request->input('tipo_escopo');
+        $statusEnvio = $request->input('status_envio');
+        $termo = $request->input('termo');
 
         $query = \App\Models\ProtocoloEnvio::with([
             'protocolo.empresa',
+            'protocolo.tipo',
+            'protocolo.usuario',
             'destinatario.empresa'
         ]);
 
-        if ($statusEnvio) {
+        if ($data) {
+            $dtFormatted = \Carbon\Carbon::parse(str_replace('/', '-', $data))->format('Y-m-d');
+            $query->whereDate('created_at', $dtFormatted);
+        } elseif ($dataInicio || $dataFim) {
+            if ($dataInicio) {
+                $dtIni = \Carbon\Carbon::parse(str_replace('/', '-', $dataInicio))->format('Y-m-d');
+                $query->whereDate('created_at', '>=', $dtIni);
+            }
+            if ($dataFim) {
+                $dtFim = \Carbon\Carbon::parse(str_replace('/', '-', $dataFim))->format('Y-m-d');
+                $query->whereDate('created_at', '<=', $dtFim);
+            }
+        } else {
+            if ($mes) {
+                $query->whereMonth('created_at', $mes);
+            }
+            if ($ano) {
+                $query->whereYear('created_at', $ano);
+            }
+        }
+
+        if ($tipoEscopo && $tipoEscopo !== 'todos') {
+            $query->whereHas('protocolo', function ($qEsc) use ($tipoEscopo) {
+                $qEsc->where('tipo_escopo', $tipoEscopo);
+            });
+        }
+
+        if ($tipoProtocoloId) {
+            $query->whereHas('protocolo', function ($qTipo) use ($tipoProtocoloId) {
+                $qTipo->where('tipo_protocolo_id', $tipoProtocoloId);
+            });
+        }
+
+        if ($statusEnvio && $statusEnvio !== 'todos') {
             if ($statusEnvio === 'sucesso') {
                 $query->whereIn('status', ['lido', 'entregue', 'sucesso']);
             } else {
@@ -387,36 +447,55 @@ class ProtocoloController extends Controller
                         ->orWhere('assunto', 'like', "%{$termo}%")
                         ->orWhereHas('empresa', function ($qEmp) use ($termo) {
                             $qEmp->where('razao_social', 'like', "%{$termo}%")
-                                ->orWhere('nome_fantasia', 'like', "%{$termo}%");
+                                ->orWhere('nome_fantasia', 'like', "%{$termo}%")
+                                ->orWhere('cnpj', 'like', "%{$termo}%");
                         });
                 })->orWhereHas('destinatario', function ($qDest) use ($termo) {
                     $qDest->where('email', 'like', "%{$termo}%")
                         ->orWhere('nome', 'like', "%{$termo}%")
                         ->orWhereHas('empresa', function ($qEmp) use ($termo) {
                             $qEmp->where('razao_social', 'like', "%{$termo}%")
-                                ->orWhere('nome_fantasia', 'like', "%{$termo}%");
+                                ->orWhere('nome_fantasia', 'like', "%{$termo}%")
+                                ->orWhere('cnpj', 'like', "%{$termo}%");
                         });
                 });
             });
         }
 
-        if ($mes) {
-            $query->whereMonth('created_at', $mes);
-        }
-
-        if ($ano) {
-            $query->whereYear('created_at', $ano);
-        }
-
         $falhas = $query->orderBy('created_at', 'desc')->get();
+
+        $totalGeral = $falhas->count();
+        $totalSucesso = $falhas->whereIn('status', ['lido', 'entregue', 'sucesso'])->count();
+        $totalEnviados = $falhas->whereIn('status', ['enviado', 'queued', 'pendente'])->count();
+        $totalFalhas = $falhas->where('status', 'falha')->count();
+
+        $tipoProtocoloNome = null;
+        if ($tipoProtocoloId) {
+            $tipoObj = \App\Models\TipoProtocolo::find($tipoProtocoloId);
+            $tipoProtocoloNome = $tipoObj?->nome;
+        }
 
         ini_set('memory_limit', '512M');
         set_time_limit(120);
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('protocolos.pdf.falhas', compact('falhas', 'mes', 'ano', 'termo', 'statusEnvio'))
-            ->setPaper('a4', 'landscape');
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('protocolos.pdf.falhas', compact(
+            'falhas',
+            'mes',
+            'ano',
+            'data',
+            'dataInicio',
+            'dataFim',
+            'termo',
+            'statusEnvio',
+            'tipoEscopo',
+            'tipoProtocoloNome',
+            'totalGeral',
+            'totalSucesso',
+            'totalEnviados',
+            'totalFalhas'
+        ))->setPaper('a4', 'landscape');
 
-        return $pdf->stream('relatorio_protocolos.pdf');
+        return $pdf->stream('relatorio_analitico_protocolos.pdf');
     }
 
     public function baixarAnexo(Protocolo $protocolo, \App\Models\ProtocoloAnexo $anexo)

@@ -74,13 +74,26 @@
     <!-- Filtros -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body py-3">
-            <form method="GET" action="{{ route('protocolos.oficios.index') }}" class="row g-3 align-items-center">
-                <div class="col-md-4">
-                    <input type="text" name="termo" class="form-control" placeholder="Buscar por referência, assunto ou destinatário..." value="{{ $termo }}">
+            <form method="GET" action="{{ route('protocolos.oficios.index') }}" class="row g-2 align-items-center">
+                <div class="col-md-3">
+                    <input type="text" name="termo" class="form-control form-control-sm" placeholder="Buscar por referência, assunto ou destinatário..." value="{{ $termo }}">
                 </div>
                 <div class="col-md-2">
-                    <select name="mes" class="form-select">
-                        <option value="">Todos os Meses</option>
+                    <input type="date" name="data" class="form-control form-control-sm" title="Data Específica" value="{{ request('data', $data ?? '') }}">
+                </div>
+                <div class="col-md-2">
+                    <select name="tipo_protocolo_id" class="form-select form-select-sm">
+                        <option value="">Todos os Tipos</option>
+                        @foreach($tiposProtocolo as $tipo)
+                            <option value="{{ $tipo->id }}" {{ request('tipo_protocolo_id', $tipoProtocoloId ?? '') == $tipo->id ? 'selected' : '' }}>
+                                {{ $tipo->nome }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <select name="mes" class="form-select form-select-sm">
+                        <option value="">Mês</option>
                         @for($m = 1; $m <= 12; $m++)
                             <option value="{{ $m }}" {{ $mes == $m ? 'selected' : '' }}>
                                 {{ \Carbon\Carbon::create()->month($m)->locale('pt_BR')->translatedFormat('F') }}
@@ -88,25 +101,28 @@
                         @endfor
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <select name="ano" class="form-select">
+                <div class="col-md-1">
+                    <select name="ano" class="form-select form-select-sm">
                         @for($a = date('Y'); $a >= 2024; $a--)
                             <option value="{{ $a }}" {{ $ano == $a ? 'selected' : '' }}>{{ $a }}</option>
                         @endfor
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <select name="status_envio" class="form-select">
-                        <option value="">Todos os Status</option>
+                <div class="col-md-1">
+                    <select name="status_envio" class="form-select form-select-sm">
+                        <option value="">Status</option>
                         <option value="sucesso" {{ $status == 'sucesso' ? 'selected' : '' }}>Sucesso</option>
                         <option value="enviado" {{ $status == 'enviado' ? 'selected' : '' }}>Enviado</option>
                         <option value="pendente" {{ $status == 'pendente' ? 'selected' : '' }}>Pendente</option>
                         <option value="falha" {{ $status == 'falha' ? 'selected' : '' }}>Falha</option>
                     </select>
                 </div>
-                <div class="col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-magnifying-glass me-1"></i> Filtrar</button>
-                    <a href="{{ route('protocolos.oficios.index') }}" class="btn btn-outline-secondary" title="Limpar"><i class="fa-solid fa-xmark"></i></a>
+                <div class="col-md-2 d-flex gap-1">
+                    <button type="submit" class="btn btn-primary btn-sm flex-grow-1" title="Filtrar"><i class="fa-solid fa-magnifying-glass me-1"></i> Filtrar</button>
+                    <a href="{{ route('protocolos.oficios.index') }}" class="btn btn-outline-secondary btn-sm" title="Limpar"><i class="fa-solid fa-xmark"></i></a>
+                    <a href="{{ route('protocolos.pdf.falhas', array_merge(request()->all(), ['tipo_escopo' => 'coletivo'])) }}" target="_blank" class="btn btn-danger btn-sm" title="Exportar Relatório PDF Analítico">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </a>
                 </div>
             </form>
         </div>
