@@ -558,19 +558,31 @@
                         @endif
 
                         @if(auth()->user()->temPermissao('protocolos.visualizar'))
-                            <li class="nav-item">
-                                <a href="{{ route('protocolos.index') }}"
-                                    class="nav-link {{ (request()->routeIs('protocolos.*') && !request()->routeIs('protocolos.oficios.*') && !request()->routeIs('protocolos.tipos.*')) ? 'active' : '' }}">
+                            @php $isProtocolosActive = request()->routeIs('protocolos.*'); @endphp
+                            <li class="nav-item {{ $isProtocolosActive ? 'menu-open' : '' }}">
+                                <a href="#" class="nav-link {{ $isProtocolosActive ? 'active' : '' }}">
                                     <i class="nav-icon fa-solid fa-file-signature"></i>
-                                    <p>Protocolos</p>
+                                    <p>
+                                        Protocolos
+                                        <i class="nav-arrow fa-solid fa-chevron-right"></i>
+                                    </p>
                                 </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('protocolos.oficios.index') }}"
-                                    class="nav-link {{ request()->routeIs('protocolos.oficios.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fa-solid fa-mail-bulk"></i>
-                                    <p>Envio Coletivo (Ofícios)</p>
-                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ route('protocolos.index') }}"
+                                            class="nav-link {{ (request()->routeIs('protocolos.*') && !request()->routeIs('protocolos.oficios.*') && !request()->routeIs('protocolos.tipos.*')) ? 'active' : '' }}">
+                                            <i class="nav-icon fa-solid fa-file-invoice"></i>
+                                            <p>Protocolos (Individuais)</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('protocolos.oficios.index') }}"
+                                            class="nav-link {{ request()->routeIs('protocolos.oficios.*') ? 'active' : '' }}">
+                                            <i class="nav-icon fa-solid fa-mail-bulk"></i>
+                                            <p>Envio Coletivo (Ofícios)</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         @endif
 

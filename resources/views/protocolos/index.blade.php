@@ -63,7 +63,10 @@
         <div class="card card-outline card-primary shadow-sm">
             <div class="card-header border-0 py-3 d-flex align-items-center flex-wrap">
                 <h3 class="card-title fw-bold m-0">Gestão de Protocolos</h3>
-                <div class="card-tools ms-auto">
+                <div class="card-tools ms-auto d-flex gap-2">
+                    <a href="{{ route('protocolos.oficios.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm">
+                        <i class="fa-solid fa-mail-bulk me-1"></i> Envio Coletivo (Ofícios)
+                    </a>
                     <a href="{{ route('protocolos.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
                         <i class="fa-solid fa-plus me-1"></i> Novo Protocolo
                     </a>
