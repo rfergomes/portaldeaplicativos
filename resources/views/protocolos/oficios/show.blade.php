@@ -50,7 +50,7 @@
                     <p class="mb-2"><strong>Criado por:</strong><br>{{ $protocolo->usuario->name ?? 'Sistema' }}</p>
                     <p class="mb-3">
                         <strong>Status Geral:</strong><br>
-                        @match($protocolo->status)
+                        @switch($protocolo->status)
                             @case('sucesso')
                                 <span class="badge bg-success fs-6">Sucesso</span>
                                 @break
@@ -62,7 +62,7 @@
                                 @break
                             @default
                                 <span class="badge bg-warning text-dark fs-6">{{ ucfirst($protocolo->status) }}</span>
-                        @endmatch
+                        @endswitch
                     </p>
 
                     @if($protocolo->anexos && $protocolo->anexos->isNotEmpty())
@@ -120,7 +120,7 @@
                                         </td>
                                         <td>
                                             @if($envio)
-                                                @match($envio->status)
+                                                @switch($envio->status)
                                                     @case('lido')
                                                         <span class="badge bg-success"><i class="fa-solid fa-eye me-1"></i> Lido</span>
                                                         @break
@@ -135,7 +135,7 @@
                                                         @break
                                                     @default
                                                         <span class="badge bg-secondary">{{ ucfirst($envio->status) }}</span>
-                                                @endmatch
+                                                @endswitch
                                                 <br><small class="text-muted">ID: {{ substr($envio->id_email_externo, 0, 18) }}...</small>
                                             @else
                                                 <span class="badge bg-secondary">Pendente</span>

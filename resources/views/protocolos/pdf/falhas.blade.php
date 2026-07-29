@@ -97,7 +97,7 @@
                             <span class="small-text">{{ $dest ? $dest->email : '—' }}</span>
                         </td>
                         <td class="text-center">
-                            @match($envio->status)
+                            @switch($envio->status)
                                 @case('lido')
                                 @case('entregue')
                                 @case('sucesso')
@@ -111,7 +111,7 @@
                                     @break
                                 @default
                                     <span class="badge badge-pendente">{{ strtoupper($envio->status) }}</span>
-                            @endmatch
+                            @endswitch
                         </td>
                     </tr>
                 @endforeach

@@ -144,7 +144,7 @@
                                 </td>
                                 <td>{{ $oficio->created_at->format('d/m/Y H:i') }}</td>
                                 <td>
-                                    @match($oficio->status)
+                                    @switch($oficio->status)
                                         @case('sucesso')
                                             <span class="badge bg-success">Sucesso</span>
                                             @break
@@ -156,7 +156,7 @@
                                             @break
                                         @default
                                             <span class="badge bg-warning text-dark">{{ ucfirst($oficio->status) }}</span>
-                                    @endmatch
+                                    @endswitch
                                 </td>
                                 <td class="text-end">
                                     <a href="{{ route('protocolos.oficios.show', $oficio->id) }}" class="btn btn-sm btn-outline-primary me-1" title="Ver Detalhes e Timeline">
