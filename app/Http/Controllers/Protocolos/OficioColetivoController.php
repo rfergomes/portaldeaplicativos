@@ -164,7 +164,12 @@ class OficioColetivoController extends Controller
                 $q->where('razao_social', 'like', "%{$termo}%")
                     ->orWhere('nome_fantasia', 'like', "%{$termo}%")
                     ->orWhere('nome_curto', 'like', "%{$termo}%")
-                    ->orWhere('cnpj', 'like', "%{$termo}%");
+                    ->orWhere('cnpj', 'like', "%{$termo}%")
+                    ->orWhere('email', 'like', "%{$termo}%")
+                    ->orWhereHas('clientes', function ($qClient) use ($termo) {
+                        $qClient->where('email', 'like', "%{$termo}%")
+                            ->orWhere('nome', 'like', "%{$termo}%");
+                    });
             });
         }
 

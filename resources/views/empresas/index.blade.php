@@ -50,7 +50,7 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-sm">
                             <input type="text" name="search" class="form-control rounded-start-pill px-3"
-                                placeholder="Buscar por razão, cnpj, erp..." value="{{ $search }}">
+                                placeholder="Buscar por razão, cnpj, erp, e-mail..." value="{{ $search }}">
                             <button type="submit" class="btn btn-primary rounded-end-pill px-3">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </button>

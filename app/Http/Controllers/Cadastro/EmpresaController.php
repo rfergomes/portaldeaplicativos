@@ -20,10 +20,17 @@ class EmpresaController extends Controller
                 return $query->where('ativo', true);
             })
             ->when($search, function ($query, $search) {
-                return $query->where('razao_social', 'like', "%{$search}%")
-                    ->orWhere('nome_fantasia', 'like', "%{$search}%")
-                    ->orWhere('cnpj', 'like', "%{$search}%")
-                    ->orWhere('empresa_erp', 'like', "%{$search}%");
+                return $query->where(function ($q) use ($search) {
+                    $q->where('razao_social', 'like', "%{$search}%")
+                        ->orWhere('nome_fantasia', 'like', "%{$search}%")
+                        ->orWhere('cnpj', 'like', "%{$search}%")
+                        ->orWhere('empresa_erp', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhereHas('clientes', function ($qClient) use ($search) {
+                            $qClient->where('email', 'like', "%{$search}%")
+                                ->orWhere('nome', 'like', "%{$search}%");
+                        });
+                });
             })
             ->when($regiao_id, function ($query, $regiao_id) {
                 return $query->where('regiao_id', $regiao_id);
