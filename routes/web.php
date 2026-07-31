@@ -109,6 +109,7 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::delete('/lotes/{lote}', [BatchController::class, 'destroy'])->name('lotes.destroy');
 
     // Cadastro de Empresas e Contatos (Clientes)
+    Route::post('/empresas/import', [EmpresaController::class, 'import'])->name('empresas.import')->middleware('can:empresas.editar');
     Route::resource('empresas', EmpresaController::class)->middleware('can:empresas.visualizar');
     Route::resource('clientes', ClienteController::class)->middleware('can:clientes.visualizar');
     Route::resource('tipos_clientes', TipoClienteController::class)->except(['create', 'show', 'edit'])->middleware('can:tipos_clientes.visualizar');

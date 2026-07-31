@@ -23,6 +23,40 @@
 
 @section('content')
     <div class="container-fluid">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4" role="alert">
+                <i class="fa-solid fa-circle-check me-2"></i>{{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>{{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @can('empresas.editar')
+            <div class="card card-outline card-primary shadow-sm mb-4 border-0">
+                <div class="card-header border-0 pb-0">
+                    <h3 class="card-title fw-bold text-primary"><i class="fas fa-file-import me-2"></i>Importar Planilha</h3>
+                </div>
+                <form id="importForm" action="{{ route('empresas.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="card-body">
+                        <div class="bg-light p-3 rounded border border-primary-subtle">
+                            <small class="text-muted d-block mb-3">O sistema sincroniza automaticamente registros de empresas baseados em CNPJ (Upsert).</small>
+                            <div class="input-group">
+                                <input type="file" name="file" id="file" class="form-control" accept=".xls,.xlsx,.csv" required>
+                                <button type="submit" id="btnImportar" class="btn btn-primary px-4 fw-bold"><i class="fas fa-upload me-2"></i>Importar</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        @endcan
+
         <div class="card card-outline card-primary shadow-sm mb-4">
             <div class="card-header border-0 py-3 d-flex align-items-center flex-wrap">
                 <h3 class="card-title fw-bold mb-0">Cadastro de Empresas</h3>

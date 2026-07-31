@@ -129,4 +129,24 @@ class EmpresaController extends Controller
         $empresa->delete();
         return redirect()->route('empresas.index')->with('success', 'Empresa excluída com sucesso!');
     }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xls,xlsx,csv|max:10240',
+        ], [
+            'file.required' => 'Por favor, selecione um arquivo para importar.',
+            'file.file'     => 'O envio deve ser um arquivo válido.',
+            'file.mimes'    => 'Formato de arquivo inválido. Suportados: .xls, .xlsx, .csv.',
+            'file.max'      => 'O arquivo não pode ser maior que 10MB.',
+        ]);
+
+        try {
+            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\EmpresasImport, $request->file('file'));
+            return redirect()->back()->with('success', 'Importação concluída! Os registros de empresas foram sincronizados com sucesso (Upsert).');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erro na importação: ' . $e->getMessage());
+        }
+    }
 }
+
