@@ -158,8 +158,21 @@ class EmpresasImport implements ToCollection, WithHeadingRow
         $duplicates = $query->get();
 
         foreach ($duplicates as $duplicate) {
-            // Mover clientes/contatos vinculados para o registro principal
+            // Re-vincular clientes/contatos da empresa duplicada para a empresa principal
             Cliente::where('empresa_id', $duplicate->id)->update(['empresa_id' => $mainEmpresa->id]);
+
+            // Re-vincular sócios folha
+            \App\Models\SocioFolha::where('empresa_id', $duplicate->id)->update(['empresa_id' => $mainEmpresa->id]);
+
+            // Re-vincular protocolos e destinatários de protocolos
+            \App\Models\Protocolo::where('empresa_id', $duplicate->id)->update(['empresa_id' => $mainEmpresa->id]);
+            \App\Models\ProtocoloDestinatario::where('empresa_id', $duplicate->id)->update(['empresa_id' => $mainEmpresa->id]);
+
+            // Re-vincular agenda de hóspedes e ativos de usuários
+            \App\Models\AgendaHospede::where('empresa_id', $duplicate->id)->update(['empresa_id' => $mainEmpresa->id]);
+            \App\Models\AtivoUsuario::where('empresa_id', $duplicate->id)->update(['empresa_id' => $mainEmpresa->id]);
+
+            // Excluir registro duplicado após re-vincular todas as tabelas filhas
             $duplicate->delete();
         }
     }
