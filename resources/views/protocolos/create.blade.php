@@ -258,7 +258,7 @@
                 });
 
                 // Auto-fill assunto e mensagem baseado no tipo
-                $('#inputTipo').on('change', function () {
+                $('#inputTipo').on('change select2:select select2:clear', function () {
                     let tipoId = $(this).val();
                     if (tipoId && tiposProtocolo[tipoId]) {
                         let tipo = tiposProtocolo[tipoId];
@@ -377,12 +377,12 @@
                                     <div class="row g-2 align-items-end">
                                         <div class="col-md-4">
                                             <label class="form-label small fw-bold text-muted">NOME</label>
-                                            <input type="text" name="destinatarios[${i}][nome]" value="${nome}"
+                                            <input type="text" name="destinatarios[${i}][nome]" value="${nome || ''}"
                                                 class="form-control form-control-sm" placeholder="NOME COMPLETO" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label small fw-bold text-muted">E-MAIL</label>
-                                            <input type="email" name="destinatarios[${i}][email]" value="${email}"
+                                            <input type="email" name="destinatarios[${i}][email]" value="${email || ''}"
                                                 class="form-control form-control-sm" placeholder="email@empresa.com" required>
                                         </div>
                                         <div class="col-md-3">
@@ -431,7 +431,7 @@
                 togglePuxarBtn();
 
                 // Listen for change
-                empresaSelect.on('change', togglePuxarBtn);
+                empresaSelect.on('change select2:select select2:clear', togglePuxarBtn);
 
                 btnPuxar.on('click', function () {
                     const empresaId = empresaSelect.val();
