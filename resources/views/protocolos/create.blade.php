@@ -4,6 +4,13 @@
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bs-stepper/dist/css/bs-stepper.min.css">
+    <style>
+        .bs-stepper .content.active,
+        .bs-stepper .content.dstepper-block {
+            display: block !important;
+            opacity: 1 !important;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -254,7 +261,7 @@
             document.addEventListener('DOMContentLoaded', function () {
                 stepper = new Stepper(document.querySelector('.bs-stepper'), {
                     linear: false,
-                    animation: true
+                    animation: false
                 });
 
                 // Auto-fill assunto e mensagem baseado no tipo
