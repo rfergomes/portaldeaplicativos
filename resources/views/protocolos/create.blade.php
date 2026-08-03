@@ -476,6 +476,7 @@
                         .always(function () {
                             btnPuxar.html('<i class="fa-solid fa-cloud-arrow-down"></i>').removeAttr('disabled');
                         });
+                });
             });
         </script>
     @endpush
