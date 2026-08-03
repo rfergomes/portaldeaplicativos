@@ -18,7 +18,7 @@
                         <div class="bs-stepper" id="stepperProtocolo">
                             <div class="bs-stepper-header" role="tablist">
                                 <!-- Step 1 -->
-                                <div class="step" data-target="#step-identificacao">
+                                <div class="step active" data-target="#step-identificacao">
                                     <button type="button" class="step-trigger" role="tab" aria-controls="step-identificacao"
                                         id="step-identificacao-trigger">
                                         <span class="bs-stepper-circle bg-primary"><i class="fa-solid fa-tag"></i></span>
@@ -61,7 +61,7 @@
                                     @endif
 
                                     <!-- Passo 1: Identificação -->
-                                    <div id="step-identificacao" class="content" role="tabpanel"
+                                    <div id="step-identificacao" class="content active dstepper-block" role="tabpanel"
                                         aria-labelledby="step-identificacao-trigger">
                                         <div class="row align-items-center mb-4">
                                             <div class="col-md-6 mb-3">
@@ -476,14 +476,6 @@
                         .always(function () {
                             btnPuxar.html('<i class="fa-solid fa-cloud-arrow-down"></i>').removeAttr('disabled');
                         });
-                $('#inputTipo').on('change', function () {
-                    const opt = $(this).find('option:selected');
-                    const assunto = opt.data('assunto');
-                    const mensagem = opt.data('mensagem');
-
-                    if (assunto) $('input[name="assunto"]').val(assunto);
-                    if (mensagem) $('textarea[name="corpo"]').val(mensagem);
-                });
             });
         </script>
     @endpush
