@@ -117,6 +117,10 @@ class Protocolo extends Model
      */
     public function temEnviosComFalha(): bool
     {
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('protocolo_envios', 'bloqueado_reenvio')) {
+            return false;
+        }
+
         return $this->envios()->where('status', 'falha')->where('bloqueado_reenvio', false)->exists();
     }
 
@@ -125,8 +129,13 @@ class Protocolo extends Model
      */
     public function enviosComFalha()
     {
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('protocolo_envios', 'bloqueado_reenvio')) {
+            return $this->envios()->where('status', 'falha');
+        }
+
         return $this->envios()->where('status', 'falha')->where('bloqueado_reenvio', false);
     }
 }
+
 
 

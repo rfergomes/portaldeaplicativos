@@ -163,4 +163,17 @@ class ProtocoloReenvioTest extends TestCase
             'nome' => 'Maria Silva',
         ]);
     }
+
+    public function test_tolerancia_defensiva_para_schema(): void
+    {
+        $user = User::factory()->create();
+        $tipo = TipoProtocolo::create(['nome' => 'Tipo Teste', 'slug' => 'tipo-teste', 'ativo' => true]);
+        $protocolo = Protocolo::create(['tipo_protocolo_id' => $tipo->id, 'user_id' => $user->id, 'assunto' => 'A', 'corpo' => 'C', 'canal' => 'email', 'tipo_escopo' => 'individual', 'status' => 'sucesso']);
+
+        $response = $this->actingAs($user)->get("/protocolos/{$protocolo->id}");
+
+        $response->assertStatus(200);
+        $this->assertFalse($protocolo->temEnviosComFalha());
+    }
 }
+
