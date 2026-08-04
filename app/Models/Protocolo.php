@@ -111,5 +111,22 @@ class Protocolo extends Model
             $this->update(['status' => $bestStatus]);
         }
     }
+
+    /**
+     * Verifica se o protocolo possui algum envio com tag/status de falha apto para reenvio.
+     */
+    public function temEnviosComFalha(): bool
+    {
+        return $this->envios()->where('status', 'falha')->where('bloqueado_reenvio', false)->exists();
+    }
+
+    /**
+     * Retorna os envios com falha que podem ser reenviados.
+     */
+    public function enviosComFalha()
+    {
+        return $this->envios()->where('status', 'falha')->where('bloqueado_reenvio', false);
+    }
 }
+
 

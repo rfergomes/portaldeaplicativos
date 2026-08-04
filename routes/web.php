@@ -139,6 +139,10 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
 
     // Protocolos e AR-Online
     Route::get('/protocolos/pdf/falhas', [ProtocoloController::class, 'relatorioFalhas'])->name('protocolos.pdf.falhas')->middleware('can:protocolos.visualizar');
+    Route::post('/protocolos/{protocolo}/envios/{envio}/reenviar', [ProtocoloController::class, 'reenviarEnvio'])->name('protocolos.envios.reenviar')->middleware('can:protocolos.criar');
+    Route::post('/protocolos/{protocolo}/reenviar-falhas', [ProtocoloController::class, 'reenviarFalhas'])->name('protocolos.reenviarFalhas')->middleware('can:protocolos.criar');
+    Route::put('/protocolos/{protocolo}/destinatarios/{destinatario}', [ProtocoloController::class, 'updateDestinatario'])->name('protocolos.destinatarios.update')->middleware('can:protocolos.criar');
+    Route::get('/protocolos/{protocolo}/envios/{envio}/historico', [ProtocoloController::class, 'historicoEnvio'])->name('protocolos.envios.historico')->middleware('can:protocolos.visualizar');
     Route::patch('/protocolos/{protocolo}/finalizar', [ProtocoloController::class, 'finalizar'])->name('protocolos.finalizar')->middleware('can:protocolos.finalizar');
     Route::get('/protocolos/{protocolo}/comprovante/{envio}', [ProtocoloController::class, 'baixarComprovante'])->name('protocolos.comprovante')->middleware('can:protocolos.visualizar');
     Route::get('/protocolos/{protocolo}/laudo/{envio}', [ProtocoloController::class, 'baixarLaudoPericial'])->name('protocolos.laudo')->middleware('can:protocolos.visualizar');

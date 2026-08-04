@@ -13,6 +13,14 @@
                             <i class="fa-solid fa-file-contract me-2"></i>Protocolo #{{ $protocolo->id }}
                         </h6>
                         <div class="card-tools ms-auto d-flex gap-2">
+                            @if($protocolo->temEnviosComFalha())
+                                <form action="{{ route('protocolos.reenviarFalhas', $protocolo) }}" method="POST" class="m-0 p-0">
+                                    @csrf
+                                    <button type="submit" class="btn btn-danger btn-sm shadow-sm" style="height: 32px; padding: 0 10px;" title="Reenviar todas as falhas">
+                                        <i class="fa-solid fa-paper-plane me-1"></i> Reenviar Falhas
+                                    </button>
+                                </form>
+                            @endif
                             <form action="{{ route('protocolos.syncStatus', $protocolo) }}" method="GET" class="m-0 p-0"
                                 id="formSync">
                                 <button type="submit" class="btn btn-outline-primary btn-sm shadow-sm"
@@ -252,34 +260,178 @@
                                                                                         target="_blank"
                                                                                         class="btn btn-light btn-sm border rounded-pill px-2 shadow-sm"
                                                                                         title="Baixar Laudo Pericial PDF">
-                                                                                        <i class="fa-solid fa-scale-balanced text-warning me-1"></i>
-                                                                                        <span class="small">Laudo Pericial</span>
-                                                                                    </a>
-                                                                                @endif
-                                                                            </div>
-                                                                        @endif
+                                            <div class="position-relative mb-3" style="padding-left: 1.5rem;">
+                                                <!-- Bolinha na linha do tempo -->
+                                                <div class="position-absolute start-0 translate-middle-x" style="width:14px;height:14px;border-radius:50%;top:4px;left:-1px; background:{{ match ($envio->status) {
+                                                        'enviado' => '#0d6efd',
+                                                        'entregue' => '#0dcaf0',
+                                                        'lido' => '#198754',
+                                                        'falha' => '#dc3545',
+                                                        default => '#6c757d'
+                                                    } }}; border: 2px solid white; box-shadow:0 0 0 2px {{ match ($envio->status) {
+                                                        'enviado' => '#0d6efd',
+                                                        'entregue' => '#0dcaf0',
+                                                        'lido' => '#198754',
+                                                        'falha' => '#dc3545',
+                                                        default => '#6c757d'
+                                                    } }};">
+                                                </div>
 
-                                                                        @if($envio->status === 'falha' && $envio->ultima_resposta)
-                                                                            <div class="mt-1">
-                                                                                @php
-                                                                                    $respArr = json_decode($envio->ultima_resposta, true);
-                                                                                    $msgFalha = $respArr['message'] ?? $respArr['error'] ?? $envio->ultima_resposta;
-                                                                                    // Fallback pra string limpa sem json visível
-                                                                                    if (is_array($msgFalha))
-                                                                                        $msgFalha = json_encode($msgFalha);
-                                                                                @endphp
-                                                                                <small class="text-danger">
-                                                                                    <i class="fa-solid fa-circle-exclamation me-1"></i>
-                                                                                    {{ Str::limit($msgFalha, 120) }}
-                                                                                </small>
-                                                                            </div>
-                                                                        @endif
-                                                                    </div>
-                                                                </div>
+                                                <!-- Conteúdo do evento -->
+                                                <div class="card border-0 shadow-sm position-relative">
+                                                    <div class="card-body py-2 px-3">
+                                                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-1">
+                                                            <div>
+                                                                <span class="badge text-bg-{{ $envio->statusCor() }} shadow-sm me-2"
+                                                                    style="font-size: 0.70rem; vertical-align: middle;">
+                                                                    {{ $envio->statusLabel() }}
+                                                                </span>
+                                                                <span class="small text-muted" style="vertical-align: middle;">
+                                                                    <i
+                                                                        class="fa-solid fa-{{ $envio->canal === 'email' ? 'envelope' : 'whatsapp' }} me-1"></i>
+                                                                    {{ strtoupper($envio->canal) }}
+                                                                </span>
                                                             </div>
+                                                            <small class="text-muted mr-5 pe-5">
+                                                                {{ $envio->enviado_em?->format('d/m/Y H:i') ?? $envio->created_at?->format('d/m/Y H:i') }}
+                                                            </small>
+                                                        </div>
+
+                                                        @if($envio->id_email_externo)
+                                                            <div class="mt-1">
+                                                                <small class="text-muted font-monospace">
+                                                                    ID: {{ $envio->id_email_externo }}
+                                                                </small>
+                                                            </div>
+                                                        @endif
+
+                                                        <!-- Datas de progresso -->
+                                                        <div class="d-flex gap-3 mt-2 flex-wrap">
+                                                            @if($envio->enviado_em)
+                                                                <small class="text-muted">
+                                                                    <i class="fa-solid fa-paper-plane text-primary me-1"></i>
+                                                                    Enviado: {{ $envio->enviado_em->format('d/m H:i') }}
+                                                                </small>
+                                                            @endif
+                                                            @if($envio->entregue_em)
+                                                                <small class="text-muted">
+                                                                    <i class="fa-solid fa-inbox text-info me-1"></i>
+                                                                    Entregue: {{ $envio->entregue_em->format('d/m H:i') }}
+                                                                </small>
+                                                            @endif
+                                                            @if($envio->lido_em)
+                                                                <small class="text-muted">
+                                                                    <i class="fa-solid fa-eye text-success me-1"></i>
+                                                                    Lido: {{ $envio->lido_em->format('d/m H:i') }}
+                                                                </small>
+                                                            @endif
+                                                        </div>
+
+                                                        <!-- Botões AR-Online -->
+                                                        @if($envio->id_email_externo && !in_array($envio->status, ['falha', 'queued']))
+                                                            <div class="d-flex gap-2 mt-2">
+                                                                <a href="{{ route('protocolos.comprovante', [$protocolo, $envio]) }}"
+                                                                    target="_blank"
+                                                                    class="btn btn-light btn-sm border rounded-pill px-2 shadow-sm"
+                                                                    title="Baixar Comprovante PDF">
+                                                                    <i class="fa-solid fa-file-pdf text-danger me-1"></i>
+                                                                    <span class="small">Comprovante</span>
+                                                                </a>
+                                                                <a href="https://portal.ar-online.com.br/emails/info/public/{{ $envio->id_email_externo }}"
+                                                                    target="_blank"
+                                                                    class="btn btn-light btn-sm border rounded-pill px-2 shadow-sm"
+                                                                    title="Visualizar Comprovante Público">
+                                                                    <i class="fa-solid fa-arrow-up-right-from-square text-primary me-1"></i>
+                                                                    <span class="small">Abrir no AR-Online</span>
+                                                                </a>
+                                                                @if($envio->status === 'lido' || $envio->status === 'entregue')
+                                                                    <a href="{{ route('protocolos.laudo', [$protocolo, $envio]) }}"
+                                                                        target="_blank"
+                                                                        class="btn btn-light btn-sm border rounded-pill px-2 shadow-sm"
+                                                                        title="Baixar Laudo Pericial PDF">
+                                                                        <i class="fa-solid fa-scale-balanced text-warning me-1"></i>
+                                                                        <span class="small">Laudo Pericial</span>
+                                                                    </a>
+                                                                @endif
+                                                            </div>
+                                                        @endif
+
+                                                        @if($envio->status === 'falha')
+                                                            <div class="mt-2 d-flex gap-2 align-items-center flex-wrap">
+                                                                @if($envio->podeSerReenviado())
+                                                                    <form action="{{ route('protocolos.envios.reenviar', [$protocolo, $envio]) }}" method="POST" class="m-0 p-0">
+                                                                        @csrf
+                                                                        <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm">
+                                                                            <i class="fa-solid fa-rotate-right me-1"></i> Reenviar
+                                                                        </button>
+                                                                    </form>
+                                                                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-2" data-bs-toggle="modal" data-bs-target="#modalEditarDestinatario{{ $destinatario->id }}">
+                                                                        <i class="fa-solid fa-pen me-1"></i> Editar E-mail
+                                                                    </button>
+                                                                @else
+                                                                    <span class="badge text-bg-danger rounded-pill px-2 py-1">
+                                                                        <i class="fa-solid fa-ban me-1"></i> Reenvio Bloqueado
+                                                                    </span>
+                                                                @endif
+                                                                @if($envio->tentativas > 1)
+                                                                    <span class="badge text-bg-secondary rounded-pill px-2 py-1">
+                                                                        {{ $envio->tentativas }}ª Tentativa
+                                                                    </span>
+                                                                @endif
+                                                            </div>
+                                                        @endif
+
+                                                        @if($envio->status === 'falha' && $envio->ultima_resposta)
+                                                            <div class="mt-2">
+                                                                @php
+                                                                    $respArr = json_decode($envio->ultima_resposta, true);
+                                                                    $msgFalha = $respArr['message'] ?? $respArr['error'] ?? $envio->ultima_resposta;
+                                                                    if (is_array($msgFalha))
+                                                                        $msgFalha = json_encode($msgFalha);
+                                                                @endphp
+                                                                <small class="text-danger d-block">
+                                                                    <i class="fa-solid fa-circle-exclamation me-1"></i>
+                                                                    {{ Str::limit($msgFalha, 120) }}
+                                                                </small>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
                                         @endforeach
                                     </div>
                                 @endif
+                            </div>
+
+                            <!-- Modal Editar Destinatario -->
+                            <div class="modal fade" id="modalEditarDestinatario{{ $destinatario->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form action="{{ route('protocolos.destinatarios.update', [$protocolo, $destinatario]) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="modal-header">
+                                                <h5 class="modal-title"><i class="fa-solid fa-user-pen me-2"></i>Editar E-mail do Destinatário</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Nome</label>
+                                                    <input type="text" name="nome" class="form-control" value="{{ $destinatario->nome }}">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Endereço de E-mail</label>
+                                                    <input type="email" name="email" class="form-control" value="{{ $destinatario->email }}" required>
+                                                    <small class="text-muted">Corrija o e-mail caso a falha tenha sido provocada por endereço incorreto.</small>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
 
                             @if(!$loop->last)

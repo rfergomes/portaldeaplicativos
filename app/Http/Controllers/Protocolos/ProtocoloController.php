@@ -513,4 +513,105 @@ class ProtocoloController extends Controller
 
         return response()->download($fullPath, $anexo->nome_original);
     }
+
+    /**
+     * Reenvia um disparo individual com falha.
+     */
+    public function reenviarEnvio(Request $request, Protocolo $protocolo, ProtocoloEnvio $envio)
+    {
+        if ($envio->protocolo_id !== $protocolo->id) {
+            return back()->with('error', 'Envio não pertence a este protocolo.');
+        }
+
+        if (!$envio->podeSerReenviado()) {
+            return back()->with('error', 'Este envio não está apto para reenvio ou já foi entregue.');
+        }
+
+        $sucesso = $this->dispatcher->reenviarEnvio($envio);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => $sucesso,
+                'message' => $sucesso ? 'Reenvio realizado com sucesso.' : 'Falha ao processar o reenvio: ' . $envio->ultima_resposta,
+                'status' => $envio->fresh()->status,
+                'tentativas' => $envio->fresh()->tentativas,
+            ]);
+        }
+
+        if ($sucesso) {
+            return back()->with('success', 'Reenvio realizado com sucesso!');
+        }
+
+        return back()->with('error', 'Falha ao re-enviar: ' . $envio->ultima_resposta);
+    }
+
+    /**
+     * Reenvia todos os disparos em falha de um protocolo.
+     */
+    public function reenviarFalhas(Request $request, Protocolo $protocolo)
+    {
+        if (!$protocolo->temEnviosComFalha()) {
+            return back()->with('error', 'Não há mensagens com falha aptas para reenvio neste protocolo.');
+        }
+
+        $totalReenviados = $this->dispatcher->reenviarFalhasDoProtocolo($protocolo);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Reenvio processado. Total de sucessos: {$totalReenviados}",
+                'total' => $totalReenviados,
+            ]);
+        }
+
+        return back()->with('success', "Processado o reenvio das falhas! ({$totalReenviados} re-enviados com sucesso)");
+    }
+
+    /**
+     * Atualiza os dados (ex: e-mail) de um destinatário antes do reenvio.
+     */
+    public function updateDestinatario(Request $request, Protocolo $protocolo, ProtocoloDestinatario $destinatario)
+    {
+        if ($destinatario->protocolo_id !== $protocolo->id) {
+            return back()->with('error', 'Destinatário não pertence a este protocolo.');
+        }
+
+        $validated = $request->validate([
+            'email' => 'required|email|max:255',
+            'nome' => 'nullable|string|max:255',
+        ]);
+
+        $destinatario->update($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Dados do destinatário atualizados com sucesso.',
+                'destinatario' => $destinatario,
+            ]);
+        }
+
+        return back()->with('success', 'Dados do destinatário atualizados com sucesso!');
+    }
+
+    /**
+     * Retorna o histórico de tentativas de envio de um disparo.
+     */
+    public function historicoEnvio(Protocolo $protocolo, ProtocoloEnvio $envio)
+    {
+        if ($envio->protocolo_id !== $protocolo->id) {
+            return response()->json(['error' => 'Envio inválido'], 403);
+        }
+
+        $historico = $envio->tentativasHistorico()->with('usuario:id,name')->get();
+
+        return response()->json([
+            'success' => true,
+            'envio_id' => $envio->id,
+            'tentativas_count' => $envio->tentativas,
+            'status_atual' => $envio->statusLabel(),
+            'historico' => $historico,
+        ]);
+    }
 }
+

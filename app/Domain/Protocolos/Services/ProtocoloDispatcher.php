@@ -154,6 +154,152 @@ class ProtocoloDispatcher
     }
 
     /**
+     * Executa o reenvio individual de um envio especifico com falha.
+     */
+    public function reenviarEnvio(ProtocoloEnvio $envio): bool
+    {
+        if (!$envio->podeSerReenviado()) {
+            return false;
+        }
+
+        $protocolo = $envio->protocolo;
+        $destinatario = $envio->destinatario;
+
+        if (!$protocolo || !$destinatario) {
+            return false;
+        }
+
+        $token = $this->resolveToken($protocolo);
+        $this->httpClient->setToken($token);
+
+        $envio->increment('tentativas');
+        $numeroTentativa = $envio->tentativas;
+
+        // Verificação de Bounce Prévia
+        $cliente = $destinatario->cliente_id
+            ? \App\Models\Cliente::find($destinatario->cliente_id)
+            : \App\Models\Cliente::where('email', $destinatario->email)->first();
+
+        if ($cliente && $cliente->temBounce()) {
+            $bounceInfo = $cliente->email_bounce_code ? " (Código: {$cliente->email_bounce_code})" : "";
+            $msgErro = "Envio cancelado: E-mail marcado como bounce prévio{$bounceInfo}";
+
+            $envio->update([
+                'status' => 'falha',
+                'bloqueado_reenvio' => true,
+                'ultima_resposta' => $msgErro,
+            ]);
+
+            \App\Models\ProtocoloEnvioTentativa::create([
+                'protocolo_envio_id' => $envio->id,
+                'numero_tentativa' => $numeroTentativa,
+                'status_resultado' => 'bounce_cancelado',
+                'resposta_api' => $msgErro,
+                'executado_por_user_id' => Auth::id(),
+            ]);
+
+            return false;
+        }
+
+        try {
+            $attachmentsPayload = null;
+            if ($protocolo->anexos && $protocolo->anexos->isNotEmpty()) {
+                $attachmentsPayload = [];
+                foreach ($protocolo->anexos as $anexo) {
+                    $content = \Illuminate\Support\Facades\Storage::disk('local')->get($anexo->caminho_armazenado);
+                    if ($content !== null) {
+                        $attachmentsPayload[] = [
+                            'name' => $anexo->nome_original,
+                            'base64' => base64_encode($content)
+                        ];
+                    }
+                }
+            }
+
+            $empresaNome = $destinatario->empresa ? $destinatario->empresa->razao_social : ($protocolo->empresa ? $protocolo->empresa->razao_social : '');
+            $replaceVars = [
+                '{nome_contato}' => $destinatario->nome,
+                '{empresa}' => $empresaNome,
+                '{whatsapp}' => $destinatario->telefone ?? '',
+                '{email}' => $destinatario->email,
+            ];
+
+            $assuntoMsg = strtr($protocolo->assunto, $replaceVars);
+            $corpoMsg = strtr($protocolo->corpo, $replaceVars);
+
+            $payload = new ArOnlineSendPayload(
+                nameTo: $destinatario->nome,
+                subject: $assuntoMsg,
+                contentHtml: $corpoMsg,
+                emailTo: $destinatario->email,
+                attachments: $attachmentsPayload,
+                customId: (string) $protocolo->id,
+            );
+
+            $idEmail = $this->httpClient->send($payload);
+
+            $envio->update([
+                'status' => 'enviado',
+                'id_email_externo' => $idEmail,
+                'enviado_em' => now(),
+                'token_usado' => $token,
+                'ultima_resposta' => 'Reenviado com sucesso.',
+            ]);
+
+            \App\Models\ProtocoloEnvioTentativa::create([
+                'protocolo_envio_id' => $envio->id,
+                'numero_tentativa' => $numeroTentativa,
+                'status_resultado' => 'sucesso',
+                'resposta_api' => "ID E-mail: {$idEmail}",
+                'executado_por_user_id' => Auth::id(),
+            ]);
+
+            $protocolo->atualizarStatusGeral();
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error("ProtocoloDispatcher: falha no reenvio para {$destinatario->email}", [
+                'protocolo_id' => $protocolo->id,
+                'destinatario_id' => $destinatario->id,
+                'envio_id' => $envio->id,
+                'erro' => $e->getMessage(),
+            ]);
+
+            $envio->update([
+                'status' => 'falha',
+                'ultima_resposta' => $e->getMessage(),
+            ]);
+
+            \App\Models\ProtocoloEnvioTentativa::create([
+                'protocolo_envio_id' => $envio->id,
+                'numero_tentativa' => $numeroTentativa,
+                'status_resultado' => 'falha',
+                'resposta_api' => $e->getMessage(),
+                'executado_por_user_id' => Auth::id(),
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Executa o reenvio em lote para todos os envios com falha de um protocolo.
+     */
+    public function reenviarFalhasDoProtocolo(Protocolo $protocolo): int
+    {
+        $enviosComFalha = $protocolo->enviosComFalha()->get();
+        $reenviados = 0;
+
+        foreach ($enviosComFalha as $envio) {
+            if ($this->reenviarEnvio($envio)) {
+                $reenviados++;
+            }
+        }
+
+        return $reenviados;
+    }
+
+    /**
      * Determina o token AR-Online a usar:
      * 1. Token do usuário que criou o protocolo
      * 2. Token do usuário autenticado no momento

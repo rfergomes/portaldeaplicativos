@@ -15,6 +15,8 @@ class ProtocoloEnvio extends Model
         'canal',
         'id_email_externo',
         'status',
+        'tentativas',
+        'bloqueado_reenvio',
         'ultima_resposta',
         'enviado_em',
         'entregue_em',
@@ -27,6 +29,8 @@ class ProtocoloEnvio extends Model
         'enviado_em' => 'datetime',
         'entregue_em' => 'datetime',
         'lido_em' => 'datetime',
+        'bloqueado_reenvio' => 'boolean',
+        'tentativas' => 'integer',
     ];
 
     public function protocolo()
@@ -37,6 +41,19 @@ class ProtocoloEnvio extends Model
     public function destinatario()
     {
         return $this->belongsTo(ProtocoloDestinatario::class, 'destinatario_id');
+    }
+
+    public function tentativasHistorico()
+    {
+        return $this->hasMany(ProtocoloEnvioTentativa::class, 'protocolo_envio_id')->orderBy('numero_tentativa', 'asc');
+    }
+
+    /**
+     * Verifica se o envio está apto para reenvio.
+     */
+    public function podeSerReenviado(): bool
+    {
+        return $this->status === 'falha' && !$this->bloqueado_reenvio;
     }
 
     /**
