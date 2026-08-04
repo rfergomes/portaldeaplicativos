@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Empresa;
 use App\Models\Protocolo;
 use App\Models\ProtocoloDestinatario;
+use App\Models\ProtocoloEnvio;
 use App\Models\TipoProtocolo;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

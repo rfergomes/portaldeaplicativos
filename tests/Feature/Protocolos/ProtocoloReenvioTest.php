@@ -60,7 +60,7 @@ class ProtocoloReenvioTest extends TestCase
         ]);
 
         $this->mock(ArOnlineHttpClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('setToken')->andReturnNull();
+            $mock->shouldReceive('setToken')->andReturnSelf();
             $mock->shouldReceive('send')->once()->andReturn('MSG_EXT_999');
         });
 
@@ -107,7 +107,7 @@ class ProtocoloReenvioTest extends TestCase
         $envio2 = ProtocoloEnvio::create(['protocolo_id' => $protocolo->id, 'destinatario_id' => $dest2->id, 'canal' => 'email', 'status' => 'falha', 'tentativas' => 1]);
 
         $this->mock(ArOnlineHttpClient::class, function (MockInterface $mock) {
-            $mock->shouldReceive('setToken')->andReturnNull();
+            $mock->shouldReceive('setToken')->andReturnSelf();
             $mock->shouldReceive('send')->twice()->andReturn('MSG_EXT_OK');
         });
 
