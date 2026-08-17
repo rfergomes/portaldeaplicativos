@@ -4,20 +4,23 @@
     <meta charset="utf-8">
     <title>Termo de Cessão de Uso - {{ $cessao->codigo_cessao }}</title>
     <style>
-        body { font-family: sans-serif; font-size: 13px; line-height: 1.6; color: #333; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .logo { max-width: 150px; margin-bottom: 10px; }
-        .title { font-size: 18px; font-weight: bold; text-transform: uppercase; margin: 20px 0; }
-        .section { margin-bottom: 25px; text-align: justify; }
-        .section-title { font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
+        @page { margin: 15mm 18mm; }
+        body { font-family: sans-serif; font-size: 11.5px; line-height: 1.4; color: #333; }
+        p { margin: 0 0 6px 0; }
+        .header { text-align: center; margin-bottom: 15px; }
+        .logo { margin-bottom: 5px; }
+        .logo img { max-width: 130px; }
+        .title { font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 10px 0; }
+        .section { margin-bottom: 12px; text-align: justify; }
+        .section-title { font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
         .data-row { margin-bottom: 5px; }
         .label { font-weight: bold; }
-        .item-list { margin-top: 15px; }
-        .item { margin-bottom: 10px; padding-left: 20px; position: relative; }
+        .item-list { margin-top: 8px; }
+        .item { margin-bottom: 5px; padding-left: 15px; position: relative; }
         .item:before { content: "-"; position: absolute; left: 0; }
-        .footer { margin-top: 50px; }
-        .signature-table { width: 100%; margin-top: 60px; }
-        .signature-table td { width: 45%; text-align: center; border-top: 1px solid #000; padding-top: 10px; }
+        .footer { margin-top: 30px; }
+        .signature-table { width: 100%; margin-top: 35px; page-break-inside: avoid; }
+        .signature-table td { width: 45%; text-align: center; border-top: 1px solid #000; padding-top: 8px; }
         .signature-table .spacer { width: 10%; border-top: 0; }
         .page-break { page-break-after: always; }
     </style>
