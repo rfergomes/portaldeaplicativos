@@ -577,9 +577,36 @@
                 }
 
                 function editInvite(invite) {
-                    document.getElementById('editInviteResponsavel').value = invite.nome_responsavel;
-                    document.getElementById('editInvitePlaca').value = invite.placa;
-                    document.getElementById('editInviteEmpresa').value = invite.empresa;
+                    document.getElementById('editInviteResponsavel').value = invite.nome_responsavel || '';
+                    document.getElementById('editInvitePlaca').value = invite.placa || '';
+                    
+                    const selectEmp = $('#selectEmp_edit');
+                    const inputEmp = document.getElementById('inputEmp_edit');
+                    const switchEmp = document.getElementById('switchEmp_edit');
+                    const empresaVal = invite.empresa || '';
+
+                    let existsInSelect = false;
+                    if (empresaVal) {
+                        selectEmp.find('option').each(function() {
+                            if ($(this).val() === empresaVal) {
+                                existsInSelect = true;
+                                return false;
+                            }
+                        });
+                    }
+
+                    if (existsInSelect || !empresaVal) {
+                        switchEmp.checked = false;
+                        toggleEmpresa('edit');
+                        selectEmp.val(empresaVal).trigger('change');
+                        inputEmp.value = '';
+                    } else {
+                        switchEmp.checked = true;
+                        toggleEmpresa('edit');
+                        inputEmp.value = empresaVal;
+                        selectEmp.val('').trigger('change');
+                    }
+
                     document.getElementById('editInviteTipo').value = invite.tipo;
                     document.getElementById('editInviteLote').value = invite.lote_id || '';
                     document.getElementById('formEditarConvite').action = `/convites/${invite.id}`;
@@ -663,7 +690,10 @@
                     }).then(() => {
                         document.getElementById('guestName').value = '';
                         document.getElementById('guestDocument').value = '';
-                        document.getElementById('guestCompany').value = '';
+                        $('#selectEmp_add').val('').trigger('change');
+                        document.getElementById('inputEmp_add').value = '';
+                        document.getElementById('switchEmp_add').checked = false;
+                        toggleEmpresa('add');
                         loadGuests(currentInviteId);
                     });
                 }
