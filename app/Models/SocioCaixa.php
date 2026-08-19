@@ -19,6 +19,7 @@ class SocioCaixa extends Model
         'cpf',
         'telefone',
         'valor',
+        'data_vencimento',
         'pago',
         'data_pagamento',
         'user_id',
@@ -31,12 +32,26 @@ class SocioCaixa extends Model
 
     protected $casts = [
         'pago' => 'boolean',
+        'data_vencimento' => 'date',
         'data_pagamento' => 'datetime',
         'postergado_ate' => 'datetime',
         'inativado_abaco' => 'boolean',
         'inativado_abaco_em' => 'datetime',
         'valor' => 'decimal:2',
     ];
+
+    public function isVencido(): bool
+    {
+        return !$this->pago && $this->data_vencimento && $this->data_vencimento->isPast();
+    }
+
+    public function diasAtraso(): int
+    {
+        if (!$this->isVencido()) {
+            return 0;
+        }
+        return (int) $this->data_vencimento->diffInDays(now()->startOfDay());
+    }
 
     public function scopeAtivos($query)
     {

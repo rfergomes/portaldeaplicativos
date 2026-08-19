@@ -48,6 +48,17 @@
                             <span class="text-muted"><i class="fas fa-calendar-alt me-2"></i>Lançamentos:</span>
                             <span class="badge bg-light text-dark border">{{ $lancamentos->count() }} meses</span>
                         </div>
+                        @php
+                            $vencMaisAntigo = $lancamentos->where('pago', false)->whereNotNull('data_vencimento')->sortBy('data_vencimento')->first();
+                        @endphp
+                        @if($vencMaisAntigo)
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom align-items-center">
+                            <span class="text-muted"><i class="fas fa-clock me-2"></i>Venc. Mais Antigo:</span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger fw-bold">
+                                {{ $vencMaisAntigo->data_vencimento->format('d/m/Y') }} ({{ str_pad($vencMaisAntigo->mes, 2, '0', STR_PAD_LEFT) }}/{{ $vencMaisAntigo->ano }})
+                            </span>
+                        </div>
+                        @endif
                         <div class="d-flex justify-content-between align-items-center mt-3 p-3 bg-light rounded border border-danger-subtle">
                             <span class="text-muted fw-bold">TOTAL EM ABERTO:</span>
                             <span class="text-danger fw-bold fs-4">R$ {{ number_format($lancamentos->where('pago', false)->sum('valor'), 2, ',', '.') }}</span>
@@ -126,8 +137,10 @@
                             <thead>
                                 <tr class="table-light">
                                     <th class="ps-3 border-0">Ref (Mês/Ano)</th>
+                                    <th class="border-0">Vencimento</th>
                                     <th class="border-0">Valor</th>
                                     <th class="text-center border-0">Pago?</th>
+                                    <th class="border-0">Pagamento / Autenticação</th>
                                     <th class="border-0">Última Baixa</th>
                                     <th class="text-end pe-3 border-0">Auditoria</th>
                                 </tr>
@@ -136,6 +149,22 @@
                                 @foreach($lancamentos as $item)
                                 <tr>
                                     <td class="ps-3 fw-bold">{{ str_pad($item->mes, 2, '0', STR_PAD_LEFT) }}/{{ $item->ano }}</td>
+                                    <td>
+                                        @if($item->data_vencimento)
+                                            <div style="line-height: 1.2;">
+                                                <span class="fw-semibold {{ $item->isVencido() ? 'text-danger' : 'text-dark' }}">
+                                                    {{ $item->data_vencimento->format('d/m/Y') }}
+                                                </span>
+                                                @if($item->isVencido())
+                                                    <small class="badge bg-danger-subtle text-danger border border-danger d-block mt-1" style="font-size: 0.65rem;">
+                                                        Vencido ({{ $item->diasAtraso() }}d)
+                                                    </small>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <span class="text-muted small">-</span>
+                                        @endif
+                                    </td>
                                     <td><span class="text-secondary fw-semibold">R$ {{ number_format($item->valor, 2, ',', '.') }}</span></td>
                                     <td class="text-center">
                                         <div class="form-check form-switch d-inline-block">
@@ -147,6 +176,21 @@
                                                    {{ $item->pago ? 'checked' : '' }}
                                                    {{ !auth()->user()->temPermissao('socio_caixa.gerenciar') ? 'disabled' : '' }}>
                                         </div>
+                                    </td>
+                                    <td>
+                                        @if($item->pago)
+                                            @if($item->data_pagamento)
+                                                <span class="badge bg-success-subtle text-success border border-success">
+                                                    <i class="fas fa-check-circle me-1"></i>{{ $item->data_pagamento->format('d/m/Y') }}
+                                                </span>
+                                            @else
+                                                <span class="badge bg-success-subtle text-success border border-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Pago
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="badge bg-danger-subtle text-danger border border-danger">Em Aberto</span>
+                                        @endif
                                     </td>
                                     <td>
                                         @if($item->usuarioBaixa)
@@ -170,7 +214,7 @@
                                     </td>
                                 </tr>
                                 <tr class="collapse" id="hist-{{ $item->id }}">
-                                    <td colspan="5" class="bg-gray-100 p-0">
+                                    <td colspan="7" class="bg-gray-100 p-0">
                                         <div class="p-3 border-start border-primary border-4 ms-3 my-2 shadow-sm rounded bg-white">
                                             <h6 class="fw-bold small mb-2 text-primary text-uppercase"><i class="fas fa-fingerprint me-2"></i>Trilha de Auditoria</h6>
                                             @forelse($item->historico as $log)

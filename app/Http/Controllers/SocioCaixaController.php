@@ -347,7 +347,11 @@ class SocioCaixaController extends Controller
         }
 
         $competencias = $abertos->map(function($item) {
-            return str_pad($item->mes, 2, '0', STR_PAD_LEFT) . '/' . $item->ano;
+            $comp = str_pad($item->mes, 2, '0', STR_PAD_LEFT) . '/' . $item->ano;
+            if ($item->data_vencimento) {
+                $comp .= ' (Venc: ' . $item->data_vencimento->format('d/m/Y') . ')';
+            }
+            return $comp;
         })->implode(', ');
 
         $userName = auth()->user()->nickname ?: auth()->user()->name;
