@@ -73,10 +73,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer bg-transparent border-0 pt-0">
+                    <div class="card-footer bg-transparent border-0 pt-0 d-flex flex-wrap gap-3">
                         <div class="form-check form-switch d-inline-block">
                             <input class="form-check-input" type="checkbox" name="ver_postergados" id="verPostergados" value="1" {{ request('ver_postergados') ? 'checked' : '' }} onchange="this.form.submit()">
                             <label class="form-check-label small fw-bold text-muted" for="verPostergados">Exibir somente postergados (Snooze)</label>
+                        </div>
+                        <div class="form-check form-switch d-inline-block">
+                            <input class="form-check-input" type="checkbox" name="ver_inativados" id="verInativados" value="1" {{ request('ver_inativados') ? 'checked' : '' }} onchange="this.form.submit()">
+                            <label class="form-check-label small fw-bold text-danger" for="verInativados">
+                                <i class="fas fa-user-slash me-1"></i>Exibir Inativados no Ábaco
+                            </label>
                         </div>
                     </div>
                 </form>
@@ -122,6 +128,9 @@
                             <td class="ps-3"><span class="badge bg-secondary-subtle text-secondary border border-secondary">{{ $socio->matricula }}</span></td>
                             <td>
                                 <span class="fw-bold text-dark">{{ $socio->nome }}</span>
+                                @if($socio->inativado_abaco)
+                                    <span class="badge bg-danger-subtle text-danger border border-danger ms-1" style="font-size: 0.7rem;"><i class="fas fa-user-slash me-1"></i>Inativado Ábaco</span>
+                                @endif
                             </td>
                             <td class="text-center"><span class="small text-muted text-uppercase">{{ $socio->tipo_socio }}</span></td>
                             <td class="text-center">
@@ -154,18 +163,35 @@
                                     <a href="{{ route('socios-caixa.show', $socio->id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3" title="Gerenciar Lançamentos">
                                         <i class="fas fa-list-check me-1"></i> Detalhes
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-outline-warning ms-1 rounded-pill btn-postpone" 
-                                            data-id="{{ $socio->id }}" 
-                                            data-nome="{{ $socio->nome }}"
-                                            title="Postergar todos os débitos">
-                                        <i class="fas fa-clock"></i>
-                                    </button>
+                                    @if(auth()->user()->temPermissao('socio_caixa.gerenciar'))
+                                        @if(!$socio->inativado_abaco)
+                                            <button type="button" class="btn btn-sm btn-outline-warning ms-1 rounded-pill btn-postpone" 
+                                                    data-id="{{ $socio->id }}" 
+                                                    data-nome="{{ $socio->nome }}"
+                                                    title="Postergar todos os débitos">
+                                                <i class="fas fa-clock"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger ms-1 rounded-pill btn-inativar-abaco" 
+                                                    data-id="{{ $socio->id }}" 
+                                                    data-nome="{{ $socio->nome }}"
+                                                    title="Marcar como Inativado no ERP Ábaco">
+                                                <i class="fas fa-user-slash"></i>
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn btn-sm btn-outline-success ms-1 rounded-pill btn-reativar-abaco" 
+                                                    data-id="{{ $socio->id }}" 
+                                                    data-nome="{{ $socio->nome }}"
+                                                    title="Reativar Associado">
+                                                <i class="fas fa-user-check me-1"></i> Reativar
+                                            </button>
+                                        @endif
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="text-center py-5">
+                            <td colspan="9" class="text-center py-5">
                                 <div class="text-muted opacity-50">
                                     <i class="fas fa-search fa-3x mb-3"></i>
                                     <p class="mb-0 fs-5">Nenhum registro encontrado.</p>
@@ -205,6 +231,59 @@
             <div class="modal-footer border-0 p-4 pt-0">
                 <button type="button" class="btn btn-light rounded-pill px-4" onclick="fecharModal()">Cancelar</button>
                 <button type="button" id="btnConfirmar" class="btn btn-primary rounded-pill px-4 fw-bold">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Inativação Ábaco -->
+<div class="modal fade" id="modalInativarAbaco" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h4 class="modal-title fw-bold text-danger"><i class="fas fa-user-slash me-2"></i>Inativar no ERP Ábaco</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="mb-3 text-muted">
+                    Confirma que o associado <strong id="inativarNome"></strong> foi inativado/desligado no <strong>ERP Ábaco</strong>?
+                </p>
+                <div class="alert alert-warning border-0 small py-2">
+                    <i class="fas fa-info-circle me-1"></i> Este associado não será mais exibido na lista ativa de cobranças. Caso ele conste em uma nova importação de planilha do ERP, será reativado automaticamente.
+                </div>
+                <div class="form-group">
+                    <label class="small fw-bold text-secondary text-uppercase mb-2">Motivo / Observações</label>
+                    <textarea id="inativarMotivo" class="form-control" rows="2" placeholder="Opcional..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnConfirmarInativar" class="btn btn-danger rounded-pill px-4 fw-bold">Confirmar Inativação</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Reativação Ábaco -->
+<div class="modal fade" id="modalReativarAbaco" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h4 class="modal-title fw-bold text-success"><i class="fas fa-user-check me-2"></i>Reativar Associado</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="mb-3 text-muted">
+                    Deseja reativar o associado <strong id="reativarNome"></strong>? Ele voltará para a lista regular de cobranças.
+                </p>
+                <div class="form-group">
+                    <label class="small fw-bold text-secondary text-uppercase mb-2">Motivo / Observações</label>
+                    <textarea id="reativarMotivo" class="form-control" rows="2" placeholder="Opcional..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnConfirmarReativar" class="btn btn-success rounded-pill px-4 fw-bold">Reativar Agora</button>
             </div>
         </div>
     </div>
@@ -407,6 +486,96 @@ document.addEventListener('DOMContentLoaded', function() {
             Swal.fire('Erro', 'Não foi possível postergar.', 'error');
             btn.disabled = false;
             btn.innerHTML = 'Postergar Agora';
+        });
+    });
+
+    // Inativação ERP Ábaco
+    const modalInativarObj = new bootstrap.Modal(document.getElementById('modalInativarAbaco'));
+    document.querySelectorAll('.btn-inativar-abaco').forEach(btn => {
+        btn.addEventListener('click', function() {
+            currentId = this.dataset.id;
+            document.getElementById('inativarNome').textContent = this.dataset.nome;
+            document.getElementById('inativarMotivo').value = '';
+            modalInativarObj.show();
+        });
+    });
+
+    document.getElementById('btnConfirmarInativar').addEventListener('click', function() {
+        const motivo = document.getElementById('inativarMotivo').value;
+        const btn = this;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Inativando...';
+
+        axios.patch(`/socio-caixa/${currentId}/inativar-abaco`, {
+            motivo: motivo
+        }, {
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        })
+        .then(response => {
+            if (response.data.success) {
+                modalInativarObj.hide();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Inativado no Ábaco!',
+                    text: 'Associado inativado com sucesso.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        })
+        .catch(error => {
+            const msg = error.response?.data?.message || 'Não foi possível inativar o associado.';
+            Swal.fire('Erro', msg, 'error');
+            btn.disabled = false;
+            btn.innerHTML = 'Confirmar Inativação';
+        });
+    });
+
+    // Reativação de Associado
+    const modalReativarObj = new bootstrap.Modal(document.getElementById('modalReativarAbaco'));
+    document.querySelectorAll('.btn-reativar-abaco').forEach(btn => {
+        btn.addEventListener('click', function() {
+            currentId = this.dataset.id;
+            document.getElementById('reativarNome').textContent = this.dataset.nome;
+            document.getElementById('reativarMotivo').value = '';
+            modalReativarObj.show();
+        });
+    });
+
+    document.getElementById('btnConfirmarReativar').addEventListener('click', function() {
+        const motivo = document.getElementById('reativarMotivo').value;
+        const btn = this;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Reativando...';
+
+        axios.patch(`/socio-caixa/${currentId}/reativar-abaco`, {
+            motivo: motivo
+        }, {
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        })
+        .then(response => {
+            if (response.data.success) {
+                modalReativarObj.hide();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Reativado!',
+                    text: 'Associado reativado com sucesso.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        })
+        .catch(error => {
+            const msg = error.response?.data?.message || 'Não foi possível reativar o associado.';
+            Swal.fire('Erro', msg, 'error');
+            btn.disabled = false;
+            btn.innerHTML = 'Reativar Agora';
         });
     });
 });

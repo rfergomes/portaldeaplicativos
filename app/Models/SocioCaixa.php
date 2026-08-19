@@ -25,14 +25,28 @@ class SocioCaixa extends Model
         'observacao',
         'postergado_ate',
         'motivo_postergacao',
+        'inativado_abaco',
+        'inativado_abaco_em',
     ];
 
     protected $casts = [
         'pago' => 'boolean',
         'data_pagamento' => 'datetime',
         'postergado_ate' => 'datetime',
+        'inativado_abaco' => 'boolean',
+        'inativado_abaco_em' => 'datetime',
         'valor' => 'decimal:2',
     ];
+
+    public function scopeAtivos($query)
+    {
+        return $query->where('inativado_abaco', false);
+    }
+
+    public function scopeInativadosAbaco($query)
+    {
+        return $query->where('inativado_abaco', true);
+    }
 
     public function historico()
     {

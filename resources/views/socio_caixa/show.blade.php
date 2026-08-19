@@ -15,6 +15,11 @@
                         </div>
                         <h4 class="fw-bold mb-0 text-truncate">{{ $socio->nome }}</h4>
                         <span class="badge bg-secondary rounded-pill">MATRÍCULA: {{ $socio->matricula }}</span>
+                        @if($socio->inativado_abaco)
+                            <span class="badge bg-danger rounded-pill mt-1 d-inline-block"><i class="fas fa-user-slash me-1"></i>INATIVADO ERP ÁBACO</span>
+                        @else
+                            <span class="badge bg-success-subtle text-success border border-success rounded-pill mt-1 d-inline-block"><i class="fas fa-check-circle me-1"></i>ATIVO</span>
+                        @endif
                     </div>
                     
                     <div class="mt-4">
@@ -51,9 +56,21 @@
                 </div>
                 <div class="card-footer bg-transparent border-0 pb-4">
                     @if(auth()->user()->temPermissao('socio_caixa.gerenciar'))
-                        <button class="btn btn-success w-100 rounded-pill mb-3 py-2 fw-bold shadow-sm" id="btnWhatsapp">
-                            <i class="fab fa-whatsapp me-2"></i> Avisar Mensalidades
-                        </button>
+                        @if(!$socio->inativado_abaco)
+                            <button class="btn btn-success w-100 rounded-pill mb-2 py-2 fw-bold shadow-sm" id="btnWhatsapp">
+                                <i class="fab fa-whatsapp me-2"></i> Avisar Mensalidades
+                            </button>
+                            <button class="btn btn-outline-danger w-100 rounded-pill mb-3 py-2 fw-bold" id="btnInativarShow" data-bs-toggle="modal" data-bs-target="#modalInativarAbaco">
+                                <i class="fas fa-user-slash me-2"></i> Inativado no Ábaco
+                            </button>
+                        @else
+                            <div class="alert alert-danger py-2 small mb-2 border-0 text-center">
+                                <i class="fas fa-exclamation-circle me-1"></i> Associado inativado no ERP Ábaco.
+                            </div>
+                            <button class="btn btn-success w-100 rounded-pill mb-3 py-2 fw-bold shadow-sm" id="btnReativarShow" data-bs-toggle="modal" data-bs-target="#modalReativarAbaco">
+                                <i class="fas fa-user-check me-2"></i> Reativar Associado
+                            </button>
+                        @endif
                     @endif
                     <a href="{{ session('socio_caixa_url', route('socios-caixa.index')) }}" class="btn btn-outline-secondary w-100 rounded-pill">
                         <i class="fas fa-arrow-left me-2"></i> Voltar à Lista Geral
@@ -223,6 +240,59 @@
             <div class="modal-footer border-0 p-4 pt-0">
                 <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Fechar</button>
                 <button type="button" id="btnSalvarOcorrencia" class="btn btn-info text-white rounded-pill px-4 fw-bold">Salvar Registro</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Inativar Ábaco -->
+<div class="modal fade" id="modalInativarAbaco" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h4 class="modal-title fw-bold text-danger"><i class="fas fa-user-slash me-2"></i>Inativar no ERP Ábaco</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="mb-3 text-muted">
+                    Confirma que o associado <strong>{{ $socio->nome }}</strong> foi inativado no <strong>ERP Ábaco</strong>?
+                </p>
+                <div class="alert alert-warning border-0 small py-2">
+                    <i class="fas fa-info-circle me-1"></i> Este associado não será mais exibido na lista ativa de cobranças. Caso ele conste em uma nova importação de planilha do ERP, será reativado automaticamente.
+                </div>
+                <div class="form-group">
+                    <label class="small fw-bold text-secondary text-uppercase mb-2">Motivo / Observações</label>
+                    <textarea id="inativarMotivoShow" class="form-control" rows="2" placeholder="Opcional..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnConfirmarInativarShow" class="btn btn-danger rounded-pill px-4 fw-bold">Confirmar Inativação</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Reativar Ábaco -->
+<div class="modal fade" id="modalReativarAbaco" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h4 class="modal-title fw-bold text-success"><i class="fas fa-user-check me-2"></i>Reativar Associado</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="mb-3 text-muted">
+                    Deseja reativar o associado <strong>{{ $socio->nome }}</strong>? Ele voltará para a lista regular de cobranças.
+                </p>
+                <div class="form-group">
+                    <label class="small fw-bold text-secondary text-uppercase mb-2">Motivo / Observações</label>
+                    <textarea id="reativarMotivoShow" class="form-control" rows="2" placeholder="Opcional..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnConfirmarReativarShow" class="btn btn-success rounded-pill px-4 fw-bold">Reativar Agora</button>
             </div>
         </div>
     </div>
@@ -462,6 +532,80 @@ document.addEventListener('DOMContentLoaded', function() {
                         btnWhatsapp.innerHTML = '<i class="fab fa-whatsapp me-2"></i> Avisar Mensalidades';
                     });
                 }
+            });
+        });
+    }
+
+    // Inativação Ábaco
+    const btnConfirmarInativarShow = document.getElementById('btnConfirmarInativarShow');
+    if (btnConfirmarInativarShow) {
+        btnConfirmarInativarShow.addEventListener('click', function() {
+            const motivo = document.getElementById('inativarMotivoShow').value;
+            const btn = this;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Inativando...';
+
+            axios.patch('{{ route("socios-caixa.inativar-abaco", $socio->id) }}', {
+                motivo: motivo
+            }, {
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(response => {
+                if (response.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Inativado no Ábaco!',
+                        text: 'Associado inativado com sucesso.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            })
+            .catch(error => {
+                const msg = error.response?.data?.message || 'Não foi possível inativar o associado.';
+                Swal.fire('Erro', msg, 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'Confirmar Inativação';
+            });
+        });
+    }
+
+    // Reativação Ábaco
+    const btnConfirmarReativarShow = document.getElementById('btnConfirmarReativarShow');
+    if (btnConfirmarReativarShow) {
+        btnConfirmarReativarShow.addEventListener('click', function() {
+            const motivo = document.getElementById('reativarMotivoShow').value;
+            const btn = this;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Reativando...';
+
+            axios.patch('{{ route("socios-caixa.reativar-abaco", $socio->id) }}', {
+                motivo: motivo
+            }, {
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(response => {
+                if (response.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Reativado!',
+                        text: 'Associado reativado com sucesso.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            })
+            .catch(error => {
+                const msg = error.response?.data?.message || 'Não foi possível reativar o associado.';
+                Swal.fire('Erro', msg, 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'Reativar Agora';
             });
         });
     }
