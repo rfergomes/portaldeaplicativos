@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('protocolos:update-status')->dailyAt('00:00');
         $schedule->command('agenda:inativar-periodos')->dailyAt('00:01');
         $schedule->command('kwik:alertar-atrasados')->dailyAt('08:00');
+        $schedule->command('socios-caixa:enviar-lembretes-vencimento')->dailyAt('08:30');
         $schedule->command('socios-folha:enviar-lembretes')->dailyAt('09:00');
     }
 
