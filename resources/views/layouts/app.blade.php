@@ -840,7 +840,7 @@
                         <!-- Administração -->
                         @if(auth()->user()->temPermissao('usuarios.visualizar') || auth()->user()->temPermissao('administrar_usuarios'))
                             @php
-                                $isAdminActive = request()->routeIs('users.*') || request()->routeIs('perfis.*') || request()->routeIs('protocolos.tipos.*') || request()->routeIs('token-deptos.*');
+                                $isAdminActive = request()->routeIs('users.*') || request()->routeIs('perfis.*') || request()->routeIs('protocolos.tipos.*') || request()->routeIs('token-deptos.*') || request()->routeIs('admin.relatorios.*');
                             @endphp
                             <li class="nav-item {{ $isAdminActive ? 'menu-open' : '' }}">
                                 <a href="#" class="nav-link {{ $isAdminActive ? 'active' : '' }}">
@@ -882,6 +882,15 @@
                                                 class="nav-link {{ request()->routeIs('token-deptos.*') ? 'active' : '' }}">
                                                 <i class="nav-icon fa-solid fa-key"></i>
                                                 <p>Tokens AR-Online</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('usuarios.visualizar') || auth()->user()->temPermissao('administrar_usuarios'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.relatorios.index') }}"
+                                                class="nav-link {{ request()->routeIs('admin.relatorios.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-chart-line"></i>
+                                                <p>Relatórios</p>
                                             </a>
                                         </li>
                                     @endif

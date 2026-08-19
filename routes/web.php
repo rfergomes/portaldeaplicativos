@@ -32,6 +32,7 @@ use App\Http\Controllers\Protocolos\TipoProtocoloController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PerfilController;
 use App\Http\Controllers\Admin\TokenDeptoController;
+use App\Http\Controllers\Admin\RelatorioController;
 use App\Http\Controllers\Ativos\AtivoMovimentacaoController;
 use App\Http\Controllers\Ativos\AtivoUsuarioController;
 use App\Http\Controllers\Ativos\AtivoDepartamentoController;
@@ -204,6 +205,12 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::resource('token-deptos', TokenDeptoController::class)
         ->except(['create', 'show', 'edit'])
         ->middleware('can:administrar_usuarios');
+
+    // Relatórios Administrativos
+    Route::prefix('admin/relatorios')->name('admin.relatorios.')->middleware('can:usuarios.visualizar')->group(function () {
+        Route::get('/', [RelatorioController::class, 'index'])->name('index');
+        Route::get('/pdf', [RelatorioController::class, 'exportPdf'])->name('pdf');
+    });
 });
 
 Route::middleware('auth')->group(function () {
