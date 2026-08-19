@@ -265,6 +265,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/import', [SocioCaixaController::class, 'import'])->name('import')->middleware('can:socio_caixa.importar');
         Route::patch('/{socio}/toggle-payment', [SocioCaixaController::class, 'togglePayment'])->name('toggle-payment')->middleware('can:socio_caixa.gerenciar');
         Route::patch('/{socio}/postpone', [SocioCaixaController::class, 'postpone'])->name('postpone')->middleware('can:socio_caixa.gerenciar');
+        Route::patch('/{socio}/inativar-abaco', [SocioCaixaController::class, 'inativarAbaco'])->name('inativar-abaco')->middleware('can:socio_caixa.gerenciar');
+        Route::patch('/{socio}/reativar-abaco', [SocioCaixaController::class, 'reativarAbaco'])->name('reativar-abaco')->middleware('can:socio_caixa.gerenciar');
         Route::patch('/{socio}/update-telefone', [SocioCaixaController::class, 'updateTelefone'])->name('update-telefone')->middleware('can:socio_caixa.gerenciar');
         Route::post('/{socio}/enviar-whatsapp', [SocioCaixaController::class, 'enviarWhatsapp'])->name('enviar-whatsapp')->middleware('can:socio_caixa.gerenciar');
         Route::get('/{socio}', [SocioCaixaController::class, 'show'])->name('show')->middleware('can:socio_caixa.visualizar');

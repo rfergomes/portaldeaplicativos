@@ -22,6 +22,13 @@ class SocioCaixaController extends Controller
 
         $query = SocioCaixa::query();
 
+        // Filtro por status de inativação Ábaco
+        if ($request->has('ver_inativados')) {
+            $query->where('inativado_abaco', true);
+        } else {
+            $query->where('inativado_abaco', false);
+        }
+
         // Filtros encadeados (restaurados)
         if ($request->filled('ano')) {
             $query->where('ano', $request->ano);
@@ -41,6 +48,7 @@ class SocioCaixaController extends Controller
             ->selectRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) as total_abertos')
             ->selectRaw('SUM(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN valor ELSE 0 END) as valor_aberto')
             ->selectRaw('COUNT(CASE WHEN (pago = 0 AND postergado_ate > NOW()) THEN 1 END) as total_postergados')
+            ->selectRaw('MAX(inativado_abaco) as inativado_abaco')
             ->selectRaw('MIN(id) as id') 
             ->selectSub(\App\Models\SocioCaixaOcorrencia::whereColumn('matricula', 'socio_caixas.matricula')->where('mensagem', 'LIKE', '[WHATSAPP]%')->selectRaw('COUNT(*)'), 'qtde_contatos')
             ->groupBy('matricula', 'nome', 'tipo_socio');
@@ -48,7 +56,10 @@ class SocioCaixaController extends Controller
         // Filtro de quantidade mínima em aberto
         $minAbertos = $request->input('min_abertos', 2);
         
-        if ($request->has('ver_postergados')) {
+        if ($request->has('ver_inativados')) {
+            // Ao consultar inativados, listamos todos independentemente de filtro de abertos
+            $query->havingRaw('COUNT(id) > 0');
+        } elseif ($request->has('ver_postergados')) {
             $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND postergado_ate > NOW()) THEN 1 END) > 0');
         } else {
             // Se min_abertos não foi informado, mantemos o padrão de mostrar quem tem pelo menos 1 (para ser um "Painel de Pendências")
@@ -142,6 +153,78 @@ class SocioCaixaController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+    }
+
+    public function inativarAbaco(Request $request, SocioCaixa $socio)
+    {
+        $motivo = $request->input('motivo');
+
+        // Atualiza todos os lançamentos desta matrícula para inativado
+        SocioCaixa::where('matricula', $socio->matricula)->update([
+            'inativado_abaco' => true,
+            'inativado_abaco_em' => now(),
+        ]);
+
+        $userName = auth()->user()->nickname ?: auth()->user()->name;
+        $obs = "[INATIVAÇÃO ERP ÁBACO] Associado inativado no ERP Ábaco pelo operador {$userName}.";
+        if (!empty($motivo)) {
+            $obs .= " Motivo: " . $motivo;
+        }
+
+        // Registrar na timeline de ocorrências
+        SocioCaixaOcorrencia::create([
+            'matricula' => $socio->matricula,
+            'user_id' => auth()->id(),
+            'mensagem' => $obs,
+        ]);
+
+        // Registrar no histórico de lançamentos do registro
+        $socio->historico()->create([
+            'user_id' => auth()->id(),
+            'acao' => 'inativar_abaco',
+            'observacao' => $obs,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Associado inativado no Ábaco com sucesso.'
+        ]);
+    }
+
+    public function reativarAbaco(Request $request, SocioCaixa $socio)
+    {
+        $motivo = $request->input('motivo');
+
+        // Reverte status para ativo em todos os lançamentos desta matrícula
+        SocioCaixa::where('matricula', $socio->matricula)->update([
+            'inativado_abaco' => false,
+            'inativado_abaco_em' => null,
+        ]);
+
+        $userName = auth()->user()->nickname ?: auth()->user()->name;
+        $obs = "[REATIVAÇÃO MANUAL] Associado reativado manualmente pelo operador {$userName}.";
+        if (!empty($motivo)) {
+            $obs .= " Motivo: " . $motivo;
+        }
+
+        // Registrar na timeline de ocorrências
+        SocioCaixaOcorrencia::create([
+            'matricula' => $socio->matricula,
+            'user_id' => auth()->id(),
+            'mensagem' => $obs,
+        ]);
+
+        // Registrar no histórico de lançamentos do registro
+        $socio->historico()->create([
+            'user_id' => auth()->id(),
+            'acao' => 'reativar_abaco',
+            'observacao' => $obs,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Associado reativado com sucesso.'
+        ]);
     }
 
     public function import(Request $request)
@@ -241,6 +324,10 @@ class SocioCaixaController extends Controller
 
     public function enviarWhatsapp(Request $request, SocioCaixa $socio)
     {
+        if ($socio->inativado_abaco) {
+            return response()->json(['success' => false, 'message' => 'Este associado está inativado no ERP Ábaco.'], 422);
+        }
+
         if (empty($socio->telefone)) {
             return response()->json(['success' => false, 'message' => 'Telefone não cadastrado.'], 422);
         }
@@ -260,7 +347,11 @@ class SocioCaixaController extends Controller
         }
 
         $competencias = $abertos->map(function($item) {
-            return str_pad($item->mes, 2, '0', STR_PAD_LEFT) . '/' . $item->ano;
+            $comp = str_pad($item->mes, 2, '0', STR_PAD_LEFT) . '/' . $item->ano;
+            if ($item->data_vencimento) {
+                $comp .= ' (Venc: ' . $item->data_vencimento->format('d/m/Y') . ')';
+            }
+            return $comp;
         })->implode(', ');
 
         $userName = auth()->user()->nickname ?: auth()->user()->name;

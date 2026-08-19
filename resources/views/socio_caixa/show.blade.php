@@ -15,6 +15,11 @@
                         </div>
                         <h4 class="fw-bold mb-0 text-truncate">{{ $socio->nome }}</h4>
                         <span class="badge bg-secondary rounded-pill">MATRÍCULA: {{ $socio->matricula }}</span>
+                        @if($socio->inativado_abaco)
+                            <span class="badge bg-danger rounded-pill mt-1 d-inline-block"><i class="fas fa-user-slash me-1"></i>INATIVADO ERP ÁBACO</span>
+                        @else
+                            <span class="badge bg-success-subtle text-success border border-success rounded-pill mt-1 d-inline-block"><i class="fas fa-check-circle me-1"></i>ATIVO</span>
+                        @endif
                     </div>
                     
                     <div class="mt-4">
@@ -43,6 +48,17 @@
                             <span class="text-muted"><i class="fas fa-calendar-alt me-2"></i>Lançamentos:</span>
                             <span class="badge bg-light text-dark border">{{ $lancamentos->count() }} meses</span>
                         </div>
+                        @php
+                            $vencMaisAntigo = $lancamentos->where('pago', false)->whereNotNull('data_vencimento')->sortBy('data_vencimento')->first();
+                        @endphp
+                        @if($vencMaisAntigo)
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom align-items-center">
+                            <span class="text-muted"><i class="fas fa-clock me-2"></i>Venc. Mais Antigo:</span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger fw-bold">
+                                {{ $vencMaisAntigo->data_vencimento->format('d/m/Y') }} ({{ str_pad($vencMaisAntigo->mes, 2, '0', STR_PAD_LEFT) }}/{{ $vencMaisAntigo->ano }})
+                            </span>
+                        </div>
+                        @endif
                         <div class="d-flex justify-content-between align-items-center mt-3 p-3 bg-light rounded border border-danger-subtle">
                             <span class="text-muted fw-bold">TOTAL EM ABERTO:</span>
                             <span class="text-danger fw-bold fs-4">R$ {{ number_format($lancamentos->where('pago', false)->sum('valor'), 2, ',', '.') }}</span>
@@ -51,9 +67,21 @@
                 </div>
                 <div class="card-footer bg-transparent border-0 pb-4">
                     @if(auth()->user()->temPermissao('socio_caixa.gerenciar'))
-                        <button class="btn btn-success w-100 rounded-pill mb-3 py-2 fw-bold shadow-sm" id="btnWhatsapp">
-                            <i class="fab fa-whatsapp me-2"></i> Avisar Mensalidades
-                        </button>
+                        @if(!$socio->inativado_abaco)
+                            <button class="btn btn-success w-100 rounded-pill mb-2 py-2 fw-bold shadow-sm" id="btnWhatsapp">
+                                <i class="fab fa-whatsapp me-2"></i> Avisar Mensalidades
+                            </button>
+                            <button class="btn btn-outline-danger w-100 rounded-pill mb-3 py-2 fw-bold" id="btnInativarShow" data-bs-toggle="modal" data-bs-target="#modalInativarAbaco">
+                                <i class="fas fa-user-slash me-2"></i> Inativado no Ábaco
+                            </button>
+                        @else
+                            <div class="alert alert-danger py-2 small mb-2 border-0 text-center">
+                                <i class="fas fa-exclamation-circle me-1"></i> Associado inativado no ERP Ábaco.
+                            </div>
+                            <button class="btn btn-success w-100 rounded-pill mb-3 py-2 fw-bold shadow-sm" id="btnReativarShow" data-bs-toggle="modal" data-bs-target="#modalReativarAbaco">
+                                <i class="fas fa-user-check me-2"></i> Reativar Associado
+                            </button>
+                        @endif
                     @endif
                     <a href="{{ session('socio_caixa_url', route('socios-caixa.index')) }}" class="btn btn-outline-secondary w-100 rounded-pill">
                         <i class="fas fa-arrow-left me-2"></i> Voltar à Lista Geral
@@ -109,8 +137,10 @@
                             <thead>
                                 <tr class="table-light">
                                     <th class="ps-3 border-0">Ref (Mês/Ano)</th>
+                                    <th class="border-0">Vencimento</th>
                                     <th class="border-0">Valor</th>
                                     <th class="text-center border-0">Pago?</th>
+                                    <th class="border-0">Pagamento / Autenticação</th>
                                     <th class="border-0">Última Baixa</th>
                                     <th class="text-end pe-3 border-0">Auditoria</th>
                                 </tr>
@@ -119,6 +149,22 @@
                                 @foreach($lancamentos as $item)
                                 <tr>
                                     <td class="ps-3 fw-bold">{{ str_pad($item->mes, 2, '0', STR_PAD_LEFT) }}/{{ $item->ano }}</td>
+                                    <td>
+                                        @if($item->data_vencimento)
+                                            <div style="line-height: 1.2;">
+                                                <span class="fw-semibold {{ $item->isVencido() ? 'text-danger' : 'text-dark' }}">
+                                                    {{ $item->data_vencimento->format('d/m/Y') }}
+                                                </span>
+                                                @if($item->isVencido())
+                                                    <small class="badge bg-danger-subtle text-danger border border-danger d-block mt-1" style="font-size: 0.65rem;">
+                                                        Vencido ({{ $item->diasAtraso() }}d)
+                                                    </small>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <span class="text-muted small">-</span>
+                                        @endif
+                                    </td>
                                     <td><span class="text-secondary fw-semibold">R$ {{ number_format($item->valor, 2, ',', '.') }}</span></td>
                                     <td class="text-center">
                                         <div class="form-check form-switch d-inline-block">
@@ -130,6 +176,21 @@
                                                    {{ $item->pago ? 'checked' : '' }}
                                                    {{ !auth()->user()->temPermissao('socio_caixa.gerenciar') ? 'disabled' : '' }}>
                                         </div>
+                                    </td>
+                                    <td>
+                                        @if($item->pago)
+                                            @if($item->data_pagamento)
+                                                <span class="badge bg-success-subtle text-success border border-success">
+                                                    <i class="fas fa-check-circle me-1"></i>{{ $item->data_pagamento->format('d/m/Y') }}
+                                                </span>
+                                            @else
+                                                <span class="badge bg-success-subtle text-success border border-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Pago
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="badge bg-danger-subtle text-danger border border-danger">Em Aberto</span>
+                                        @endif
                                     </td>
                                     <td>
                                         @if($item->usuarioBaixa)
@@ -153,7 +214,7 @@
                                     </td>
                                 </tr>
                                 <tr class="collapse" id="hist-{{ $item->id }}">
-                                    <td colspan="5" class="bg-gray-100 p-0">
+                                    <td colspan="7" class="bg-gray-100 p-0">
                                         <div class="p-3 border-start border-primary border-4 ms-3 my-2 shadow-sm rounded bg-white">
                                             <h6 class="fw-bold small mb-2 text-primary text-uppercase"><i class="fas fa-fingerprint me-2"></i>Trilha de Auditoria</h6>
                                             @forelse($item->historico as $log)
@@ -223,6 +284,59 @@
             <div class="modal-footer border-0 p-4 pt-0">
                 <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Fechar</button>
                 <button type="button" id="btnSalvarOcorrencia" class="btn btn-info text-white rounded-pill px-4 fw-bold">Salvar Registro</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Inativar Ábaco -->
+<div class="modal fade" id="modalInativarAbaco" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h4 class="modal-title fw-bold text-danger"><i class="fas fa-user-slash me-2"></i>Inativar no ERP Ábaco</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="mb-3 text-muted">
+                    Confirma que o associado <strong>{{ $socio->nome }}</strong> foi inativado no <strong>ERP Ábaco</strong>?
+                </p>
+                <div class="alert alert-warning border-0 small py-2">
+                    <i class="fas fa-info-circle me-1"></i> Este associado não será mais exibido na lista ativa de cobranças. Caso ele conste em uma nova importação de planilha do ERP, será reativado automaticamente.
+                </div>
+                <div class="form-group">
+                    <label class="small fw-bold text-secondary text-uppercase mb-2">Motivo / Observações</label>
+                    <textarea id="inativarMotivoShow" class="form-control" rows="2" placeholder="Opcional..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnConfirmarInativarShow" class="btn btn-danger rounded-pill px-4 fw-bold">Confirmar Inativação</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Reativar Ábaco -->
+<div class="modal fade" id="modalReativarAbaco" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h4 class="modal-title fw-bold text-success"><i class="fas fa-user-check me-2"></i>Reativar Associado</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="mb-3 text-muted">
+                    Deseja reativar o associado <strong>{{ $socio->nome }}</strong>? Ele voltará para a lista regular de cobranças.
+                </p>
+                <div class="form-group">
+                    <label class="small fw-bold text-secondary text-uppercase mb-2">Motivo / Observações</label>
+                    <textarea id="reativarMotivoShow" class="form-control" rows="2" placeholder="Opcional..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnConfirmarReativarShow" class="btn btn-success rounded-pill px-4 fw-bold">Reativar Agora</button>
             </div>
         </div>
     </div>
@@ -462,6 +576,80 @@ document.addEventListener('DOMContentLoaded', function() {
                         btnWhatsapp.innerHTML = '<i class="fab fa-whatsapp me-2"></i> Avisar Mensalidades';
                     });
                 }
+            });
+        });
+    }
+
+    // Inativação Ábaco
+    const btnConfirmarInativarShow = document.getElementById('btnConfirmarInativarShow');
+    if (btnConfirmarInativarShow) {
+        btnConfirmarInativarShow.addEventListener('click', function() {
+            const motivo = document.getElementById('inativarMotivoShow').value;
+            const btn = this;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Inativando...';
+
+            axios.patch('{{ route("socios-caixa.inativar-abaco", $socio->id) }}', {
+                motivo: motivo
+            }, {
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(response => {
+                if (response.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Inativado no Ábaco!',
+                        text: 'Associado inativado com sucesso.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            })
+            .catch(error => {
+                const msg = error.response?.data?.message || 'Não foi possível inativar o associado.';
+                Swal.fire('Erro', msg, 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'Confirmar Inativação';
+            });
+        });
+    }
+
+    // Reativação Ábaco
+    const btnConfirmarReativarShow = document.getElementById('btnConfirmarReativarShow');
+    if (btnConfirmarReativarShow) {
+        btnConfirmarReativarShow.addEventListener('click', function() {
+            const motivo = document.getElementById('reativarMotivoShow').value;
+            const btn = this;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Reativando...';
+
+            axios.patch('{{ route("socios-caixa.reativar-abaco", $socio->id) }}', {
+                motivo: motivo
+            }, {
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(response => {
+                if (response.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Reativado!',
+                        text: 'Associado reativado com sucesso.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            })
+            .catch(error => {
+                const msg = error.response?.data?.message || 'Não foi possível reativar o associado.';
+                Swal.fire('Erro', msg, 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'Reativar Agora';
             });
         });
     }
