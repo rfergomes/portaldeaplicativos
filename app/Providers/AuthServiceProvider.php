@@ -22,6 +22,9 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+            if ($user->temPerfil('Administrador')) {
+                return true;
+            }
             if ($user->temPermissao($ability)) {
                 return true;
             }

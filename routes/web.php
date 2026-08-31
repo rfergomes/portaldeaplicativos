@@ -306,6 +306,12 @@ Route::middleware('auth')->group(function () {
         return 'Seeder executado! O perfil Administrador agora deve ter acesso ao Dashboard Macro. <a href="/dashboard">Voltar ao Dashboard</a>';
     });
 
+    Route::get('/run-convencoes-seeder', function() {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'ConvencaoPermissoesSeeder', '--force' => true]);
+        return 'Permissões de Convenção sincronizadas com sucesso! <a href="/admin/convencoes">Ir para Convenções</a>';
+    });
+
     // Sócio Folha
     Route::prefix('socio-folha')->name('socios-folha.')->group(function () {
         Route::get('/', [SocioFolhaController::class, 'index'])->name('index')->middleware('can:socio_folha.visualizar');
