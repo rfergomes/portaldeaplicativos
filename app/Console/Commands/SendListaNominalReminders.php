@@ -96,8 +96,7 @@ class SendListaNominalReminders extends Command
 
             if ($convencao) {
                 $clausula = $convencao->clausulas->where('dispara_lembrete_lista_nominal', true)->first()
-                    ?? $convencao->clausulas->where('numero', '76')->first()
-                    ?? $convencao->clausulas->first();
+                    ?? $convencao->clausulas->where('numero', '76')->first();
             }
 
             $clientes = $empresa->clientes ?? collect();
@@ -111,6 +110,8 @@ class SendListaNominalReminders extends Command
             $this->info("\nEmpresa: {$empresaName} (CNPJ: {$empresa->cnpj}) - Categoria: {$categoriaEmpresa} - Vencimento: {$vencimentoFormatado}");
             if ($clausula) {
                 $this->info(" - Cláusula Aplicada: Nº {$clausula->numero} ({$clausula->titulo}) da convenção '{$convencao->titulo}'");
+            } else {
+                $this->info(" - Utilizando Cláusula 76 padrão institucional.");
             }
 
             foreach ($clientes as $cliente) {
@@ -120,13 +121,13 @@ class SendListaNominalReminders extends Command
                     continue;
                 }
 
-                // Prevenção de duplicidade: verifica se já enviou para este lançamento e cliente
+                // Prevenção de duplicidade: verifica se já enviou para este lançamento e cliente (em execuções de produção)
                 $jaEnviado = SocioFolhaEmailHistorico::where('socio_folha_id', $lancamento->id)
                     ->where('cliente_id', $cliente->id)
                     ->where('tipo_envio', 'lista_nominal_15_dias')
                     ->exists();
 
-                if ($jaEnviado) {
+                if ($jaEnviado && empty($testEmail)) {
                     $this->comment("  [Ignorado] Já foi enviado anteriormente para: {$cliente->nome} <{$originalEmail}>");
                     $duplicadosCount++;
                     continue;
@@ -136,7 +137,8 @@ class SendListaNominalReminders extends Command
                 $subjectText = "Lembrete: Envio da Relação Nominal de Contribuições - Cláusula {$numClausula}";
                 $historicoId = null;
 
-                if (!$dryRun) {
+                // Não grava auditoria de envio definitivo quando em dry-run ou em modo test-email
+                if (!$dryRun && empty($testEmail)) {
                     $historico = SocioFolhaEmailHistorico::create([
                         'socio_folha_id'     => $lancamento->id,
                         'cliente_id'          => $cliente->id,

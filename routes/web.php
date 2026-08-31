@@ -215,20 +215,22 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     });
 
     // Convenções Coletivas e Cláusulas
-    Route::prefix('admin/convencoes')->name('admin.convencoes.')->middleware('auth')->group(function () {
-        Route::get('/', [ConvencaoColetivaController::class, 'index'])->name('index');
-        Route::get('/create', [ConvencaoColetivaController::class, 'create'])->name('create');
-        Route::post('/', [ConvencaoColetivaController::class, 'store'])->name('store');
-        Route::get('/{convencao}', [ConvencaoColetivaController::class, 'show'])->name('show');
-        Route::get('/{convencao}/edit', [ConvencaoColetivaController::class, 'edit'])->name('edit');
-        Route::put('/{convencao}', [ConvencaoColetivaController::class, 'update'])->name('update');
-        Route::delete('/{convencao}', [ConvencaoColetivaController::class, 'destroy'])->name('destroy');
+    Route::prefix('admin/convencoes')->name('admin.convencoes.')->group(function () {
+        Route::get('/', [ConvencaoColetivaController::class, 'index'])->name('index')->middleware('can:convencoes.visualizar');
+        Route::get('/create', [ConvencaoColetivaController::class, 'create'])->name('create')->middleware('can:convencoes.criar');
+        Route::post('/', [ConvencaoColetivaController::class, 'store'])->name('store')->middleware('can:convencoes.criar');
+        Route::get('/{convencao}', [ConvencaoColetivaController::class, 'show'])->name('show')->middleware('can:convencoes.visualizar');
+        Route::get('/{convencao}/edit', [ConvencaoColetivaController::class, 'edit'])->name('edit')->middleware('can:convencoes.editar');
+        Route::put('/{convencao}', [ConvencaoColetivaController::class, 'update'])->name('update')->middleware('can:convencoes.editar');
+        Route::delete('/{convencao}', [ConvencaoColetivaController::class, 'destroy'])->name('destroy')->middleware('can:convencoes.excluir');
 
-        // Gestão de Cláusulas
-        Route::post('/{convencao}/clausulas', [ConvencaoClausulaController::class, 'store'])->name('clausulas.store');
-        Route::put('/{convencao}/clausulas/{clausula}', [ConvencaoClausulaController::class, 'update'])->name('clausulas.update');
-        Route::delete('/{convencao}/clausulas/{clausula}', [ConvencaoClausulaController::class, 'destroy'])->name('clausulas.destroy');
-        Route::patch('/{convencao}/clausulas/{clausula}/toggle-lembrete', [ConvencaoClausulaController::class, 'toggleLembrete'])->name('clausulas.toggle-lembrete');
+        // Gestão de Cláusulas com Scoped Bindings
+        Route::scopeBindings()->group(function () {
+            Route::post('/{convencao}/clausulas', [ConvencaoClausulaController::class, 'store'])->name('clausulas.store')->middleware('can:convencoes.criar');
+            Route::put('/{convencao}/clausulas/{clausula}', [ConvencaoClausulaController::class, 'update'])->name('clausulas.update')->middleware('can:convencoes.editar');
+            Route::delete('/{convencao}/clausulas/{clausula}', [ConvencaoClausulaController::class, 'destroy'])->name('clausulas.destroy')->middleware('can:convencoes.excluir');
+            Route::patch('/{convencao}/clausulas/{clausula}/toggle-lembrete', [ConvencaoClausulaController::class, 'toggleLembrete'])->name('clausulas.toggle-lembrete')->middleware('can:convencoes.editar');
+        });
     });
 });
 

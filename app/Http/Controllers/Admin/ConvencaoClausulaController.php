@@ -50,6 +50,8 @@ class ConvencaoClausulaController extends Controller
 
     public function update(Request $request, ConvencaoColetiva $convencao, ConvencaoClausula $clausula): RedirectResponse
     {
+        $this->validarPertencimento($convencao, $clausula);
+
         $validated = $request->validate([
             'numero' => 'required|string|max:50',
             'titulo' => 'required|string|max:255',
@@ -84,6 +86,8 @@ class ConvencaoClausulaController extends Controller
 
     public function destroy(ConvencaoColetiva $convencao, ConvencaoClausula $clausula): RedirectResponse
     {
+        $this->validarPertencimento($convencao, $clausula);
+
         $clausula->delete();
 
         return redirect()->route('admin.convencoes.show', $convencao)
@@ -92,6 +96,8 @@ class ConvencaoClausulaController extends Controller
 
     public function toggleLembrete(ConvencaoColetiva $convencao, ConvencaoClausula $clausula): JsonResponse
     {
+        $this->validarPertencimento($convencao, $clausula);
+
         $novoEstado = !$clausula->dispara_lembrete_lista_nominal;
 
         if ($novoEstado) {
@@ -108,5 +114,10 @@ class ConvencaoClausulaController extends Controller
                 ? "Cláusula {$clausula->numero} definida como regra ativa de cobrança de lista nominal."
                 : "Gatilho de cobrança desativado para a Cláusula {$clausula->numero}."
         ]);
+    }
+
+    private function validarPertencimento(ConvencaoColetiva $convencao, ConvencaoClausula $clausula): void
+    {
+        abort_if($clausula->convencao_coletiva_id !== $convencao->id, 404, 'Cláusula não pertence à convenção informada.');
     }
 }
