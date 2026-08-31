@@ -33,6 +33,8 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PerfilController;
 use App\Http\Controllers\Admin\TokenDeptoController;
 use App\Http\Controllers\Admin\RelatorioController;
+use App\Http\Controllers\Admin\ConvencaoColetivaController;
+use App\Http\Controllers\Admin\ConvencaoClausulaController;
 use App\Http\Controllers\Ativos\AtivoMovimentacaoController;
 use App\Http\Controllers\Ativos\AtivoUsuarioController;
 use App\Http\Controllers\Ativos\AtivoDepartamentoController;
@@ -210,6 +212,23 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::prefix('admin/relatorios')->name('admin.relatorios.')->middleware('can:usuarios.visualizar')->group(function () {
         Route::get('/', [RelatorioController::class, 'index'])->name('index');
         Route::get('/pdf', [RelatorioController::class, 'exportPdf'])->name('pdf');
+    });
+
+    // Convenções Coletivas e Cláusulas
+    Route::prefix('admin/convencoes')->name('admin.convencoes.')->middleware('auth')->group(function () {
+        Route::get('/', [ConvencaoColetivaController::class, 'index'])->name('index');
+        Route::get('/create', [ConvencaoColetivaController::class, 'create'])->name('create');
+        Route::post('/', [ConvencaoColetivaController::class, 'store'])->name('store');
+        Route::get('/{convencao}', [ConvencaoColetivaController::class, 'show'])->name('show');
+        Route::get('/{convencao}/edit', [ConvencaoColetivaController::class, 'edit'])->name('edit');
+        Route::put('/{convencao}', [ConvencaoColetivaController::class, 'update'])->name('update');
+        Route::delete('/{convencao}', [ConvencaoColetivaController::class, 'destroy'])->name('destroy');
+
+        // Gestão de Cláusulas
+        Route::post('/{convencao}/clausulas', [ConvencaoClausulaController::class, 'store'])->name('clausulas.store');
+        Route::put('/{convencao}/clausulas/{clausula}', [ConvencaoClausulaController::class, 'update'])->name('clausulas.update');
+        Route::delete('/{convencao}/clausulas/{clausula}', [ConvencaoClausulaController::class, 'destroy'])->name('clausulas.destroy');
+        Route::patch('/{convencao}/clausulas/{clausula}/toggle-lembrete', [ConvencaoClausulaController::class, 'toggleLembrete'])->name('clausulas.toggle-lembrete');
     });
 });
 

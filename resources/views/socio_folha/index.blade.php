@@ -606,11 +606,18 @@
                                         statusBadge = '<span class="badge bg-danger-subtle text-danger border border-danger">Bounce</span>';
                                     }
 
-                                    let tipoEnvioLabel = '';
-                                    if (email.tipo_envio === '10_dias') tipoEnvioLabel = '10 Dias';
-                                    else if (email.tipo_envio === '5_dias') tipoEnvioLabel = '5 Dias';
-                                    else if (email.tipo_envio === '1_dia') tipoEnvioLabel = '1 Dia';
-                                    else tipoEnvioLabel = email.tipo_envio;
+                                    let tipoEnvioHtml = '';
+                                    if (email.tipo_envio === '10_dias') {
+                                        tipoEnvioHtml = '<span class="badge bg-light text-dark border">10 Dias</span>';
+                                    } else if (email.tipo_envio === '5_dias') {
+                                        tipoEnvioHtml = '<span class="badge bg-light text-dark border">5 Dias</span>';
+                                    } else if (email.tipo_envio === '1_dia') {
+                                        tipoEnvioHtml = '<span class="badge bg-light text-dark border">1 Dia</span>';
+                                    } else if (email.tipo_envio === 'lista_nominal_15_dias') {
+                                        tipoEnvioHtml = '<span class="badge bg-primary-subtle text-primary border border-primary fw-bold"><i class="fas fa-file-signature me-1"></i>Lista Nominal (15d)</span>';
+                                    } else {
+                                        tipoEnvioHtml = `<span class="badge bg-light text-dark border">${email.tipo_envio}</span>`;
+                                    }
 
                                     const sentDate = new Date(email.created_at).toLocaleString('pt-BR');
 
@@ -628,7 +635,7 @@
                                     tr.innerHTML = `
                                         <td><strong>${contatoName}</strong></td>
                                         <td><code>${email.email_destinatario}</code></td>
-                                        <td class="text-center"><span class="badge bg-light text-dark border">${tipoEnvioLabel}</span></td>
+                                        <td class="text-center">${tipoEnvioHtml}</td>
                                         <td class="text-center">${statusBadge}</td>
                                         <td class="text-center"><small>${sentDate}</small></td>
                                         <td>${actionContent}</td>

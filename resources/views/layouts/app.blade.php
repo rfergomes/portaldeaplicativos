@@ -840,7 +840,7 @@
                         <!-- Administração -->
                         @if(auth()->user()->temPermissao('usuarios.visualizar') || auth()->user()->temPermissao('administrar_usuarios'))
                             @php
-                                $isAdminActive = request()->routeIs('users.*') || request()->routeIs('perfis.*') || request()->routeIs('protocolos.tipos.*') || request()->routeIs('token-deptos.*') || request()->routeIs('admin.relatorios.*');
+                                $isAdminActive = request()->routeIs('users.*') || request()->routeIs('perfis.*') || request()->routeIs('protocolos.tipos.*') || request()->routeIs('token-deptos.*') || request()->routeIs('admin.relatorios.*') || request()->routeIs('admin.convencoes.*');
                             @endphp
                             <li class="nav-item {{ $isAdminActive ? 'menu-open' : '' }}">
                                 <a href="#" class="nav-link {{ $isAdminActive ? 'active' : '' }}">
@@ -864,6 +864,15 @@
                                                 class="nav-link {{ request()->routeIs('perfis.*') ? 'active' : '' }}">
                                                 <i class="nav-icon fa-solid fa-user-lock"></i>
                                                 <p>Perfis e Acessos</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('convencoes.visualizar') || auth()->user()->temPermissao('usuarios.visualizar') || auth()->user()->temPermissao('administrar_usuarios'))
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.convencoes.index') }}"
+                                                class="nav-link {{ request()->routeIs('admin.convencoes.*') ? 'active' : '' }}">
+                                                <i class="nav-icon fa-solid fa-file-contract"></i>
+                                                <p>Convenção</p>
                                             </a>
                                         </li>
                                     @endif
