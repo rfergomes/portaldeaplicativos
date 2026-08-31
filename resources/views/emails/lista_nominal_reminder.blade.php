@@ -170,7 +170,7 @@
         @endif
 
         <p>
-            A relação nominal é fundamental para a correta identificação dos associados e manutenção dos seus direitos e benefícios sindicais. Solicitamos a gentileza de encaminhar o arquivo/documento respondendo a este e-mail ou diretamente para o nosso setor de arrecadação.
+            A relação nominal é fundamental para a correta identificação dos associados e manutenção dos seus direitos e benefícios sindicais. Solicitamos a gentileza de encaminhar o arquivo/documento respondendo diretamente a este e-mail ou para o nosso setor de arrecadação no endereço <a href="mailto:arrecadacao@quimicosunificados.com.br" style="color: #033c5a; font-weight: bold;">arrecadacao@quimicosunificados.com.br</a>.
         </p>
 
         <div class="disclaimer-box">
@@ -179,7 +179,7 @@
 
         <div class="footer">
             <p>Este é um comunicado automático gerado pelo Portal de Aplicativos - Químicos Unificados.</p>
-            <p>&copy; {{ date('Y') }} Sindicato dos Trabalhadores Químicos e Farmacêuticos. Todos os direitos reservados.</p>
+            <p>&copy; {{ date('Y') }} Sindicato dos Químicos Unificados de Campinas e Região. Todos os direitos reservados.</p>
         </div>
     </div>
 </body>

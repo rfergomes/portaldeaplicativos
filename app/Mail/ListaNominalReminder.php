@@ -10,6 +10,7 @@ use App\Models\ConvencaoColetiva;
 use App\Models\SocioFolha;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -51,6 +52,9 @@ class ListaNominalReminder extends Mailable
 
         $envelopeData = [
             'subject' => $subject,
+            'replyTo' => [
+                new Address('arrecadacao@quimicosunificados.com.br', 'Setor de Arrecadação - Químicos Unificados')
+            ],
         ];
 
         if ($this->historicoId) {
