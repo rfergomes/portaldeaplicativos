@@ -47,8 +47,9 @@ class ListaNominalReminder extends Mailable
      */
     public function envelope(): Envelope
     {
-        $numClausula = $this->clausula ? $this->clausula->numero : '76';
-        $subject = "Lembrete: Envio da Relação Nominal de Contribuições - Cláusula {$numClausula}";
+        $subject = $this->clausula 
+            ? "Lembrete: Envio da Relação Nominal de Contribuições - Cláusula {$this->clausula->numero}"
+            : "Lembrete: Envio da Relação Nominal de Contribuições Associativas";
 
         $envelopeData = [
             'subject' => $subject,

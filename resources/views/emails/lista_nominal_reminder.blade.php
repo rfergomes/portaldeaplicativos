@@ -163,7 +163,11 @@
         @else
             <div class="clausula-card">
                 <div class="clausula-header">
-                    Cláusula 76 - Contribuições Associativas Mensais
+                    @if(str_contains(strtoupper($socio->empresa->categoria ?? ''), 'FARMAC'))
+                        Convenção Coletiva de Trabalho - Farmacêutica
+                    @else
+                        Cláusula 76 - Contribuições Associativas Mensais
+                    @endif
                 </div>
                 <p class="clausula-text">"As empresas fornecerão no prazo de 15 (quinze) dias, contados da data de recolhimento, às respectivas entidades sindicais dos trabalhadores, em caráter confidencial e mediante recibo, uma relação contendo os nomes e valores da contribuição."</p>
             </div>

@@ -88,15 +88,22 @@ class SendListaNominalReminders extends Command
         foreach ($lancamentos as $lancamento) {
             $empresa = $lancamento->empresa;
             $empresaName = $empresa->razao_social ?? 'Empresa Sem Razão Social';
-            $categoriaEmpresa = strtoupper(trim((string) ($empresa->categoria ?? 'QUIMICA')));
+            $categoriaNormalizada = $this->normalizarCategoria($empresa->categoria);
             
-            // Seleciona a convenção correspondente à categoria da empresa
-            $convencao = $convencoesPorCategoria[$categoriaEmpresa] ?? $convencoesPorCategoria['QUIMICA'] ?? null;
+            // Seleciona a convenção correspondente estritamente à categoria da empresa
+            $convencao = $convencoesPorCategoria[$categoriaNormalizada] ?? null;
             $clausula = null;
 
             if ($convencao) {
-                $clausula = $convencao->clausulas->where('dispara_lembrete_lista_nominal', true)->first()
-                    ?? $convencao->clausulas->where('numero', '76')->first();
+                // 1º: Cláusula marcada com o gatilho ativo para a convenção desta categoria
+                $clausula = $convencao->clausulas->where('dispara_lembrete_lista_nominal', true)->first();
+
+                // 2º: Fallback por número padrão conforme a categoria
+                if (!$clausula) {
+                    if ($categoriaNormalizada === 'QUIMICA') {
+                        $clausula = $convencao->clausulas->where('numero', '76')->first();
+                    }
+                }
             }
 
             $clientes = $empresa->clientes ?? collect();
@@ -107,11 +114,11 @@ class SendListaNominalReminders extends Command
             }
 
             $vencimentoFormatado = Carbon::parse($lancamento->data_vencimento)->format('d/m/Y');
-            $this->info("\nEmpresa: {$empresaName} (CNPJ: {$empresa->cnpj}) - Categoria: {$categoriaEmpresa} - Vencimento: {$vencimentoFormatado}");
+            $this->info("\nEmpresa: {$empresaName} (CNPJ: {$empresa->cnpj}) - Categoria: {$categoriaNormalizada} (Original: '{$empresa->categoria}') - Vencimento: {$vencimentoFormatado}");
             if ($clausula) {
-                $this->info(" - Cláusula Aplicada: Nº {$clausula->numero} ({$clausula->titulo}) da convenção '{$convencao->titulo}'");
+                $this->info(" - Cláusula Aplicada: Nº {$clausula->numero} ({$clausula->titulo}) da convenção '{$convencao->titulo}' [{$convencao->categoria}]");
             } else {
-                $this->info(" - Utilizando Cláusula 76 padrão institucional.");
+                $this->info(" - Utilizando texto padrão de lembrete da lista nominal.");
             }
 
             foreach ($clientes as $cliente) {
@@ -133,8 +140,10 @@ class SendListaNominalReminders extends Command
                     continue;
                 }
 
-                $numClausula = $clausula ? $clausula->numero : '76';
-                $subjectText = "Lembrete: Envio da Relação Nominal de Contribuições - Cláusula {$numClausula}";
+                $subjectText = $clausula
+                    ? "Lembrete: Envio da Relação Nominal de Contribuições - Cláusula {$clausula->numero}"
+                    : "Lembrete: Envio da Relação Nominal de Contribuições Associativas";
+
                 $historicoId = null;
 
                 // Não grava auditoria de envio definitivo quando em dry-run ou em modo test-email
@@ -195,5 +204,23 @@ class SendListaNominalReminders extends Command
         $this->info("Processamento concluído com sucesso.");
 
         return 0;
+    }
+
+    /**
+     * Normaliza a categoria informada na empresa para QUIMICA ou FARMACEUTICA.
+     */
+    private function normalizarCategoria(?string $categoria): string
+    {
+        if (empty($categoria)) {
+            return 'QUIMICA';
+        }
+
+        $cat = mb_strtoupper(trim($categoria), 'UTF-8');
+
+        if (str_contains($cat, 'FARMAC')) {
+            return 'FARMACEUTICA';
+        }
+
+        return 'QUIMICA';
     }
 }
