@@ -83,6 +83,7 @@ class SendListaNominalReminders extends Command
 
         $enviadosCount = 0;
         $duplicadosCount = 0;
+        $semClausulaCount = 0;
         $falhasCount = 0;
 
         foreach ($lancamentos as $lancamento) {
@@ -96,29 +97,37 @@ class SendListaNominalReminders extends Command
 
             if ($convencao) {
                 // 1º: Cláusula marcada com o gatilho ativo para a convenção desta categoria
-                $clausula = $convencao->clausulas->where('dispara_lembrete_lista_nominal', true)->first();
+                $clausula = $convencao->clausulas
+                    ->where('ativo', true)
+                    ->where('dispara_lembrete_lista_nominal', true)
+                    ->first();
 
-                // 2º: Fallback por número padrão conforme a categoria
-                if (!$clausula) {
-                    if ($categoriaNormalizada === 'QUIMICA') {
-                        $clausula = $convencao->clausulas->where('numero', '76')->first();
-                    }
+                // 2º: Fallback para cláusula 76 ativa dos Químicos
+                if (!$clausula && $categoriaNormalizada === 'QUIMICA') {
+                    $clausula = $convencao->clausulas
+                        ->where('ativo', true)
+                        ->where('numero', '76')
+                        ->first();
                 }
             }
+
+            $vencimentoFormatado = Carbon::parse($lancamento->data_vencimento)->format('d/m/Y');
+            $this->info("\nEmpresa: {$empresaName} (CNPJ: {$empresa->cnpj}) - Categoria: {$categoriaNormalizada} (Original: '{$empresa->categoria}') - Vencimento: {$vencimentoFormatado}");
+
+            // REGRA: Envia lembrete de lista nominal apenas se existir cláusula cadastrada e ativa
+            if (!$convencao || !$clausula) {
+                $this->warn("  [Cancelado/Ignorado] Nenhuma convenção/cláusula ativa de cobrança da lista nominal cadastrada para a categoria '{$categoriaNormalizada}'. O e-mail não será enviado.");
+                $semClausulaCount++;
+                continue;
+            }
+
+            $this->info(" - Cláusula Aplicada: Nº {$clausula->numero} ({$clausula->titulo}) da convenção '{$convencao->titulo}' [{$convencao->categoria}]");
 
             $clientes = $empresa->clientes ?? collect();
 
             if ($clientes->isEmpty()) {
                 $this->warn("Aviso: Lançamento ID {$lancamento->id} ({$empresaName}) não possui contatos ativos com e-mail cadastrado.");
                 continue;
-            }
-
-            $vencimentoFormatado = Carbon::parse($lancamento->data_vencimento)->format('d/m/Y');
-            $this->info("\nEmpresa: {$empresaName} (CNPJ: {$empresa->cnpj}) - Categoria: {$categoriaNormalizada} (Original: '{$empresa->categoria}') - Vencimento: {$vencimentoFormatado}");
-            if ($clausula) {
-                $this->info(" - Cláusula Aplicada: Nº {$clausula->numero} ({$clausula->titulo}) da convenção '{$convencao->titulo}' [{$convencao->categoria}]");
-            } else {
-                $this->info(" - Utilizando texto padrão de lembrete da lista nominal.");
             }
 
             foreach ($clientes as $cliente) {
@@ -140,10 +149,7 @@ class SendListaNominalReminders extends Command
                     continue;
                 }
 
-                $subjectText = $clausula
-                    ? "Lembrete: Envio da Relação Nominal de Contribuições - Cláusula {$clausula->numero}"
-                    : "Lembrete: Envio da Relação Nominal de Contribuições Associativas";
-
+                $subjectText = "Lembrete: Envio da Relação Nominal de Contribuições - Cláusula {$clausula->numero}";
                 $historicoId = null;
 
                 // Não grava auditoria de envio definitivo quando em dry-run ou em modo test-email
@@ -198,10 +204,13 @@ class SendListaNominalReminders extends Command
         $this->info("\n--- RESUMO DO PROCESSAMENTO ---");
         $this->info("E-mails processados/enviados: {$enviadosCount}");
         $this->info("Envios ignorados por duplicidade: {$duplicadosCount}");
+        if ($semClausulaCount > 0) {
+            $this->warn("Envios cancelados (sem cláusula cadastrada/ativa): {$semClausulaCount}");
+        }
         if ($falhasCount > 0) {
             $this->error("Falhas no disparo: {$falhasCount}");
         }
-        $this->info("Processamento concluído com sucesso.");
+        $this->info("Processamento concluído.");
 
         return 0;
     }
