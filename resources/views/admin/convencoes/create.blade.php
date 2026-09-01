@@ -9,7 +9,7 @@
             <h1 class="h4 mb-0 text-gray-800 fw-bold">
                 <i class="fa-solid fa-plus-circle text-primary me-2"></i>Nova Convenção Coletiva
             </h1>
-            <p class="text-muted small mb-0">Cadastre o instrumento coletivo e configure suas vigências e data-base</p>
+            <p class="text-muted small mb-0">Cadastre o instrumento coletivo e configure suas vigências e documento oficial</p>
         </div>
         <div class="col-sm-6 text-end">
             <a href="{{ route('admin.convencoes.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-sm">
@@ -35,7 +35,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admin.convencoes.store') }}" method="POST">
+                    <form action="{{ route('admin.convencoes.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <div class="row g-3">
@@ -78,14 +78,23 @@
                             </div>
 
                             <div class="col-12">
+                                <div class="bg-light p-3 rounded border">
+                                    <label class="form-label fw-bold small text-primary mb-1">
+                                        <i class="fa-solid fa-file-pdf text-danger me-1"></i> Documento Oficial da Convenção Completa (PDF)
+                                    </label>
+                                    <input type="file" name="arquivo_pdf" class="form-control form-control-sm @error('arquivo_pdf') is-invalid @enderror" accept=".pdf,application/pdf">
+                                    <div class="form-text small text-muted">
+                                        Anexe a íntegra da convenção assinada e registrada no MTE em formato PDF (máximo 25MB).
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
                                 <div class="form-check form-switch pt-2">
                                     <input class="form-check-input" type="checkbox" name="ativo" id="ativoCheck" value="1" {{ old('ativo', '1') ? 'checked' : '' }}>
                                     <label class="form-check-label fw-bold text-dark" for="ativoCheck">
                                         Convenção Ativa no Sistema
                                     </label>
-                                    <div class="form-text text-muted small">
-                                        Convenções ativas são utilizadas como referência para fundamentação de lembretes e regras sindicais.
-                                    </div>
                                 </div>
                             </div>
                         </div>

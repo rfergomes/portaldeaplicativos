@@ -35,7 +35,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admin.convencoes.update', $convencao) }}" method="POST">
+                    <form action="{{ route('admin.convencoes.update', $convencao) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -78,14 +78,46 @@
                             </div>
 
                             <div class="col-12">
+                                <div class="bg-light p-3 rounded border">
+                                    <label class="form-label fw-bold small text-primary mb-1">
+                                        <i class="fa-solid fa-file-pdf text-danger me-1"></i> Documento Oficial da Convenção Completa (PDF)
+                                    </label>
+                                    
+                                    @if($convencao->arquivo_pdf)
+                                        <div class="d-flex align-items-center justify-content-between bg-white p-2 rounded border mb-2">
+                                            <div>
+                                                <i class="fa-solid fa-file-pdf text-danger fa-lg me-2"></i>
+                                                <a href="{{ route('admin.convencoes.download-pdf', $convencao) }}" target="_blank" class="fw-bold text-decoration-none text-dark small">
+                                                    {{ $convencao->arquivo_nome_original ?: 'Arquivo Anexo da Convenção' }}
+                                                </a>
+                                                @if($convencao->arquivo_tamanho_formatado)
+                                                    <span class="badge bg-secondary-subtle text-secondary small ms-1">{{ $convencao->arquivo_tamanho_formatado }}</span>
+                                                @endif
+                                            </div>
+                                            <div>
+                                                <a href="{{ route('admin.convencoes.download-pdf', $convencao) }}" class="btn btn-sm btn-outline-primary rounded-pill px-2 py-1 small">
+                                                    <i class="fa-solid fa-download me-1"></i> Baixar
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1 small ms-1" onclick="confirmRemoverPdf()">
+                                                    <i class="fa-solid fa-trash me-1"></i> Remover
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <input type="file" name="arquivo_pdf" class="form-control form-control-sm @error('arquivo_pdf') is-invalid @enderror" accept=".pdf,application/pdf">
+                                    <div class="form-text small text-muted">
+                                        {{ $convencao->arquivo_pdf ? 'Envie um novo arquivo PDF caso deseje substituir o documento atual.' : 'Anexe a cópia integral da convenção assinada e registrada (PDF até 25MB).' }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
                                 <div class="form-check form-switch pt-2">
                                     <input class="form-check-input" type="checkbox" name="ativo" id="ativoCheck" value="1" {{ old('ativo', $convencao->ativo) ? 'checked' : '' }}>
                                     <label class="form-check-label fw-bold text-dark" for="ativoCheck">
                                         Convenção Ativa no Sistema
                                     </label>
-                                    <div class="form-text text-muted small">
-                                        Convenções ativas são utilizadas como referência para fundamentação de lembretes e regras sindicais.
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -99,9 +131,37 @@
                             </button>
                         </div>
                     </form>
+
+                    @if($convencao->arquivo_pdf)
+                        <form id="formRemoverPdf" action="{{ route('admin.convencoes.remover-pdf', $convencao) }}" method="POST" style="display: none;">
+                            @csrf
+                            @method('DELETE')
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function confirmRemoverPdf() {
+        Swal.fire({
+            title: 'Remover PDF da Convenção?',
+            text: "O arquivo anexo será excluído do servidor.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Sim, remover',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('formRemoverPdf').submit();
+            }
+        });
+    }
+</script>
+@endpush
 @endsection

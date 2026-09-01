@@ -18,6 +18,7 @@ class ConvencaoClausula extends Model
 
     protected $fillable = [
         'convencao_coletiva_id',
+        'convencao_termo_aditivo_id',
         'numero',
         'titulo',
         'categoria_clausula',
@@ -40,6 +41,11 @@ class ConvencaoClausula extends Model
     public function convencao(): BelongsTo
     {
         return $this->belongsTo(ConvencaoColetiva::class, 'convencao_coletiva_id');
+    }
+
+    public function termoAditivo(): BelongsTo
+    {
+        return $this->belongsTo(ConvencaoTermoAditivo::class, 'convencao_termo_aditivo_id');
     }
 
     public function scopeAtiva($query)

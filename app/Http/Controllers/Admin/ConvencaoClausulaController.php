@@ -16,6 +16,7 @@ class ConvencaoClausulaController extends Controller
     public function store(Request $request, ConvencaoColetiva $convencao): RedirectResponse
     {
         $validated = $request->validate([
+            'convencao_termo_aditivo_id' => 'nullable|exists:convencao_termos_aditivos,id',
             'numero' => 'required|string|max:50',
             'titulo' => 'required|string|max:255',
             'categoria_clausula' => 'required|string|max:50',
@@ -53,6 +54,7 @@ class ConvencaoClausulaController extends Controller
         $this->validarPertencimento($convencao, $clausula);
 
         $validated = $request->validate([
+            'convencao_termo_aditivo_id' => 'nullable|exists:convencao_termos_aditivos,id',
             'numero' => 'required|string|max:50',
             'titulo' => 'required|string|max:255',
             'categoria_clausula' => 'required|string|max:50',

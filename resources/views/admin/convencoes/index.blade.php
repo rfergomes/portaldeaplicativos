@@ -65,7 +65,9 @@
                             <th class="text-center">Categoria</th>
                             <th class="text-center">Vigência</th>
                             <th class="text-center">Data-Base</th>
+                            <th class="text-center">Aditivos</th>
                             <th class="text-center">Cláusulas</th>
+                            <th class="text-center">PDF</th>
                             <th class="text-center">Status</th>
                             <th class="text-end pe-4">Ações</th>
                         </tr>
@@ -104,9 +106,27 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
+                                    @if($convencao->aditivos_count > 0)
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning px-2 py-1">
+                                            <i class="fa-solid fa-file-circle-plus me-1"></i> {{ $convencao->aditivos_count }} aditivo(s)
+                                        </span>
+                                    @else
+                                        <span class="badge bg-light text-muted border px-2 py-1">Sem aditivos</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
                                     <span class="badge rounded-pill bg-info text-dark px-2">
                                         {{ $convencao->clausulas_count }} cláusula(s)
                                     </span>
+                                </td>
+                                <td class="text-center">
+                                    @if($convencao->arquivo_pdf)
+                                        <a href="{{ route('admin.convencoes.download-pdf', $convencao) }}" target="_blank" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1 small shadow-sm" title="Baixar PDF Oficial ({{ $convencao->arquivo_tamanho_formatado }})">
+                                            <i class="fa-solid fa-file-pdf me-1"></i> PDF
+                                        </a>
+                                    @else
+                                        <span class="text-muted small">-</span>
+                                    @endif
                                 </td>
                                 <td class="text-center">
                                     @if($convencao->ativo)
@@ -117,7 +137,7 @@
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('admin.convencoes.show', $convencao) }}" class="btn btn-outline-primary" title="Ver Detalhes e Cláusulas">
+                                        <a href="{{ route('admin.convencoes.show', $convencao) }}" class="btn btn-outline-primary" title="Ver Detalhes, Cláusulas e Aditivos">
                                             <i class="fa-solid fa-list-check"></i>
                                         </a>
                                         <a href="{{ route('admin.convencoes.edit', $convencao) }}" class="btn btn-outline-secondary" title="Editar">
@@ -135,7 +155,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-5 text-muted">
+                                <td colspan="9" class="text-center py-5 text-muted">
                                     <div class="mb-2"><i class="fa-solid fa-file-circle-xmark fa-3x opacity-25"></i></div>
                                     Nenhuma convenção coletiva cadastrada para os filtros selecionados.
                                 </td>
@@ -158,7 +178,7 @@
     function confirmDelete(id) {
         Swal.fire({
             title: 'Excluir Convenção?',
-            text: "Todas as cláusulas vinculadas a esta convenção também serão removidas permanentemente.",
+            text: "Todas as cláusulas, aditivos e arquivos vinculados a esta convenção também serão removidos permanentemente.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',

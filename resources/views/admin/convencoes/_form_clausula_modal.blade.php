@@ -33,6 +33,21 @@
                             </select>
                         </div>
 
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-secondary">Origem do Texto / Instrumento Normativo</label>
+                            <select name="convencao_termo_aditivo_id" id="clausulaTermoAditivo" class="form-select form-select-sm">
+                                <option value="">Convenção Coletiva Principal (Texto Original)</option>
+                                @foreach($convencao->aditivos as $aditivo)
+                                    <option value="{{ $aditivo->id }}">
+                                        {{ $aditivo->numero_termo }} - {{ $aditivo->titulo }} (Vigência: {{ $aditivo->vigencia_inicio->format('d/m/Y') }} a {{ $aditivo->vigencia_fim->format('d/m/Y') }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="form-text small text-muted">
+                                Indique se esta redação foi alterada ou criada por um Termo Aditivo específico.
+                            </div>
+                        </div>
+
                         <div class="col-12">
                             <label class="form-label small fw-bold text-secondary">Texto / Teor Normativo da Cláusula <span class="text-danger">*</span></label>
                             <textarea name="texto" id="clausulaTexto" rows="6" class="form-control" placeholder="Transcreva aqui o texto da cláusula..." required></textarea>
@@ -59,7 +74,7 @@
                                 <div class="form-check form-switch mb-2">
                                     <input class="form-check-input" type="checkbox" name="dispara_lembrete_lista_nominal" id="clausulaLembrete" value="1">
                                     <label class="form-check-label fw-bold text-primary" for="clausulaLembrete">
-                                        <i class="fa-solid fa-bell me-1"></i> Disparar Lembrete Automático da Lista Nominal (Cláusula 76)
+                                        <i class="fa-solid fa-bell me-1"></i> Disparar Lembrete Automático da Lista Nominal (Cláusula Ativa de Cobrança)
                                     </label>
                                 </div>
                                 <small class="text-muted d-block">

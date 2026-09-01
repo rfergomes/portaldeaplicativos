@@ -6,16 +6,21 @@
 <div class="container-fluid">
     <!-- Header -->
     <div class="row mb-4 align-items-center">
-        <div class="col-sm-8">
+        <div class="col-sm-6">
             <h1 class="h4 mb-0 text-gray-800 fw-bold">
                 <i class="fa-solid fa-file-contract text-primary me-2"></i>{{ $convencao->titulo }}
             </h1>
-            <p class="text-muted small mb-0">Gestão de dados e cláusulas registradas desta convenção</p>
+            <p class="text-muted small mb-0">Gestão de vigência, documento oficial, cláusulas e termos aditivos</p>
         </div>
-        <div class="col-sm-4 text-end">
+        <div class="col-sm-6 text-end">
             <a href="{{ route('admin.convencoes.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-sm me-1">
                 <i class="fa-solid fa-arrow-left me-1"></i> Voltar
             </a>
+            @if($convencao->arquivo_pdf)
+                <a href="{{ route('admin.convencoes.download-pdf', $convencao) }}" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm me-1">
+                    <i class="fa-solid fa-file-pdf me-1"></i> Baixar Convenção (PDF)
+                </a>
+            @endif
             <a href="{{ route('admin.convencoes.edit', $convencao) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm">
                 <i class="fa-solid fa-pen me-1"></i> Editar Convenção
             </a>
@@ -54,11 +59,17 @@
                             </span>
                         </div>
                         <div class="col-md-3 text-md-end">
-                            <small class="text-uppercase text-muted fw-bold d-block small">Status</small>
+                            <small class="text-uppercase text-muted fw-bold d-block small">Status & Anexo</small>
                             @if($convencao->ativo)
                                 <span class="badge bg-success px-3 py-2 rounded-pill">Ativa</span>
                             @else
                                 <span class="badge bg-secondary px-3 py-2 rounded-pill">Inativa</span>
+                            @endif
+
+                            @if($convencao->arquivo_pdf)
+                                <span class="badge bg-danger-subtle text-danger border border-danger px-2 py-2 rounded-pill ms-1" title="{{ $convencao->arquivo_nome_original }}">
+                                    <i class="fa-solid fa-file-pdf me-1"></i> PDF Anexado ({{ $convencao->arquivo_tamanho_formatado }})
+                                </span>
                             @endif
                         </div>
                         @if($convencao->abrangencia)
@@ -67,6 +78,118 @@
                                 <p class="text-muted small mb-0">{{ $convencao->abrangencia }}</p>
                             </div>
                         @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Termos Aditivos -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light border-0 py-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="m-0 fw-bold text-primary">
+                            <i class="fa-solid fa-file-circle-plus me-2"></i>Termos Aditivos Registrados ({{ $convencao->aditivos->count() }})
+                        </h6>
+                        <small class="text-muted">Renovações de campanhas salariais intermediárias (ex: 2027) e aditivos contratuais</small>
+                    </div>
+                    <button type="button" class="btn btn-warning btn-sm rounded-pill px-3 shadow-sm fw-bold text-dark" onclick="abrirModalNovoAditivo()">
+                        <i class="fa-solid fa-plus me-1"></i> Novo Termo Aditivo
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 premium-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4" style="width: 140px;">Nº Termo</th>
+                                    <th>Título e Resumo do Aditivo</th>
+                                    <th class="text-center">Tipo</th>
+                                    <th class="text-center">Vigência do Aditivo</th>
+                                    <th class="text-center">Documento</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-end pe-4" style="width: 130px;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($convencao->aditivos as $aditivo)
+                                    <tr>
+                                        <td class="ps-4">
+                                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning px-2 py-2 fs-6">
+                                                <i class="fa-solid fa-file-signature me-1"></i> {{ $aditivo->numero_termo }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <strong class="d-block text-dark">{{ $aditivo->titulo }}</strong>
+                                            @if($aditivo->descricao)
+                                                <div class="text-muted small mt-1" style="max-width: 500px;">{{ Str::limit($aditivo->descricao, 150) }}</div>
+                                            @endif
+                                            @if($aditivo->data_assinatura)
+                                                <small class="text-muted d-block mt-1">
+                                                    <i class="fa-solid fa-signature me-1"></i> Assinado/Registrado em: {{ $aditivo->data_assinatura->format('d/m/Y') }}
+                                                </small>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            @if($aditivo->tipo === 'SALARIAL_ECONOMICO')
+                                                <span class="badge bg-success-subtle text-success border border-success px-2 py-1">Salarial / Econômico</span>
+                                            @elseif($aditivo->tipo === 'GERAL_RETIFICATIVO')
+                                                <span class="badge bg-info-subtle text-info border border-info px-2 py-1">Retificativo</span>
+                                            @else
+                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary px-2 py-1">{{ $aditivo->tipo }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center small">
+                                            <i class="fa-regular fa-calendar-days text-muted me-1"></i>
+                                            {{ $aditivo->vigencia_inicio->format('d/m/Y') }} a {{ $aditivo->vigencia_fim->format('d/m/Y') }}
+                                        </td>
+                                        <td class="text-center">
+                                            @if($aditivo->arquivo_pdf)
+                                                <a href="{{ route('admin.convencoes.aditivos.download-pdf', [$convencao, $aditivo]) }}" target="_blank" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1 small shadow-sm" title="Baixar PDF do Aditivo ({{ $aditivo->arquivo_tamanho_formatado }})">
+                                                    <i class="fa-solid fa-file-pdf me-1"></i> PDF
+                                                </a>
+                                            @else
+                                                <span class="text-muted small">Sem PDF</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            @if($aditivo->ativo)
+                                                <span class="badge bg-success-subtle text-success border border-success px-2 py-1">Ativo</span>
+                                            @else
+                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary px-2 py-1">Inativo</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-outline-primary" 
+                                                    onclick='abrirModalEditarAditivo(@json($aditivo))' title="Editar Aditivo">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger" 
+                                                    onclick="confirmDeleteAditivo({{ $aditivo->id }})" title="Excluir Aditivo">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </div>
+                                            <form id="delete-aditivo-{{ $aditivo->id }}" 
+                                                action="{{ route('admin.convencoes.aditivos.destroy', [$convencao, $aditivo]) }}" 
+                                                method="POST" style="display: none;">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4 text-muted">
+                                            <div class="mb-1"><i class="fa-solid fa-file-circle-plus fa-2x opacity-25"></i></div>
+                                            Nenhum termo aditivo registrado ainda para esta convenção coletiva.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -94,7 +217,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th class="ps-4" style="width: 100px;">Cláusula</th>
-                                    <th>Título e Teor Normativo</th>
+                                    <th>Título, Origem e Teor Normativo</th>
                                     <th class="text-center">Categoria</th>
                                     <th class="text-center">Lembrete Automático</th>
                                     <th class="text-center">Status</th>
@@ -110,7 +233,14 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <strong class="d-block text-dark">{{ $clausula->titulo }}</strong>
+                                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                                <strong class="text-dark">{{ $clausula->titulo }}</strong>
+                                                @if($clausula->termoAditivo)
+                                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning small">
+                                                        <i class="fa-solid fa-file-circle-plus me-1"></i> {{ $clausula->termoAditivo->numero_termo }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                             <div class="text-muted small mt-1" style="max-width: 600px; white-space: pre-line;">{{ Str::limit($clausula->texto, 200) }}</div>
                                             @if($clausula->vigencia_inicio || $clausula->vigencia_fim)
                                                 <small class="text-muted d-block mt-1">
@@ -198,10 +328,12 @@
 </div>
 
 @include('admin.convencoes._form_clausula_modal')
+@include('admin.convencoes._form_aditivo_modal')
 
 @push('scripts')
 <script>
     const modalClausulaObj = new bootstrap.Modal(document.getElementById('modalClausula'));
+    const modalAditivoObj = new bootstrap.Modal(document.getElementById('modalAditivo'));
 
     function abrirModalNovaClausula() {
         document.getElementById('modalClausulaTitle').innerHTML = '<i class="fa-solid fa-plus-circle me-2"></i>Adicionar Cláusula';
@@ -211,6 +343,7 @@
         document.getElementById('clausulaNumero').value = '';
         document.getElementById('clausulaTitulo').value = '';
         document.getElementById('clausulaCategoria').value = 'CONTRIBUICAO';
+        document.getElementById('clausulaTermoAditivo').value = '';
         document.getElementById('clausulaTexto').value = '';
         document.getElementById('clausulaVigenciaInicio').value = '';
         document.getElementById('clausulaVigenciaFim').value = '';
@@ -229,6 +362,7 @@
         document.getElementById('clausulaNumero').value = clausula.numero;
         document.getElementById('clausulaTitulo').value = clausula.titulo;
         document.getElementById('clausulaCategoria').value = clausula.categoria_clausula;
+        document.getElementById('clausulaTermoAditivo').value = clausula.convencao_termo_aditivo_id || '';
         document.getElementById('clausulaTexto').value = clausula.texto;
         document.getElementById('clausulaVigenciaInicio').value = clausula.vigencia_inicio ? clausula.vigencia_inicio.substring(0, 10) : '';
         document.getElementById('clausulaVigenciaFim').value = clausula.vigencia_fim ? clausula.vigencia_fim.substring(0, 10) : '';
@@ -279,6 +413,69 @@
                 }).catch(err => {
                     Swal.fire('Erro', 'Falha ao alterar regra de cobrança.', 'error');
                 });
+            }
+        });
+    }
+
+    // Gestão de Termos Aditivos
+    function abrirModalNovoAditivo() {
+        document.getElementById('modalAditivoTitle').innerHTML = '<i class="fa-solid fa-file-circle-plus me-2"></i>Novo Termo Aditivo';
+        document.getElementById('formAditivo').action = "{{ route('admin.convencoes.aditivos.store', $convencao) }}";
+        document.getElementById('aditivoMethod').value = 'POST';
+
+        document.getElementById('aditivoNumeroTermo').value = '';
+        document.getElementById('aditivoTitulo').value = '';
+        document.getElementById('aditivoTipo').value = 'SALARIAL_ECONOMICO';
+        document.getElementById('aditivoDataAssinatura').value = '';
+        document.getElementById('aditivoVigenciaInicio').value = '';
+        document.getElementById('aditivoVigenciaFim').value = '';
+        document.getElementById('aditivoDescricao').value = '';
+        document.getElementById('aditivoArquivoPdf').value = '';
+        document.getElementById('aditivoArquivoAtual').style.display = 'none';
+        document.getElementById('aditivoAtivo').checked = true;
+
+        modalAditivoObj.show();
+    }
+
+    function abrirModalEditarAditivo(aditivo) {
+        document.getElementById('modalAditivoTitle').innerHTML = '<i class="fa-solid fa-pen-to-square me-2"></i>Editar ' + aditivo.numero_termo;
+        document.getElementById('formAditivo').action = `/admin/convencoes/{{ $convencao->id }}/aditivos/${aditivo.id}`;
+        document.getElementById('aditivoMethod').value = 'PUT';
+
+        document.getElementById('aditivoNumeroTermo').value = aditivo.numero_termo;
+        document.getElementById('aditivoTitulo').value = aditivo.titulo;
+        document.getElementById('aditivoTipo').value = aditivo.tipo;
+        document.getElementById('aditivoDataAssinatura').value = aditivo.data_assinatura ? aditivo.data_assinatura.substring(0, 10) : '';
+        document.getElementById('aditivoVigenciaInicio').value = aditivo.vigencia_inicio ? aditivo.vigencia_inicio.substring(0, 10) : '';
+        document.getElementById('aditivoVigenciaFim').value = aditivo.vigencia_fim ? aditivo.vigencia_fim.substring(0, 10) : '';
+        document.getElementById('aditivoDescricao').value = aditivo.descricao || '';
+        document.getElementById('aditivoArquivoPdf').value = '';
+
+        if (aditivo.arquivo_pdf) {
+            document.getElementById('aditivoArquivoAtual').style.display = 'block';
+            document.getElementById('aditivoArquivoNome').innerText = aditivo.arquivo_nome_original || 'Arquivo Anexo PDF';
+        } else {
+            document.getElementById('aditivoArquivoAtual').style.display = 'none';
+        }
+
+        document.getElementById('aditivoAtivo').checked = Boolean(aditivo.ativo);
+
+        modalAditivoObj.show();
+    }
+
+    function confirmDeleteAditivo(id) {
+        Swal.fire({
+            title: 'Excluir Termo Aditivo?',
+            text: "O termo aditivo e seu documento em PDF serão removidos permanentemente.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-aditivo-' + id).submit();
             }
         });
     }

@@ -35,6 +35,7 @@ use App\Http\Controllers\Admin\TokenDeptoController;
 use App\Http\Controllers\Admin\RelatorioController;
 use App\Http\Controllers\Admin\ConvencaoColetivaController;
 use App\Http\Controllers\Admin\ConvencaoClausulaController;
+use App\Http\Controllers\Admin\ConvencaoTermoAditivoController;
 use App\Http\Controllers\Ativos\AtivoMovimentacaoController;
 use App\Http\Controllers\Ativos\AtivoUsuarioController;
 use App\Http\Controllers\Ativos\AtivoDepartamentoController;
@@ -214,7 +215,7 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
         Route::get('/pdf', [RelatorioController::class, 'exportPdf'])->name('pdf');
     });
 
-    // Convenções Coletivas e Cláusulas
+    // Convenções Coletivas, Cláusulas e Termos Aditivos
     Route::prefix('admin/convencoes')->name('admin.convencoes.')->group(function () {
         Route::get('/', [ConvencaoColetivaController::class, 'index'])->name('index')->middleware('can:convencoes.visualizar');
         Route::get('/create', [ConvencaoColetivaController::class, 'create'])->name('create')->middleware('can:convencoes.criar');
@@ -223,13 +224,22 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
         Route::get('/{convencao}/edit', [ConvencaoColetivaController::class, 'edit'])->name('edit')->middleware('can:convencoes.editar');
         Route::put('/{convencao}', [ConvencaoColetivaController::class, 'update'])->name('update')->middleware('can:convencoes.editar');
         Route::delete('/{convencao}', [ConvencaoColetivaController::class, 'destroy'])->name('destroy')->middleware('can:convencoes.excluir');
+        Route::get('/{convencao}/download-pdf', [ConvencaoColetivaController::class, 'downloadPdf'])->name('download-pdf')->middleware('can:convencoes.visualizar');
+        Route::delete('/{convencao}/remover-pdf', [ConvencaoColetivaController::class, 'removerPdf'])->name('remover-pdf')->middleware('can:convencoes.editar');
 
-        // Gestão de Cláusulas com Scoped Bindings
+        // Gestão de Cláusulas e Termos Aditivos com Scoped Bindings
         Route::scopeBindings()->group(function () {
+            // Cláusulas
             Route::post('/{convencao}/clausulas', [ConvencaoClausulaController::class, 'store'])->name('clausulas.store')->middleware('can:convencoes.criar');
             Route::put('/{convencao}/clausulas/{clausula}', [ConvencaoClausulaController::class, 'update'])->name('clausulas.update')->middleware('can:convencoes.editar');
             Route::delete('/{convencao}/clausulas/{clausula}', [ConvencaoClausulaController::class, 'destroy'])->name('clausulas.destroy')->middleware('can:convencoes.excluir');
             Route::patch('/{convencao}/clausulas/{clausula}/toggle-lembrete', [ConvencaoClausulaController::class, 'toggleLembrete'])->name('clausulas.toggle-lembrete')->middleware('can:convencoes.editar');
+
+            // Termos Aditivos
+            Route::post('/{convencao}/aditivos', [ConvencaoTermoAditivoController::class, 'store'])->name('aditivos.store')->middleware('can:convencoes.criar');
+            Route::put('/{convencao}/aditivos/{aditivo}', [ConvencaoTermoAditivoController::class, 'update'])->name('aditivos.update')->middleware('can:convencoes.editar');
+            Route::delete('/{convencao}/aditivos/{aditivo}', [ConvencaoTermoAditivoController::class, 'destroy'])->name('aditivos.destroy')->middleware('can:convencoes.excluir');
+            Route::get('/{convencao}/aditivos/{aditivo}/download-pdf', [ConvencaoTermoAditivoController::class, 'downloadPdf'])->name('aditivos.download-pdf')->middleware('can:convencoes.visualizar');
         });
     });
 });

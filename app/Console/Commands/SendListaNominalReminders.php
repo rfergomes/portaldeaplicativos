@@ -77,8 +77,8 @@ class SendListaNominalReminders extends Command
 
         // Cache das convenções ativas por categoria
         $convencoesPorCategoria = [
-            'QUIMICA' => ConvencaoColetiva::ativa()->porCategoria('QUIMICA')->with('clausulas')->latest('vigencia_inicio')->first(),
-            'FARMACEUTICA' => ConvencaoColetiva::ativa()->porCategoria('FARMACEUTICA')->with('clausulas')->latest('vigencia_inicio')->first(),
+            'QUIMICA' => ConvencaoColetiva::ativa()->porCategoria('QUIMICA')->with(['clausulas.termoAditivo', 'aditivos'])->latest('vigencia_inicio')->first(),
+            'FARMACEUTICA' => ConvencaoColetiva::ativa()->porCategoria('FARMACEUTICA')->with(['clausulas.termoAditivo', 'aditivos'])->latest('vigencia_inicio')->first(),
         ];
 
         $enviadosCount = 0;
