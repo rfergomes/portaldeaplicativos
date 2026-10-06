@@ -316,4 +316,41 @@ class SocioFolhaController extends Controller
                   
         return $pdf->stream('relatorio_pendentes_lista_baixa.pdf');
     }
+
+    /**
+     * Pré-visualização quantitativa para disparo em lote de WhatsApp (Sócio Folha).
+     */
+    public function whatsappLotePreview(Request $request, \App\Domain\Whatsapp\Services\WhatsappLoteDispatcherService $dispatcher)
+    {
+        $preview = $dispatcher->previewFolha($request->all());
+        return response()->json(array_merge(['success' => true], $preview));
+    }
+
+    /**
+     * Efetiva a criação e enfileiramento do lote de WhatsApp para Sócio Folha.
+     */
+    public function dispararWhatsappLote(Request $request, \App\Domain\Whatsapp\Services\WhatsappLoteDispatcherService $dispatcher)
+    {
+        $request->validate([
+            'whatsapp_template_id' => 'required|exists:whatsapp_templates,id',
+            'filtros' => 'nullable|array',
+            'parametros_extras' => 'nullable|array',
+        ]);
+
+        $dto = \App\Domain\Whatsapp\DTOs\WhatsappLotePayloadDTO::fromArray([
+            'modulo' => 'folha',
+            'whatsapp_template_id' => (int) $request->input('whatsapp_template_id'),
+            'filtros' => (array) $request->input('filtros', []),
+            'parametros_extras' => (array) $request->input('parametros_extras', []),
+        ], auth()->id());
+
+        $lote = $dispatcher->criarLoteFolha($dto);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Disparo em lote iniciado com sucesso para os contatos da folha!',
+            'lote_id' => $lote->id,
+            'total_enfileirados' => $lote->total_destinatarios,
+        ]);
+    }
 }

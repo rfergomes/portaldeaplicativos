@@ -116,7 +116,10 @@
                                         PENDENTES: {{ $totalPendenteCount ?? 0 }} (R$ {{ number_format($totalPendenteValor ?? 0, 2, ',', '.') }})
                                     </span>
                                 </div>
-                                <div class="d-flex gap-2">
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button type="button" class="btn btn-sm btn-success fw-bold rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalWhatsappLoteFolha">
+                                        <i class="fa-brands fa-whatsapp me-1"></i> Disparo em Massa
+                                    </button>
                                     <a href="{{ route('socios-folha.pdf.pendentes', request()->all()) }}" target="_blank" class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3">
                                         <i class="fas fa-file-pdf me-1"></i> Exportar Débitos
                                     </a>
@@ -391,6 +394,8 @@
             font-weight: 700;
         }
     </style>
+
+    @include('socio_folha.partials.modal_whatsapp_lote')
 
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

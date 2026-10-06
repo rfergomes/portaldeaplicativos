@@ -45,6 +45,7 @@ use App\Http\Controllers\Ativos\AtivoAquisicaoController;
 use App\Http\Controllers\Ativos\AtivoFornecedorController;
 use App\Http\Controllers\Ativos\AtivoCessaoController;
 use App\Http\Controllers\DemandaController;
+use App\Http\Controllers\WhatsappTemplateController;
 use App\Models\Empresa;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -307,9 +308,17 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{socio}/reativar-abaco', [SocioCaixaController::class, 'reativarAbaco'])->name('reativar-abaco')->middleware('can:socio_caixa.gerenciar');
         Route::patch('/{socio}/update-telefone', [SocioCaixaController::class, 'updateTelefone'])->name('update-telefone')->middleware('can:socio_caixa.gerenciar');
         Route::post('/{socio}/enviar-whatsapp', [SocioCaixaController::class, 'enviarWhatsapp'])->name('enviar-whatsapp')->middleware('can:socio_caixa.gerenciar');
+        Route::post('/whatsapp-lote/preview', [SocioCaixaController::class, 'whatsappLotePreview'])->name('whatsapp-lote.preview')->middleware('can:socio_caixa.gerenciar');
+        Route::post('/whatsapp-lote/disparar', [SocioCaixaController::class, 'dispararWhatsappLote'])->name('whatsapp-lote.disparar')->middleware('can:socio_caixa.gerenciar');
         Route::get('/{socio}', [SocioCaixaController::class, 'show'])->name('show')->middleware('can:socio_caixa.visualizar');
         Route::post('/ocorrencias', [SocioCaixaController::class, 'storeOcorrencia'])->name('ocorrencias.store')->middleware('can:socio_caixa.ocorrencias');
     });
+
+    // WhatsApp Templates & Lotes
+    Route::get('/whatsapp-templates/ativos', [WhatsappTemplateController::class, 'ativos'])->name('whatsapp-templates.ativos');
+    Route::get('/whatsapp-lotes', [WhatsappTemplateController::class, 'lotes'])->name('whatsapp-lotes.index');
+    Route::get('/whatsapp-lotes/{id}/status', [WhatsappTemplateController::class, 'statusLote'])->name('whatsapp-lotes.status');
+    Route::resource('whatsapp-templates', WhatsappTemplateController::class);
 
     Route::get('/run-permissions-seeder', function() {
         \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'DashboardPermissionsSeeder']);
@@ -329,6 +338,8 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{socio}/toggle-situacao', [SocioFolhaController::class, 'toggleSituacao'])->name('toggle-situacao')->middleware('can:socio_folha.gerenciar');
         Route::patch('/{socio}/toggle-lista', [SocioFolhaController::class, 'toggleLista'])->name('toggle-lista')->middleware('can:socio_folha.gerenciar');
         Route::patch('/{socio}/toggle-baixa', [SocioFolhaController::class, 'toggleBaixa'])->name('toggle-baixa')->middleware('can:socio_folha.gerenciar');
+        Route::post('/whatsapp-lote/preview', [SocioFolhaController::class, 'whatsappLotePreview'])->name('whatsapp-lote.preview')->middleware('can:socio_folha.gerenciar');
+        Route::post('/whatsapp-lote/disparar', [SocioFolhaController::class, 'dispararWhatsappLote'])->name('whatsapp-lote.disparar')->middleware('can:socio_folha.gerenciar');
         Route::get('/empresas-por-regiao/{regiao_id}', [SocioFolhaController::class, 'getEmpresasPorRegiao'])->name('empresas-por-regiao');
         Route::get('/pdf/pendentes', [SocioFolhaController::class, 'exportPendentesPdf'])->name('pdf.pendentes')->middleware('can:socio_folha.visualizar');
         Route::get('/pdf/pendentes-lista-baixa', [SocioFolhaController::class, 'exportPendentesListaBaixaPdf'])->name('pdf.pendentes_lista_baixa')->middleware('can:socio_folha.visualizar');

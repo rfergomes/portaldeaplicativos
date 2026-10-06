@@ -16,7 +16,7 @@ class SocioCaixaController extends Controller
         session(['socio_caixa_url' => request()->fullUrl()]);
         
         // 1. Definir padrões se for a primeira vez
-        if (!$request->has('min_abertos')) {
+        if (!$request->has('min_abertos') && !$request->has('max_abertos')) {
             $request->merge(['min_abertos' => 2]);
         }
 
@@ -53,8 +53,9 @@ class SocioCaixaController extends Controller
             ->selectSub(\App\Models\SocioCaixaOcorrencia::whereColumn('matricula', 'socio_caixas.matricula')->where('mensagem', 'LIKE', '[WHATSAPP]%')->selectRaw('COUNT(*)'), 'qtde_contatos')
             ->groupBy('matricula', 'nome', 'tipo_socio');
 
-        // Filtro de quantidade mínima em aberto
-        $minAbertos = $request->input('min_abertos', 2);
+        // Filtros de quantidade de mensalidades em aberto (faixa flexível)
+        $minAbertos = $request->input('min_abertos');
+        $maxAbertos = $request->input('max_abertos');
         
         if ($request->has('ver_inativados')) {
             // Ao consultar inativados, listamos todos independentemente de filtro de abertos
@@ -62,9 +63,18 @@ class SocioCaixaController extends Controller
         } elseif ($request->has('ver_postergados')) {
             $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND postergado_ate > NOW()) THEN 1 END) > 0');
         } else {
-            // Se min_abertos não foi informado, mantemos o padrão de mostrar quem tem pelo menos 1 (para ser um "Painel de Pendências")
-            $threshold = $minAbertos > 0 ? $minAbertos : 1;
-            $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) >= ?', [$threshold]);
+            $temFiltroFaixa = false;
+            if ($minAbertos !== null && $minAbertos !== '') {
+                $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) >= ?', [(int) $minAbertos]);
+                $temFiltroFaixa = true;
+            }
+            if ($maxAbertos !== null && $maxAbertos !== '') {
+                $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) <= ?', [(int) $maxAbertos]);
+                $temFiltroFaixa = true;
+            }
+            if (!$temFiltroFaixa) {
+                $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) >= 1');
+            }
         }
 
         $socios = $query->orderBy('nome')
@@ -373,4 +383,42 @@ class SocioCaixaController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    /**
+     * Pré-visualização quantitativa para disparo em lote de WhatsApp (Sócio Caixa).
+     */
+    public function whatsappLotePreview(Request $request, \App\Domain\Whatsapp\Services\WhatsappLoteDispatcherService $dispatcher)
+    {
+        $preview = $dispatcher->previewCaixa($request->all());
+        return response()->json(array_merge(['success' => true], $preview));
+    }
+
+    /**
+     * Efetiva a criação e enfileiramento do lote de WhatsApp para Sócio Caixa.
+     */
+    public function dispararWhatsappLote(Request $request, \App\Domain\Whatsapp\Services\WhatsappLoteDispatcherService $dispatcher)
+    {
+        $request->validate([
+            'whatsapp_template_id' => 'required|exists:whatsapp_templates,id',
+            'filtros' => 'nullable|array',
+            'parametros_extras' => 'nullable|array',
+        ]);
+
+        $dto = \App\Domain\Whatsapp\DTOs\WhatsappLotePayloadDTO::fromArray([
+            'modulo' => 'caixa',
+            'whatsapp_template_id' => (int) $request->input('whatsapp_template_id'),
+            'filtros' => (array) $request->input('filtros', []),
+            'parametros_extras' => (array) $request->input('parametros_extras', []),
+        ], auth()->id());
+
+        $lote = $dispatcher->criarLoteCaixa($dto);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Disparo em lote iniciado com sucesso!',
+            'lote_id' => $lote->id,
+            'total_enfileirados' => $lote->total_destinatarios,
+        ]);
+    }
 }
+

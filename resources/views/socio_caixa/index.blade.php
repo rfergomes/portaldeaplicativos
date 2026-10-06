@@ -56,15 +56,27 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <label class="small fw-bold text-secondary">Min. em Aberto</label>
+                                <label class="small fw-bold text-secondary">Mín. em Aberto</label>
                                 <select name="min_abertos" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    <option value="0">Qualquer</option>
+                                    <option value="">Qualquer</option>
                                     @for($i=1; $i<=12; $i++)
                                         <option value="{{ $i }}" {{ request('min_abertos') == $i ? 'selected' : '' }}>{{ $i }}+ meses</option>
                                     @endfor
                                 </select>
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-2">
+                                <label class="small fw-bold text-secondary">Máx. em Aberto</label>
+                                <select name="max_abertos" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="">Qualquer</option>
+                                    <option value="0" {{ request('max_abertos') === '0' ? 'selected' : '' }}>0 (Em dia)</option>
+                                    <option value="1" {{ request('max_abertos') == '1' ? 'selected' : '' }}>Até 1 aberta</option>
+                                    <option value="2" {{ request('max_abertos') == '2' ? 'selected' : '' }}>Até 2 abertas (< 3)</option>
+                                    <option value="3" {{ request('max_abertos') == '3' ? 'selected' : '' }}>Até 3 abertas</option>
+                                    <option value="5" {{ request('max_abertos') == '5' ? 'selected' : '' }}>Até 5 abertas</option>
+                                    <option value="12" {{ request('max_abertos') == '12' ? 'selected' : '' }}>Até 12 abertas</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
                                 <label class="small fw-bold text-secondary">Busca Rápida (Nome ou Matrícula)</label>
                                 <div class="input-group input-group-sm">
                                     <input type="text" name="nome" class="form-control" placeholder="Digite o nome..." value="{{ request('nome') }}">
@@ -106,6 +118,18 @@
 
     <!-- Table Card -->
     <div class="card mt-4 shadow-sm border-0">
+        <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="fw-bold mb-0 text-dark">
+                <i class="fas fa-users text-primary me-2"></i>Associados Filtrados ({{ $socios->total() }})
+            </h5>
+            <div class="d-flex gap-2">
+                @if(auth()->user()->temPermissao('socio_caixa.gerenciar'))
+                    <button type="button" class="btn btn-success fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalWhatsappLote">
+                        <i class="fa-brands fa-whatsapp me-2"></i>Disparo em Massa WhatsApp
+                    </button>
+                @endif
+            </div>
+        </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0 premium-table">
@@ -339,6 +363,8 @@
 }
 .quick-postpone.active { background-color: #ffc107; color: #000; border-color: #ffc107; }
 </style>
+
+@include('socio_caixa.partials.modal_whatsapp_lote')
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
