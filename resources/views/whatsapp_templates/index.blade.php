@@ -112,7 +112,7 @@
                                             @endforeach
                                         </div>
                                     @else
-                                        <span class="text-muted small">Apenas Nome ({{ '{{1}}' }})</span>
+                                        <span class="text-muted small">Apenas Nome (@{{1}})</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
