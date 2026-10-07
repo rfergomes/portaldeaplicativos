@@ -792,32 +792,6 @@
                             </li>
                         @endif
 
-                        <!-- WhatsApp & Lotes -->
-                        @php $isWhatsappActive = request()->routeIs('whatsapp-templates.*') || request()->routeIs('whatsapp-lotes.*'); @endphp
-                        <li class="nav-item {{ $isWhatsappActive ? 'menu-open' : '' }}">
-                            <a href="#" class="nav-link {{ $isWhatsappActive ? 'active' : '' }}">
-                                <i class="nav-icon fa-brands fa-whatsapp text-success"></i>
-                                <p>
-                                    WhatsApp & Lotes
-                                    <i class="nav-arrow fa-solid fa-chevron-right"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ route('whatsapp-templates.index') }}" class="nav-link {{ request()->routeIs('whatsapp-templates.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-file-lines"></i>
-                                        <p>Templates</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('whatsapp-lotes.index') }}" class="nav-link {{ request()->routeIs('whatsapp-lotes.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fa-solid fa-paper-plane"></i>
-                                        <p>Histórico de Lotes</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-
                         <!-- Cadastro -->
                         @if(auth()->user()->temPermissao('empresas.visualizar') || auth()->user()->temPermissao('regioes.visualizar'))
                             @php
@@ -866,7 +840,7 @@
                         <!-- Administração -->
                         @if(auth()->user()->temPermissao('usuarios.visualizar') || auth()->user()->temPermissao('administrar_usuarios'))
                             @php
-                                $isAdminActive = request()->routeIs('users.*') || request()->routeIs('perfis.*') || request()->routeIs('protocolos.tipos.*') || request()->routeIs('token-deptos.*') || request()->routeIs('admin.relatorios.*') || request()->routeIs('admin.convencoes.*');
+                                $isAdminActive = request()->routeIs('users.*') || request()->routeIs('perfis.*') || request()->routeIs('protocolos.tipos.*') || request()->routeIs('token-deptos.*') || request()->routeIs('admin.relatorios.*') || request()->routeIs('admin.convencoes.*') || request()->routeIs('whatsapp-templates.*') || request()->routeIs('whatsapp-lotes.*');
                             @endphp
                             <li class="nav-item {{ $isAdminActive ? 'menu-open' : '' }}">
                                 <a href="#" class="nav-link {{ $isAdminActive ? 'active' : '' }}">
@@ -929,6 +903,22 @@
                                             </a>
                                         </li>
                                     @endif
+
+                                    <!-- WhatsApp (Reservado na Administração) -->
+                                    <li class="nav-item">
+                                        <a href="{{ route('whatsapp-templates.index') }}"
+                                            class="nav-link {{ request()->routeIs('whatsapp-templates.*') ? 'active' : '' }}">
+                                            <i class="nav-icon fa-brands fa-whatsapp text-success"></i>
+                                            <p>WhatsApp (Templates)</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('whatsapp-lotes.index') }}"
+                                            class="nav-link {{ request()->routeIs('whatsapp-lotes.*') ? 'active' : '' }}">
+                                            <i class="nav-icon fa-solid fa-paper-plane text-info"></i>
+                                            <p>WhatsApp (Lotes)</p>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         @endif
