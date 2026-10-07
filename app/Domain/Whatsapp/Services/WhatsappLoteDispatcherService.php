@@ -71,11 +71,23 @@ class WhatsappLoteDispatcherService
         $minAbertos = isset($filtros['min_abertos']) && $filtros['min_abertos'] !== '' ? (int) $filtros['min_abertos'] : null;
         $maxAbertos = isset($filtros['max_abertos']) && $filtros['max_abertos'] !== '' ? (int) $filtros['max_abertos'] : null;
 
-        if ($minAbertos !== null) {
-            $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) >= ?', [$minAbertos]);
-        }
+        $countSql = 'COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END)';
+
         if ($maxAbertos !== null) {
-            $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) <= ?', [$maxAbertos]);
+            if ($maxAbertos === 0) {
+                // 0 (Em dia): estritamente 0 abertos
+                $query->havingRaw("{$countSql} = 0");
+            } else {
+                // Até N abertas: estritamente > 0 e <= N (excluindo quem está em dia)
+                if ($minAbertos !== null) {
+                    $query->havingRaw("{$countSql} >= ?", [$minAbertos]);
+                } else {
+                    $query->havingRaw("{$countSql} > 0");
+                }
+                $query->havingRaw("{$countSql} <= ?", [$maxAbertos]);
+            }
+        } elseif ($minAbertos !== null) {
+            $query->havingRaw("{$countSql} >= ?", [$minAbertos]);
         }
 
         return $query;

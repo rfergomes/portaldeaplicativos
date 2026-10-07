@@ -63,17 +63,26 @@ class SocioCaixaController extends Controller
         } elseif ($request->has('ver_postergados')) {
             $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND postergado_ate > NOW()) THEN 1 END) > 0');
         } else {
-            $temFiltroFaixa = false;
-            if ($minAbertos !== null && $minAbertos !== '') {
-                $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) >= ?', [(int) $minAbertos]);
-                $temFiltroFaixa = true;
-            }
+            $countSql = 'COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END)';
+
             if ($maxAbertos !== null && $maxAbertos !== '') {
-                $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) <= ?', [(int) $maxAbertos]);
-                $temFiltroFaixa = true;
-            }
-            if (!$temFiltroFaixa) {
-                $query->havingRaw('COUNT(CASE WHEN (pago = 0 AND (postergado_ate IS NULL OR postergado_ate <= NOW())) THEN 1 END) >= 1');
+                $maxVal = (int) $maxAbertos;
+                if ($maxVal === 0) {
+                    // 0 (Em dia): apenas quem tem estritamente 0 em aberto
+                    $query->havingRaw("{$countSql} = 0");
+                } else {
+                    // Até N abertas: estritamente > 0 e <= N (excluindo em dia, a menos que min_abertos seja especificado)
+                    if ($minAbertos !== null && $minAbertos !== '') {
+                        $query->havingRaw("{$countSql} >= ?", [(int) $minAbertos]);
+                    } else {
+                        $query->havingRaw("{$countSql} > 0");
+                    }
+                    $query->havingRaw("{$countSql} <= ?", [$maxVal]);
+                }
+            } elseif ($minAbertos !== null && $minAbertos !== '') {
+                $query->havingRaw("{$countSql} >= ?", [(int) $minAbertos]);
+            } else {
+                $query->havingRaw("{$countSql} >= 1");
             }
         }
 
