@@ -21,12 +21,19 @@ class WhatsappTemplate extends Model
         'corpo_exemplo',
         'parametros_esperados',
         'ativo',
+        'status_meta',
+        'categoria',
+        'language',
+        'namespace',
+        'rejected_reason',
+        'sincronizado_em',
         'user_id',
     ];
 
     protected $casts = [
         'parametros_esperados' => 'array',
         'ativo' => 'boolean',
+        'sincronizado_em' => 'datetime',
     ];
 
     public function user(): BelongsTo

@@ -11,8 +11,14 @@
             </h1>
             <p class="text-muted mb-0">Modelos de mensagens homologados para comunicação e disparos em lote</p>
         </div>
-        <div>
-            <a href="{{ route('whatsapp-lotes.index') }}" class="btn btn-outline-secondary me-2">
+        <div class="d-flex align-items-center gap-2">
+            <form action="{{ route('whatsapp-templates.sincronizar') }}" method="POST" class="d-inline" id="formSyncKwik">
+                @csrf
+                <button type="submit" class="btn btn-primary fw-bold shadow-sm" id="btnSyncKwik" title="Sincronizar templates homologados da Meta via API Kwik">
+                    <i class="fas fa-arrows-rotate me-1" id="iconSyncKwik"></i>Sincronizar com Kwik
+                </button>
+            </form>
+            <a href="{{ route('whatsapp-lotes.index') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-history me-1"></i>Histórico de Lotes
             </a>
             <button type="button" class="btn btn-success fw-bold" data-bs-toggle="modal" data-bs-target="#modalNovoTemplate">
@@ -79,12 +85,13 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-3" style="width: 220px;">Nome do Template</th>
+                            <th class="ps-3" style="width: 240px;">Nome do Template</th>
                             <th>Descrição</th>
                             <th>Corpo de Exemplo</th>
-                            <th style="width: 180px;">Parâmetros Extras</th>
-                            <th class="text-center" style="width: 100px;">Status</th>
-                            <th class="text-end pe-3" style="width: 140px;">Ações</th>
+                            <th style="width: 170px;">Parâmetros Extras</th>
+                            <th class="text-center" style="width: 130px;">Status Meta</th>
+                            <th class="text-center" style="width: 90px;">Disparo</th>
+                            <th class="text-end pe-3" style="width: 130px;">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -92,14 +99,28 @@
                             <tr>
                                 <td class="ps-3">
                                     <div class="fw-bold text-dark font-monospace">{{ $template->nome }}</div>
-                                    <small class="text-muted">Criado por: {{ $template->user?->name ?? 'Sistema' }}</small>
+                                    <div class="d-flex flex-wrap gap-1 align-items-center mt-1">
+                                        @if($template->categoria)
+                                            <span class="badge bg-light text-dark border small" style="font-size: 0.7rem;">{{ $template->categoria }}</span>
+                                        @endif
+                                        @if($template->language)
+                                            <span class="badge bg-light text-muted border small" style="font-size: 0.7rem;">{{ $template->language }}</span>
+                                        @endif
+                                    </div>
+                                    @if($template->sincronizado_em)
+                                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;" title="Última sincronização com Kwik">
+                                            <i class="fas fa-cloud text-primary me-1"></i>Sinc: {{ $template->sincronizado_em->format('d/m/Y H:i') }}
+                                        </small>
+                                    @else
+                                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Criado por: {{ $template->user?->name ?? 'Sistema' }}</small>
+                                    @endif
                                 </td>
                                 <td>
                                     <span class="text-secondary">{{ $template->descricao }}</span>
                                 </td>
                                 <td>
                                     @if($template->corpo_exemplo)
-                                        <div class="small text-muted bg-light p-2 rounded border border-light-subtle" style="max-width: 420px; white-space: pre-wrap;">{{ $template->corpo_exemplo }}</div>
+                                        <div class="small text-muted bg-light p-2 rounded border border-light-subtle font-monospace" style="max-width: 420px; white-space: pre-wrap; font-size: 0.8rem;">{{ $template->corpo_exemplo }}</div>
                                     @else
                                         <span class="text-muted fst-italic small">Não informado</span>
                                     @endif
@@ -112,14 +133,31 @@
                                             @endforeach
                                         </div>
                                     @else
-                                        <span class="text-muted small">Apenas Nome (@{{1}})</span>
+                                        <span class="text-muted small">Apenas Nome ({{ '{' . '{1}' . '}' }})</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if($template->status_meta === 'approved')
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                            <i class="fas fa-check-circle me-1"></i>Aprovado
+                                        </span>
+                                    @elseif($template->status_meta === 'pending')
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">
+                                            <i class="fas fa-clock me-1"></i>Pendente
+                                        </span>
+                                    @elseif($template->status_meta === 'rejected')
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" title="{{ $template->rejected_reason ?? 'Rejeitado pela Meta' }}">
+                                            <i class="fas fa-times-circle me-1"></i>Rejeitado
+                                        </span>
+                                    @else
+                                        <span class="badge bg-light text-muted border px-2 py-1">Manual</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
                                     @if($template->ativo)
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Ativo</span>
+                                        <span class="badge bg-success px-2 py-1">Ativo</span>
                                     @else
-                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Inativo</span>
+                                        <span class="badge bg-secondary px-2 py-1">Inativo</span>
                                     @endif
                                 </td>
                                 <td class="text-end pe-3">
@@ -139,7 +177,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center py-5 text-muted">
+                                <td colspan="7" class="text-center py-5 text-muted">
                                     <i class="fa-brands fa-whatsapp fs-1 text-muted d-block mb-2"></i>
                                     Nenhum template de WhatsApp cadastrado.
                                 </td>
@@ -253,6 +291,19 @@
 
 @push('scripts')
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const formSync = document.getElementById('formSyncKwik');
+        if (formSync) {
+            formSync.addEventListener('submit', function () {
+                const btn = document.getElementById('btnSyncKwik');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Sincronizando...';
+                }
+            });
+        }
+    });
+
     function abrirModalEditar(template) {
         const form = document.getElementById('formEditarTemplate');
         form.action = `/whatsapp-templates/${template.id}`;

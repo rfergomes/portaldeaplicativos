@@ -315,6 +315,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // WhatsApp Templates & Lotes
+    Route::post('/whatsapp-templates/sincronizar', [WhatsappTemplateController::class, 'sincronizar'])->name('whatsapp-templates.sincronizar');
     Route::get('/whatsapp-templates/ativos', [WhatsappTemplateController::class, 'ativos'])->name('whatsapp-templates.ativos');
     Route::get('/whatsapp-lotes', [WhatsappTemplateController::class, 'lotes'])->name('whatsapp-lotes.index');
     Route::get('/whatsapp-lotes/{id}/status', [WhatsappTemplateController::class, 'statusLote'])->name('whatsapp-lotes.status');

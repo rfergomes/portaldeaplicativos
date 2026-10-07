@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Domain\Whatsapp\Services\KwikTemplateSyncService;
 use App\Http\Requests\WhatsappTemplateRequest;
 use App\Models\WhatsappLote;
 use App\Models\WhatsappTemplate;
@@ -14,6 +15,21 @@ use Illuminate\View\View;
 
 class WhatsappTemplateController extends Controller
 {
+    /**
+     * Sincroniza os templates de WhatsApp homologados na Meta a partir da API Kwik.
+     */
+    public function sincronizar(KwikTemplateSyncService $syncService): RedirectResponse
+    {
+        $resultado = $syncService->sincronizar(auth()->id());
+
+        if (!empty($resultado->erros)) {
+            return redirect()->route('whatsapp-templates.index')
+                ->with('error', 'Falha na sincronização: ' . implode('; ', $resultado->erros));
+        }
+
+        return redirect()->route('whatsapp-templates.index')
+            ->with('success', $resultado->resumoMensagem());
+    }
     /**
      * Listagem dos templates de WhatsApp cadastrados.
      */
