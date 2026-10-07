@@ -107,6 +107,75 @@ document.addEventListener('DOMContentLoaded', function () {
         return filtros;
     }
 
+    function encontrarTemplate(id) {
+        if (!id) return null;
+        return templatesDisponiveis.find(t => String(t.id) === String(id)) || null;
+    }
+
+    function atualizarEstadoBotaoDisparo() {
+        const btn = document.getElementById('btnConfirmarDisparoLote');
+        const select = document.getElementById('selectTemplateLote');
+        const aptos = parseInt(document.getElementById('previewTotalAptos').innerText) || 0;
+        const template = encontrarTemplate(select.value);
+
+        if (!template || aptos <= 0) {
+            btn.disabled = true;
+            return;
+        }
+
+        // Valida parâmetros extras se exigidos
+        const inputsExtras = document.querySelectorAll('.campo-parametro-extra');
+        for (const input of inputsExtras) {
+            if (!input.value.trim()) {
+                btn.disabled = true;
+                return;
+            }
+        }
+
+        btn.disabled = false;
+    }
+
+    function renderizarPreviaTemplate(templateId) {
+        const template = encontrarTemplate(templateId);
+        const boxPrevia = document.getElementById('boxPreviaTemplate');
+        const boxParams = document.getElementById('boxParametrosExtras');
+        const containerParams = document.getElementById('containerCamposParametros');
+        containerParams.innerHTML = '';
+
+        if (!template) {
+            boxPrevia.classList.add('d-none');
+            boxParams.classList.add('d-none');
+            atualizarEstadoBotaoDisparo();
+            return;
+        }
+
+        // Exibe prévia formatada
+        boxPrevia.classList.remove('d-none');
+        document.getElementById('badgeNomeTemplate').textContent = template.nome;
+        document.getElementById('txtDescricaoTemplate').textContent = template.descricao;
+        document.getElementById('txtCorpoTemplate').textContent = template.corpo_exemplo || 'Texto de exemplo não cadastrado.';
+
+        // Gera campos para parâmetros extras (se houver)
+        if (Array.isArray(template.parametros_esperados) && template.parametros_esperados.length > 0) {
+            boxParams.classList.remove('d-none');
+            template.parametros_esperados.forEach((paramNome, index) => {
+                const div = document.createElement('div');
+                div.className = 'input-group';
+                div.innerHTML = `
+                    <span class="input-group-text bg-light text-muted small" style="min-width: 140px;">${paramNome}</span>
+                    <input type="text" class="form-control campo-parametro-extra" data-index="${index}" placeholder="Valor para ${paramNome}" required>
+                `;
+                const inputEl = div.querySelector('input');
+                inputEl.addEventListener('input', atualizarEstadoBotaoDisparo);
+                containerParams.appendChild(div);
+            });
+        } else {
+            boxParams.classList.add('d-none');
+        }
+
+        atualizarEstadoBotaoDisparo();
+    }
+
     function carregarPreview() {
         document.getElementById('loadingPreviewLote').classList.remove('d-none');
         document.getElementById('conteudoPreviewLote').classList.add('d-none');
@@ -129,13 +198,12 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('previewTotalAptos').innerText = data.total_aptos || 0;
             document.getElementById('previewTotalSemTelefone').innerText = data.total_sem_telefone || 0;
 
-            if (data.total_aptos > 0 && document.getElementById('selectTemplateLote').value) {
-                document.getElementById('btnConfirmarDisparoLote').disabled = false;
-            }
+            atualizarEstadoBotaoDisparo();
         })
         .catch(err => {
             console.error('Erro ao carregar preview do lote:', err);
             document.getElementById('loadingPreviewLote').innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i>Erro ao carregar prévia de associados.</span>';
+            atualizarEstadoBotaoDisparo();
         });
     }
 
@@ -154,60 +222,33 @@ document.addEventListener('DOMContentLoaded', function () {
                 opt.textContent = `${t.nome} - ${t.descricao}`;
                 select.appendChild(opt);
             });
+
+            // Se houver apenas 1 template ativo homologado, auto-seleciona para facilitar
+            if (templates.length === 1) {
+                select.value = templates[0].id;
+            }
+
+            if (select.value) {
+                renderizarPreviaTemplate(select.value);
+            } else {
+                atualizarEstadoBotaoDisparo();
+            }
         })
         .catch(err => {
             console.error('Erro ao carregar templates:', err);
             select.innerHTML = '<option value="">Erro ao carregar templates</option>';
+            atualizarEstadoBotaoDisparo();
         });
     }
 
     document.getElementById('selectTemplateLote').addEventListener('change', function () {
-        const templateId = parseInt(this.value);
-        const template = templatesDisponiveis.find(t => t.id === templateId);
-
-        const boxPrevia = document.getElementById('boxPreviaTemplate');
-        const boxParams = document.getElementById('boxParametrosExtras');
-        const containerParams = document.getElementById('containerCamposParametros');
-        containerParams.innerHTML = '';
-
-        if (!template) {
-            boxPrevia.classList.add('d-none');
-            boxParams.classList.add('d-none');
-            document.getElementById('btnConfirmarDisparoLote').disabled = true;
-            return;
-        }
-
-        // Exibe prévia
-        boxPrevia.classList.remove('d-none');
-        document.getElementById('badgeNomeTemplate').textContent = template.nome;
-        document.getElementById('txtDescricaoTemplate').textContent = template.descricao;
-        document.getElementById('txtCorpoTemplate').textContent = template.corpo_exemplo || 'Texto de exemplo não cadastrado.';
-
-        // Gera campos para parâmetros extras
-        if (Array.isArray(template.parametros_esperados) && template.parametros_esperados.length > 0) {
-            boxParams.classList.remove('d-none');
-            template.parametros_esperados.forEach((paramNome, index) => {
-                const div = document.createElement('div');
-                div.className = 'input-group';
-                div.innerHTML = `
-                    <span class="input-group-text bg-light text-muted small" style="min-width: 140px;">${paramNome}</span>
-                    <input type="text" class="form-control campo-parametro-extra" data-index="${index}" placeholder="Valor para ${paramNome}" required>
-                `;
-                containerParams.appendChild(div);
-            });
-        } else {
-            boxParams.classList.add('d-none');
-        }
-
-        const aptos = parseInt(document.getElementById('previewTotalAptos').innerText) || 0;
-        if (aptos > 0) {
-            document.getElementById('btnConfirmarDisparoLote').disabled = false;
-        }
+        renderizarPreviaTemplate(this.value);
     });
 
     document.getElementById('btnConfirmarDisparoLote').addEventListener('click', function () {
         const select = document.getElementById('selectTemplateLote');
-        if (!select.value) {
+        const template = encontrarTemplate(select.value);
+        if (!template) {
             alert('Por favor, selecione um template antes de disparar.');
             return;
         }
@@ -239,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
-                whatsapp_template_id: parseInt(select.value),
+                whatsapp_template_id: template.id,
                 filtros: getFiltrosAtuais(),
                 parametros_extras: paramsExtras
             })

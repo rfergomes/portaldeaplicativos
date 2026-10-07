@@ -106,6 +106,73 @@ document.addEventListener('DOMContentLoaded', function () {
         return filtros;
     }
 
+    function encontrarTemplateFolha(id) {
+        if (!id) return null;
+        return templatesDisponiveisFolha.find(t => String(t.id) === String(id)) || null;
+    }
+
+    function atualizarEstadoBotaoDisparoFolha() {
+        const btn = document.getElementById('btnConfirmarDisparoLoteFolha');
+        const select = document.getElementById('selectTemplateLoteFolha');
+        const aptos = parseInt(document.getElementById('previewTotalAptosFolha').innerText) || 0;
+        const template = encontrarTemplateFolha(select.value);
+
+        if (!template || aptos <= 0) {
+            btn.disabled = true;
+            return;
+        }
+
+        // Valida parâmetros extras se exigidos
+        const inputsExtras = document.querySelectorAll('.campo-parametro-extra-folha');
+        for (const input of inputsExtras) {
+            if (!input.value.trim()) {
+                btn.disabled = true;
+                return;
+            }
+        }
+
+        btn.disabled = false;
+    }
+
+    function renderizarPreviaTemplateFolha(templateId) {
+        const template = encontrarTemplateFolha(templateId);
+        const boxPrevia = document.getElementById('boxPreviaTemplateFolha');
+        const boxParams = document.getElementById('boxParametrosExtrasFolha');
+        const containerParams = document.getElementById('containerCamposParametrosFolha');
+        containerParams.innerHTML = '';
+
+        if (!template) {
+            boxPrevia.classList.add('d-none');
+            boxParams.classList.add('d-none');
+            atualizarEstadoBotaoDisparoFolha();
+            return;
+        }
+
+        boxPrevia.classList.remove('d-none');
+        document.getElementById('badgeNomeTemplateFolha').textContent = template.nome;
+        document.getElementById('txtDescricaoTemplateFolha').textContent = template.descricao;
+        document.getElementById('txtCorpoTemplateFolha').textContent = template.corpo_exemplo || 'Texto de exemplo não cadastrado.';
+
+        if (Array.isArray(template.parametros_esperados) && template.parametros_esperados.length > 0) {
+            boxParams.classList.remove('d-none');
+            template.parametros_esperados.forEach((paramNome, index) => {
+                const div = document.createElement('div');
+                div.className = 'input-group';
+                div.innerHTML = `
+                    <span class="input-group-text bg-light text-muted small" style="min-width: 140px;">${paramNome}</span>
+                    <input type="text" class="form-control campo-parametro-extra-folha" data-index="${index}" placeholder="Valor para ${paramNome}" required>
+                `;
+                const inputEl = div.querySelector('input');
+                inputEl.addEventListener('input', atualizarEstadoBotaoDisparoFolha);
+                containerParams.appendChild(div);
+            });
+        } else {
+            boxParams.classList.add('d-none');
+        }
+
+        atualizarEstadoBotaoDisparoFolha();
+    }
+
     function carregarPreviewFolha() {
         document.getElementById('loadingPreviewLoteFolha').classList.remove('d-none');
         document.getElementById('conteudoPreviewLoteFolha').classList.add('d-none');
@@ -128,13 +195,12 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('previewTotalAptosFolha').innerText = data.total_aptos || 0;
             document.getElementById('previewTotalSemTelefoneFolha').innerText = data.total_sem_telefone || 0;
 
-            if (data.total_aptos > 0 && document.getElementById('selectTemplateLoteFolha').value) {
-                document.getElementById('btnConfirmarDisparoLoteFolha').disabled = false;
-            }
+            atualizarEstadoBotaoDisparoFolha();
         })
         .catch(err => {
             console.error('Erro ao carregar preview do lote folha:', err);
             document.getElementById('loadingPreviewLoteFolha').innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i>Erro ao carregar prévia da folha.</span>';
+            atualizarEstadoBotaoDisparoFolha();
         });
     }
 
@@ -153,58 +219,33 @@ document.addEventListener('DOMContentLoaded', function () {
                 opt.textContent = `${t.nome} - ${t.descricao}`;
                 select.appendChild(opt);
             });
+
+            // Se houver apenas 1 template ativo, auto-seleciona
+            if (templates.length === 1) {
+                select.value = templates[0].id;
+            }
+
+            if (select.value) {
+                renderizarPreviaTemplateFolha(select.value);
+            } else {
+                atualizarEstadoBotaoDisparoFolha();
+            }
         })
         .catch(err => {
             console.error('Erro ao carregar templates:', err);
             select.innerHTML = '<option value="">Erro ao carregar templates</option>';
+            atualizarEstadoBotaoDisparoFolha();
         });
     }
 
     document.getElementById('selectTemplateLoteFolha').addEventListener('change', function () {
-        const templateId = parseInt(this.value);
-        const template = templatesDisponiveisFolha.find(t => t.id === templateId);
-
-        const boxPrevia = document.getElementById('boxPreviaTemplateFolha');
-        const boxParams = document.getElementById('boxParametrosExtrasFolha');
-        const containerParams = document.getElementById('containerCamposParametrosFolha');
-        containerParams.innerHTML = '';
-
-        if (!template) {
-            boxPrevia.classList.add('d-none');
-            boxParams.classList.add('d-none');
-            document.getElementById('btnConfirmarDisparoLoteFolha').disabled = true;
-            return;
-        }
-
-        boxPrevia.classList.remove('d-none');
-        document.getElementById('badgeNomeTemplateFolha').textContent = template.nome;
-        document.getElementById('txtDescricaoTemplateFolha').textContent = template.descricao;
-        document.getElementById('txtCorpoTemplateFolha').textContent = template.corpo_exemplo || 'Texto de exemplo não cadastrado.';
-
-        if (Array.isArray(template.parametros_esperados) && template.parametros_esperados.length > 0) {
-            boxParams.classList.remove('d-none');
-            template.parametros_esperados.forEach((paramNome, index) => {
-                const div = document.createElement('div');
-                div.className = 'input-group';
-                div.innerHTML = `
-                    <span class="input-group-text bg-light text-muted small" style="min-width: 140px;">${paramNome}</span>
-                    <input type="text" class="form-control campo-parametro-extra-folha" data-index="${index}" placeholder="Valor para ${paramNome}" required>
-                `;
-                containerParams.appendChild(div);
-            });
-        } else {
-            boxParams.classList.add('d-none');
-        }
-
-        const aptos = parseInt(document.getElementById('previewTotalAptosFolha').innerText) || 0;
-        if (aptos > 0) {
-            document.getElementById('btnConfirmarDisparoLoteFolha').disabled = false;
-        }
+        renderizarPreviaTemplateFolha(this.value);
     });
 
     document.getElementById('btnConfirmarDisparoLoteFolha').addEventListener('click', function () {
         const select = document.getElementById('selectTemplateLoteFolha');
-        if (!select.value) {
+        const template = encontrarTemplateFolha(select.value);
+        if (!template) {
             alert('Por favor, selecione um template antes de disparar.');
             return;
         }
@@ -236,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
-                whatsapp_template_id: parseInt(select.value),
+                whatsapp_template_id: template.id,
                 filtros: getFiltrosAtuaisFolha(),
                 parametros_extras: paramsExtras
             })
