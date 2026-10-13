@@ -36,6 +36,21 @@ class DesfiliacaoTest extends TestCase
         $response->assertSee('Nome Completo do Trabalhador');
     }
 
+    public function test_rota_raiz_desfiliacao_exibe_diretamente_formulario(): void
+    {
+        $response = $this->get('/desfiliacao');
+
+        $response->assertStatus(200);
+        $response->assertSee('Requerimento de Desfiliação Sindical');
+    }
+
+    public function test_rota_desfilizacao_redireciona_para_desfiliacao(): void
+    {
+        $response = $this->get('/desfilizacao');
+
+        $response->assertRedirect('/desfiliacao');
+    }
+
     public function test_valida_campos_obrigatorios_ao_solicitar(): void
     {
         $response = $this->post(route('desfiliacao.store'), []);

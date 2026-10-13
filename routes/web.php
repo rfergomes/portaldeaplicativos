@@ -358,6 +358,9 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('desfiliacao')->group(function () {
+    // Atalho amigável: /desfiliacao abre diretamente o formulário de solicitação
+    Route::get('/', [DesfiliacaoController::class, 'create'])->name('desfiliacao.index');
+
     // Etapa 1: Formulário público e envio de e-mail com link assinado
     Route::get('/solicitar', [DesfiliacaoController::class, 'create'])->name('desfiliacao.create');
     Route::post('/solicitar', [DesfiliacaoController::class, 'store'])
@@ -380,6 +383,9 @@ Route::prefix('desfiliacao')->group(function () {
     // Etapa 3: Validação Pública da Autenticidade (Hash / QR Code)
     Route::get('/validar/{hash?}', [DesfiliacaoController::class, 'validar'])->name('desfiliacao.validar');
 });
+
+// Redirecionamento amigável para possíveis variações de digitação
+Route::redirect('/desfilizacao', '/desfiliacao');
 
 // Gestão Administrativa Interna
 Route::middleware(['auth'])->prefix('admin')->group(function () {
