@@ -385,13 +385,13 @@
                                 </span>
                             @endif
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow dropdown-user-premium" style="min-width: 300px; padding: 0;">
+                        <ul class="dropdown-menu dropdown-menu-end shadow dropdown-user-premium" style="min-width: 320px; padding: 0;">
                             <li class="user-header-new" style="padding: 12px 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
                                 <h6 class="m-0 font-weight-bold" style="font-size: 0.85rem; color: #1e293b;">
-                                    <i class="fa-solid fa-bell text-primary me-2"></i> Notificações de Demandas
+                                    <i class="fa-solid fa-bell text-primary me-2"></i> Notificações e Pendências
                                 </h6>
                             </li>
-                            <div style="max-height: 250px; overflow-y: auto;">
+                            <div style="max-height: 280px; overflow-y: auto;">
                                 @if(isset($demandasAlertasCount) && $demandasAlertasCount > 0)
                                     @foreach($demandasAlertasList as $alerta)
                                         <li>
@@ -414,10 +414,15 @@
                                     </li>
                                 @endif
                             </div>
-                            <li class="text-center py-2" style="background: #f8fafc; border-top: 1px solid #e2e8f0;">
+                            <li class="py-2 px-3 d-flex justify-content-between align-items-center" style="background: #f8fafc; border-top: 1px solid #e2e8f0;">
                                 <a href="{{ route('demandas.index') }}" class="text-decoration-none" style="font-size: 0.75rem; font-weight: 600; color: #033c5a;">
-                                    <i class="fa-solid fa-list me-1"></i> Ver Todas as Demandas
+                                    <i class="fa-solid fa-list me-1"></i> Demandas
                                 </a>
+                                @if(isset($desfiliacoesPendentesBaixaCount) && $desfiliacoesPendentesBaixaCount > 0)
+                                    <a href="{{ route('admin.desfiliacoes.index', ['status' => 'confirmada']) }}" class="text-decoration-none text-danger" style="font-size: 0.75rem; font-weight: 600;">
+                                        <i class="fa-solid fa-user-xmark me-1"></i> Desfiliações ({{ $desfiliacoesPendentesBaixaCount }})
+                                    </a>
+                                @endif
                             </li>
                         </ul>
                     </li>
@@ -777,7 +782,12 @@
                                     <li class="nav-item">
                                         <a href="{{ route('admin.desfiliacoes.index') }}" class="nav-link {{ request()->routeIs('admin.desfiliacoes.*') ? 'active' : '' }}">
                                             <i class="nav-icon fa-solid fa-file-signature text-warning"></i>
-                                            <p>Desfiliações</p>
+                                            <p>
+                                                Desfiliações
+                                                @if(isset($desfiliacoesPendentesBaixaCount) && $desfiliacoesPendentesBaixaCount > 0)
+                                                    <span class="badge bg-danger ms-auto rounded-pill" title="Aguardando providências / baixa no ERP Ábaco">{{ $desfiliacoesPendentesBaixaCount }}</span>
+                                                @endif
+                                            </p>
                                         </a>
                                     </li>
                                     <li class="nav-item">

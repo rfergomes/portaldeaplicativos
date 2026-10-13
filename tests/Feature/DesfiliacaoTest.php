@@ -293,4 +293,69 @@ class DesfiliacaoTest extends TestCase
 
         $user->delete();
     }
+
+    public function test_operador_pode_efetivar_desfiliacao_e_registrar_baixa_no_erp_abaco(): void
+    {
+        $user = User::factory()->create(['name' => 'Operador Arrecadação']);
+
+        $desfiliacao = Desfiliacao::create([
+            'nome_completo' => 'Carlos Eduardo Ferreira',
+            'cpf' => '111.444.777-35',
+            'empresa' => 'Indústria Teste S/A',
+            'email' => 'carlos.ferreira.teste@example.com',
+            'telefone' => '(19) 98765-4321',
+            'status' => 'confirmada',
+            'confirmado_em' => now(),
+            'termo_hash' => hash('sha256', 'teste-efetivar'),
+        ]);
+
+        $response = $this->actingAs($user)->post(route('admin.desfiliacoes.efetivar', ['id' => $desfiliacao->id]), [
+            'protocolo_abaco' => 'ABACO-2026-99',
+            'observacao_efetivacao' => 'Baixa realizada com sucesso no cadastro ERP Ábaco.',
+        ]);
+
+        $response->assertRedirect(route('admin.desfiliacoes.index'));
+        $response->assertSessionHas('success');
+
+        $desfiliacao->refresh();
+
+        $this->assertTrue($desfiliacao->isEfetivada());
+        $this->assertSame('efetivada', $desfiliacao->status);
+        $this->assertSame($user->id, $desfiliacao->efetivado_por_user_id);
+        $this->assertNotNull($desfiliacao->efetivado_em);
+        $this->assertSame('ABACO-2026-99', $desfiliacao->protocolo_abaco);
+        $this->assertSame('Baixa realizada com sucesso no cadastro ERP Ábaco.', $desfiliacao->observacao_efetivacao);
+
+        $user->delete();
+    }
+
+    public function test_view_composer_carrega_alertas_de_desfiliacao_aguardando_baixa(): void
+    {
+        $user = User::factory()->create(['name' => 'Admin Notificacao']);
+        $perfil = \App\Models\Perfil::firstOrCreate(
+            ['nome' => 'Administrador'],
+            ['descricao' => 'Administrador Geral']
+        );
+        $user->perfis()->syncWithoutDetaching([$perfil->id]);
+
+        $desfiliacao = Desfiliacao::create([
+            'nome_completo' => 'Carlos Eduardo Ferreira',
+            'cpf' => '111.444.777-35',
+            'empresa' => 'Indústria Teste S/A',
+            'email' => 'carlos.ferreira.teste@example.com',
+            'telefone' => '(19) 98765-4321',
+            'status' => 'confirmada',
+            'confirmado_em' => now(),
+            'termo_hash' => hash('sha256', 'teste-composer'),
+        ]);
+
+        $response = $this->actingAs($user)->get(route('admin.desfiliacoes.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Nova Desfiliação (Baixa Ábaco)');
+        $response->assertSee('Carlos Eduardo Ferreira');
+        $response->assertSee('Aguardando Baixa Ábaco');
+
+        $user->delete();
+    }
 }

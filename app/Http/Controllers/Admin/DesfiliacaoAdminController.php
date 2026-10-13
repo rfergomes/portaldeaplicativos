@@ -16,7 +16,7 @@ class DesfiliacaoAdminController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Desfiliacao::query();
+        $query = Desfiliacao::query()->with('efetivadoPor');
 
         if ($request->filled('status')) {
             $query->where('status', $request->string('status')->toString());
@@ -49,6 +49,7 @@ class DesfiliacaoAdminController extends Controller
             'total' => Desfiliacao::count(),
             'pendentes' => Desfiliacao::where('status', 'pendente')->count(),
             'confirmadas' => Desfiliacao::where('status', 'confirmada')->count(),
+            'efetivadas' => Desfiliacao::where('status', 'efetivada')->count(),
         ];
 
         return view('admin.desfiliacoes.index', compact('desfiliacoes', 'totais'));
@@ -56,7 +57,7 @@ class DesfiliacaoAdminController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $desfiliacao = Desfiliacao::findOrFail($id);
+        $desfiliacao = Desfiliacao::with('efetivadoPor')->findOrFail($id);
 
         return response()->json([
             'id' => $desfiliacao->id,
@@ -76,6 +77,12 @@ class DesfiliacaoAdminController extends Controller
             'termo_hash' => $desfiliacao->termo_hash,
             'tem_pdf' => (bool) ($desfiliacao->pdf_path && Storage::disk('local')->exists($desfiliacao->pdf_path)),
             'download_url' => route('admin.desfiliacoes.download', ['id' => $desfiliacao->id]),
+            'is_confirmada' => $desfiliacao->isConfirmada(),
+            'is_efetivada' => $desfiliacao->isEfetivada(),
+            'efetivado_em' => $desfiliacao->efetivado_em?->format('d/m/Y H:i:s'),
+            'efetivado_por' => $desfiliacao->efetivadoPor?->name,
+            'protocolo_abaco' => $desfiliacao->protocolo_abaco,
+            'observacao_efetivacao' => $desfiliacao->observacao_efetivacao,
         ]);
     }
 
@@ -94,5 +101,68 @@ class DesfiliacaoAdminController extends Controller
             $filename,
             ['Content-Type' => 'application/pdf']
         );
+    }
+
+    /**
+     * Efetiva a desfiliação após providências/baixa no ERP Ábaco pelo usuário operador.
+     */
+    public function efetivar(Request $request, int $id)
+    {
+        $desfiliacao = Desfiliacao::findOrFail($id);
+
+        if ($desfiliacao->isEfetivada()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Esta desfiliação já foi efetivada anteriormente.',
+                ], 422);
+            }
+            return back()->with('warning', 'Esta desfiliação já foi efetivada anteriormente.');
+        }
+
+        $request->validate([
+            'protocolo_abaco' => 'nullable|string|max:100',
+            'observacao_efetivacao' => 'nullable|string|max:1000',
+        ]);
+
+        $desfiliacao->update([
+            'status' => 'efetivada',
+            'efetivado_por_user_id' => auth()->id(),
+            'efetivado_em' => now(),
+            'protocolo_abaco' => $request->input('protocolo_abaco'),
+            'observacao_efetivacao' => $request->input('observacao_efetivacao'),
+        ]);
+
+        // Se o sócio existir no cadastro de sócios caixa, sincronizar flag inativado_abaco
+        $cpfLimpo = preg_replace('/\D/', '', (string) $desfiliacao->cpf);
+        $sociosCaixa = \App\Models\SocioCaixa::where(function ($q) use ($desfiliacao, $cpfLimpo) {
+            if (! empty($desfiliacao->matricula)) {
+                $q->where('matricula', $desfiliacao->matricula);
+            }
+            if (! empty($cpfLimpo)) {
+                $q->orWhere('cpf', $cpfLimpo);
+            }
+        })->get();
+
+        foreach ($sociosCaixa as $sc) {
+            if (! $sc->inativado_abaco) {
+                $sc->update([
+                    'inativado_abaco' => true,
+                    'inativado_abaco_em' => now(),
+                ]);
+            }
+        }
+
+        $msg = "Desfiliação de {$desfiliacao->nome_completo} efetivada com sucesso! Baixa no ERP Ábaco registrada.";
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'desfiliacao' => $desfiliacao->fresh(['efetivadoPor']),
+            ]);
+        }
+
+        return redirect()->route('admin.desfiliacoes.index')->with('success', $msg);
     }
 }

@@ -30,14 +30,24 @@ class Desfiliacao extends Model
         'assinatura_base64',
         'termo_hash',
         'pdf_path',
+        'efetivado_por_user_id',
+        'efetivado_em',
+        'protocolo_abaco',
+        'observacao_efetivacao',
     ];
 
     protected $casts = [
         'email_verificado_em' => 'datetime',
         'confirmado_em' => 'datetime',
+        'efetivado_em' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function efetivadoPor()
+    {
+        return $this->belongsTo(User::class, 'efetivado_por_user_id');
+    }
 
     public function isPendente(): bool
     {
@@ -47,6 +57,16 @@ class Desfiliacao extends Model
     public function isConfirmada(): bool
     {
         return $this->status === 'confirmada';
+    }
+
+    public function isEfetivada(): bool
+    {
+        return $this->status === 'efetivada';
+    }
+
+    public function scopePendentesBaixaAbaco($query)
+    {
+        return $query->where('status', 'confirmada');
     }
 
     /**

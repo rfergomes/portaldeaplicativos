@@ -108,14 +108,43 @@ class AppServiceProvider extends ServiceProvider
                     ];
                 }
 
+                // 3. Notificações de novas desfiliações confirmadas (aguardando baixa no ERP Ábaco)
+                $desfiliacoesPendentesBaixaCount = 0;
+                $user = auth()->user();
+                if ($user && ($user->can('socio_caixa.visualizar') || $user->temPerfil('Administrador'))) {
+                    try {
+                        $desfiliacoesPendentes = \App\Models\Desfiliacao::where('status', 'confirmada')
+                            ->latest('confirmado_em')
+                            ->take(10)
+                            ->get();
+
+                        $desfiliacoesPendentesBaixaCount = \App\Models\Desfiliacao::where('status', 'confirmada')->count();
+
+                        foreach ($desfiliacoesPendentes as $desf) {
+                            $alertas[] = [
+                                'id' => 'desf-' . $desf->id,
+                                'tipo' => 'desfiliacao',
+                                'icone' => 'fa-solid fa-user-xmark text-danger',
+                                'titulo' => 'Nova Desfiliação (Baixa Ábaco)',
+                                'mensagem' => \Illuminate\Support\Str::limit($desf->nome_completo . ' (' . ($desf->empresa ?: 'Sócio') . ')', 35),
+                                'url' => route('admin.desfiliacoes.index', ['status' => 'confirmada']),
+                            ];
+                        }
+                    } catch (\Throwable $e) {
+                        // Silencia caso a tabela ainda não exista em contextos de bootstrap
+                    }
+                }
+
                 $view->with([
                     'demandasAlertasCount' => count($alertas),
-                    'demandasAlertasList' => $alertas
+                    'demandasAlertasList' => $alertas,
+                    'desfiliacoesPendentesBaixaCount' => $desfiliacoesPendentesBaixaCount,
                 ]);
             } else {
                 $view->with([
                     'demandasAlertasCount' => 0,
-                    'demandasAlertasList' => []
+                    'demandasAlertasList' => [],
+                    'desfiliacoesPendentesBaixaCount' => 0,
                 ]);
             }
         });
