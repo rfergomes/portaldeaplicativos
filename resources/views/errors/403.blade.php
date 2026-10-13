@@ -1,53 +1,40 @@
-@extends('layouts.app')
-
-@section('title', 'Acesso Negado')
-
-@section('content')
-<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 70vh;">
-    <div class="text-center p-5 rounded-4 shadow-lg bg-white border border-danger border-opacity-25" style="max-width: 600px;">
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 - Acesso Não Autorizado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { background-color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }</style>
+</head>
+<body class="d-flex flex-column justify-content-center align-items-center min-vh-100 p-3">
+    <div class="text-center p-5 rounded-4 shadow-lg bg-white border border-danger border-opacity-25" style="max-width: 550px; width: 100%;">
         <div class="mb-4">
-            <i class="fa-solid fa-shield-halved text-danger" style="font-size: 8rem; opacity: 0.15;"></i>
-            <div class="position-absolute start-50 translate-middle-x" style="margin-top: -5rem;">
-                <i class="fa-solid fa-lock text-danger fa-4x shadow-sm p-3 bg-white rounded-circle border border-danger border-3"></i>
-            </div>
+            <i class="fa-solid fa-lock text-danger fa-3x p-3 bg-danger bg-opacity-10 rounded-circle border border-danger border-2"></i>
         </div>
         
-        <h1 class="display-1 fw-bold text-danger mb-0">403</h1>
-        <h2 class="fw-bold text-dark mb-4">Ação Não Autorizada</h2>
+        <h1 class="display-4 fw-bold text-danger mb-0">403</h1>
+        <h2 class="fw-bold text-dark mb-3 fs-5">Ação Não Autorizada ou Link Expirado</h2>
         
-        <p class="text-muted fs-5 mb-5">
-            Desculpe, mas sua conta não possui as permissões necessárias para realizar esta operação ou acessar este recurso.
+        <p class="text-muted mb-4 small leading-relaxed">
+            O link de confirmação acessado expirou (validade de 24 horas), foi adulterado ou você não possui permissão para executar esta operação.
         </p>
         
-        <div class="d-flex gap-3 justify-content-center">
-            <a href="javascript:history.back()" class="btn btn-outline-secondary btn-lg px-4 rounded-pill fw-bold">
-                <i class="fa-solid fa-arrow-left me-2"></i> Voltar
+        <div class="d-flex gap-2 justify-content-center">
+            <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="fa-solid fa-arrow-left me-1"></i> Voltar
             </a>
-            <a href="{{ route('dashboard') }}" class="btn btn-primary btn-lg px-4 rounded-pill fw-bold shadow">
-                <i class="fa-solid fa-house me-2"></i> Ir para a Home
+            <a href="{{ route('desfiliacao.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                <i class="fa-solid fa-file-signature me-1"></i> Nova Solicitação
             </a>
         </div>
         
-        <div class="mt-5 pt-4 border-top">
-            <small class="text-muted">
-                Se você acredita que isso é um erro, entre em contato com o administrador do sistema.
+        <div class="mt-4 pt-3 border-top">
+            <small class="text-muted" style="font-size: 11px;">
+                Portal de Aplicativos Sindicais &copy; {{ date('Y') }}
             </small>
         </div>
     </div>
-</div>
-@endsection
-
-@push('styles')
-<style>
-    body {
-        background-color: #f8fafc !important;
-    }
-    [data-bs-theme="dark"] .bg-white {
-        background-color: var(--bs-secondary-bg) !important;
-        border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-    [data-bs-theme="dark"] .text-dark {
-        color: #f8fafc !important;
-    }
-</style>
-@endpush
+</body>
+</html>

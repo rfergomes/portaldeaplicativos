@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(DashboardPermissionsSeeder::class);
+        $this->call(DesfiliacaoPermissoesSeeder::class);
         
         // 1. Criar Permissões
         $permissoes = [

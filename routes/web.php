@@ -46,6 +46,8 @@ use App\Http\Controllers\Ativos\AtivoFornecedorController;
 use App\Http\Controllers\Ativos\AtivoCessaoController;
 use App\Http\Controllers\DemandaController;
 use App\Http\Controllers\WhatsappTemplateController;
+use App\Http\Controllers\DesfiliacaoController;
+use App\Http\Controllers\Admin\DesfiliacaoAdminController;
 use App\Models\Empresa;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -348,6 +350,42 @@ Route::middleware('auth')->group(function () {
         Route::get('/{socio}/email-historico', [SocioFolhaController::class, 'getEmailHistorico'])->name('email-historico')->middleware('can:socio_folha.visualizar');
         Route::get('/{socio}/historico-alteracoes', [SocioFolhaController::class, 'getHistoricoAlteracoes'])->name('historico-alteracoes')->middleware('can:socio_folha.visualizar');
     });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Módulo de Gestão de Desfiliação Sindical Digital (Lei Federal 14.063/2020)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('desfiliacao')->group(function () {
+    // Etapa 1: Formulário público e envio de e-mail com link assinado
+    Route::get('/solicitar', [DesfiliacaoController::class, 'create'])->name('desfiliacao.create');
+    Route::post('/solicitar', [DesfiliacaoController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('desfiliacao.store');
+    Route::get('/aguardando', [DesfiliacaoController::class, 'aguardando'])->name('desfiliacao.aguardando');
+
+    // Etapa 2: Confirmação e Assinatura Eletrônica (middleware signed)
+    Route::get('/confirmar/{id}', [DesfiliacaoController::class, 'showConfirmacao'])
+        ->middleware('signed')
+        ->name('desfiliacao.confirmar');
+    Route::post('/finalizar/{id}', [DesfiliacaoController::class, 'finalizar'])
+        ->middleware('signed')
+        ->name('desfiliacao.finalizar');
+
+    // Conclusão e Download do Termo
+    Route::get('/concluido/{id}', [DesfiliacaoController::class, 'concluido'])->name('desfiliacao.concluido');
+    Route::get('/download/{id}', [DesfiliacaoController::class, 'download'])->name('desfiliacao.download');
+
+    // Etapa 3: Validação Pública da Autenticidade (Hash / QR Code)
+    Route::get('/validar/{hash?}', [DesfiliacaoController::class, 'validar'])->name('desfiliacao.validar');
+});
+
+// Gestão Administrativa Interna
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/desfiliacoes', [DesfiliacaoAdminController::class, 'index'])->name('admin.desfiliacoes.index');
+    Route::get('/desfiliacoes/{id}', [DesfiliacaoAdminController::class, 'show'])->name('admin.desfiliacoes.show');
+    Route::get('/desfiliacoes/{id}/download', [DesfiliacaoAdminController::class, 'download'])->name('admin.desfiliacoes.download');
 });
 
 

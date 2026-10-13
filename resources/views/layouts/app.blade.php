@@ -365,13 +365,15 @@
                 <!-- End navbar links -->
 
                 <ul class="navbar-nav ms-auto">
+                    @auth
                     <!-- Informações de Localização e Usuário (Esquerda do sino) -->
                     <li class="nav-item d-none d-sm-flex align-items-center">
                         <div class="header-info-left">
-                            <div class="user-profile-label">{{ Auth::user()->perfis->first()->nome ?? 'USUÁRIO' }}</div>
-                            <div class="user-nick">{{ Auth::user()->nickname ?: Auth::user()->name }}</div>
+                            <div class="user-profile-label">{{ Auth::user()?->perfis?->first()?->nome ?? 'USUÁRIO' }}</div>
+                            <div class="user-nick">{{ Auth::user()?->nickname ?: Auth::user()?->name }}</div>
                         </div>
                     </li>
+                    @endauth
 
                     <!-- Notificações de Demandas -->
                     <li class="nav-item dropdown">
@@ -458,6 +460,7 @@
                         </ul>
                     </li>
 
+                    @auth
                     <!-- User Menu -->
                     <li class="nav-item dropdown user-menu ms-2">
                         <a href="#" class="nav-link dropdown-toggle d-flex align-items-center p-0"
@@ -514,6 +517,7 @@
                             </li>
                         </ul>
                     </li>
+                    @endauth
                 </ul>
             </div>
         </nav>
@@ -748,7 +752,7 @@
 
                         <!-- Arrecadação Group -->
                         @if(auth()->user()->temPermissao('socio_caixa.visualizar'))
-                            @php $isArrecadacaoActive = request()->routeIs('socios-caixa.*') || request()->routeIs('socios-folha.*') || request()->routeIs('arrecadacao.*'); @endphp
+                            @php $isArrecadacaoActive = request()->routeIs('socios-caixa.*') || request()->routeIs('socios-folha.*') || request()->routeIs('arrecadacao.*') || request()->routeIs('admin.desfiliacoes.*'); @endphp
                             <li class="nav-item {{ $isArrecadacaoActive ? 'menu-open' : '' }}">
                                 <a href="#" class="nav-link {{ $isArrecadacaoActive ? 'active' : '' }}">
                                     <i class="nav-icon fa-solid fa-file-invoice-dollar"></i>
@@ -768,6 +772,12 @@
                                         <a href="{{ route('socios-folha.index') }}" class="nav-link {{ request()->routeIs('socios-folha.index') ? 'active' : '' }}">
                                             <i class="nav-icon fas fa-users"></i>
                                             <p>Sócio Folha</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.desfiliacoes.index') }}" class="nav-link {{ request()->routeIs('admin.desfiliacoes.*') ? 'active' : '' }}">
+                                            <i class="nav-icon fa-solid fa-file-signature text-warning"></i>
+                                            <p>Desfiliações</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
