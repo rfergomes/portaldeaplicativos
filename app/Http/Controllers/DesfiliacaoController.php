@@ -93,7 +93,7 @@ class DesfiliacaoController extends Controller
             abort(404, 'Solicitação não encontrada.');
         }
 
-        if ($desfiliacao->isConfirmada()) {
+        if ($desfiliacao->isAssinada()) {
             return redirect()
                 ->route('desfiliacao.concluido', ['id' => $desfiliacao->id])
                 ->with('info', 'Esta desfiliação já foi confirmada e assinada anteriormente.');
@@ -132,7 +132,7 @@ class DesfiliacaoController extends Controller
         /** @var Desfiliacao|null $desfiliacao */
         $desfiliacao = Desfiliacao::findOrFail($id);
 
-        if ($desfiliacao->isConfirmada()) {
+        if ($desfiliacao->isAssinada()) {
             return redirect()->route('desfiliacao.concluido', ['id' => $desfiliacao->id]);
         }
 

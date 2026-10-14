@@ -229,11 +229,34 @@ class DesfiliacaoTest extends TestCase
             'termo_hash' => $hashExemplo,
         ]);
 
+        // Status: confirmada (Pendente de Recepção)
         $response = $this->get(route('desfiliacao.validar', ['hash' => $hashExemplo]));
-
         $response->assertStatus(200);
         $response->assertSee('DOCUMENTO AUTÊNTICO E ÍNTEGRO');
         $response->assertSee('Carlos Eduardo Ferreira');
+        $response->assertSee('Aguardando Ciência Interna');
+
+        // Status: recepcionada (2ª Etapa: Baixa no Ábaco)
+        $desfiliacao->update([
+            'status' => 'recepcionada',
+            'recepcionado_em' => now(),
+        ]);
+        $responseRecepcionada = $this->get(route('desfiliacao.validar', ['hash' => $hashExemplo]));
+        $responseRecepcionada->assertStatus(200);
+        $responseRecepcionada->assertSee('DOCUMENTO AUTÊNTICO E ÍNTEGRO');
+        $responseRecepcionada->assertSee('Recepcionada pelo Sindicato');
+
+        // Status: efetivada (Baixa concluída no ERP Ábaco)
+        $desfiliacao->update([
+            'status' => 'efetivada',
+            'efetivado_em' => now(),
+            'protocolo_abaco' => 'ABACO-12345',
+        ]);
+        $responseEfetivada = $this->get(route('desfiliacao.validar', ['hash' => $hashExemplo]));
+        $responseEfetivada->assertStatus(200);
+        $responseEfetivada->assertSee('DOCUMENTO AUTÊNTICO E ÍNTEGRO');
+        $responseEfetivada->assertSee('Desfiliação Efetivada');
+        $responseEfetivada->assertSee('ABACO-12345');
     }
 
     public function test_consulta_publica_de_autenticidade_com_hash_inexistente(): void

@@ -78,6 +78,16 @@ class Desfiliacao extends Model
         return $this->status === 'efetivada';
     }
 
+    /**
+     * Retorna se a desfiliação já foi assinada e concluída pelo trabalhador,
+     * estando formalmente válida independentemente da etapa de tramitação interna
+     * (confirmada, recepcionada pelo sindicato ou baixada no Ábaco).
+     */
+    public function isAssinada(): bool
+    {
+        return in_array($this->status, ['confirmada', 'recepcionada', 'efetivada'], true);
+    }
+
     public function scopePendentesRecepcao($query)
     {
         return $query->where('status', 'confirmada');

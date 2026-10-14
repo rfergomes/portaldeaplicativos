@@ -75,7 +75,7 @@
 
         <!-- Resultado da Validação -->
         @if ($hashBuscado)
-            @if ($desfiliacao && $desfiliacao->isConfirmada())
+            @if ($desfiliacao && $desfiliacao->isAssinada())
                 <!-- Autêntico -->
                 <div class="bg-white rounded-2xl shadow-md border border-emerald-200 overflow-hidden">
                     <div class="bg-emerald-600 p-5 text-white flex items-center gap-3">
@@ -108,7 +108,31 @@
                             </div>
                             <div>
                                 <span class="block text-xs font-semibold text-slate-400 uppercase">Data e Hora da Assinatura</span>
-                                <span class="font-medium text-slate-800">{{ $desfiliacao->confirmado_em->format('d/m/Y H:i:s') }}</span>
+                                <span class="font-medium text-slate-800">{{ $desfiliacao->confirmado_em?->format('d/m/Y H:i:s') ?? '-' }}</span>
+                            </div>
+                            <div class="md:col-span-2 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                                <div>
+                                    <span class="block text-xs font-semibold text-slate-400 uppercase mb-1">Situação no Sindicato</span>
+                                    @if ($desfiliacao->isEfetivada())
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                            <i class="fa-solid fa-circle-check text-emerald-600"></i> Desfiliação Efetivada (Baixa no ERP Ábaco Concluída{{ $desfiliacao->efetivado_em ? ' em ' . $desfiliacao->efetivado_em->format('d/m/Y H:i') : '' }})
+                                        </span>
+                                    @elseif ($desfiliacao->isRecepcionada())
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                                            <i class="fa-solid fa-stamp text-blue-600"></i> Recepcionada pelo Sindicato (Ciência Formal{{ $desfiliacao->recepcionado_em ? ' em ' . $desfiliacao->recepcionado_em->format('d/m/Y H:i') : '' }})
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                            <i class="fa-solid fa-envelope-open-text text-amber-600"></i> Assinada Eletronicamente (Aguardando Ciência Interna)
+                                        </span>
+                                    @endif
+                                </div>
+                                @if ($desfiliacao->protocolo_abaco)
+                                <div class="text-right">
+                                    <span class="block text-[11px] font-semibold text-slate-400 uppercase">Protocolo Ábaco</span>
+                                    <span class="font-mono text-xs font-bold text-slate-700">{{ $desfiliacao->protocolo_abaco }}</span>
+                                </div>
+                                @endif
                             </div>
                         </div>
 
