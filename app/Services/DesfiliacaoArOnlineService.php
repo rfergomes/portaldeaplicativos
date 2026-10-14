@@ -19,8 +19,8 @@ class DesfiliacaoArOnlineService
 
         $corpoHtml = <<<HTML
 <div style="font-family: Arial, sans-serif; color: #1e293b; line-height: 1.6; max-width: 600px;">
-    <h3 style="color: #0f172a; border-bottom: 2px solid #0d6efd; padding-bottom: 8px;">
-        Sindicato dos Trabalhadores nas Indústrias Químicas e Plásticas de Campinas e Região
+    <h3 style="color: #0f172a; border-bottom: 2px solid #dc2626; padding-bottom: 8px;">
+        Sindicato dos Químicos Unificados - Regional Campinas
     </h3>
     <p>À Gerência de Recursos Humanos / Departamento Pessoal da empresa <strong>{$desfiliacao->empresa}</strong>,</p>
     
@@ -30,7 +30,7 @@ class DesfiliacaoArOnlineService
         nos termos da Lei Federal nº 14.063/2020:
     </p>
 
-    <div style="background-color: #f1f5f9; border-left: 4px solid #0d6efd; padding: 12px; margin: 16px 0;">
+    <div style="background-color: #f1f5f9; border-left: 4px solid #dc2626; padding: 12px; margin: 16px 0;">
         <p style="margin: 4px 0;"><strong>Nome Completo:</strong> {$desfiliacao->nome_completo}</p>
         <p style="margin: 4px 0;"><strong>CPF:</strong> {$desfiliacao->cpf_formatado}</p>
         <p style="margin: 4px 0;"><strong>Protocolo Interno:</strong> #{$desfiliacao->id}</p>
