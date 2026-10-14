@@ -52,6 +52,7 @@ class StoreDesfiliacaoRequest extends FormRequest
             'email' => ['required', 'email', 'max:191'],
             'telefone' => ['required', 'string', 'min:10', 'max:20'],
             'motivo' => ['nullable', 'string', 'max:1000'],
+            'aceite_lgpd' => ['required', 'accepted'],
         ];
     }
 
@@ -66,6 +67,8 @@ class StoreDesfiliacaoRequest extends FormRequest
             'email.email' => 'Informe um endereço de e-mail válido.',
             'telefone.required' => 'O telefone/WhatsApp de contato é obrigatório.',
             'telefone.min' => 'Informe um telefone válido com DDD.',
+            'aceite_lgpd.required' => 'Você deve declarar ciência e concordância com o tratamento de dados (LGPD).',
+            'aceite_lgpd.accepted' => 'Você deve concordar com a declaração de privacidade e tratamento de dados (LGPD) para prosseguir.',
         ];
     }
 }

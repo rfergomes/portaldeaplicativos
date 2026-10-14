@@ -38,6 +38,7 @@ class DesfiliacaoController extends Controller
         $dados = $request->validated();
         $dados['status'] = 'pendente';
         $dados['ip_solicitacao'] = $request->ip();
+        $dados['aceite_lgpd_em'] = now();
 
         /** @var Desfiliacao $desfiliacao */
         $desfiliacao = Desfiliacao::create($dados);

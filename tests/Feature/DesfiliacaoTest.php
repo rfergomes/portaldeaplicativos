@@ -34,6 +34,8 @@ class DesfiliacaoTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Requerimento de Desfiliação Sindical');
         $response->assertSee('Nome Completo do Trabalhador');
+        $response->assertSee('Declaração de Privacidade e Tratamento de Dados (LGPD)');
+        $response->assertSee('name="aceite_lgpd"', false);
         $response->assertDontSee('Matrícula Funcional');
         $response->assertDontSee('name="matricula"', false);
     }
@@ -57,7 +59,7 @@ class DesfiliacaoTest extends TestCase
     {
         $response = $this->post(route('desfiliacao.store'), []);
 
-        $response->assertSessionHasErrors(['nome_completo', 'cpf', 'empresa', 'email', 'telefone']);
+        $response->assertSessionHasErrors(['nome_completo', 'cpf', 'empresa', 'email', 'telefone', 'aceite_lgpd']);
     }
 
     public function test_valida_cpf_invalido(): void
@@ -68,6 +70,7 @@ class DesfiliacaoTest extends TestCase
             'empresa' => 'Empresa Teste',
             'email' => 'teste@email.com',
             'telefone' => '(19) 99999-9999',
+            'aceite_lgpd' => '1',
         ]);
 
         $response->assertSessionHasErrors('cpf');
@@ -80,11 +83,11 @@ class DesfiliacaoTest extends TestCase
         $dados = [
             'nome_completo' => 'Carlos Eduardo Ferreira',
             'cpf' => '111.444.777-35', // CPF matematicamente válido
-            'matricula' => '12345',
             'empresa' => 'Indústria Teste S/A',
             'email' => 'carlos.ferreira.teste@example.com',
             'telefone' => '(19) 98765-4321',
             'motivo' => 'Decisão pessoal',
+            'aceite_lgpd' => '1',
         ];
 
         $response = $this->post(route('desfiliacao.store'), $dados);
@@ -97,6 +100,10 @@ class DesfiliacaoTest extends TestCase
             'email' => 'carlos.ferreira.teste@example.com',
             'status' => 'pendente',
         ]);
+
+        $criada = Desfiliacao::where('cpf', '111.444.777-35')->first();
+        $this->assertNotNull($criada);
+        $this->assertNotNull($criada->aceite_lgpd_em);
 
         Mail::assertSent(ConfirmacaoDesfiliacaoMail::class, function ($mail) {
             return $mail->hasTo('carlos.ferreira.teste@example.com');

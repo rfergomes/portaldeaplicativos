@@ -195,6 +195,19 @@
                     </div>
                 </div>
 
+                <!-- Termo e Consentimento LGPD (Opção A) -->
+                <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 sm:p-5 transition hover:border-red-300">
+                    <label class="flex items-start gap-3.5 cursor-pointer">
+                        <input type="checkbox" name="aceite_lgpd" id="aceite_lgpd" value="1" required
+                            {{ old('aceite_lgpd') ? 'checked' : '' }}
+                            class="mt-1 w-5 h-5 text-red-600 rounded border-slate-300 focus:ring-red-500 cursor-pointer accent-red-600">
+                        <span class="text-xs text-slate-700 leading-relaxed select-none">
+                            <strong class="text-slate-900 block mb-0.5">Declaração de Privacidade e Tratamento de Dados (LGPD) <span class="text-red-600">*</span></strong>
+                            Declaro estar ciente e de acordo que os meus dados pessoais informados neste requerimento (Nome, CPF, Empresa, E-mail e Telefone) serão coletados e tratados pelo <strong>Sindicato Químicos Unificados</strong> exclusivamente para os fins de identificação, envio do link de confirmação e formalização da solicitação de desfiliação voluntária, em estrito cumprimento das obrigações legais e regulamentares previstas na <strong>Lei Geral de Proteção de Dados (Lei Federal nº 13.709/2018)</strong>.
+                        </span>
+                    </label>
+                </div>
+
                 <!-- Botão de Envio com Vermelho Químicos Unificados -->
                 <div class="pt-2">
                     <button type="submit"

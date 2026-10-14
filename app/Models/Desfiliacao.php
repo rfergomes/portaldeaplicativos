@@ -23,6 +23,7 @@ class Desfiliacao extends Model
         'motivo',
         'status',
         'ip_solicitacao',
+        'aceite_lgpd_em',
         'ip_confirmacao',
         'user_agent_confirmacao',
         'email_verificado_em',
@@ -40,6 +41,7 @@ class Desfiliacao extends Model
     ];
 
     protected $casts = [
+        'aceite_lgpd_em' => 'datetime',
         'email_verificado_em' => 'datetime',
         'confirmado_em' => 'datetime',
         'recepcionado_em' => 'datetime',
