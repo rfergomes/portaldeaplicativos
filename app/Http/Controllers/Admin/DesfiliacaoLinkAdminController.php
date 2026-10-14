@@ -70,6 +70,25 @@ class DesfiliacaoLinkAdminController extends Controller
                 'expira_em' => $expiraEm,
             ]);
 
+            // Disparo automático via KWIK caso o canal selecionado seja KWIK Oficial
+            if ($link->canal_envio === 'kwik' && !empty($link->destinatario_contato)) {
+                try {
+                    $nome = $link->destinatario_nome ?: 'Trabalhador(a)';
+                    $url = $link->url;
+                    $validade = $link->expira_em->format('d/m/Y \à\s H:i');
+
+                    dispatch(new \App\Jobs\SendKwikNotificationJob(
+                        $link->destinatario_contato,
+                        'desfiliacao_link_exclusivo',
+                        [$nome, $url, $validade],
+                        auth()->id()
+                    ));
+                    \Illuminate\Support\Facades\Log::info("KWIK: Disparo do link de desfiliação #{$link->id} enviado para {$link->destinatario_contato}");
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::error("KWIK: Falha ao despachar link #{$link->id} para {$link->destinatario_contato}: " . $e->getMessage());
+                }
+            }
+
             $linksGerados[] = $link;
         }
 

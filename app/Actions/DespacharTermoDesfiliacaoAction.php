@@ -65,6 +65,26 @@ class DespacharTermoDesfiliacaoAction
             }
         }
 
+        // 1.1 Notificação via WhatsApp KWIK Oficial para o Trabalhador
+        if (!empty($desfiliacao->telefone)) {
+            try {
+                $nomeTrabalhador = $desfiliacao->nome_completo;
+                $protocolo = (string) $desfiliacao->id;
+                $urlValidacao = route('desfiliacao.validar', $desfiliacao->termo_hash);
+
+                dispatch(new \App\Jobs\SendKwikNotificationJob(
+                    $desfiliacao->telefone,
+                    'desfiliacao_homologada_aviso',
+                    [$nomeTrabalhador, $protocolo, $urlValidacao],
+                    Auth::id() ?? $desfiliacao->recepcionado_por_user_id
+                ));
+                $resultados['whatsapp_kwik'] = true;
+                Log::info("KWIK: Notificação de homologação de desfiliação #{$desfiliacao->id} disparada para {$desfiliacao->telefone}.");
+            } catch (\Throwable $e) {
+                Log::warning("KWIK: Falha ao despachar notificação de homologação para {$desfiliacao->telefone}: " . $e->getMessage());
+            }
+        }
+
         // 2. Determinação do e-mail do RH da Empresa
         $emailRh = $emailEmpresaManual;
         if (empty($emailRh) && !empty($desfiliacao->empresa_email)) {
