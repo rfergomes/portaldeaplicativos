@@ -31,10 +31,10 @@ class DesfiliacaoLinkGenerationTest extends TestCase
         );
         $perfil->permissoes()->syncWithoutDetaching([$permissao->id]);
 
-        $this->adminUser = User::factory()->create();
+        $this->adminUser = User::factory()->create(['email' => 'admin_' . uniqid() . '@example.com']);
         $this->adminUser->perfis()->attach($perfil);
 
-        $this->commonUser = User::factory()->create();
+        $this->commonUser = User::factory()->create(['email' => 'common_' . uniqid() . '@example.com']);
     }
 
     public function test_usuario_com_permissao_pode_gerar_link_exclusivo(): void

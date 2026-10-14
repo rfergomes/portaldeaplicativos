@@ -221,10 +221,28 @@
                                     @endif
 
                                     {{-- Badges de Notificação da Empresa (AR-Online) --}}
-                                    @if ($item->empresa_envio_status === 'enviado')
+                                    @if ($item->empresa_envio_status === 'lido')
                                         <div class="mt-1">
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle" title="Notificação oficial enviada ao RH da empresa via API AR-Online">
-                                                <i class="fa-solid fa-stamp me-1"></i>AR-Online Notificada
+                                            <span class="badge bg-success text-white border border-success" title="Notificação oficial lida/aberta pelo RH da empresa">
+                                                <i class="fa-solid fa-envelope-open-text me-1"></i>AR-Online: Lido pelo RH
+                                            </span>
+                                        </div>
+                                    @elseif ($item->empresa_envio_status === 'entregue')
+                                        <div class="mt-1">
+                                            <span class="badge bg-success-subtle text-success border border-success" title="Notificação oficial entregue na caixa de entrada do RH">
+                                                <i class="fa-solid fa-inbox me-1"></i>AR-Online: Entregue no RH
+                                            </span>
+                                        </div>
+                                    @elseif ($item->empresa_envio_status === 'enviado')
+                                        <div class="mt-1">
+                                            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle" title="Notificação oficial despachada ao RH da empresa via API AR-Online">
+                                                <i class="fa-solid fa-paper-plane me-1"></i>AR-Online: Enviado
+                                            </span>
+                                        </div>
+                                    @elseif ($item->empresa_envio_status === 'falha')
+                                        <div class="mt-1">
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle" title="{{ $item->empresa_aronline_resposta ?? 'Falha no envio via AR-Online' }}">
+                                                <i class="fa-solid fa-circle-exclamation me-1"></i>AR-Online: Falha
                                             </span>
                                         </div>
                                     @elseif ($item->empresa_envio_status === 'pendente_contato')
@@ -768,10 +786,22 @@ document.addEventListener('DOMContentLoaded', function () {
                         toggleBloco(blocoNotificacaoEmpresa, true);
                         document.getElementById('detEmpresaEmail').innerText = data.empresa_email || 'Não informado / Pendente';
                         const statusBadge = document.getElementById('detEmpresaStatus');
-                        if (data.empresa_envio_status === 'enviado') {
+                        if (data.empresa_envio_status === 'lido') {
                             statusBadge.className = 'badge bg-success';
+                            statusBadge.innerText = 'Lido pelo RH (AR-Online)';
+                            if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
+                        } else if (data.empresa_envio_status === 'entregue') {
+                            statusBadge.className = 'badge bg-info text-dark';
+                            statusBadge.innerText = 'Entregue no RH (AR-Online)';
+                            if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
+                        } else if (data.empresa_envio_status === 'enviado') {
+                            statusBadge.className = 'badge bg-primary';
                             statusBadge.innerText = 'Enviado via AR-Online';
                             if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
+                        } else if (data.empresa_envio_status === 'falha') {
+                            statusBadge.className = 'badge bg-danger';
+                            statusBadge.innerText = 'Falha na Entrega';
+                            if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.remove('d-none');
                         } else if (data.empresa_envio_status === 'pendente_contato' || !data.empresa_email) {
                             statusBadge.className = 'badge bg-warning text-dark';
                             statusBadge.innerText = 'Pendente (Empresa sem E-mail)';
