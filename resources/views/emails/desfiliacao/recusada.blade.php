@@ -43,7 +43,7 @@
 
             <p>
                 <strong>Deseja sanar a divergência ou solicitar um novo atendimento?</strong><br>
-                Caso queira regularizar as informações, esclarecer eventuais dúvidas ou solicitar a emissão de um novo link exclusivo de atendimento, entre em contato diretamente com a nossa Central de Atendimento pelo telefone <strong>(19) 3737-1400</strong> ou pelo WhatsApp institucional da entidade.
+                Caso queira regularizar as informações, esclarecer eventuais dúvidas ou solicitar a emissão de um novo link exclusivo de atendimento, entre em contato diretamente com a nossa Central de Atendimento pelo telefone <strong>(19) 3735-4900</strong> ou pelo WhatsApp institucional <strong>(19) 97405-5662</strong>.
             </p>
 
             <p style="margin-top: 25px;">

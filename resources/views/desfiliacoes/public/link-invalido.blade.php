@@ -47,7 +47,7 @@
         </div>
 
         <div class="d-grid gap-2">
-            <a href="https://wa.me/551937371400" target="_blank" class="btn btn-success fw-bold">
+            <a href="https://wa.me/5519974055662" target="_blank" class="btn btn-success fw-bold">
                 <i class="fa-brands fa-whatsapp me-2"></i> Falar com o Sindicato no WhatsApp
             </a>
             <a href="{{ route('desfiliacao.validar') }}" class="btn btn-outline-secondary">

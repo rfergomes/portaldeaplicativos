@@ -74,7 +74,7 @@
                             <i class="fa-brands fa-whatsapp text-success fa-2x me-3"></i>
                             <div>
                                 <div class="fw-semibold small">WhatsApp Oficial</div>
-                                <div class="text-muted small">Atendimento da Entidade</div>
+                                <div class="text-muted small">(19) 9.7405-5662</div>
                             </div>
                         </div>
                     </div>
@@ -83,7 +83,7 @@
                             <i class="fa-solid fa-phone text-primary fa-2x me-3"></i>
                             <div>
                                 <div class="fw-semibold small">Central Telefônica</div>
-                                <div class="text-muted small">(19) 3737-1400</div>
+                                <div class="text-muted small">(19) 3735-4900</div>
                             </div>
                         </div>
                     </div>
@@ -91,7 +91,7 @@
             </div>
 
             <div class="d-grid gap-2 mb-3">
-                <a href="https://wa.me/551937371400?text={{ rawurlencode('Olá! Gostaria de receber atendimento sobre desfiliação sindical.') }}" 
+                <a href="https://wa.me/5519974055662?text={{ rawurlencode('Olá! Gostaria de receber atendimento sobre desfiliação sindical.') }}" 
                    target="_blank" 
                    rel="noopener noreferrer" 
                    class="btn btn-success btn-lg fw-bold shadow-sm">
