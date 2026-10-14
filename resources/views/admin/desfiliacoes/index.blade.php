@@ -431,7 +431,7 @@
                 </div>
                 <div id="modalContent" style="display: none;">
                     <!-- Bloco de Recepção Institucional -->
-                    <div id="blocoRecepcionada" class="alert alert-info d-flex align-items-center mb-3" style="display: none;">
+                    <div id="blocoRecepcionada" class="alert alert-info align-items-center mb-3 d-none">
                         <i class="fa-solid fa-stamp fs-3 me-3 text-info"></i>
                         <div class="small w-100">
                             <strong class="d-block text-info-emphasis">Carta Recepcionada pelo Sindicato (Ciência Formal)</strong>
@@ -442,10 +442,15 @@
                     </div>
 
                     <!-- Bloco de Notificação à Empresa (AR-Online) -->
-                    <div id="blocoNotificacaoEmpresa" class="alert alert-secondary d-flex align-items-center mb-3" style="display: none;">
-                        <i class="fa-solid fa-stamp fs-3 me-3 text-primary"></i>
+                    <div id="blocoNotificacaoEmpresa" class="alert alert-secondary align-items-center mb-3 d-none">
+                        <i class="fa-solid fa-paper-plane fs-3 me-3 text-primary"></i>
                         <div class="small w-100">
-                            <strong class="d-block text-primary-emphasis">Notificação Oficial à Empresa (AR-Online)</strong>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong class="text-primary-emphasis">Notificação Oficial à Empresa (AR-Online)</strong>
+                                <button type="button" id="btnNotificarEmpresaModal" class="btn btn-warning btn-sm py-0 px-2 fw-bold d-none" style="font-size: 11px;">
+                                    <i class="fa-solid fa-building-circle-arrow-right me-1"></i>Informar E-mail do RH e Notificar
+                                </button>
+                            </div>
                             <div><strong>E-mail Destinatário:</strong> <span id="detEmpresaEmail"></span></div>
                             <div><strong>Status AR-Online:</strong> <span id="detEmpresaStatus" class="badge"></span></div>
                             <div id="detLinhaArOnlineId"><strong>ID AR-Online:</strong> <span id="detEmpresaArOnlineId" class="font-monospace"></span></div>
@@ -454,7 +459,7 @@
                     </div>
 
                     <!-- Bloco de Recusa Justificada -->
-                    <div id="blocoRecusada" class="alert alert-danger d-flex align-items-center mb-3" style="display: none;">
+                    <div id="blocoRecusada" class="alert alert-danger align-items-center mb-3 d-none">
                         <i class="fa-solid fa-ban fs-3 me-3 text-danger"></i>
                         <div class="small w-100">
                             <strong class="d-block text-danger">Solicitação Recusada / Não Homologada</strong>
@@ -468,7 +473,7 @@
                     </div>
 
                     <!-- Bloco de Efetivação / Baixa ERP Ábaco -->
-                    <div id="blocoEfetivada" class="alert alert-success d-flex align-items-center mb-3" style="display: none;">
+                    <div id="blocoEfetivada" class="alert alert-success align-items-center mb-3 d-none">
                         <i class="fa-solid fa-circle-check fs-3 me-3 text-success"></i>
                         <div class="small w-100">
                             <strong class="d-block text-success-emphasis">Baixa Realizada no ERP Ábaco (Efetivada)</strong>
@@ -481,7 +486,7 @@
 
                     <!-- Avisos de Ação Pendente -->
                     @can('desfiliacoes.recepcionar')
-                    <div id="blocoAvisoRecepcao" class="alert alert-warning d-flex align-items-center justify-content-between mb-3" style="display: none;">
+                    <div id="blocoAvisoRecepcao" class="alert alert-warning align-items-center justify-content-between mb-3 d-none">
                         <div class="d-flex align-items-center small">
                             <i class="fa-solid fa-envelope-open-text fs-3 me-3 text-warning"></i>
                             <div>
@@ -503,7 +508,7 @@
                     @endcan
 
                     @can('desfiliacoes.baixar_abaco')
-                    <div id="blocoAvisoBaixa" class="alert alert-info d-flex align-items-center justify-content-between mb-3" style="display: none;">
+                    <div id="blocoAvisoBaixa" class="alert alert-info align-items-center justify-content-between mb-3 d-none">
                         <div class="d-flex align-items-center small">
                             <i class="fa-solid fa-clipboard-check fs-3 me-3 text-info"></i>
                             <div>
@@ -591,7 +596,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalEfetivar = new bootstrap.Modal(modalEfetivarEl);
     const formEfetivar = document.getElementById('formEfetivar');
 
+    const modalNotificarEmpresaEl = document.getElementById('modalInformarEmailEmpresa');
+    const modalNotificarEmpresa = modalNotificarEmpresaEl ? new bootstrap.Modal(modalNotificarEmpresaEl) : null;
+    const formNotificarEmpresa = document.getElementById('formNotificarEmpresa');
+
     let currentItemData = null;
+
+    // Abertura do modal de Notificar Empresa via AR-Online
+    function abrirModalNotificarEmpresa(id, nome, empresa) {
+        if (!modalNotificarEmpresa) return;
+        formNotificarEmpresa.action = `/admin/desfiliacoes/${id}/notificar-empresa`;
+        document.getElementById('empresaNotifTrabalhador').innerText = nome;
+        document.getElementById('empresaNotifRazaoSocial').innerText = empresa;
+        document.getElementById('email_rh').value = '';
+        modalNotificarEmpresa.show();
+    }
 
     // Abertura do modal de Recepção / Aceite
     function abrirModalRecepcionar(id, nome, cpf, empresa) {
@@ -637,6 +656,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    document.querySelectorAll('.btn-abrir-notificar-empresa').forEach(btn => {
+        btn.addEventListener('click', function () {
+            abrirModalNotificarEmpresa(
+                this.dataset.id,
+                this.dataset.nome,
+                this.dataset.empresa
+            );
+        });
+    });
+
     // Botões de ação dentro do modal de auditoria
     document.getElementById('btnRecepcionarModal').addEventListener('click', function() {
         if (currentItemData) {
@@ -661,6 +690,20 @@ document.addEventListener('DOMContentLoaded', function () {
             );
         }
     });
+
+    const btnNotifModal = document.getElementById('btnNotificarEmpresaModal');
+    if (btnNotifModal) {
+        btnNotifModal.addEventListener('click', function() {
+            if (currentItemData) {
+                modalAuditoria.hide();
+                abrirModalNotificarEmpresa(
+                    currentItemData.id,
+                    currentItemData.nome_completo,
+                    currentItemData.empresa
+                );
+            }
+        });
+    }
 
     // Detalhes de Auditoria
     document.querySelectorAll('.btn-detalhes').forEach(btn => {
@@ -692,9 +735,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     const blocoAvisoRecepcao = document.getElementById('blocoAvisoRecepcao');
                     const blocoAvisoBaixa = document.getElementById('blocoAvisoBaixa');
 
+                    function toggleBloco(el, show) {
+                        if (!el) return;
+                        if (show) {
+                            el.classList.remove('d-none');
+                            el.classList.add('d-flex');
+                        } else {
+                            el.classList.add('d-none');
+                            el.classList.remove('d-flex');
+                        }
+                    }
+
                     // 1. Dados de Recepção
                     if (data.recepcionado_em) {
-                        blocoRecepcionada.style.display = 'flex';
+                        toggleBloco(blocoRecepcionada, true);
                         document.getElementById('detRecepcionadoPor').innerText = data.recepcionado_por || 'Operador';
                         document.getElementById('detDataRecepcao').innerText = data.recepcionado_em;
                         if (data.observacao_recepcao) {
@@ -704,46 +758,50 @@ document.addEventListener('DOMContentLoaded', function () {
                             document.getElementById('detLinhaObsRecepcao').style.display = 'none';
                         }
                     } else {
-                        blocoRecepcionada.style.display = 'none';
+                        toggleBloco(blocoRecepcionada, false);
                     }
 
                     // 2. Dados de Notificação AR-Online à Empresa
                     const blocoNotificacaoEmpresa = document.getElementById('blocoNotificacaoEmpresa');
-                    if (data.empresa_notificada_em || data.empresa_aronline_id || data.empresa_envio_status === 'pendente_contato') {
-                        blocoNotificacaoEmpresa.style.display = 'flex';
+                    const btnNotificarEmpresaModal = document.getElementById('btnNotificarEmpresaModal');
+                    if (data.recepcionado_em || data.empresa_notificada_em || data.empresa_aronline_id || data.empresa_envio_status === 'pendente_contato') {
+                        toggleBloco(blocoNotificacaoEmpresa, true);
                         document.getElementById('detEmpresaEmail').innerText = data.empresa_email || 'Não informado / Pendente';
                         const statusBadge = document.getElementById('detEmpresaStatus');
                         if (data.empresa_envio_status === 'enviado') {
                             statusBadge.className = 'badge bg-success';
                             statusBadge.innerText = 'Enviado via AR-Online';
-                        } else if (data.empresa_envio_status === 'pendente_contato') {
+                            if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
+                        } else if (data.empresa_envio_status === 'pendente_contato' || !data.empresa_email) {
                             statusBadge.className = 'badge bg-warning text-dark';
                             statusBadge.innerText = 'Pendente (Empresa sem E-mail)';
+                            if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.remove('d-none');
                         } else {
                             statusBadge.className = 'badge bg-secondary';
-                            statusBadge.innerText = data.empresa_envio_status || 'N/A';
+                            statusBadge.innerText = data.empresa_envio_status || 'Pendente';
+                            if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
                         }
 
                         document.getElementById('detEmpresaArOnlineId').innerText = data.empresa_aronline_id || 'Pendente';
                         document.getElementById('detEmpresaNotificadaEm').innerText = data.empresa_notificada_em || 'Pendente';
                     } else {
-                        blocoNotificacaoEmpresa.style.display = 'none';
+                        toggleBloco(blocoNotificacaoEmpresa, false);
                     }
 
                     // 3. Dados de Recusa Justificada
                     const blocoRecusada = document.getElementById('blocoRecusada');
                     if (data.is_recusada) {
-                        blocoRecusada.style.display = 'flex';
+                        toggleBloco(blocoRecusada, true);
                         document.getElementById('detRecusadoPor').innerText = data.recusado_por || 'Operador';
                         document.getElementById('detDataRecusa').innerText = data.recusado_em || '-';
                         document.getElementById('detMotivoRecusa').innerText = data.motivo_recusa || '-';
                     } else {
-                        blocoRecusada.style.display = 'none';
+                        toggleBloco(blocoRecusada, false);
                     }
 
                     // 4. Dados de Efetivação / Baixa
                     if (data.is_efetivada) {
-                        blocoEfetivada.style.display = 'flex';
+                        toggleBloco(blocoEfetivada, true);
                         document.getElementById('detEfetivadoPor').innerText = data.efetivado_por || 'Operador';
                         document.getElementById('detDataEfetivacao').innerText = data.efetivado_em || '-';
                         if (data.protocolo_abaco) {
@@ -759,19 +817,19 @@ document.addEventListener('DOMContentLoaded', function () {
                             document.getElementById('detLinhaObs').style.display = 'none';
                         }
                     } else {
-                        blocoEfetivada.style.display = 'none';
+                        toggleBloco(blocoEfetivada, false);
                     }
 
                     // 5. Avisos de ação pendente
                     if (data.is_confirmada) {
-                        blocoAvisoRecepcao.style.display = 'flex';
-                        blocoAvisoBaixa.style.display = 'none';
+                        toggleBloco(blocoAvisoRecepcao, true);
+                        toggleBloco(blocoAvisoBaixa, false);
                     } else if (data.is_recepcionada) {
-                        blocoAvisoRecepcao.style.display = 'none';
-                        blocoAvisoBaixa.style.display = 'flex';
+                        toggleBloco(blocoAvisoRecepcao, false);
+                        toggleBloco(blocoAvisoBaixa, true);
                     } else {
-                        blocoAvisoRecepcao.style.display = 'none';
-                        blocoAvisoBaixa.style.display = 'none';
+                        toggleBloco(blocoAvisoRecepcao, false);
+                        toggleBloco(blocoAvisoBaixa, false);
                     }
 
                     const btnPdf = document.getElementById('detBtnPdf');

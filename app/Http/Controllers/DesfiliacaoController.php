@@ -236,7 +236,9 @@ class DesfiliacaoController extends Controller
         $desfiliacao = null;
 
         if (! empty($hashBuscado)) {
-            $desfiliacao = Desfiliacao::where('termo_hash', $hashBuscado)->first();
+            $desfiliacao = Desfiliacao::with(['recepcionadoPor', 'efetivadoPor'])
+                ->where('termo_hash', $hashBuscado)
+                ->first();
         }
 
         return view('desfiliacao.validar', compact('desfiliacao', 'hashBuscado'));

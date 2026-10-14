@@ -115,11 +115,11 @@
                                     <span class="block text-xs font-semibold text-slate-400 uppercase mb-1">Situação no Sindicato</span>
                                     @if ($desfiliacao->isEfetivada())
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                            <i class="fa-solid fa-circle-check text-emerald-600"></i> Desfiliação Efetivada (Baixa no ERP Ábaco Concluída{{ $desfiliacao->efetivado_em ? ' em ' . $desfiliacao->efetivado_em->format('d/m/Y H:i') : '' }})
+                                            <i class="fa-solid fa-circle-check text-emerald-600"></i> Desfiliação Efetivada{{ $desfiliacao->efetivadoPor ? ' por ' . ($desfiliacao->efetivadoPor->nickname ?: $desfiliacao->efetivadoPor->name) : '' }} (Baixa no ERP Ábaco Concluída{{ $desfiliacao->efetivado_em ? ' em ' . $desfiliacao->efetivado_em->format('d/m/Y H:i') : '' }})
                                         </span>
                                     @elseif ($desfiliacao->isRecepcionada())
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
-                                            <i class="fa-solid fa-stamp text-blue-600"></i> Recepcionada pelo Sindicato (Ciência Formal{{ $desfiliacao->recepcionado_em ? ' em ' . $desfiliacao->recepcionado_em->format('d/m/Y H:i') : '' }})
+                                            <i class="fa-solid fa-stamp text-blue-600"></i> Recepcionada pelo Sindicato{{ $desfiliacao->recepcionadoPor ? ' por ' . ($desfiliacao->recepcionadoPor->nickname ?: $desfiliacao->recepcionadoPor->name) : '' }} (Ciência Formal{{ $desfiliacao->recepcionado_em ? ' em ' . $desfiliacao->recepcionado_em->format('d/m/Y H:i') : '' }})
                                         </span>
                                     @else
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">

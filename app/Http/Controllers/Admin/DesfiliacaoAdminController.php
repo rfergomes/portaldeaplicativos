@@ -161,15 +161,25 @@ class DesfiliacaoAdminController extends Controller
             // Continua a execução mesmo se falhar a gravação do PDF em ambiente de teste
         }
 
+        $resDespacho = [
+            'trabalhador' => false,
+            'empresa' => false,
+            'empresa_status' => 'nao_aplicavel',
+        ];
+
         // Despacha notificação por e-mail ao trabalhador e via AR-Online para a empresa
         try {
             $despachoAction = app(DespacharTermoDesfiliacaoAction::class);
-            $despachoAction->execute($desfiliacao);
+            $resDespacho = $despachoAction->execute($desfiliacao);
         } catch (\Throwable $e) {
-            // Log do erro já registrado na Action
+            \Illuminate\Support\Facades\Log::error('Erro ao despachar desfiliação #' . $desfiliacao->id . ': ' . $e->getMessage());
         }
 
-        $msg = "Solicitação de desfiliação de {$desfiliacao->nome_completo} homologada com sucesso! O termo em PDF foi emitido, encaminhado ao trabalhador e processado via AR-Online para a empresa.";
+        if (($resDespacho['empresa_status'] ?? '') === 'pendente_contato') {
+            $msg = "Solicitação de {$desfiliacao->nome_completo} homologada com sucesso! O termo em PDF foi encaminhado ao trabalhador. Atenção: a empresa não possui e-mail de RH cadastrado no catálogo. Clique no botão de notificar empresa para informar o e-mail e despachar via AR-Online.";
+        } else {
+            $msg = "Solicitação de desfiliação de {$desfiliacao->nome_completo} homologada com sucesso! O termo em PDF foi emitido, encaminhado ao trabalhador e notificado via AR-Online para a empresa.";
+        }
 
         if ($request->wantsJson()) {
             return response()->json([

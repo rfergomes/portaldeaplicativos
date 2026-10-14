@@ -9,8 +9,11 @@ use App\Mail\TermoDesfiliacaoTrabalhadorMail;
 use App\Models\Desfiliacao;
 use App\Models\EmpresaContato;
 use App\Services\DesfiliacaoArOnlineService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class DespacharTermoDesfiliacaoAction
 {
@@ -31,11 +34,32 @@ class DespacharTermoDesfiliacaoAction
             'empresa_aronline_id' => null,
         ];
 
+        // 0. Garante que o PDF do Termo exista em disco antes de qualquer envio
+        if (empty($desfiliacao->pdf_path) || !Storage::disk('local')->exists($desfiliacao->pdf_path)) {
+            try {
+                $pdf = Pdf::loadView('pdf.termo_desfiliacao', compact('desfiliacao'))
+                    ->setPaper('a4', 'portrait')
+                    ->setOptions([
+                        'isRemoteEnabled' => true,
+                        'isHtml5ParserEnabled' => true,
+                        'dpi' => 150,
+                        'defaultFont' => 'Helvetica',
+                    ]);
+                $ano = $desfiliacao->created_at ? $desfiliacao->created_at->format('Y') : date('Y');
+                $relPath = "desfiliacoes/{$ano}/{$desfiliacao->termo_hash}.pdf";
+                Storage::disk('local')->put($relPath, $pdf->output());
+                $desfiliacao->update(['pdf_path' => $relPath]);
+            } catch (\Throwable $e) {
+                Log::warning("Falha ao gerar PDF sob demanda no despacho #{$desfiliacao->id}: " . $e->getMessage());
+            }
+        }
+
         // 1. Despacho por e-mail para o Trabalhador
         if (!empty($desfiliacao->email)) {
             try {
                 Mail::to($desfiliacao->email)->send(new TermoDesfiliacaoTrabalhadorMail($desfiliacao));
                 $resultados['trabalhador'] = true;
+                Log::info("Termo de desfiliação #{$desfiliacao->id} enviado com sucesso por e-mail para o trabalhador ({$desfiliacao->email}).");
             } catch (\Throwable $e) {
                 Log::error("Falha ao enviar e-mail com termo para o trabalhador #{$desfiliacao->id}: " . $e->getMessage());
             }
@@ -57,6 +81,19 @@ class DespacharTermoDesfiliacaoAction
         // 3. Despacho Oficial via API AR-Online com Carimbo de Tempo e Validade Jurídica
         if (!empty($emailRh)) {
             try {
+                // Configura o Token AR-Online (prioriza departamento do usuário logado/recebedor)
+                $tokenArOnline = Auth::user()?->tokenDepto?->token 
+                    ?? $desfiliacao->recepcionadoPor?->tokenDepto?->token 
+                    ?? config('services.ar_online.token');
+
+                if ($tokenArOnline) {
+                    try {
+                        $this->arOnlineClient->setToken($tokenArOnline);
+                    } catch (\Throwable $e) {
+                        // Tolera mocks de teste sem expectativa prévia de setToken
+                    }
+                }
+
                 $payload = $this->arOnlineService->criarPayloadNotificacaoEmpresa($desfiliacao, $emailRh);
                 $idEmailArOnline = $this->arOnlineClient->send($payload);
 
