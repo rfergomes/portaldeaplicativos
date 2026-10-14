@@ -418,9 +418,9 @@
                                 <a href="{{ route('demandas.index') }}" class="text-decoration-none" style="font-size: 0.75rem; font-weight: 600; color: #033c5a;">
                                     <i class="fa-solid fa-list me-1"></i> Demandas
                                 </a>
-                                @if(isset($desfiliacoesPendentesBaixaCount) && $desfiliacoesPendentesBaixaCount > 0)
-                                    <a href="{{ route('admin.desfiliacoes.index', ['status' => 'confirmada']) }}" class="text-decoration-none text-danger" style="font-size: 0.75rem; font-weight: 600;">
-                                        <i class="fa-solid fa-user-xmark me-1"></i> Desfiliações ({{ $desfiliacoesPendentesBaixaCount }})
+                                @if(isset($desfiliacoesTotalPendencias) && $desfiliacoesTotalPendencias > 0)
+                                    <a href="{{ route('admin.desfiliacoes.index') }}" class="text-decoration-none text-danger" style="font-size: 0.75rem; font-weight: 600;" title="{{ $desfiliacoesPendentesRecepcaoCount ?? 0 }} a recepcionar / {{ $desfiliacoesPendentesBaixaCount ?? 0 }} a baixar no Ábaco">
+                                        <i class="fa-solid fa-file-signature me-1"></i> Desfiliações ({{ $desfiliacoesTotalPendencias }})
                                     </a>
                                 @endif
                             </li>
@@ -784,8 +784,8 @@
                                             <i class="nav-icon fa-solid fa-file-signature text-warning"></i>
                                             <p>
                                                 Desfiliações
-                                                @if(isset($desfiliacoesPendentesBaixaCount) && $desfiliacoesPendentesBaixaCount > 0)
-                                                    <span class="badge bg-danger ms-auto rounded-pill" title="Aguardando providências / baixa no ERP Ábaco">{{ $desfiliacoesPendentesBaixaCount }}</span>
+                                                @if(isset($desfiliacoesTotalPendencias) && $desfiliacoesTotalPendencias > 0)
+                                                    <span class="badge bg-danger ms-auto rounded-pill" title="{{ $desfiliacoesPendentesRecepcaoCount ?? 0 }} a recepcionar / {{ $desfiliacoesPendentesBaixaCount ?? 0 }} a baixar no Ábaco">{{ $desfiliacoesTotalPendencias }}</span>
                                                 @endif
                                             </p>
                                         </a>
@@ -1122,6 +1122,126 @@
             });
         }
     </script>
+
+    @if(auth()->check() && isset($desfiliacoesTotalPendencias) && $desfiliacoesTotalPendencias > 0)
+    <!-- Modal de Alerta Proativo: Desfiliações Sindicais Pendentes de Providências -->
+    <div class="modal fade" id="modalAlertaDesfiliacoes" tabindex="-1" aria-labelledby="modalAlertaDesfiliacoesLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow-lg border-0 overflow-hidden" style="border-radius: 14px;">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #033c5a 0%, #0284c7 100%); padding: 18px 24px;">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-white bg-opacity-20 p-2 me-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                            <i class="fa-solid fa-bell text-warning fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0" id="modalAlertaDesfiliacoesLabel" style="font-size: 1.15rem;">
+                                Atenção: Desfiliações Pendentes de Providências
+                            </h5>
+                            <small class="text-white-50">Existem processos que necessitam da atuação da equipe de Arrecadação / Cadastro</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+
+                <div class="modal-body p-4 bg-light">
+                    <!-- Resumo dos Contadores em Destaque -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #f59e0b !important; border-radius: 10px;">
+                                <div class="card-body p-3 d-flex align-items-center">
+                                    <div class="rounded-circle bg-warning bg-opacity-15 p-3 me-3 text-warning">
+                                        <i class="fa-solid fa-envelope-open-text fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small fw-bold text-uppercase">1ª Etapa: Pendente Recepção</div>
+                                        <div class="fs-3 fw-bold text-dark">{{ $desfiliacoesPendentesRecepcaoCount ?? 0 }}</div>
+                                        <small class="text-muted">Cartas assinadas aguardando conferência e aceite</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #0284c7 !important; border-radius: 10px;">
+                                <div class="card-body p-3 d-flex align-items-center">
+                                    <div class="rounded-circle bg-info bg-opacity-15 p-3 me-3 text-info">
+                                        <i class="fa-solid fa-clipboard-check fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small fw-bold text-uppercase">2ª Etapa: Baixa no ERP Ábaco</div>
+                                        <div class="fs-3 fw-bold text-dark">{{ $desfiliacoesPendentesBaixaCount ?? 0 }}</div>
+                                        <small class="text-muted">Cartas recepcionadas aguardando baixa no sistema</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Amostra das Solicitações -->
+                    @if(isset($desfiliacoesPendentesAmostra) && $desfiliacoesPendentesAmostra->count() > 0)
+                        <div class="card border-0 shadow-sm" style="border-radius: 10px;">
+                            <div class="card-header bg-white py-2 px-3 border-bottom d-flex justify-content-between align-items-center">
+                                <span class="fw-bold small text-dark"><i class="fa-solid fa-clock-rotate-left me-1 text-primary"></i> Solicitações Recentes Aguardando Providências</span>
+                                <span class="badge bg-secondary">{{ $desfiliacoesTotalPendencias }} no total</span>
+                            </div>
+                            <div class="table-responsive" style="max-height: 220px;">
+                                <table class="table table-sm table-hover align-middle mb-0" style="font-size: 0.82rem;">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Trabalhador</th>
+                                            <th>Empresa</th>
+                                            <th>Etapa Atual</th>
+                                            <th>Data Confirmação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($desfiliacoesPendentesAmostra as $item)
+                                            <tr>
+                                                <td class="fw-bold text-slate-800">{{ $item->nome_completo }}</td>
+                                                <td>{{ $item->empresa }}</td>
+                                                <td>
+                                                    @if($item->isConfirmada())
+                                                        <span class="badge bg-warning text-dark"><i class="fa-solid fa-envelope-open-text me-1"></i>Pendente Recepção</span>
+                                                    @elseif($item->isRecepcionada())
+                                                        <span class="badge bg-info text-dark"><i class="fa-solid fa-clipboard-check me-1"></i>Aguardando Baixa Ábaco</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-muted">{{ $item->confirmado_em?->format('d/m/Y H:i') ?? '-' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="modal-footer bg-white py-3 px-4 d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-clock me-1"></i> Lembrar Mais Tarde
+                    </button>
+                    <a href="{{ route('admin.desfiliacoes.index') }}" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm">
+                        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Acessar Painel de Desfiliações
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const alertKey = 'desfiliacao_alerta_sessao_visto';
+            const modalEl = document.getElementById('modalAlertaDesfiliacoes');
+            if (modalEl && !sessionStorage.getItem(alertKey)) {
+                setTimeout(() => {
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                    sessionStorage.setItem(alertKey, '1');
+                }, 500);
+            }
+        });
+    </script>
+    @endif
 
     @stack('scripts')
 </body>

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Desfiliacao;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +17,7 @@ class DesfiliacaoAdminController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Desfiliacao::query()->with('efetivadoPor');
+        $query = Desfiliacao::query()->with(['recepcionadoPor', 'efetivadoPor']);
 
         if ($request->filled('status')) {
             $query->where('status', $request->string('status')->toString());
@@ -48,8 +49,9 @@ class DesfiliacaoAdminController extends Controller
         $totais = [
             'total' => Desfiliacao::count(),
             'pendentes' => Desfiliacao::where('status', 'pendente')->count(),
-            'confirmadas' => Desfiliacao::where('status', 'confirmada')->count(),
-            'efetivadas' => Desfiliacao::where('status', 'efetivada')->count(),
+            'confirmadas' => Desfiliacao::where('status', 'confirmada')->count(), // Pendente Recepção/Ciência
+            'recepcionadas' => Desfiliacao::where('status', 'recepcionada')->count(), // Pendente Baixa no Ábaco
+            'efetivadas' => Desfiliacao::where('status', 'efetivada')->count(), // Baixa Concluída
         ];
 
         return view('admin.desfiliacoes.index', compact('desfiliacoes', 'totais'));
@@ -57,7 +59,7 @@ class DesfiliacaoAdminController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $desfiliacao = Desfiliacao::with('efetivadoPor')->findOrFail($id);
+        $desfiliacao = Desfiliacao::with(['recepcionadoPor', 'efetivadoPor'])->findOrFail($id);
 
         return response()->json([
             'id' => $desfiliacao->id,
@@ -78,7 +80,11 @@ class DesfiliacaoAdminController extends Controller
             'tem_pdf' => (bool) ($desfiliacao->pdf_path && Storage::disk('local')->exists($desfiliacao->pdf_path)),
             'download_url' => route('admin.desfiliacoes.download', ['id' => $desfiliacao->id]),
             'is_confirmada' => $desfiliacao->isConfirmada(),
+            'is_recepcionada' => $desfiliacao->isRecepcionada(),
             'is_efetivada' => $desfiliacao->isEfetivada(),
+            'recepcionado_em' => $desfiliacao->recepcionado_em?->format('d/m/Y H:i:s'),
+            'recepcionado_por' => $desfiliacao->recepcionadoPor?->name,
+            'observacao_recepcao' => $desfiliacao->observacao_recepcao,
             'efetivado_em' => $desfiliacao->efetivado_em?->format('d/m/Y H:i:s'),
             'efetivado_por' => $desfiliacao->efetivadoPor?->name,
             'protocolo_abaco' => $desfiliacao->protocolo_abaco,
@@ -104,6 +110,56 @@ class DesfiliacaoAdminController extends Controller
     }
 
     /**
+     * Registra o aceite / recepção formal e ciência institucional da carta de desfiliação.
+     */
+    public function recepcionar(Request $request, int $id)
+    {
+        $desfiliacao = Desfiliacao::findOrFail($id);
+
+        if ($desfiliacao->isRecepcionada() || $desfiliacao->isEfetivada()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Esta carta de desfiliação já foi recepcionada anteriormente.',
+                ], 422);
+            }
+            return back()->with('warning', 'Esta carta de desfiliação já foi recepcionada anteriormente.');
+        }
+
+        $request->validate([
+            'observacao_recepcao' => 'nullable|string|max:1000',
+        ]);
+
+        $desfiliacao->update([
+            'status' => 'recepcionada',
+            'recepcionado_por_user_id' => auth()->id(),
+            'recepcionado_em' => now(),
+            'observacao_recepcao' => $request->input('observacao_recepcao'),
+        ]);
+
+        $desfiliacao->load('recepcionadoPor');
+
+        // Regenerar o PDF para estampar o Protocolo de Recepção Institucional (Ciência)
+        try {
+            $this->regenerarPdf($desfiliacao);
+        } catch (\Throwable $e) {
+            // Continua a execução mesmo se falhar a gravação do PDF em ambiente de teste
+        }
+
+        $msg = "Carta de desfiliação de {$desfiliacao->nome_completo} recepcionada com sucesso! O protocolo institucional de ciência foi registrado no documento e a solicitação agora aguarda baixa no ERP Ábaco.";
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'desfiliacao' => $desfiliacao->fresh(['recepcionadoPor', 'efetivadoPor']),
+            ]);
+        }
+
+        return redirect()->route('admin.desfiliacoes.index')->with('success', $msg);
+    }
+
+    /**
      * Efetiva a desfiliação após providências/baixa no ERP Ábaco pelo usuário operador.
      */
     public function efetivar(Request $request, int $id)
@@ -125,13 +181,33 @@ class DesfiliacaoAdminController extends Controller
             'observacao_efetivacao' => 'nullable|string|max:1000',
         ]);
 
+        // Se ainda não tiver sido recepcionada formalmente, registra o operador atual como recebedor também
+        if (! $desfiliacao->recepcionado_em) {
+            $desfiliacao->recepcionado_por_user_id = auth()->id();
+            $desfiliacao->recepcionado_em = now();
+            if (empty($desfiliacao->observacao_recepcao)) {
+                $desfiliacao->observacao_recepcao = 'Recepcionado e baixado simultaneamente no ERP Ábaco.';
+            }
+        }
+
         $desfiliacao->update([
             'status' => 'efetivada',
+            'recepcionado_por_user_id' => $desfiliacao->recepcionado_por_user_id,
+            'recepcionado_em' => $desfiliacao->recepcionado_em,
+            'observacao_recepcao' => $desfiliacao->observacao_recepcao,
             'efetivado_por_user_id' => auth()->id(),
             'efetivado_em' => now(),
             'protocolo_abaco' => $request->input('protocolo_abaco'),
             'observacao_efetivacao' => $request->input('observacao_efetivacao'),
         ]);
+
+        $desfiliacao->load(['recepcionadoPor', 'efetivadoPor']);
+
+        try {
+            $this->regenerarPdf($desfiliacao);
+        } catch (\Throwable $e) {
+            // Continua caso dê erro no PDF
+        }
 
         // Se o sócio existir no cadastro de sócios caixa, sincronizar flag inativado_abaco
         $cpfLimpo = preg_replace('/\D/', '', (string) $desfiliacao->cpf);
@@ -159,10 +235,33 @@ class DesfiliacaoAdminController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $msg,
-                'desfiliacao' => $desfiliacao->fresh(['efetivadoPor']),
+                'desfiliacao' => $desfiliacao->fresh(['recepcionadoPor', 'efetivadoPor']),
             ]);
         }
 
         return redirect()->route('admin.desfiliacoes.index')->with('success', $msg);
+    }
+
+    /**
+     * Regenera o PDF do termo com os carimbos de auditoria, recepção institucional e baixa.
+     */
+    protected function regenerarPdf(Desfiliacao $desfiliacao): void
+    {
+        $pdf = Pdf::loadView('pdf.termo_desfiliacao', compact('desfiliacao'))
+            ->setPaper('a4', 'portrait')
+            ->setOptions([
+                'isRemoteEnabled' => true,
+                'isHtml5ParserEnabled' => true,
+                'dpi' => 150,
+                'defaultFont' => 'Helvetica',
+            ]);
+
+        $ano = $desfiliacao->created_at ? $desfiliacao->created_at->format('Y') : date('Y');
+        $relPath = "desfiliacoes/{$ano}/{$desfiliacao->termo_hash}.pdf";
+        Storage::disk('local')->put($relPath, $pdf->output());
+
+        if ($desfiliacao->pdf_path !== $relPath) {
+            $desfiliacao->update(['pdf_path' => $relPath]);
+        }
     }
 }

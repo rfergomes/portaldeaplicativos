@@ -108,27 +108,58 @@ class AppServiceProvider extends ServiceProvider
                     ];
                 }
 
-                // 3. Notificações de novas desfiliações confirmadas (aguardando baixa no ERP Ábaco)
+                // 3. Notificações de desfiliações: (A) Pendentes de Recepção/Ciência e (B) Pendentes de Baixa no ERP Ábaco
+                $desfiliacoesPendentesRecepcaoCount = 0;
                 $desfiliacoesPendentesBaixaCount = 0;
+                $desfiliacoesTotalPendencias = 0;
+                $desfiliacoesPendentesAmostra = collect();
+
                 $user = auth()->user();
                 if ($user && ($user->can('socio_caixa.visualizar') || $user->temPerfil('Administrador'))) {
                     try {
-                        $desfiliacoesPendentes = \App\Models\Desfiliacao::where('status', 'confirmada')
+                        // (A) Pendentes de Recepção / Aceite (status: confirmada)
+                        $desfiliacoesRecepcao = \App\Models\Desfiliacao::where('status', 'confirmada')
                             ->latest('confirmado_em')
-                            ->take(10)
+                            ->take(5)
                             ->get();
+                        $desfiliacoesPendentesRecepcaoCount = \App\Models\Desfiliacao::where('status', 'confirmada')->count();
 
-                        $desfiliacoesPendentesBaixaCount = \App\Models\Desfiliacao::where('status', 'confirmada')->count();
-
-                        foreach ($desfiliacoesPendentes as $desf) {
+                        foreach ($desfiliacoesRecepcao as $desf) {
                             $alertas[] = [
-                                'id' => 'desf-' . $desf->id,
-                                'tipo' => 'desfiliacao',
-                                'icone' => 'fa-solid fa-user-xmark text-danger',
-                                'titulo' => 'Nova Desfiliação (Baixa Ábaco)',
+                                'id' => 'desf-rec-' . $desf->id,
+                                'tipo' => 'desfiliacao_recepcao',
+                                'icone' => 'fa-solid fa-envelope-open-text text-warning',
+                                'titulo' => 'Nova Carta (Pendente Recepção)',
                                 'mensagem' => \Illuminate\Support\Str::limit($desf->nome_completo . ' (' . ($desf->empresa ?: 'Sócio') . ')', 35),
                                 'url' => route('admin.desfiliacoes.index', ['status' => 'confirmada']),
                             ];
+                        }
+
+                        // (B) Pendentes de Baixa no ERP Ábaco (status: recepcionada)
+                        $desfiliacoesBaixa = \App\Models\Desfiliacao::where('status', 'recepcionada')
+                            ->latest('recepcionado_em')
+                            ->take(5)
+                            ->get();
+                        $desfiliacoesPendentesBaixaCount = \App\Models\Desfiliacao::where('status', 'recepcionada')->count();
+
+                        foreach ($desfiliacoesBaixa as $desf) {
+                            $alertas[] = [
+                                'id' => 'desf-bx-' . $desf->id,
+                                'tipo' => 'desfiliacao_baixa',
+                                'icone' => 'fa-solid fa-clipboard-check text-primary',
+                                'titulo' => 'Pendente Baixa no ERP Ábaco',
+                                'mensagem' => \Illuminate\Support\Str::limit($desf->nome_completo . ' (' . ($desf->empresa ?: 'Sócio') . ')', 35),
+                                'url' => route('admin.desfiliacoes.index', ['status' => 'recepcionada']),
+                            ];
+                        }
+
+                        $desfiliacoesTotalPendencias = $desfiliacoesPendentesRecepcaoCount + $desfiliacoesPendentesBaixaCount;
+
+                        if ($desfiliacoesTotalPendencias > 0) {
+                            $desfiliacoesPendentesAmostra = \App\Models\Desfiliacao::whereIn('status', ['confirmada', 'recepcionada'])
+                                ->latest('confirmado_em')
+                                ->take(6)
+                                ->get();
                         }
                     } catch (\Throwable $e) {
                         // Silencia caso a tabela ainda não exista em contextos de bootstrap
@@ -138,13 +169,19 @@ class AppServiceProvider extends ServiceProvider
                 $view->with([
                     'demandasAlertasCount' => count($alertas),
                     'demandasAlertasList' => $alertas,
+                    'desfiliacoesPendentesRecepcaoCount' => $desfiliacoesPendentesRecepcaoCount,
                     'desfiliacoesPendentesBaixaCount' => $desfiliacoesPendentesBaixaCount,
+                    'desfiliacoesTotalPendencias' => $desfiliacoesTotalPendencias,
+                    'desfiliacoesPendentesAmostra' => $desfiliacoesPendentesAmostra,
                 ]);
             } else {
                 $view->with([
                     'demandasAlertasCount' => 0,
                     'demandasAlertasList' => [],
+                    'desfiliacoesPendentesRecepcaoCount' => 0,
                     'desfiliacoesPendentesBaixaCount' => 0,
+                    'desfiliacoesTotalPendencias' => 0,
+                    'desfiliacoesPendentesAmostra' => collect(),
                 ]);
             }
         });

@@ -294,6 +294,39 @@ class DesfiliacaoTest extends TestCase
         $user->delete();
     }
 
+    public function test_operador_pode_recepcionar_carta_de_desfiliacao_e_estampar_protocolo(): void
+    {
+        $user = User::factory()->create(['name' => 'Operador Recepção']);
+
+        $desfiliacao = Desfiliacao::create([
+            'nome_completo' => 'Carlos Eduardo Ferreira',
+            'cpf' => '111.444.777-35',
+            'empresa' => 'Indústria Teste S/A',
+            'email' => 'carlos.ferreira.teste@example.com',
+            'telefone' => '(19) 98765-4321',
+            'status' => 'confirmada',
+            'confirmado_em' => now(),
+            'termo_hash' => hash('sha256', 'teste-recepcao'),
+        ]);
+
+        $response = $this->actingAs($user)->post(route('admin.desfiliacoes.recepcionar', ['id' => $desfiliacao->id]), [
+            'observacao_recepcao' => 'Carta conferida e recebida no setor de arrecadação.',
+        ]);
+
+        $response->assertRedirect(route('admin.desfiliacoes.index'));
+        $response->assertSessionHas('success');
+
+        $desfiliacao->refresh();
+
+        $this->assertTrue($desfiliacao->isRecepcionada());
+        $this->assertSame('recepcionada', $desfiliacao->status);
+        $this->assertSame($user->id, $desfiliacao->recepcionado_por_user_id);
+        $this->assertNotNull($desfiliacao->recepcionado_em);
+        $this->assertSame('Carta conferida e recebida no setor de arrecadação.', $desfiliacao->observacao_recepcao);
+
+        $user->delete();
+    }
+
     public function test_operador_pode_efetivar_desfiliacao_e_registrar_baixa_no_erp_abaco(): void
     {
         $user = User::factory()->create(['name' => 'Operador Arrecadação']);
@@ -304,8 +337,10 @@ class DesfiliacaoTest extends TestCase
             'empresa' => 'Indústria Teste S/A',
             'email' => 'carlos.ferreira.teste@example.com',
             'telefone' => '(19) 98765-4321',
-            'status' => 'confirmada',
+            'status' => 'recepcionada',
             'confirmado_em' => now(),
+            'recepcionado_em' => now(),
+            'recepcionado_por_user_id' => $user->id,
             'termo_hash' => hash('sha256', 'teste-efetivar'),
         ]);
 
@@ -329,7 +364,7 @@ class DesfiliacaoTest extends TestCase
         $user->delete();
     }
 
-    public function test_view_composer_carrega_alertas_de_desfiliacao_aguardando_baixa(): void
+    public function test_view_composer_carrega_alertas_de_desfiliacao_e_modal_proativo(): void
     {
         $user = User::factory()->create(['name' => 'Admin Notificacao']);
         $perfil = \App\Models\Perfil::firstOrCreate(
@@ -352,9 +387,10 @@ class DesfiliacaoTest extends TestCase
         $response = $this->actingAs($user)->get(route('admin.desfiliacoes.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Nova Desfiliação (Baixa Ábaco)');
+        $response->assertSee('Nova Carta (Pendente Recepção)');
+        $response->assertSee('modalAlertaDesfiliacoes');
         $response->assertSee('Carlos Eduardo Ferreira');
-        $response->assertSee('Aguardando Baixa Ábaco');
+        $response->assertSee('1ª Etapa: Pendente Recepção');
 
         $user->delete();
     }

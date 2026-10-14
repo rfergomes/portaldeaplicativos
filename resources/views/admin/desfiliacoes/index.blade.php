@@ -6,59 +6,84 @@
 <div class="container-fluid">
     <!-- Header e Métricas -->
     <div class="row mb-3">
-        <div class="col-md-3 col-sm-6 mb-2">
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-2">
             <div class="card card-outline card-primary shadow-sm h-100">
-                <div class="card-body d-flex align-items-center">
+                <div class="card-body p-3 d-flex align-items-center">
                     <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-3 me-3">
                         <i class="fa-solid fa-file-signature fa-2x"></i>
                     </div>
                     <div>
-                        <div class="text-muted small text-uppercase fw-bold">Total de Solicitações</div>
+                        <div class="text-muted small text-uppercase fw-bold">Total</div>
                         <div class="fs-4 fw-bold text-dark">{{ $totais['total'] }}</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-2">
+
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-2">
             <div class="card card-outline card-secondary shadow-sm h-100">
-                <div class="card-body d-flex align-items-center">
+                <div class="card-body p-3 d-flex align-items-center">
                     <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary p-3 me-3">
                         <i class="fa-solid fa-hourglass-half fa-2x"></i>
                     </div>
                     <div>
-                        <div class="text-muted small text-uppercase fw-bold">Pendentes de Assinatura</div>
+                        <div class="text-muted small text-uppercase fw-bold">Pendente Assinatura</div>
                         <div class="fs-4 fw-bold text-dark">{{ $totais['pendentes'] }}</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-2">
+
+        <div class="col-xl-3 col-md-4 col-sm-6 mb-2">
             <div class="card card-outline card-warning shadow-sm h-100 border-warning">
-                <div class="card-body d-flex align-items-center">
+                <div class="card-body p-3 d-flex align-items-center">
                     <div class="rounded-circle bg-warning bg-opacity-25 text-warning-emphasis p-3 me-3">
-                        <i class="fa-solid fa-clock-rotate-left fa-2x text-warning"></i>
+                        <i class="fa-solid fa-envelope-open-text fa-2x text-warning"></i>
                     </div>
                     <div>
                         <div class="text-warning-emphasis small text-uppercase fw-bold">
-                            Aguardando Baixa Ábaco
+                            1ª Etapa: Pendente Recepção
                             @if($totais['confirmadas'] > 0)
-                                <span class="badge bg-danger rounded-pill ms-1 animate-pulse">Ação necessária</span>
+                                <span class="badge bg-danger rounded-pill ms-1">Novo</span>
                             @endif
                         </div>
                         <div class="fs-4 fw-bold text-dark">{{ $totais['confirmadas'] }}</div>
+                        <small class="text-muted text-xs">Aguardando conferência/ciência</small>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-2">
+
+        <div class="col-xl-3 col-md-6 col-sm-6 mb-2">
+            <div class="card card-outline card-info shadow-sm h-100 border-info">
+                <div class="card-body p-3 d-flex align-items-center">
+                    <div class="rounded-circle bg-info bg-opacity-15 text-info p-3 me-3">
+                        <i class="fa-solid fa-clipboard-check fa-2x text-info"></i>
+                    </div>
+                    <div>
+                        <div class="text-info-emphasis small text-uppercase fw-bold">
+                            2ª Etapa: Pendente Baixa Ábaco
+                            @if($totais['recepcionadas'] > 0)
+                                <span class="badge bg-warning text-dark rounded-pill ms-1">Ação</span>
+                            @endif
+                        </div>
+                        <div class="fs-4 fw-bold text-dark">{{ $totais['recepcionadas'] }}</div>
+                        <small class="text-muted text-xs">Recepcionadas prontas para baixa</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-6 col-sm-6 mb-2">
             <div class="card card-outline card-success shadow-sm h-100">
-                <div class="card-body d-flex align-items-center">
+                <div class="card-body p-3 d-flex align-items-center">
                     <div class="rounded-circle bg-success bg-opacity-10 text-success p-3 me-3">
                         <i class="fa-solid fa-check-double fa-2x"></i>
                     </div>
                     <div>
-                        <div class="text-muted small text-uppercase fw-bold">Efetivadas (Baixa no Ábaco)</div>
+                        <div class="text-muted small text-uppercase fw-bold">Efetivadas</div>
                         <div class="fs-4 fw-bold text-success">{{ $totais['efetivadas'] }}</div>
+                        <small class="text-muted text-xs">Processo concluído</small>
                     </div>
                 </div>
             </div>
@@ -77,11 +102,12 @@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label small fw-bold">Status</label>
+                    <label class="form-label small fw-bold">Status / Etapa</label>
                     <select name="status" class="form-select form-select-sm">
                         <option value="">Todos os status</option>
-                        <option value="confirmada" {{ request('status') === 'confirmada' ? 'selected' : '' }}>Aguardando Baixa Ábaco</option>
-                        <option value="efetivada" {{ request('status') === 'efetivada' ? 'selected' : '' }}>Efetivada (Baixa Concluída)</option>
+                        <option value="confirmada" {{ request('status') === 'confirmada' ? 'selected' : '' }}>1ª Etapa: Pendente Recepção/Ciência</option>
+                        <option value="recepcionada" {{ request('status') === 'recepcionada' ? 'selected' : '' }}>2ª Etapa: Pendente Baixa no Ábaco</option>
+                        <option value="efetivada" {{ request('status') === 'efetivada' ? 'selected' : '' }}>Efetivada (Baixa Realizada)</option>
                         <option value="pendente" {{ request('status') === 'pendente' ? 'selected' : '' }}>Pendente de Assinatura</option>
                         <option value="expirada" {{ request('status') === 'expirada' ? 'selected' : '' }}>Expirada</option>
                         <option value="cancelada" {{ request('status') === 'cancelada' ? 'selected' : '' }}>Cancelada</option>
@@ -127,12 +153,12 @@
                             <th>Empresa</th>
                             <th>Status / Providências</th>
                             <th>Hash / Validação</th>
-                            <th class="text-center" style="width: 170px;">Ações</th>
+                            <th class="text-center" style="width: 200px;">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($desfiliacoes as $item)
-                            <tr class="{{ $item->isConfirmada() ? 'table-warning bg-opacity-25' : '' }}">
+                            <tr class="{{ $item->isConfirmada() ? 'table-warning bg-opacity-25' : ($item->isRecepcionada() ? 'table-info bg-opacity-10' : '') }}">
                                 <td class="fw-bold text-muted">#{{ str_pad((string)$item->id, 5, '0', STR_PAD_LEFT) }}</td>
                                 <td>
                                     <div class="fw-semibold small">{{ $item->created_at->format('d/m/Y') }}</div>
@@ -146,15 +172,24 @@
                                 <td class="small">{{ $item->empresa }}</td>
                                 <td>
                                     @if ($item->status === 'confirmada')
-                                        <span class="badge bg-warning text-dark rounded-pill px-2" title="Assinado pelo trabalhador. Aguardando baixa no ERP Ábaco.">
-                                            <i class="fa-solid fa-clock-rotate-left me-1"></i>Aguardando Baixa Ábaco
+                                        <span class="badge bg-warning text-dark rounded-pill px-2" title="Assinado pelo trabalhador. Aguardando aceite e ciência do sindicato.">
+                                            <i class="fa-solid fa-envelope-open-text me-1"></i>1ª Etapa: Pendente Recepção
                                         </span>
+                                        <div class="text-xs text-muted mt-1">Aguardando ciência interna</div>
+                                    @elseif ($item->status === 'recepcionada')
+                                        <span class="badge bg-info text-dark rounded-pill px-2" title="Carta recepcionada. Aguardando baixa cadastral no ERP Ábaco.">
+                                            <i class="fa-solid fa-clipboard-check me-1"></i>2ª Etapa: Baixa no Ábaco
+                                        </span>
+                                        <div class="text-xs text-muted mt-1">
+                                            <i class="fa-solid fa-stamp me-1"></i>Recepcionado por {{ $item->recepcionadoPor?->nickname ?: ($item->recepcionadoPor?->name ?? 'Operador') }}
+                                            <span class="text-muted">({{ $item->recepcionado_em?->format('d/m/Y H:i') }})</span>
+                                        </div>
                                     @elseif ($item->status === 'efetivada')
                                         <span class="badge bg-success rounded-pill px-2" title="Baixa realizada no ERP Ábaco">
                                             <i class="fa-solid fa-check-double me-1"></i>Efetivada (Ábaco)
                                         </span>
                                         <div class="text-xs text-muted mt-1">
-                                            <i class="fa-regular fa-user me-1"></i>{{ $item->efetivadoPor?->nickname ?: ($item->efetivadoPor?->name ?? 'Operador') }}
+                                            <i class="fa-regular fa-user me-1"></i>Baixado por {{ $item->efetivadoPor?->nickname ?: ($item->efetivadoPor?->name ?? 'Operador') }}
                                             <span class="text-muted">({{ $item->efetivado_em?->format('d/m/Y H:i') }})</span>
                                         </div>
                                         @if($item->protocolo_abaco)
@@ -185,14 +220,24 @@
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm">
                                         @if ($item->isConfirmada())
-                                            <button type="button" class="btn btn-warning btn-sm btn-abrir-efetivar text-dark fw-semibold" 
+                                            <button type="button" class="btn btn-warning btn-sm btn-abrir-recepcionar text-dark fw-bold" 
+                                                data-id="{{ $item->id }}" 
+                                                data-nome="{{ $item->nome_completo }}" 
+                                                data-cpf="{{ $item->cpf_formatado }}" 
+                                                data-empresa="{{ $item->empresa }}" 
+                                                data-matricula="{{ $item->matricula ?: 'Não informada' }}" 
+                                                title="Recepcionar / Dar Ciência da Carta">
+                                                <i class="fa-solid fa-stamp me-1"></i>Recepcionar
+                                            </button>
+                                        @elseif ($item->isRecepcionada())
+                                            <button type="button" class="btn btn-info btn-sm btn-abrir-efetivar text-dark fw-bold" 
                                                 data-id="{{ $item->id }}" 
                                                 data-nome="{{ $item->nome_completo }}" 
                                                 data-cpf="{{ $item->cpf_formatado }}" 
                                                 data-empresa="{{ $item->empresa }}" 
                                                 data-matricula="{{ $item->matricula ?: 'Não informada' }}" 
                                                 title="Confirmar Baixa no ERP Ábaco">
-                                                <i class="fa-solid fa-clipboard-check me-1"></i>Dar Baixa
+                                                <i class="fa-solid fa-clipboard-check me-1"></i>Baixar Ábaco
                                             </button>
                                         @endif
 
@@ -200,7 +245,7 @@
                                             <i class="fa-solid fa-eye"></i>
                                         </button>
 
-                                        @if (($item->isConfirmada() || $item->isEfetivada()) && $item->pdf_path)
+                                        @if (($item->isConfirmada() || $item->isRecepcionada() || $item->isEfetivada()) && $item->pdf_path)
                                             <a href="{{ route('admin.desfiliacoes.download', ['id' => $item->id]) }}" class="btn btn-outline-danger" title="Baixar Termo em PDF">
                                                 <i class="fa-solid fa-file-pdf"></i>
                                             </a>
@@ -228,21 +273,64 @@
     </div>
 </div>
 
-<!-- Modal para Confirmar Baixa no ERP Ábaco (Efetivação) -->
-<div class="modal fade" id="modalEfetivar" tabindex="-1" aria-labelledby="modalEfetivarLabel" aria-hidden="true">
+<!-- Modal 1: Confirmar Recepção / Ciência da Carta de Desfiliação -->
+<div class="modal fade" id="modalRecepcionar" tabindex="-1" aria-labelledby="modalRecepcionarLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content shadow border-warning">
-            <form id="formEfetivar" method="POST" action="">
+            <form id="formRecepcionar" method="POST" action="">
                 @csrf
                 <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fs-6 fw-bold" id="modalRecepcionarLabel">
+                        <i class="fa-solid fa-stamp me-2"></i>Recepcionar Carta de Desfiliação (Ciência)
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning py-2 small mb-3">
+                        <i class="fa-solid fa-circle-info me-1"></i>
+                        Ao confirmar a recepção, você registra a <strong>ciência formal do sindicato</strong>. O documento oficial será atualizado com o carimbo institucional contendo seu nome e horário, e a solicitação passará para a etapa de <strong>baixa no ERP Ábaco</strong>.
+                    </div>
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-body p-2 small">
+                            <div><strong>Trabalhador:</strong> <span id="recNome"></span></div>
+                            <div><strong>CPF:</strong> <span id="recCpf" class="font-monospace"></span></div>
+                            <div><strong>Empresa:</strong> <span id="recEmpresa"></span></div>
+                            <div><strong>Matrícula:</strong> <span id="recMatricula"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="inputObservacaoRecepcao" class="form-label small fw-bold">Observações do Recebimento <span class="text-muted fw-normal">(Opcional)</span></label>
+                        <textarea name="observacao_recepcao" id="inputObservacaoRecepcao" rows="3" class="form-control form-control-sm" placeholder="Ex: Carta conferida e recepcionada no departamento de arrecadação."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning btn-sm text-dark fw-bold shadow-sm">
+                        <i class="fa-solid fa-stamp me-1"></i> Confirmar Recepção e Carimbar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 2: Confirmar Baixa no ERP Ábaco (Efetivação) -->
+<div class="modal fade" id="modalEfetivar" tabindex="-1" aria-labelledby="modalEfetivarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content shadow border-info">
+            <form id="formEfetivar" method="POST" action="">
+                @csrf
+                <div class="modal-header bg-info text-dark">
                     <h5 class="modal-title fs-6 fw-bold" id="modalEfetivarLabel">
                         <i class="fa-solid fa-clipboard-check me-2"></i>Confirmar Baixa no ERP Ábaco
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="alert alert-warning py-2 small mb-3">
-                        <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                    <div class="alert alert-info py-2 small mb-3">
+                        <i class="fa-solid fa-circle-check me-1"></i>
                         Esta ação altera o status da solicitação para <strong>Efetivada</strong>, registrando seu usuário e horário como comprovação de que o sócio foi baixado no sistema ERP Ábaco.
                     </div>
 
@@ -257,19 +345,19 @@
 
                     <div class="mb-3">
                         <label for="inputProtocoloAbaco" class="form-label small fw-bold">Nº de Protocolo / Código no Ábaco <span class="text-muted fw-normal">(Opcional)</span></label>
-                        <input type="text" name="protocolo_abaco" id="inputProtocoloAbaco" class="form-control form-control-sm" placeholder="Ex: PROTO-2026-098 ou Código de Baixa">
+                        <input type="text" name="protocolo_abaco" id="inputProtocoloAbaco" class="form-control form-control-sm" placeholder="Ex: PROTO-2026-098 ou Código da Baixa">
                         <div class="form-text text-xs">Identificador ou número do chamado registrado no ERP Ábaco.</div>
                     </div>
 
                     <div class="mb-2">
-                        <label for="inputObservacao" class="form-label small fw-bold">Observações da Efetivação <span class="text-muted fw-normal">(Opcional)</span></label>
+                        <label for="inputObservacao" class="form-label small fw-bold">Observações da Baixa <span class="text-muted fw-normal">(Opcional)</span></label>
                         <textarea name="observacao_efetivacao" id="inputObservacao" rows="3" class="form-control form-control-sm" placeholder="Ex: Sócio baixado no módulo de arrecadação do ERP Ábaco pelo operador."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-success btn-sm shadow-sm">
-                        <i class="fa-solid fa-check-double me-1"></i> Confirmar Baixa no Ábaco
+                        <i class="fa-solid fa-check-double me-1"></i> Confirmar Baixa no ERP Ábaco
                     </button>
                 </div>
             </form>
@@ -277,7 +365,7 @@
     </div>
 </div>
 
-<!-- Modal de Detalhes de Auditoria -->
+<!-- Modal 3: Detalhes de Auditoria e Trilha Probatória -->
 <div class="modal fade" id="modalAuditoria" tabindex="-1" aria-labelledby="modalAuditoriaLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content shadow">
@@ -293,10 +381,21 @@
                     <div class="small text-muted mt-2">Carregando dados da solicitação...</div>
                 </div>
                 <div id="modalContent" style="display: none;">
-                    <!-- Bloco de Status de Efetivação / Baixa ERP Ábaco -->
+                    <!-- Bloco de Recepção Institucional -->
+                    <div id="blocoRecepcionada" class="alert alert-info d-flex align-items-center mb-3" style="display: none;">
+                        <i class="fa-solid fa-stamp fs-3 me-3 text-info"></i>
+                        <div class="small w-100">
+                            <strong class="d-block text-info-emphasis">Carta Recepcionada pelo Sindicato (Ciência Formal)</strong>
+                            <div><strong>Operador Recebedor:</strong> <span id="detRecepcionadoPor"></span></div>
+                            <div><strong>Data/Hora do Recebimento:</strong> <span id="detDataRecepcao"></span></div>
+                            <div id="detLinhaObsRecepcao"><strong>Observações:</strong> <span id="detObsRecepcao"></span></div>
+                        </div>
+                    </div>
+
+                    <!-- Bloco de Efetivação / Baixa ERP Ábaco -->
                     <div id="blocoEfetivada" class="alert alert-success d-flex align-items-center mb-3" style="display: none;">
                         <i class="fa-solid fa-circle-check fs-3 me-3 text-success"></i>
-                        <div class="small">
+                        <div class="small w-100">
                             <strong class="d-block text-success-emphasis">Baixa Realizada no ERP Ábaco (Efetivada)</strong>
                             <div><strong>Operador Responsável:</strong> <span id="detEfetivadoPor"></span></div>
                             <div><strong>Data/Hora da Baixa:</strong> <span id="detDataEfetivacao"></span></div>
@@ -305,15 +404,29 @@
                         </div>
                     </div>
 
-                    <div id="blocoPendenteBaixa" class="alert alert-warning d-flex align-items-center justify-content-between mb-3" style="display: none;">
+                    <!-- Avisos de Ação Pendente -->
+                    <div id="blocoAvisoRecepcao" class="alert alert-warning d-flex align-items-center justify-content-between mb-3" style="display: none;">
                         <div class="d-flex align-items-center small">
-                            <i class="fa-solid fa-clock-rotate-left fs-3 me-3 text-warning"></i>
+                            <i class="fa-solid fa-envelope-open-text fs-3 me-3 text-warning"></i>
                             <div>
-                                <strong class="d-block text-warning-emphasis">Aguardando Baixa no ERP Ábaco</strong>
-                                <span>O trabalhador já confirmou e assinou o termo. É necessário realizar a baixa no sistema Ábaco.</span>
+                                <strong class="d-block text-warning-emphasis">1ª Etapa Pendente: Recepção / Ciência</strong>
+                                <span>O trabalhador já assinou a carta digitalmente. É necessário dar o aceite/ciência institucional.</span>
                             </div>
                         </div>
-                        <button type="button" id="btnDarBaixaModal" class="btn btn-warning btn-sm text-dark fw-bold ms-3">
+                        <button type="button" id="btnRecepcionarModal" class="btn btn-warning btn-sm text-dark fw-bold ms-3 text-nowrap">
+                            <i class="fa-solid fa-stamp me-1"></i>Recepcionar Agora
+                        </button>
+                    </div>
+
+                    <div id="blocoAvisoBaixa" class="alert alert-info d-flex align-items-center justify-content-between mb-3" style="display: none;">
+                        <div class="d-flex align-items-center small">
+                            <i class="fa-solid fa-clipboard-check fs-3 me-3 text-info"></i>
+                            <div>
+                                <strong class="d-block text-info-emphasis">2ª Etapa Pendente: Baixa no ERP Ábaco</strong>
+                                <span>A carta já foi recepcionada. Conclua o processo dando a baixa cadastral no ERP Ábaco.</span>
+                            </div>
+                        </div>
+                        <button type="button" id="btnDarBaixaModal" class="btn btn-info btn-sm text-dark fw-bold ms-3 text-nowrap">
                             <i class="fa-solid fa-clipboard-check me-1"></i>Dar Baixa Agora
                         </button>
                     </div>
@@ -373,7 +486,7 @@
             </div>
             <div class="modal-footer bg-light">
                 <a href="#" id="detBtnPdf" class="btn btn-danger btn-sm shadow-sm" style="display: none;" target="_blank">
-                    <i class="fa-solid fa-file-pdf me-1"></i> Baixar PDF Oficial
+                    <i class="fa-solid fa-file-pdf me-1"></i> Baixar PDF Oficial com Carimbo
                 </a>
                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
             </div>
@@ -388,11 +501,26 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalLoading = document.getElementById('modalLoading');
     const modalContent = document.getElementById('modalContent');
 
+    const modalRecepcionarEl = document.getElementById('modalRecepcionar');
+    const modalRecepcionar = new bootstrap.Modal(modalRecepcionarEl);
+    const formRecepcionar = document.getElementById('formRecepcionar');
+
     const modalEfetivarEl = document.getElementById('modalEfetivar');
     const modalEfetivar = new bootstrap.Modal(modalEfetivarEl);
     const formEfetivar = document.getElementById('formEfetivar');
 
     let currentItemData = null;
+
+    // Abertura do modal de Recepção / Aceite
+    function abrirModalRecepcionar(id, nome, cpf, empresa, matricula) {
+        formRecepcionar.action = `/admin/desfiliacoes/${id}/recepcionar`;
+        document.getElementById('recNome').innerText = nome;
+        document.getElementById('recCpf').innerText = cpf;
+        document.getElementById('recEmpresa').innerText = empresa;
+        document.getElementById('recMatricula').innerText = matricula;
+        document.getElementById('inputObservacaoRecepcao').value = '';
+        modalRecepcionar.show();
+    }
 
     // Abertura do modal de Efetivação / Baixa ERP Ábaco
     function abrirModalEfetivar(id, nome, cpf, empresa, matricula) {
@@ -406,6 +534,19 @@ document.addEventListener('DOMContentLoaded', function () {
         modalEfetivar.show();
     }
 
+    // Gatilhos da tabela
+    document.querySelectorAll('.btn-abrir-recepcionar').forEach(btn => {
+        btn.addEventListener('click', function () {
+            abrirModalRecepcionar(
+                this.dataset.id,
+                this.dataset.nome,
+                this.dataset.cpf,
+                this.dataset.empresa,
+                this.dataset.matricula
+            );
+        });
+    });
+
     document.querySelectorAll('.btn-abrir-efetivar').forEach(btn => {
         btn.addEventListener('click', function () {
             abrirModalEfetivar(
@@ -418,7 +559,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Botão de Dar Baixa dentro do Modal de Auditoria
+    // Botões de ação dentro do modal de auditoria
+    document.getElementById('btnRecepcionarModal').addEventListener('click', function() {
+        if (currentItemData) {
+            modalAuditoria.hide();
+            abrirModalRecepcionar(
+                currentItemData.id,
+                currentItemData.nome_completo,
+                currentItemData.cpf,
+                currentItemData.empresa,
+                currentItemData.matricula
+            );
+        }
+    });
+
     document.getElementById('btnDarBaixaModal').addEventListener('click', function() {
         if (currentItemData) {
             modalAuditoria.hide();
@@ -457,13 +611,30 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('detUserAgent').innerText = data.user_agent_confirmacao || 'N/A';
                     document.getElementById('detHash').innerText = data.termo_hash || 'Aguardando finalização';
 
-                    // Tratamento do bloco de status de baixa ERP Ábaco
+                    // Tratamento dos blocos de status
+                    const blocoRecepcionada = document.getElementById('blocoRecepcionada');
                     const blocoEfetivada = document.getElementById('blocoEfetivada');
-                    const blocoPendenteBaixa = document.getElementById('blocoPendenteBaixa');
+                    const blocoAvisoRecepcao = document.getElementById('blocoAvisoRecepcao');
+                    const blocoAvisoBaixa = document.getElementById('blocoAvisoBaixa');
 
+                    // 1. Dados de Recepção
+                    if (data.recepcionado_em) {
+                        blocoRecepcionada.style.display = 'flex';
+                        document.getElementById('detRecepcionadoPor').innerText = data.recepcionado_por || 'Operador';
+                        document.getElementById('detDataRecepcao').innerText = data.recepcionado_em;
+                        if (data.observacao_recepcao) {
+                            document.getElementById('detObsRecepcao').innerText = data.observacao_recepcao;
+                            document.getElementById('detLinhaObsRecepcao').style.display = 'block';
+                        } else {
+                            document.getElementById('detLinhaObsRecepcao').style.display = 'none';
+                        }
+                    } else {
+                        blocoRecepcionada.style.display = 'none';
+                    }
+
+                    // 2. Dados de Efetivação / Baixa
                     if (data.is_efetivada) {
                         blocoEfetivada.style.display = 'flex';
-                        blocoPendenteBaixa.style.display = 'none';
                         document.getElementById('detEfetivadoPor').innerText = data.efetivado_por || 'Operador';
                         document.getElementById('detDataEfetivacao').innerText = data.efetivado_em || '-';
                         if (data.protocolo_abaco) {
@@ -478,12 +649,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         } else {
                             document.getElementById('detLinhaObs').style.display = 'none';
                         }
-                    } else if (data.is_confirmada) {
-                        blocoEfetivada.style.display = 'none';
-                        blocoPendenteBaixa.style.display = 'flex';
                     } else {
                         blocoEfetivada.style.display = 'none';
-                        blocoPendenteBaixa.style.display = 'none';
+                    }
+
+                    // 3. Avisos de ação pendente
+                    if (data.is_confirmada) {
+                        blocoAvisoRecepcao.style.display = 'flex';
+                        blocoAvisoBaixa.style.display = 'none';
+                    } else if (data.is_recepcionada) {
+                        blocoAvisoRecepcao.style.display = 'none';
+                        blocoAvisoBaixa.style.display = 'flex';
+                    } else {
+                        blocoAvisoRecepcao.style.display = 'none';
+                        blocoAvisoBaixa.style.display = 'none';
                     }
 
                     const btnPdf = document.getElementById('detBtnPdf');

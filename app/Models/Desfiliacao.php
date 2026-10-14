@@ -30,6 +30,9 @@ class Desfiliacao extends Model
         'assinatura_base64',
         'termo_hash',
         'pdf_path',
+        'recepcionado_por_user_id',
+        'recepcionado_em',
+        'observacao_recepcao',
         'efetivado_por_user_id',
         'efetivado_em',
         'protocolo_abaco',
@@ -39,10 +42,16 @@ class Desfiliacao extends Model
     protected $casts = [
         'email_verificado_em' => 'datetime',
         'confirmado_em' => 'datetime',
+        'recepcionado_em' => 'datetime',
         'efetivado_em' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function recepcionadoPor()
+    {
+        return $this->belongsTo(User::class, 'recepcionado_por_user_id');
+    }
 
     public function efetivadoPor()
     {
@@ -59,14 +68,29 @@ class Desfiliacao extends Model
         return $this->status === 'confirmada';
     }
 
+    public function isRecepcionada(): bool
+    {
+        return $this->status === 'recepcionada';
+    }
+
     public function isEfetivada(): bool
     {
         return $this->status === 'efetivada';
     }
 
-    public function scopePendentesBaixaAbaco($query)
+    public function scopePendentesRecepcao($query)
     {
         return $query->where('status', 'confirmada');
+    }
+
+    public function scopePendentesBaixaAbaco($query)
+    {
+        return $query->where('status', 'recepcionada');
+    }
+
+    public function scopePendentesInternas($query)
+    {
+        return $query->whereIn('status', ['confirmada', 'recepcionada']);
     }
 
     /**

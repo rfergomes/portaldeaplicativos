@@ -199,6 +199,27 @@
         <div class="cpf-assinante">CPF: {{ $desfiliacao->cpf_formatado }}</div>
     </div>
 
+    <!-- Protocolo de Recepção Institucional (Ciência do Sindicato) -->
+    @if($desfiliacao->recepcionado_em)
+    <div style="margin-top: 14px; margin-bottom: 10px; border: 1.5px solid #0284c7; background-color: #f0f9ff; padding: 7px 10px; font-size: 7.5pt; color: #0369a1; border-radius: 4px;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="width: 28px; vertical-align: middle; text-align: center; font-size: 16pt; color: #0284c7; font-weight: bold;">
+                    &#10003;
+                </td>
+                <td style="vertical-align: middle; padding-left: 6px;">
+                    <strong style="text-transform: uppercase; font-size: 8pt; color: #0369a1; letter-spacing: 0.5px;">PROTOCOLO DE RECEPÇÃO INSTITUCIONAL &mdash; CIÊNCIA SINDICAL</strong><br>
+                    <span>Recepcionado formalmente por: <strong>{{ $desfiliacao->recepcionadoPor?->name ?? 'Operador do Sindicato' }}</strong></span> &bull; 
+                    <span>Data/Hora: <strong>{{ $desfiliacao->recepcionado_em->format('d/m/Y H:i:s') }}</strong></span>
+                    @if($desfiliacao->observacao_recepcao)
+                        <br><span style="color: #475569;">Observações da Recepção: {{ $desfiliacao->observacao_recepcao }}</span>
+                    @endif
+                </td>
+            </tr>
+        </table>
+    </div>
+    @endif
+
     <!-- Trilha Probatória de Autenticidade (Lei Federal nº 14.063/2020) -->
     <div class="box-probatario">
         <div class="box-probatario-titulo">
@@ -210,6 +231,12 @@
                     <strong>Identificador do Requerimento:</strong> #{{ str_pad((string)$desfiliacao->id, 6, '0', STR_PAD_LEFT) }}<br>
                     <strong>Data/Hora da Solicitação:</strong> {{ $desfiliacao->created_at->format('d/m/Y H:i:s') }} (IP: {{ $desfiliacao->ip_solicitacao ?: 'Não registrado' }})<br>
                     <strong>Data/Hora da Confirmação:</strong> {{ $desfiliacao->confirmado_em ? $desfiliacao->confirmado_em->format('d/m/Y H:i:s') : 'N/A' }} (IP: {{ $desfiliacao->ip_confirmacao ?: 'Não registrado' }})<br>
+                    @if($desfiliacao->recepcionado_em)
+                        <strong>Recepção / Ciência Institucional:</strong> {{ $desfiliacao->recepcionado_em->format('d/m/Y H:i:s') }} por {{ $desfiliacao->recepcionadoPor?->name ?? 'Operador' }}<br>
+                    @endif
+                    @if($desfiliacao->efetivado_em)
+                        <strong>Efetivação / Baixa ERP Ábaco:</strong> {{ $desfiliacao->efetivado_em->format('d/m/Y H:i:s') }} por {{ $desfiliacao->efetivadoPor?->name ?? 'Operador' }} @if($desfiliacao->protocolo_abaco) (Prot: {{ $desfiliacao->protocolo_abaco }}) @endif<br>
+                    @endif
                     <strong>E-mail Autenticado:</strong> {{ $desfiliacao->email }}<br>
                     <strong>Hash Criptográfico SHA-256:</strong><br>
                     <span class="hash-code">{{ $desfiliacao->termo_hash }}</span><br>
