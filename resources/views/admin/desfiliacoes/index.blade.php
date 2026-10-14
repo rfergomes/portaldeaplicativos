@@ -885,26 +885,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
-    // Handlers para o Modal de Notificação à Empresa (AR-Online)
-    const modalNotifEmpresaEl = document.getElementById('modalInformarEmailEmpresa');
-    const modalNotifEmpresa = modalNotifEmpresaEl ? new bootstrap.Modal(modalNotifEmpresaEl) : null;
-    const formNotificarEmpresa = document.getElementById('formNotificarEmpresa');
-
-    function abrirModalNotifEmpresa(id, nome, empresa) {
-        if (!modalNotifEmpresa) return;
-        document.getElementById('empresaNotifRazaoSocial').innerText = empresa;
-        document.getElementById('empresaNotifTrabalhador').innerText = nome;
-        formNotificarEmpresa.action = `/admin/desfiliacoes/${id}/notificar-empresa`;
-        document.getElementById('email_rh').value = '';
-        modalNotifEmpresa.show();
-    }
-
-    document.querySelectorAll('.btn-abrir-notificar-empresa').forEach(btn => {
-        btn.addEventListener('click', function() {
-            abrirModalNotifEmpresa(this.dataset.id, this.dataset.nome, this.dataset.empresa);
-        });
-    });
 });
 </script>
 
