@@ -16,16 +16,23 @@ class TermoDesfiliacaoTrabalhadorMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public ?string $pdfAbsolutePath;
+
     public function __construct(
         public Desfiliacao $desfiliacao,
-        public string $pdfAbsolutePath
+        ?string $pdfAbsolutePath = null
     ) {
+        $this->pdfAbsolutePath = $pdfAbsolutePath ?: (
+            $this->desfiliacao->pdf_path && \Illuminate\Support\Facades\Storage::disk('local')->exists($this->desfiliacao->pdf_path)
+                ? \Illuminate\Support\Facades\Storage::disk('local')->path($this->desfiliacao->pdf_path)
+                : null
+        );
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Termo de Desfiliação Sindical Assinado - Cópia Oficial com Trilha Probatória',
+            subject: 'Termo de Desfiliação Sindical Homologado - Cópia Oficial com Trilha Probatória',
         );
     }
 
@@ -38,10 +45,14 @@ class TermoDesfiliacaoTrabalhadorMail extends Mailable
 
     public function attachments(): array
     {
-        return [
-            Attachment::fromPath($this->pdfAbsolutePath)
-                ->as('Termo_Desfiliacao_' . preg_replace('/\D/', '', $this->desfiliacao->cpf) . '.pdf')
-                ->withMime('application/pdf'),
-        ];
+        if ($this->pdfAbsolutePath && file_exists($this->pdfAbsolutePath)) {
+            return [
+                Attachment::fromPath($this->pdfAbsolutePath)
+                    ->as('Termo_Desfiliacao_' . preg_replace('/\D/', '', $this->desfiliacao->cpf) . '.pdf')
+                    ->withMime('application/pdf'),
+            ];
+        }
+
+        return [];
     }
 }

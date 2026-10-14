@@ -48,6 +48,9 @@ use App\Http\Controllers\DemandaController;
 use App\Http\Controllers\WhatsappTemplateController;
 use App\Http\Controllers\DesfiliacaoController;
 use App\Http\Controllers\Admin\DesfiliacaoAdminController;
+use App\Http\Controllers\Admin\DesfiliacaoLinkAdminController;
+use App\Http\Controllers\DesfiliacaoPublicLinkController;
+use App\Http\Controllers\Representante\DesfiliacaoLinkRapidoController;
 use App\Models\Empresa;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -358,29 +361,21 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('desfiliacao')->group(function () {
-    // Atalho amigável: /desfiliacao abre diretamente o formulário de solicitação
-    Route::get('/', [DesfiliacaoController::class, 'create'])->name('desfiliacao.index');
+    // Acesso direto sem token: exibe página institucional informativa (desativação de preenchimento aberto)
+    Route::get('/', [DesfiliacaoController::class, 'index'])->name('desfiliacao.index');
+    Route::get('/solicitar', [DesfiliacaoController::class, 'index'])->name('desfiliacao.create');
 
-    // Etapa 1: Formulário público e envio de e-mail com link assinado
-    Route::get('/solicitar', [DesfiliacaoController::class, 'create'])->name('desfiliacao.create');
-    Route::post('/solicitar', [DesfiliacaoController::class, 'store'])
+    // Fluxo Exclusivo via Token Temporal de Uso Único
+    Route::get('/solicitar/{token}', [DesfiliacaoPublicLinkController::class, 'show'])->name('desfiliacao.solicitar.token');
+    Route::post('/solicitar/{token}', [DesfiliacaoPublicLinkController::class, 'store'])
         ->middleware('throttle:10,1')
-        ->name('desfiliacao.store');
-    Route::get('/aguardando', [DesfiliacaoController::class, 'aguardando'])->name('desfiliacao.aguardando');
+        ->name('desfiliacao.solicitar.submit');
+    Route::get('/solicitada/{id}', [DesfiliacaoPublicLinkController::class, 'sucesso'])->name('desfiliacao.solicitada.sucesso');
 
-    // Etapa 2: Confirmação e Assinatura Eletrônica (middleware signed)
-    Route::get('/confirmar/{id}', [DesfiliacaoController::class, 'showConfirmacao'])
-        ->middleware('signed')
-        ->name('desfiliacao.confirmar');
-    Route::post('/finalizar/{id}', [DesfiliacaoController::class, 'finalizar'])
-        ->middleware('signed')
-        ->name('desfiliacao.finalizar');
-
-    // Conclusão e Download do Termo
-    Route::get('/concluido/{id}', [DesfiliacaoController::class, 'concluido'])->name('desfiliacao.concluido');
+    // Download do Termo
     Route::get('/download/{id}', [DesfiliacaoController::class, 'download'])->name('desfiliacao.download');
 
-    // Etapa 3: Validação Pública da Autenticidade (Hash / QR Code)
+    // Consulta Pública da Autenticidade (Hash / QR Code) - Mantém livre acesso público
     Route::get('/validar/{hash?}', [DesfiliacaoController::class, 'validar'])->name('desfiliacao.validar');
 });
 
@@ -389,6 +384,20 @@ Route::redirect('/desfilizacao', '/desfiliacao');
 
 // Gestão Administrativa Interna
 Route::middleware(['auth'])->prefix('admin')->group(function () {
+    // Gestão de Links Exclusivos
+    Route::get('/desfiliacao/links', [DesfiliacaoLinkAdminController::class, 'index'])
+        ->name('admin.desfiliacao.links.index')
+        ->middleware('can:desfiliacoes.links.gerar');
+
+    Route::post('/desfiliacao/links', [DesfiliacaoLinkAdminController::class, 'store'])
+        ->name('admin.desfiliacao.links.store')
+        ->middleware('can:desfiliacoes.links.gerar');
+
+    Route::post('/desfiliacao/links/{id}/cancelar', [DesfiliacaoLinkAdminController::class, 'cancelar'])
+        ->name('admin.desfiliacao.links.cancelar')
+        ->middleware('can:desfiliacoes.links.gerar');
+
+    // Fila de Triagem e Solicitações de Desfiliação
     Route::get('/desfiliacoes', [DesfiliacaoAdminController::class, 'index'])
         ->name('admin.desfiliacoes.index')
         ->middleware('can:desfiliacoes.visualizar');
@@ -405,9 +414,26 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         ->name('admin.desfiliacoes.recepcionar')
         ->middleware('can:desfiliacoes.recepcionar');
 
+    Route::post('/desfiliacoes/{id}/recusar', [DesfiliacaoAdminController::class, 'recusar'])
+        ->name('admin.desfiliacoes.recusar')
+        ->middleware('can:desfiliacoes.recusar');
+
+    Route::post('/desfiliacoes/{id}/notificar-empresa', [DesfiliacaoAdminController::class, 'notificarEmpresa'])
+        ->name('admin.desfiliacoes.notificar_empresa')
+        ->middleware('can:desfiliacoes.recepcionar');
+
     Route::post('/desfiliacoes/{id}/efetivar', [DesfiliacaoAdminController::class, 'efetivar'])
         ->name('admin.desfiliacoes.efetivar')
         ->middleware('can:desfiliacoes.baixar_abaco');
+});
+
+// Portal Dedicado aos Representantes Sindicais / Diretores de Base
+Route::middleware(['auth', 'can:desfiliacoes.links.gerar.proprios'])->prefix('representante')->group(function () {
+    Route::get('/desfiliacao/links', [DesfiliacaoLinkRapidoController::class, 'index'])
+        ->name('representante.desfiliacao.links');
+
+    Route::post('/desfiliacao/links', [DesfiliacaoLinkRapidoController::class, 'store'])
+        ->name('representante.desfiliacao.links.store');
 });
 
 

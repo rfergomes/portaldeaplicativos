@@ -23,11 +23,19 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class DesfiliacaoController extends Controller
 {
     /**
-     * Exibe o formulário público inicial de solicitação.
+     * Exibe a página institucional com aviso de desativação do formulário público aberto.
+     */
+    public function index(): View
+    {
+        return view('desfiliacao.public-disabled');
+    }
+
+    /**
+     * Bloqueia o preenchimento livre direto redirecionando/renderizando tela informativa.
      */
     public function create(): View
     {
-        return view('desfiliacao.create');
+        return view('desfiliacao.public-disabled');
     }
 
     /**

@@ -796,6 +796,22 @@
                                         </a>
                                     </li>
                                     @endif
+                                    @if(auth()->user()->temPermissao('desfiliacoes.links.gerar') || auth()->user()->temPerfil('Administrador'))
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.desfiliacao.links.index') }}" class="nav-link {{ request()->routeIs('admin.desfiliacao.links.*') ? 'active' : '' }}">
+                                            <i class="nav-icon fa-solid fa-link text-info"></i>
+                                            <p>Links Exclusivos</p>
+                                        </a>
+                                    </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('desfiliacoes.links.gerar.proprios'))
+                                    <li class="nav-item">
+                                        <a href="{{ route('representante.desfiliacao.links') }}" class="nav-link {{ request()->routeIs('representante.desfiliacao.*') ? 'active' : '' }}">
+                                            <i class="nav-icon fa-solid fa-bolt-lightning text-warning"></i>
+                                            <p>Links Rápidos (Fábrica)</p>
+                                        </a>
+                                    </li>
+                                    @endif
                                     <li class="nav-item">
                                         <a href="#" class="nav-link disabled text-muted" title="Implantação Futura">
                                             <i class="nav-icon fas fa-hand-holding-dollar"></i>

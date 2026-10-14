@@ -108,6 +108,7 @@
                         <option value="confirmada" {{ request('status') === 'confirmada' ? 'selected' : '' }}>1ª Etapa: Pendente Recepção/Ciência</option>
                         <option value="recepcionada" {{ request('status') === 'recepcionada' ? 'selected' : '' }}>2ª Etapa: Pendente Baixa no Ábaco</option>
                         <option value="efetivada" {{ request('status') === 'efetivada' ? 'selected' : '' }}>Efetivada (Baixa Realizada)</option>
+                        <option value="recusada" {{ request('status') === 'recusada' ? 'selected' : '' }}>Recusada (Com Justificativa)</option>
                         <option value="pendente" {{ request('status') === 'pendente' ? 'selected' : '' }}>Pendente de Assinatura</option>
                         <option value="expirada" {{ request('status') === 'expirada' ? 'selected' : '' }}>Expirada</option>
                         <option value="cancelada" {{ request('status') === 'cancelada' ? 'selected' : '' }}>Cancelada</option>
@@ -135,11 +136,18 @@
 
     <!-- Tabela de Solicitações -->
     <div class="card card-outline card-primary shadow-sm">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h3 class="card-title fw-bold m-0">
                 <i class="fa-solid fa-list-check me-2"></i>Registros de Desfiliação
             </h3>
-            <span class="badge bg-secondary ms-auto">{{ $desfiliacoes->total() }} registros</span>
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                @can('desfiliacoes.links.gerar')
+                    <a href="{{ route('admin.desfiliacao.links.index') }}" class="btn btn-sm btn-primary shadow-sm fw-semibold">
+                        <i class="fa-solid fa-link me-1"></i> Links Exclusivos
+                    </a>
+                @endcan
+                <span class="badge bg-secondary">{{ $desfiliacoes->total() }} registros</span>
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -183,8 +191,7 @@
                                         <div class="text-xs text-muted mt-1">
                                             <i class="fa-solid fa-stamp me-1"></i>Recepcionado por {{ $item->recepcionadoPor?->nickname ?: ($item->recepcionadoPor?->name ?? 'Operador') }}
                                             <span class="text-muted">({{ $item->recepcionado_em?->format('d/m/Y H:i') }})</span>
-                                        </div>
-                                    @elseif ($item->status === 'efetivada')
+                                              @elseif ($item->status === 'efetivada')
                                         <span class="badge bg-success rounded-pill px-2" title="Baixa realizada no ERP Ábaco">
                                             <i class="fa-solid fa-check-double me-1"></i>Efetivada (Ábaco)
                                         </span>
@@ -197,12 +204,35 @@
                                                 <i class="fa-solid fa-hashtag me-1"></i>{{ $item->protocolo_abaco }}
                                             </div>
                                         @endif
+                                    @elseif ($item->isRecusada())
+                                        <span class="badge bg-danger rounded-pill px-2" title="{{ $item->motivo_recusa }}">
+                                            <i class="fa-solid fa-ban me-1"></i>Recusada
+                                        </span>
+                                        <div class="text-xs text-danger mt-1" title="{{ $item->motivo_recusa }}">
+                                            <i class="fa-regular fa-user me-1"></i>Por {{ $item->recusadoPor?->name ?? 'Operador' }}
+                                            <span class="text-muted">({{ $item->recusado_em?->format('d/m/Y H:i') }})</span>
+                                        </div>
                                     @elseif ($item->status === 'pendente')
                                         <span class="badge bg-secondary rounded-pill px-2">
                                             <i class="fa-solid fa-hourglass-start me-1"></i>Pendente Assinatura
                                         </span>
                                     @else
                                         <span class="badge bg-secondary rounded-pill px-2">{{ ucfirst($item->status) }}</span>
+                                    @endif
+
+                                    {{-- Badges de Notificação da Empresa (AR-Online) --}}
+                                    @if ($item->empresa_envio_status === 'enviado')
+                                        <div class="mt-1">
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle" title="Notificação oficial enviada ao RH da empresa via API AR-Online">
+                                                <i class="fa-solid fa-stamp me-1"></i>AR-Online Notificada
+                                            </span>
+                                        </div>
+                                    @elseif ($item->empresa_envio_status === 'pendente_contato')
+                                        <div class="mt-1">
+                                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle" title="Empresa não possui e-mail de RH cadastrado">
+                                                <i class="fa-solid fa-building-circle-exclamation me-1"></i>RH Empresa Pendente
+                                            </span>
+                                        </div>
                                     @endif
                                 </td>
                                 <td>
@@ -225,8 +255,8 @@
                                                 data-nome="{{ $item->nome_completo }}" 
                                                 data-cpf="{{ $item->cpf_formatado }}" 
                                                 data-empresa="{{ $item->empresa }}" 
-                                                title="Recepcionar / Dar Ciência da Carta">
-                                                <i class="fa-solid fa-stamp me-1"></i>Recepcionar
+                                                title="Homologar / Dar Aceite Formal">
+                                                <i class="fa-solid fa-stamp me-1"></i>Aceitar
                                             </button>
                                         @elseif ($item->isRecepcionada() && auth()->user()->can('desfiliacoes.baixar_abaco'))
                                             <button type="button" class="btn btn-info btn-sm btn-abrir-efetivar text-dark fw-bold" 
@@ -236,6 +266,29 @@
                                                 data-empresa="{{ $item->empresa }}" 
                                                 title="Confirmar Baixa no ERP Ábaco">
                                                 <i class="fa-solid fa-clipboard-check me-1"></i>Baixar Ábaco
+                                            </button>
+                                        @endif
+
+                                        {{-- Botão de Recusa Justificada --}}
+                                        @if ($item->isConfirmada() && auth()->user()->can('desfiliacoes.recusar'))
+                                            <button type="button" class="btn btn-outline-danger btn-sm btn-abrir-recusa"
+                                                data-id="{{ $item->id }}"
+                                                data-nome="{{ $item->nome_completo }}"
+                                                data-cpf="{{ $item->cpf_formatado }}"
+                                                data-empresa="{{ $item->empresa }}"
+                                                title="Recusar / Desaprovar com Justificativa">
+                                                <i class="fa-solid fa-ban"></i>
+                                            </button>
+                                        @endif
+
+                                        {{-- Botão para Notificar Empresa Pendente --}}
+                                        @if ($item->empresa_envio_status === 'pendente_contato' && auth()->user()->can('desfiliacoes.recepcionar'))
+                                            <button type="button" class="btn btn-warning btn-sm btn-abrir-notificar-empresa"
+                                                data-id="{{ $item->id }}"
+                                                data-nome="{{ $item->nome_completo }}"
+                                                data-empresa="{{ $item->empresa }}"
+                                                title="Informar e-mail de RH e Notificar Empresa via AR-Online">
+                                                <i class="fa-solid fa-building-circle-arrow-right"></i>
                                             </button>
                                         @endif
 
@@ -388,6 +441,32 @@
                         </div>
                     </div>
 
+                    <!-- Bloco de Notificação à Empresa (AR-Online) -->
+                    <div id="blocoNotificacaoEmpresa" class="alert alert-secondary d-flex align-items-center mb-3" style="display: none;">
+                        <i class="fa-solid fa-stamp fs-3 me-3 text-primary"></i>
+                        <div class="small w-100">
+                            <strong class="d-block text-primary-emphasis">Notificação Oficial à Empresa (AR-Online)</strong>
+                            <div><strong>E-mail Destinatário:</strong> <span id="detEmpresaEmail"></span></div>
+                            <div><strong>Status AR-Online:</strong> <span id="detEmpresaStatus" class="badge"></span></div>
+                            <div id="detLinhaArOnlineId"><strong>ID AR-Online:</strong> <span id="detEmpresaArOnlineId" class="font-monospace"></span></div>
+                            <div id="detLinhaNotificadaEm"><strong>Data de Despacho:</strong> <span id="detEmpresaNotificadaEm"></span></div>
+                        </div>
+                    </div>
+
+                    <!-- Bloco de Recusa Justificada -->
+                    <div id="blocoRecusada" class="alert alert-danger d-flex align-items-center mb-3" style="display: none;">
+                        <i class="fa-solid fa-ban fs-3 me-3 text-danger"></i>
+                        <div class="small w-100">
+                            <strong class="d-block text-danger">Solicitação Recusada / Não Homologada</strong>
+                            <div><strong>Operador Responsável:</strong> <span id="detRecusadoPor"></span></div>
+                            <div><strong>Data/Hora da Recusa:</strong> <span id="detDataRecusa"></span></div>
+                            <div class="mt-2 p-2 bg-white rounded border border-danger-subtle text-dark">
+                                <strong>Justificativa da Recusa:</strong>
+                                <div id="detMotivoRecusa" class="fst-italic mt-1 text-danger-emphasis"></div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Bloco de Efetivação / Baixa ERP Ábaco -->
                     <div id="blocoEfetivada" class="alert alert-success d-flex align-items-center mb-3" style="display: none;">
                         <i class="fa-solid fa-circle-check fs-3 me-3 text-success"></i>
@@ -406,13 +485,20 @@
                         <div class="d-flex align-items-center small">
                             <i class="fa-solid fa-envelope-open-text fs-3 me-3 text-warning"></i>
                             <div>
-                                <strong class="d-block text-warning-emphasis">1ª Etapa Pendente: Recepção / Ciência</strong>
-                                <span>O trabalhador já assinou a carta digitalmente. É necessário dar o aceite/ciência institucional.</span>
+                                <strong class="d-block text-warning-emphasis">1ª Etapa Pendente: Recepção / Homologação</strong>
+                                <span>O trabalhador assinou a solicitação. Confirme os dados no ERP Ábaco antes de homologar.</span>
                             </div>
                         </div>
-                        <button type="button" id="btnRecepcionarModal" class="btn btn-warning btn-sm text-dark fw-bold ms-3 text-nowrap">
-                            <i class="fa-solid fa-stamp me-1"></i>Recepcionar Agora
-                        </button>
+                        <div class="d-flex gap-2 ms-3">
+                            <button type="button" id="btnRecepcionarModal" class="btn btn-warning btn-sm text-dark fw-bold text-nowrap">
+                                <i class="fa-solid fa-stamp me-1"></i>Aceitar
+                            </button>
+                            @can('desfiliacoes.recusar')
+                                <button type="button" id="btnRecusarModal" class="btn btn-outline-danger btn-sm fw-bold text-nowrap">
+                                    <i class="fa-solid fa-ban me-1"></i>Recusar
+                                </button>
+                            @endcan
+                        </div>
                     </div>
                     @endcan
 
@@ -621,7 +707,41 @@ document.addEventListener('DOMContentLoaded', function () {
                         blocoRecepcionada.style.display = 'none';
                     }
 
-                    // 2. Dados de Efetivação / Baixa
+                    // 2. Dados de Notificação AR-Online à Empresa
+                    const blocoNotificacaoEmpresa = document.getElementById('blocoNotificacaoEmpresa');
+                    if (data.empresa_notificada_em || data.empresa_aronline_id || data.empresa_envio_status === 'pendente_contato') {
+                        blocoNotificacaoEmpresa.style.display = 'flex';
+                        document.getElementById('detEmpresaEmail').innerText = data.empresa_email || 'Não informado / Pendente';
+                        const statusBadge = document.getElementById('detEmpresaStatus');
+                        if (data.empresa_envio_status === 'enviado') {
+                            statusBadge.className = 'badge bg-success';
+                            statusBadge.innerText = 'Enviado via AR-Online';
+                        } else if (data.empresa_envio_status === 'pendente_contato') {
+                            statusBadge.className = 'badge bg-warning text-dark';
+                            statusBadge.innerText = 'Pendente (Empresa sem E-mail)';
+                        } else {
+                            statusBadge.className = 'badge bg-secondary';
+                            statusBadge.innerText = data.empresa_envio_status || 'N/A';
+                        }
+
+                        document.getElementById('detEmpresaArOnlineId').innerText = data.empresa_aronline_id || 'Pendente';
+                        document.getElementById('detEmpresaNotificadaEm').innerText = data.empresa_notificada_em || 'Pendente';
+                    } else {
+                        blocoNotificacaoEmpresa.style.display = 'none';
+                    }
+
+                    // 3. Dados de Recusa Justificada
+                    const blocoRecusada = document.getElementById('blocoRecusada');
+                    if (data.is_recusada) {
+                        blocoRecusada.style.display = 'flex';
+                        document.getElementById('detRecusadoPor').innerText = data.recusado_por || 'Operador';
+                        document.getElementById('detDataRecusa').innerText = data.recusado_em || '-';
+                        document.getElementById('detMotivoRecusa').innerText = data.motivo_recusa || '-';
+                    } else {
+                        blocoRecusada.style.display = 'none';
+                    }
+
+                    // 4. Dados de Efetivação / Baixa
                     if (data.is_efetivada) {
                         blocoEfetivada.style.display = 'flex';
                         document.getElementById('detEfetivadoPor').innerText = data.efetivado_por || 'Operador';
@@ -642,7 +762,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         blocoEfetivada.style.display = 'none';
                     }
 
-                    // 3. Avisos de ação pendente
+                    // 5. Avisos de ação pendente
                     if (data.is_confirmada) {
                         blocoAvisoRecepcao.style.display = 'flex';
                         blocoAvisoBaixa.style.display = 'none';
@@ -671,6 +791,66 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
         });
     });
+
+    // Handlers para o Modal de Recusa
+    const modalRecusarEl = document.getElementById('modalRecusarSolicitacao');
+    const modalRecusar = modalRecusarEl ? new bootstrap.Modal(modalRecusarEl) : null;
+    const formRecusar = document.getElementById('formRecusarSolicitacao');
+
+    function abrirModalRecusa(id, nome, cpf, empresa) {
+        if (!modalRecusar) return;
+        document.getElementById('recusaNomeTrabalhador').innerText = nome;
+        document.getElementById('recusaCpfTrabalhador').innerText = cpf;
+        document.getElementById('recusaEmpresaTrabalhador').innerText = empresa;
+        formRecusar.action = `/admin/desfiliacoes/${id}/recusar`;
+        document.getElementById('motivo_recusa').value = '';
+        modalRecusar.show();
+    }
+
+    document.querySelectorAll('.btn-abrir-recusa').forEach(btn => {
+        btn.addEventListener('click', function() {
+            abrirModalRecusa(this.dataset.id, this.dataset.nome, this.dataset.cpf, this.dataset.empresa);
+        });
+    });
+
+    const btnRecusarModal = document.getElementById('btnRecusarModal');
+    if (btnRecusarModal) {
+        btnRecusarModal.addEventListener('click', function() {
+            if (currentItemData) {
+                modalAuditoria.hide();
+                abrirModalRecusa(
+                    currentItemData.id,
+                    currentItemData.nome_completo,
+                    currentItemData.cpf,
+                    currentItemData.empresa
+                );
+            }
+        });
+    }
+
+    // Handlers para o Modal de Notificação à Empresa (AR-Online)
+    const modalNotifEmpresaEl = document.getElementById('modalInformarEmailEmpresa');
+    const modalNotifEmpresa = modalNotifEmpresaEl ? new bootstrap.Modal(modalNotifEmpresaEl) : null;
+    const formNotificarEmpresa = document.getElementById('formNotificarEmpresa');
+
+    function abrirModalNotifEmpresa(id, nome, empresa) {
+        if (!modalNotifEmpresa) return;
+        document.getElementById('empresaNotifRazaoSocial').innerText = empresa;
+        document.getElementById('empresaNotifTrabalhador').innerText = nome;
+        formNotificarEmpresa.action = `/admin/desfiliacoes/${id}/notificar-empresa`;
+        document.getElementById('email_rh').value = '';
+        modalNotifEmpresa.show();
+    }
+
+    document.querySelectorAll('.btn-abrir-notificar-empresa').forEach(btn => {
+        btn.addEventListener('click', function() {
+            abrirModalNotifEmpresa(this.dataset.id, this.dataset.nome, this.dataset.empresa);
+        });
+    });
 });
 </script>
+
+{{-- Inclusão dos Modais de Ação --}}
+@include('desfiliacoes.partials.modal-recusar')
+@include('desfiliacoes.partials.modal-informar-email-empresa')
 @endsection

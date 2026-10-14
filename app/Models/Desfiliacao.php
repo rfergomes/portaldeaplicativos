@@ -38,6 +38,15 @@ class Desfiliacao extends Model
         'efetivado_em',
         'protocolo_abaco',
         'observacao_efetivacao',
+        'desfiliacao_link_id',
+        'recusado_por_user_id',
+        'recusado_em',
+        'motivo_recusa',
+        'empresa_email',
+        'empresa_aronline_id',
+        'empresa_aronline_resposta',
+        'empresa_notificada_em',
+        'empresa_envio_status',
     ];
 
     protected $casts = [
@@ -46,13 +55,25 @@ class Desfiliacao extends Model
         'confirmado_em' => 'datetime',
         'recepcionado_em' => 'datetime',
         'efetivado_em' => 'datetime',
+        'recusado_em' => 'datetime',
+        'empresa_notificada_em' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
+    public function desfiliacaoLink()
+    {
+        return $this->belongsTo(DesfiliacaoLink::class, 'desfiliacao_link_id');
+    }
+
     public function recepcionadoPor()
     {
         return $this->belongsTo(User::class, 'recepcionado_por_user_id');
+    }
+
+    public function recusadoPor()
+    {
+        return $this->belongsTo(User::class, 'recusado_por_user_id');
     }
 
     public function efetivadoPor()
@@ -80,6 +101,16 @@ class Desfiliacao extends Model
         return $this->status === 'efetivada';
     }
 
+    public function isRecusada(): bool
+    {
+        return $this->status === 'recusada';
+    }
+
+    public function isAceita(): bool
+    {
+        return in_array($this->status, ['recepcionada', 'efetivada'], true);
+    }
+
     /**
      * Retorna se a desfiliação já foi assinada e concluída pelo trabalhador,
      * estando formalmente válida independentemente da etapa de tramitação interna
@@ -93,6 +124,16 @@ class Desfiliacao extends Model
     public function scopePendentesRecepcao($query)
     {
         return $query->where('status', 'confirmada');
+    }
+
+    public function scopeRecusadas($query)
+    {
+        return $query->where('status', 'recusada');
+    }
+
+    public function scopePendentesNotificacaoEmpresa($query)
+    {
+        return $query->where('empresa_envio_status', 'pendente_contato');
     }
 
     public function scopePendentesBaixaAbaco($query)

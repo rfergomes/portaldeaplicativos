@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\DespacharTermoDesfiliacaoAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RecusarDesfiliacaoRequest;
+use App\Mail\RecusaDesfiliacaoMail;
 use App\Models\Desfiliacao;
+use App\Models\EmpresaContato;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -52,6 +57,8 @@ class DesfiliacaoAdminController extends Controller
             'confirmadas' => Desfiliacao::where('status', 'confirmada')->count(), // Pendente Recepção/Ciência
             'recepcionadas' => Desfiliacao::where('status', 'recepcionada')->count(), // Pendente Baixa no Ábaco
             'efetivadas' => Desfiliacao::where('status', 'efetivada')->count(), // Baixa Concluída
+            'recusadas' => Desfiliacao::where('status', 'recusada')->count(), // Recusadas com Justificativa
+            'pendentes_empresa' => Desfiliacao::where('empresa_envio_status', 'pendente_contato')->count(),
         ];
 
         return view('admin.desfiliacoes.index', compact('desfiliacoes', 'totais'));
@@ -59,7 +66,7 @@ class DesfiliacaoAdminController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $desfiliacao = Desfiliacao::with(['recepcionadoPor', 'efetivadoPor'])->findOrFail($id);
+        $desfiliacao = Desfiliacao::with(['recepcionadoPor', 'efetivadoPor', 'recusadoPor', 'desfiliacaoLink'])->findOrFail($id);
 
         return response()->json([
             'id' => $desfiliacao->id,
@@ -67,6 +74,10 @@ class DesfiliacaoAdminController extends Controller
             'cpf' => $desfiliacao->cpf_formatado,
             'matricula' => $desfiliacao->matricula ?: 'Não informado',
             'empresa' => $desfiliacao->empresa,
+            'empresa_email' => $desfiliacao->empresa_email,
+            'empresa_aronline_id' => $desfiliacao->empresa_aronline_id,
+            'empresa_envio_status' => $desfiliacao->empresa_envio_status,
+            'empresa_notificada_em' => $desfiliacao->empresa_notificada_em?->format('d/m/Y H:i:s'),
             'email' => $desfiliacao->email,
             'telefone' => $desfiliacao->telefone_formatado,
             'motivo' => $desfiliacao->motivo ?: 'Não informado',
@@ -82,6 +93,10 @@ class DesfiliacaoAdminController extends Controller
             'is_confirmada' => $desfiliacao->isConfirmada(),
             'is_recepcionada' => $desfiliacao->isRecepcionada(),
             'is_efetivada' => $desfiliacao->isEfetivada(),
+            'is_recusada' => $desfiliacao->isRecusada(),
+            'recusado_em' => $desfiliacao->recusado_em?->format('d/m/Y H:i:s'),
+            'recusado_por' => $desfiliacao->recusadoPor?->name,
+            'motivo_recusa' => $desfiliacao->motivo_recusa,
             'recepcionado_em' => $desfiliacao->recepcionado_em?->format('d/m/Y H:i:s'),
             'recepcionado_por' => $desfiliacao->recepcionadoPor?->name,
             'observacao_recepcao' => $desfiliacao->observacao_recepcao,
@@ -146,7 +161,15 @@ class DesfiliacaoAdminController extends Controller
             // Continua a execução mesmo se falhar a gravação do PDF em ambiente de teste
         }
 
-        $msg = "Carta de desfiliação de {$desfiliacao->nome_completo} recepcionada com sucesso! O protocolo institucional de ciência foi registrado no documento e a solicitação agora aguarda baixa no ERP Ábaco.";
+        // Despacha notificação por e-mail ao trabalhador e via AR-Online para a empresa
+        try {
+            $despachoAction = app(DespacharTermoDesfiliacaoAction::class);
+            $despachoAction->execute($desfiliacao);
+        } catch (\Throwable $e) {
+            // Log do erro já registrado na Action
+        }
+
+        $msg = "Solicitação de desfiliação de {$desfiliacao->nome_completo} homologada com sucesso! O termo em PDF foi emitido, encaminhado ao trabalhador e processado via AR-Online para a empresa.";
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -157,6 +180,87 @@ class DesfiliacaoAdminController extends Controller
         }
 
         return redirect()->route('admin.desfiliacoes.index')->with('success', $msg);
+    }
+
+    /**
+     * Recusa formalmente uma solicitação divergente com justificativa obrigatória e notifica o trabalhador.
+     */
+    public function recusar(RecusarDesfiliacaoRequest $request, int $id)
+    {
+        $desfiliacao = Desfiliacao::findOrFail($id);
+
+        if ($desfiliacao->isRecusada()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Esta solicitação já foi recusada anteriormente.',
+                ], 422);
+            }
+            return back()->with('warning', 'Esta solicitação já foi recusada anteriormente.');
+        }
+
+        $motivo = $request->validated('motivo_recusa');
+
+        $desfiliacao->update([
+            'status' => 'recusada',
+            'recusado_por_user_id' => auth()->id(),
+            'recusado_em' => now(),
+            'motivo_recusa' => $motivo,
+        ]);
+
+        // Dispara e-mail com a justificativa de recusa para o trabalhador
+        try {
+            Mail::to($desfiliacao->email)->send(new RecusaDesfiliacaoMail($desfiliacao, $motivo));
+        } catch (\Throwable $e) {
+            // Continua mesmo em falha de conexão de e-mail local
+        }
+
+        $msg = "A solicitação #{$desfiliacao->id} foi recusada com sucesso. O solicitante foi notificado por e-mail com a justificativa informada.";
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'desfiliacao' => $desfiliacao->fresh(['recusadoPor']),
+            ]);
+        }
+
+        return redirect()->route('admin.desfiliacoes.index')->with('status', $msg);
+    }
+
+    /**
+     * Informa ou atualiza o e-mail de RH da empresa e despacha a notificação via API AR-Online.
+     */
+    public function notificarEmpresa(Request $request, int $id)
+    {
+        $desfiliacao = Desfiliacao::findOrFail($id);
+
+        $request->validate([
+            'email_rh' => ['required', 'email', 'max:191'],
+            'salvar_contato' => ['nullable', 'boolean'],
+        ]);
+
+        $emailRh = strtolower(trim((string) $request->input('email_rh')));
+
+        if ($request->boolean('salvar_contato')) {
+            EmpresaContato::updateOrCreate(
+                ['razao_social' => $desfiliacao->empresa],
+                [
+                    'email_rh' => $emailRh,
+                    'nome_fantasia' => $desfiliacao->empresa,
+                ]
+            );
+        }
+
+        $despachoAction = app(DespacharTermoDesfiliacaoAction::class);
+        $resultado = $despachoAction->execute($desfiliacao, $emailRh);
+
+        if ($resultado['empresa']) {
+            $msg = "Notificação encaminhada com sucesso via API AR-Online para {$emailRh} (ID: {$resultado['empresa_aronline_id']}).";
+            return back()->with('success', $msg);
+        }
+
+        return back()->with('error', 'Ocorreu uma falha ao enviar via AR-Online: ' . ($desfiliacao->empresa_aronline_resposta ?? 'Erro desconhecido'));
     }
 
     /**
