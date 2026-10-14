@@ -756,7 +756,7 @@
                         @endif
 
                         <!-- Arrecadação Group -->
-                        @if(auth()->user()->temPermissao('socio_caixa.visualizar'))
+                        @if(auth()->user()->temPermissao('socio_caixa.visualizar') || auth()->user()->temPermissao('desfiliacoes.visualizar') || auth()->user()->temPerfil('Administrador'))
                             @php $isArrecadacaoActive = request()->routeIs('socios-caixa.*') || request()->routeIs('socios-folha.*') || request()->routeIs('arrecadacao.*') || request()->routeIs('admin.desfiliacoes.*'); @endphp
                             <li class="nav-item {{ $isArrecadacaoActive ? 'menu-open' : '' }}">
                                 <a href="#" class="nav-link {{ $isArrecadacaoActive ? 'active' : '' }}">
@@ -767,18 +767,23 @@
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
+                                    @if(auth()->user()->temPermissao('socio_caixa.visualizar') || auth()->user()->temPerfil('Administrador'))
                                     <li class="nav-item">
                                         <a href="{{ route('socios-caixa.index') }}" class="nav-link {{ request()->routeIs('socios-caixa.index') ? 'active' : '' }}">
                                             <i class="nav-icon fas fa-list-ul"></i>
                                             <p>Sócio Caixa</p>
                                         </a>
                                     </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('socio_folha.visualizar') || auth()->user()->temPerfil('Administrador'))
                                     <li class="nav-item">
                                         <a href="{{ route('socios-folha.index') }}" class="nav-link {{ request()->routeIs('socios-folha.index') ? 'active' : '' }}">
                                             <i class="nav-icon fas fa-users"></i>
                                             <p>Sócio Folha</p>
                                         </a>
                                     </li>
+                                    @endif
+                                    @if(auth()->user()->temPermissao('desfiliacoes.visualizar') || auth()->user()->temPermissao('socio_caixa.visualizar') || auth()->user()->temPerfil('Administrador'))
                                     <li class="nav-item">
                                         <a href="{{ route('admin.desfiliacoes.index') }}" class="nav-link {{ request()->routeIs('admin.desfiliacoes.*') ? 'active' : '' }}">
                                             <i class="nav-icon fa-solid fa-file-signature text-warning"></i>
@@ -790,6 +795,7 @@
                                             </p>
                                         </a>
                                     </li>
+                                    @endif
                                     <li class="nav-item">
                                         <a href="#" class="nav-link disabled text-muted" title="Implantação Futura">
                                             <i class="nav-icon fas fa-hand-holding-dollar"></i>

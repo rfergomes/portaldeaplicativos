@@ -238,9 +238,20 @@ class DesfiliacaoTest extends TestCase
         $response->assertSee('DOCUMENTO NÃO ENCONTRADO OU INVÁLIDO');
     }
 
+    protected function criarUsuarioAdmin(array $attributes = []): User
+    {
+        $user = User::factory()->create($attributes);
+        $perfil = \App\Models\Perfil::firstOrCreate(
+            ['nome' => 'Administrador'],
+            ['descricao' => 'Administrador Geral']
+        );
+        $user->perfis()->syncWithoutDetaching([$perfil->id]);
+        return $user;
+    }
+
     public function test_painel_administrativo_lista_desfiliacoes_para_usuario_autenticado(): void
     {
-        $user = User::factory()->create();
+        $user = $this->criarUsuarioAdmin();
 
         $desfiliacao = Desfiliacao::create([
             'nome_completo' => 'Carlos Eduardo Ferreira',
@@ -265,7 +276,7 @@ class DesfiliacaoTest extends TestCase
 
     public function test_api_detalhes_de_auditoria_para_modal_administrativo(): void
     {
-        $user = User::factory()->create();
+        $user = $this->criarUsuarioAdmin();
 
         $desfiliacao = Desfiliacao::create([
             'nome_completo' => 'Carlos Eduardo Ferreira',
@@ -296,7 +307,7 @@ class DesfiliacaoTest extends TestCase
 
     public function test_operador_pode_recepcionar_carta_de_desfiliacao_e_estampar_protocolo(): void
     {
-        $user = User::factory()->create(['name' => 'Operador Recepção']);
+        $user = $this->criarUsuarioAdmin(['name' => 'Operador Recepção']);
 
         $desfiliacao = Desfiliacao::create([
             'nome_completo' => 'Carlos Eduardo Ferreira',
@@ -329,7 +340,7 @@ class DesfiliacaoTest extends TestCase
 
     public function test_operador_pode_efetivar_desfiliacao_e_registrar_baixa_no_erp_abaco(): void
     {
-        $user = User::factory()->create(['name' => 'Operador Arrecadação']);
+        $user = $this->criarUsuarioAdmin(['name' => 'Operador Arrecadação']);
 
         $desfiliacao = Desfiliacao::create([
             'nome_completo' => 'Carlos Eduardo Ferreira',
@@ -366,12 +377,7 @@ class DesfiliacaoTest extends TestCase
 
     public function test_view_composer_carrega_alertas_de_desfiliacao_e_modal_proativo(): void
     {
-        $user = User::factory()->create(['name' => 'Admin Notificacao']);
-        $perfil = \App\Models\Perfil::firstOrCreate(
-            ['nome' => 'Administrador'],
-            ['descricao' => 'Administrador Geral']
-        );
-        $user->perfis()->syncWithoutDetaching([$perfil->id]);
+        $user = $this->criarUsuarioAdmin(['name' => 'Admin Notificacao']);
 
         $desfiliacao = Desfiliacao::create([
             'nome_completo' => 'Carlos Eduardo Ferreira',
@@ -393,5 +399,30 @@ class DesfiliacaoTest extends TestCase
         $response->assertSee('1ª Etapa: Pendente Recepção');
 
         $user->delete();
+    }
+
+    public function test_usuario_sem_permissao_recebe_403_e_com_permissao_acessa(): void
+    {
+        $user = User::factory()->create(['name' => 'Usuario Sem Permissao']);
+
+        // Sem permissão: deve receber 403
+        $response = $this->actingAs($user)->get(route('admin.desfiliacoes.index'));
+        $response->assertStatus(403);
+
+        // Atribuir permissão desfiliacoes.visualizar
+        $permissao = \App\Models\Permissao::firstOrCreate(
+            ['chave' => 'desfiliacoes.visualizar'],
+            ['nome' => 'Visualizar Desfiliações', 'descricao' => 'Permite visualizar']
+        );
+        $perfil = \App\Models\Perfil::create(['nome' => 'Perfil Teste Desfiliacao', 'ativo' => true]);
+        $perfil->permissoes()->attach($permissao->id);
+        $user->perfis()->attach($perfil->id);
+
+        // Com permissão: deve receber 200
+        $response = $this->actingAs($user)->get(route('admin.desfiliacoes.index'));
+        $response->assertStatus(200);
+
+        $user->delete();
+        $perfil->delete();
     }
 }

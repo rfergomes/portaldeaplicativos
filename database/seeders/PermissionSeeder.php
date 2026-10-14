@@ -29,6 +29,7 @@ class PermissionSeeder extends Seeder
             'socio_caixa' => ['Visualizar', 'Importar', 'Gerenciar', 'Ocorrencias'],
             'socio_folha' => ['Visualizar', 'Importar', 'Gerenciar'],
             'demandas' => ['Visualizar', 'Criar', 'Gerenciar'],
+            'desfiliacoes' => ['Visualizar', 'Recepcionar', 'Baixar Abaco'],
         ];
 
         $allPermissionIds = [];

@@ -389,11 +389,25 @@ Route::redirect('/desfilizacao', '/desfiliacao');
 
 // Gestão Administrativa Interna
 Route::middleware(['auth'])->prefix('admin')->group(function () {
-    Route::get('/desfiliacoes', [DesfiliacaoAdminController::class, 'index'])->name('admin.desfiliacoes.index');
-    Route::get('/desfiliacoes/{id}', [DesfiliacaoAdminController::class, 'show'])->name('admin.desfiliacoes.show');
-    Route::get('/desfiliacoes/{id}/download', [DesfiliacaoAdminController::class, 'download'])->name('admin.desfiliacoes.download');
-    Route::post('/desfiliacoes/{id}/recepcionar', [DesfiliacaoAdminController::class, 'recepcionar'])->name('admin.desfiliacoes.recepcionar');
-    Route::post('/desfiliacoes/{id}/efetivar', [DesfiliacaoAdminController::class, 'efetivar'])->name('admin.desfiliacoes.efetivar');
+    Route::get('/desfiliacoes', [DesfiliacaoAdminController::class, 'index'])
+        ->name('admin.desfiliacoes.index')
+        ->middleware('can:desfiliacoes.visualizar');
+
+    Route::get('/desfiliacoes/{id}', [DesfiliacaoAdminController::class, 'show'])
+        ->name('admin.desfiliacoes.show')
+        ->middleware('can:desfiliacoes.visualizar');
+
+    Route::get('/desfiliacoes/{id}/download', [DesfiliacaoAdminController::class, 'download'])
+        ->name('admin.desfiliacoes.download')
+        ->middleware('can:desfiliacoes.visualizar');
+
+    Route::post('/desfiliacoes/{id}/recepcionar', [DesfiliacaoAdminController::class, 'recepcionar'])
+        ->name('admin.desfiliacoes.recepcionar')
+        ->middleware('can:desfiliacoes.recepcionar');
+
+    Route::post('/desfiliacoes/{id}/efetivar', [DesfiliacaoAdminController::class, 'efetivar'])
+        ->name('admin.desfiliacoes.efetivar')
+        ->middleware('can:desfiliacoes.baixar_abaco');
 });
 
 

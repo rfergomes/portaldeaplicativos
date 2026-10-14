@@ -115,7 +115,7 @@ class AppServiceProvider extends ServiceProvider
                 $desfiliacoesPendentesAmostra = collect();
 
                 $user = auth()->user();
-                if ($user && ($user->can('socio_caixa.visualizar') || $user->temPerfil('Administrador'))) {
+                if ($user && ($user->can('desfiliacoes.visualizar') || $user->can('socio_caixa.visualizar') || $user->temPerfil('Administrador'))) {
                     try {
                         // (A) Pendentes de Recepção / Aceite (status: confirmada)
                         $desfiliacoesRecepcao = \App\Models\Desfiliacao::where('status', 'confirmada')

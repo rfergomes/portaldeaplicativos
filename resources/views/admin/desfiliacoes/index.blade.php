@@ -219,7 +219,7 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm">
-                                        @if ($item->isConfirmada())
+                                        @if ($item->isConfirmada() && auth()->user()->can('desfiliacoes.recepcionar'))
                                             <button type="button" class="btn btn-warning btn-sm btn-abrir-recepcionar text-dark fw-bold" 
                                                 data-id="{{ $item->id }}" 
                                                 data-nome="{{ $item->nome_completo }}" 
@@ -229,7 +229,7 @@
                                                 title="Recepcionar / Dar Ciência da Carta">
                                                 <i class="fa-solid fa-stamp me-1"></i>Recepcionar
                                             </button>
-                                        @elseif ($item->isRecepcionada())
+                                        @elseif ($item->isRecepcionada() && auth()->user()->can('desfiliacoes.baixar_abaco'))
                                             <button type="button" class="btn btn-info btn-sm btn-abrir-efetivar text-dark fw-bold" 
                                                 data-id="{{ $item->id }}" 
                                                 data-nome="{{ $item->nome_completo }}" 
@@ -405,6 +405,7 @@
                     </div>
 
                     <!-- Avisos de Ação Pendente -->
+                    @can('desfiliacoes.recepcionar')
                     <div id="blocoAvisoRecepcao" class="alert alert-warning d-flex align-items-center justify-content-between mb-3" style="display: none;">
                         <div class="d-flex align-items-center small">
                             <i class="fa-solid fa-envelope-open-text fs-3 me-3 text-warning"></i>
@@ -417,7 +418,9 @@
                             <i class="fa-solid fa-stamp me-1"></i>Recepcionar Agora
                         </button>
                     </div>
+                    @endcan
 
+                    @can('desfiliacoes.baixar_abaco')
                     <div id="blocoAvisoBaixa" class="alert alert-info d-flex align-items-center justify-content-between mb-3" style="display: none;">
                         <div class="d-flex align-items-center small">
                             <i class="fa-solid fa-clipboard-check fs-3 me-3 text-info"></i>
@@ -430,6 +433,7 @@
                             <i class="fa-solid fa-clipboard-check me-1"></i>Dar Baixa Agora
                         </button>
                     </div>
+                    @endcan
 
                     <div class="row g-3">
                         <div class="col-md-6">
