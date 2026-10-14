@@ -104,7 +104,7 @@
 
             <div class="text-center pt-3 border-top">
                 <small class="text-muted">
-                    Regional Campinas, Osasco, Vinhedo e Região &bull; Portal de Aplicativos Sindicais
+                    Regional Campinas, Osasco e Região &bull; Portal de Aplicativos - TI Químicos unificados
                 </small>
             </div>
         </div>

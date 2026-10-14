@@ -69,7 +69,7 @@
     </main>
 
     <footer class="py-4 text-center text-xs text-slate-400 border-t border-slate-200 bg-white">
-        Sindicato Químicos Unificados &bull; Campinas, Osasco, Vinhedo e Região
+        Sindicato Químicos Unificados &bull; Campinas, Osasco e Região
     </footer>
 </body>
 </html>
