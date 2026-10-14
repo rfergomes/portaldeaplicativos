@@ -34,6 +34,8 @@ class DesfiliacaoTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Requerimento de Desfiliação Sindical');
         $response->assertSee('Nome Completo do Trabalhador');
+        $response->assertDontSee('Matrícula Funcional');
+        $response->assertDontSee('name="matricula"', false);
     }
 
     public function test_rota_raiz_desfiliacao_exibe_diretamente_formulario(): void
@@ -145,6 +147,7 @@ class DesfiliacaoTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Assinatura Eletrônica do Requerimento');
         $response->assertSee('Carlos Eduardo Ferreira');
+        $response->assertDontSee('Matrícula Funcional');
     }
 
     public function test_rejeita_acesso_a_tela_de_confirmacao_com_link_invalido(): void
@@ -203,6 +206,9 @@ class DesfiliacaoTest extends TestCase
         $this->assertNotNull($desfiliacao->confirmado_em);
 
         Storage::disk('local')->assertExists($desfiliacao->pdf_path);
+
+        $htmlPdf = view('pdf.termo_desfiliacao', ['desfiliacao' => $desfiliacao])->render();
+        $this->assertStringNotContainsString('matrícula funcional', mb_strtolower($htmlPdf));
 
         Mail::assertSent(NotificacaoDiretoriaDesfiliacaoMail::class);
         Mail::assertSent(TermoDesfiliacaoTrabalhadorMail::class);

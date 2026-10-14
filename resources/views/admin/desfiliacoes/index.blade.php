@@ -225,7 +225,6 @@
                                                 data-nome="{{ $item->nome_completo }}" 
                                                 data-cpf="{{ $item->cpf_formatado }}" 
                                                 data-empresa="{{ $item->empresa }}" 
-                                                data-matricula="{{ $item->matricula ?: 'Não informada' }}" 
                                                 title="Recepcionar / Dar Ciência da Carta">
                                                 <i class="fa-solid fa-stamp me-1"></i>Recepcionar
                                             </button>
@@ -235,7 +234,6 @@
                                                 data-nome="{{ $item->nome_completo }}" 
                                                 data-cpf="{{ $item->cpf_formatado }}" 
                                                 data-empresa="{{ $item->empresa }}" 
-                                                data-matricula="{{ $item->matricula ?: 'Não informada' }}" 
                                                 title="Confirmar Baixa no ERP Ábaco">
                                                 <i class="fa-solid fa-clipboard-check me-1"></i>Baixar Ábaco
                                             </button>
@@ -296,7 +294,6 @@
                             <div><strong>Trabalhador:</strong> <span id="recNome"></span></div>
                             <div><strong>CPF:</strong> <span id="recCpf" class="font-monospace"></span></div>
                             <div><strong>Empresa:</strong> <span id="recEmpresa"></span></div>
-                            <div><strong>Matrícula:</strong> <span id="recMatricula"></span></div>
                         </div>
                     </div>
 
@@ -339,7 +336,6 @@
                             <div><strong>Sócio:</strong> <span id="efetivarNome"></span></div>
                             <div><strong>CPF:</strong> <span id="efetivarCpf" class="font-monospace"></span></div>
                             <div><strong>Empresa:</strong> <span id="efetivarEmpresa"></span></div>
-                            <div><strong>Matrícula:</strong> <span id="efetivarMatricula"></span></div>
                         </div>
                     </div>
 
@@ -440,13 +436,9 @@
                             <label class="text-muted small fw-bold">Nome Completo</label>
                             <div class="fw-bold" id="detNome"></div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <label class="text-muted small fw-bold">CPF</label>
                             <div class="font-monospace" id="detCpf"></div>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="text-muted small fw-bold">Matrícula</label>
-                            <div id="detMatricula"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="text-muted small fw-bold">Empresa Empregadora</label>
@@ -516,23 +508,21 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentItemData = null;
 
     // Abertura do modal de Recepção / Aceite
-    function abrirModalRecepcionar(id, nome, cpf, empresa, matricula) {
+    function abrirModalRecepcionar(id, nome, cpf, empresa) {
         formRecepcionar.action = `/admin/desfiliacoes/${id}/recepcionar`;
         document.getElementById('recNome').innerText = nome;
         document.getElementById('recCpf').innerText = cpf;
         document.getElementById('recEmpresa').innerText = empresa;
-        document.getElementById('recMatricula').innerText = matricula;
         document.getElementById('inputObservacaoRecepcao').value = '';
         modalRecepcionar.show();
     }
 
     // Abertura do modal de Efetivação / Baixa ERP Ábaco
-    function abrirModalEfetivar(id, nome, cpf, empresa, matricula) {
+    function abrirModalEfetivar(id, nome, cpf, empresa) {
         formEfetivar.action = `/admin/desfiliacoes/${id}/efetivar`;
         document.getElementById('efetivarNome').innerText = nome;
         document.getElementById('efetivarCpf').innerText = cpf;
         document.getElementById('efetivarEmpresa').innerText = empresa;
-        document.getElementById('efetivarMatricula').innerText = matricula;
         document.getElementById('inputProtocoloAbaco').value = '';
         document.getElementById('inputObservacao').value = '';
         modalEfetivar.show();
@@ -545,8 +535,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.dataset.id,
                 this.dataset.nome,
                 this.dataset.cpf,
-                this.dataset.empresa,
-                this.dataset.matricula
+                this.dataset.empresa
             );
         });
     });
@@ -557,8 +546,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.dataset.id,
                 this.dataset.nome,
                 this.dataset.cpf,
-                this.dataset.empresa,
-                this.dataset.matricula
+                this.dataset.empresa
             );
         });
     });
@@ -571,8 +559,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 currentItemData.id,
                 currentItemData.nome_completo,
                 currentItemData.cpf,
-                currentItemData.empresa,
-                currentItemData.matricula
+                currentItemData.empresa
             );
         }
     });
@@ -584,8 +571,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 currentItemData.id,
                 currentItemData.nome_completo,
                 currentItemData.cpf,
-                currentItemData.empresa,
-                currentItemData.matricula
+                currentItemData.empresa
             );
         }
     });
@@ -604,7 +590,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     currentItemData = data;
                     document.getElementById('detNome').innerText = data.nome_completo;
                     document.getElementById('detCpf').innerText = data.cpf;
-                    document.getElementById('detMatricula').innerText = data.matricula;
                     document.getElementById('detEmpresa').innerText = data.empresa;
                     document.getElementById('detEmail').innerText = data.email;
                     document.getElementById('detMotivo').innerText = data.motivo;

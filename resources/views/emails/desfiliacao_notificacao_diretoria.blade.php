@@ -30,12 +30,7 @@
                         <td style="padding: 5px 0;"><strong>CPF:</strong></td>
                         <td style="padding: 5px 0;">{{ $desfiliacao->cpf_formatado }}</td>
                     </tr>
-                    @if($desfiliacao->matricula)
-                    <tr>
-                        <td style="padding: 5px 0;"><strong>Matrícula:</strong></td>
-                        <td style="padding: 5px 0;">{{ $desfiliacao->matricula }}</td>
-                    </tr>
-                    @endif
+
                     <tr>
                         <td style="padding: 5px 0;"><strong>Empresa:</strong></td>
                         <td style="padding: 5px 0;">{{ $desfiliacao->empresa }}</td>

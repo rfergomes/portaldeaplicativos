@@ -48,7 +48,6 @@ class StoreDesfiliacaoRequest extends FormRequest
                     }
                 },
             ],
-            'matricula' => ['nullable', 'string', 'max:50'],
             'empresa' => ['required', 'string', 'min:2', 'max:191'],
             'email' => ['required', 'email', 'max:191'],
             'telefone' => ['required', 'string', 'min:10', 'max:20'],

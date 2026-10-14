@@ -77,10 +77,6 @@
                             <span class="font-medium text-slate-800">{{ $desfiliacao->empresa }}</span>
                         </div>
                         <div>
-                            <span class="block text-xs text-slate-400 uppercase font-semibold">Matrícula Funcional</span>
-                            <span class="font-medium text-slate-800">{{ $desfiliacao->matricula ?: 'Não informado' }}</span>
-                        </div>
-                        <div>
                             <span class="block text-xs text-slate-400 uppercase font-semibold">E-mail Cadastrado</span>
                             <span class="font-medium text-slate-800">{{ $desfiliacao->email }}</span>
                         </div>

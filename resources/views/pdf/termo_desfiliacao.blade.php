@@ -162,7 +162,6 @@
 
     <div class="paragraph">
         Eu, <strong>{{ $desfiliacao->nome_completo }}</strong>, portador(a) do CPF nº <strong>{{ $desfiliacao->cpf_formatado }}</strong>,
-        matrícula funcional nº <strong>{{ $desfiliacao->matricula ?: 'Não informado' }}</strong>,
         atualmente empregado(a) na empresa <strong>{{ $desfiliacao->empresa }}</strong>,
         venho, por meio deste instrumento e por livre e espontânea manifestação de vontade:
     </div>

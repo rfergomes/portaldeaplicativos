@@ -29,12 +29,7 @@
                         <td style="padding: 4px 0;"><strong>Empresa:</strong></td>
                         <td style="padding: 4px 0;">{{ $desfiliacao->empresa }}</td>
                     </tr>
-                    @if($desfiliacao->matricula)
-                    <tr>
-                        <td style="padding: 4px 0;"><strong>Matrícula:</strong></td>
-                        <td style="padding: 4px 0;">{{ $desfiliacao->matricula }}</td>
-                    </tr>
-                    @endif
+
                     <tr>
                         <td style="padding: 4px 0;"><strong>Data da Solicitação:</strong></td>
                         <td style="padding: 4px 0;">{{ $desfiliacao->created_at->format('d/m/Y H:i:s') }}</td>
