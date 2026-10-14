@@ -39,9 +39,14 @@ class DesfiliacaoPublicLinkController extends Controller
             ]);
         }
 
+        $empresas = \App\Models\Empresa::where('ativo', true)
+            ->orderBy('razao_social')
+            ->get(['id', 'razao_social', 'nome_fantasia', 'cnpj']);
+
         return view('desfiliacoes.public.solicitar-exclusivo', [
             'link' => $link,
             'token' => $token,
+            'empresas' => $empresas,
         ]);
     }
 

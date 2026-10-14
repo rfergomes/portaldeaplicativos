@@ -7,9 +7,76 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jQuery & Select2 -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         #canvas-assinatura { touch-action: none; cursor: crosshair; }
+
+        /* Custom Select2 Tailwind Styling */
+        .select2-container {
+            width: 100% !important;
+        }
+        .select2-container--default .select2-selection--single {
+            height: 42px;
+            padding: 6px 14px;
+            border-radius: 0.75rem; /* rounded-xl */
+            border: 1px solid #cbd5e1; /* border-slate-300 */
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease-in-out;
+        }
+        .select2-container--default .select2-selection--single:focus,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: #2563eb; /* blue-600 */
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+            outline: none;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #1e293b;
+            font-size: 0.875rem;
+            padding-left: 0;
+            line-height: normal;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #94a3b8;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px;
+            right: 12px;
+        }
+        .select2-dropdown {
+            border-radius: 0.75rem;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            font-size: 0.875rem;
+            z-index: 50;
+        }
+        .select2-container--default .select2-search--dropdown {
+            padding: 8px;
+        }
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            padding: 6px 10px;
+            outline: none;
+        }
+        .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+            border-color: #2563eb;
+        }
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+        .select2-container--default .select2-results__option--selected {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
@@ -100,10 +167,29 @@
                                 <label for="empresa" class="block text-xs font-semibold uppercase text-slate-700 mb-1">
                                     Empresa Empregadora <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" name="empresa" id="empresa" required
-                                       value="{{ old('empresa') }}"
-                                       placeholder="Nome da empresa onde trabalha"
-                                       class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition">
+                                <select name="empresa" id="empresa" required class="w-full">
+                                    <option value="">Selecione ou digite o nome da empresa</option>
+                                    @if(old('empresa') && isset($empresas) && !$empresas->contains('razao_social', old('empresa')))
+                                        <option value="{{ old('empresa') }}" selected>{{ old('empresa') }}</option>
+                                    @endif
+                                    @if(isset($empresas))
+                                        @foreach($empresas as $emp)
+                                            @php
+                                                $rotulo = $emp->razao_social;
+                                                if ($emp->nome_fantasia && $emp->nome_fantasia !== $emp->razao_social) {
+                                                    $rotulo .= ' (' . $emp->nome_fantasia . ')';
+                                                }
+                                                if ($emp->cnpj) {
+                                                    $rotulo .= ' - CNPJ: ' . $emp->cnpj;
+                                                }
+                                            @endphp
+                                            <option value="{{ $emp->razao_social }}" {{ old('empresa') == $emp->razao_social ? 'selected' : '' }}>
+                                                {{ $rotulo }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                <span class="text-[11px] text-slate-400">Busque por Razão Social, Fantasia ou digite se sua empresa não estiver listada.</span>
                             </div>
 
                             <div>
@@ -197,6 +283,21 @@
 
     <!-- Scripts de Interação do Canvas e Máscaras -->
     <script>
+        $(document).ready(function () {
+            // Inicialização do Select2 com busca de empresas e criação dinâmica (tags)
+            $('#empresa').select2({
+                placeholder: 'Selecione ou digite o nome da empresa',
+                allowClear: true,
+                tags: true,
+                width: '100%',
+                language: {
+                    noResults: function () {
+                        return "Nenhuma empresa cadastrada encontrada (tecle Enter para usar o nome digitado)";
+                    }
+                }
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
             // Máscara de CPF
             const cpfInput = document.getElementById('cpf');

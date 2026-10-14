@@ -52,6 +52,29 @@ class DesfiliacaoPublicSubmissionTest extends TestCase
         $response->assertSee('Este link expirou');
     }
 
+    public function test_acesso_com_token_valido_carrega_select2_de_empresas(): void
+    {
+        \App\Models\Empresa::updateOrCreate(
+            ['cnpj' => '12345678000199'],
+            ['razao_social' => 'Empresa Select2 Teste S/A', 'ativo' => true]
+        );
+
+        $link = DesfiliacaoLink::create([
+            'token' => DesfiliacaoLink::gerarToken(),
+            'user_id' => $this->user->id,
+            'horas_validade' => 24,
+            'expira_em' => now()->addHours(24),
+            'utilizado' => false,
+        ]);
+
+        $response = $this->get(route('desfiliacao.solicitar.token', $link->token));
+
+        $response->assertOk();
+        $response->assertSee('select2');
+        $response->assertSee('Empresa Select2 Teste S/A');
+        $response->assertSee('select name="empresa" id="empresa"', false);
+    }
+
     public function test_submissao_unificada_valida_consome_token_e_cria_desfiliacao(): void
     {
         $link = DesfiliacaoLink::create([
@@ -77,7 +100,7 @@ class DesfiliacaoPublicSubmissionTest extends TestCase
 
         $response = $this->post(route('desfiliacao.solicitar.submit', $link->token), $payload);
 
-        $desfiliacao = Desfiliacao::where('email', 'carlos.ferreira@teste.com')->first();
+        $desfiliacao = Desfiliacao::where('desfiliacao_link_id', $link->id)->first();
         $this->assertNotNull($desfiliacao);
 
         $response->assertRedirect(route('desfiliacao.solicitada.sucesso', $desfiliacao->id));
