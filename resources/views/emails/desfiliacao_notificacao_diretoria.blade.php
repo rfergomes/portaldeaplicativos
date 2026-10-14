@@ -72,7 +72,7 @@
         </tr>
         <tr>
             <td style="background-color: #f1f5f9; padding: 15px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0;">
-                Sistema Portal de Aplicativos Sindicais
+                Portal de Aplicativos - TI Químicos Unificados
             </td>
         </tr>
     </table>

@@ -61,7 +61,7 @@
         <tr>
             <td style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border-top: 1px solid #e5e7eb;">
                 <p style="margin: 0;">Caso você não tenha realizado esta solicitação, por favor desconsidere este e-mail.</p>
-                <p style="margin: 5px 0 0 0;">Portal de Aplicativos Sindicais &copy; {{ date('Y') }}</p>
+                <p style="margin: 5px 0 0 0;">Portal de Aplicativos - TI Químicos Unificados &copy; {{ date('Y') }}</p>
             </td>
         </tr>
     </table>

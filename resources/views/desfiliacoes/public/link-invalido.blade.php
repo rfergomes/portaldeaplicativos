@@ -25,15 +25,21 @@
             border-radius: 16px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
             border: 1px solid #e2e8f0;
+            border-top: 4px solid #dc2626;
             overflow: hidden;
             text-align: center;
-            padding: 3rem 2rem;
+            padding: 2.5rem 2rem;
         }
     </style>
 </head>
 <body>
     <div class="error-card">
-        <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle mb-3" style="width: 80px; height: 80px;">
+        <div class="mb-4">
+            <img src="{{ asset('img/logo.jpg') }}" alt="Sindicato Químicos Unificados" class="img-fluid rounded border shadow-sm" style="max-height: 55px;">
+            <div class="text-muted small mt-1 font-monospace" style="font-size: 11px;">Regional Campinas, Osasco e Região</div>
+        </div>
+
+        <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle mb-3" style="width: 70px; height: 70px;">
             <i class="fa-solid fa-link-slash fa-2x"></i>
         </div>
         <h2 class="h4 fw-bold text-dark mb-2">Link Exclusivo Não Disponível</h2>

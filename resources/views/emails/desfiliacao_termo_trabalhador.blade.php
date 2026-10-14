@@ -70,7 +70,7 @@
         </tr>
         <tr>
             <td style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border-top: 1px solid #e5e7eb;">
-                <p style="margin: 0;">Portal de Aplicativos Sindicais &copy; {{ date('Y') }}</p>
+                <p style="margin: 0;">Portal de Aplicativos  - TI Químicos Unificados &copy; {{ date('Y') }}</p>
             </td>
         </tr>
     </table>

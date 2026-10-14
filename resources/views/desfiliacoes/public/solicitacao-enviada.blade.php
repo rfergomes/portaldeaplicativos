@@ -9,18 +9,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
-    <!-- Header -->
-    <header class="bg-slate-900 border-b border-slate-800 py-4 px-6 shadow-sm">
-        <div class="max-w-4xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                    <i class="fa-solid fa-check"></i>
+<body class="bg-slate-100/80 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+    <!-- Header Institucional com Logotipo -->
+    <header class="bg-white border-t-4 border-red-600 border-b border-slate-200 py-3.5 px-4 sm:px-6 shadow-sm sticky top-0 z-20">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-3.5">
+                <div class="flex-shrink-0">
+                    <img src="{{ asset('img/logo.jpg') }}" alt="Sindicato Químicos Unificados" class="h-12 sm:h-14 w-auto object-contain rounded border border-slate-200 shadow-sm">
                 </div>
                 <div>
-                    <h1 class="text-white font-semibold text-lg leading-tight">Sindicato Químicos Unificados</h1>
-                    <p class="text-slate-400 text-xs">Atendimento Digital &bull; Requerimento Protocolado</p>
+                    <h1 class="text-slate-900 font-extrabold text-lg sm:text-xl leading-tight tracking-tight">Sindicato Químicos Unificados</h1>
+                    <p class="text-slate-500 text-[11px] sm:text-xs font-medium">
+                        Regional Campinas, Osasco e Região &bull; Atendimento Digital
+                    </p>
                 </div>
+            </div>
+            <div class="flex items-center text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full font-medium shadow-xs">
+                <i class="fa-solid fa-circle-check text-emerald-600 me-1.5"></i> Requerimento Protocolado
             </div>
         </div>
     </header>
@@ -69,7 +74,7 @@
     </main>
 
     <footer class="py-4 text-center text-xs text-slate-400 border-t border-slate-200 bg-white">
-        Sindicato Químicos Unificados &bull; Campinas, Osasco e Região
+        Sindicato Químicos Unificados &bull; Regional Campinas, Osasco e Região &bull; Segurança e Validade Jurídica (Lei 14.063/2020)
     </footer>
 </body>
 </html>

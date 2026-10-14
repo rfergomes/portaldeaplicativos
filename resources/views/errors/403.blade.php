@@ -32,7 +32,7 @@
         
         <div class="mt-4 pt-3 border-top">
             <small class="text-muted" style="font-size: 11px;">
-                Portal de Aplicativos Sindicais &copy; {{ date('Y') }}
+                Portal de Aplicativos - TI Químicos Unificados &copy; {{ date('Y') }}
             </small>
         </div>
     </div>
