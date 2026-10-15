@@ -85,16 +85,17 @@ class DespacharTermoDesfiliacaoAction
             }
         }
 
-        // 2. Determinação do e-mail do RH da Empresa
+        // 2. Determinação do e-mail do RH da Empresa (tabelas empresa_contatos e empresas)
         $emailRh = $emailEmpresaManual;
         if (empty($emailRh) && !empty($desfiliacao->empresa_email)) {
             $emailRh = $desfiliacao->empresa_email;
         }
 
         if (empty($emailRh)) {
-            $contatoEmpresa = EmpresaContato::encontrarPorCnpjOuNome(null, $desfiliacao->empresa);
+            $contatoEmpresa = EmpresaContato::obterOuSincronizarContatoEmpresa($desfiliacao->empresa);
             if ($contatoEmpresa && !empty($contatoEmpresa->email_rh)) {
                 $emailRh = $contatoEmpresa->email_rh;
+                $desfiliacao->update(['empresa_email' => $emailRh]);
             }
         }
 

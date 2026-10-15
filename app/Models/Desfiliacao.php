@@ -201,4 +201,17 @@ class Desfiliacao extends Model
         ->where('created_at', '>=', now()->subHours(24))
         ->exists();
     }
+
+    /**
+     * Obtém o e-mail cadastrado ou sugerido da empresa empregadora.
+     */
+    public function obterEmailEmpresaSugerido(): ?string
+    {
+        if (!empty($this->empresa_email)) {
+            return $this->empresa_email;
+        }
+
+        $contato = EmpresaContato::obterOuSincronizarContatoEmpresa($this->empresa);
+        return $contato?->email_rh;
+    }
 }

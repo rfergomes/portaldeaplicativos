@@ -305,6 +305,7 @@
                                                 data-id="{{ $item->id }}"
                                                 data-nome="{{ $item->nome_completo }}"
                                                 data-empresa="{{ $item->empresa }}"
+                                                data-email="{{ $item->empresa_email ?? $item->obterEmailEmpresaSugerido() }}"
                                                 title="Informar e-mail de RH e Notificar Empresa via AR-Online">
                                                 <i class="fa-solid fa-building-circle-arrow-right"></i>
                                             </button>
@@ -621,12 +622,12 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentItemData = null;
 
     // Abertura do modal de Notificar Empresa via AR-Online
-    function abrirModalNotificarEmpresa(id, nome, empresa) {
+    function abrirModalNotificarEmpresa(id, nome, empresa, email = '') {
         if (!modalNotificarEmpresa) return;
         formNotificarEmpresa.action = `/admin/desfiliacoes/${id}/notificar-empresa`;
         document.getElementById('empresaNotifTrabalhador').innerText = nome;
         document.getElementById('empresaNotifRazaoSocial').innerText = empresa;
-        document.getElementById('email_rh').value = '';
+        document.getElementById('email_rh').value = email || '';
         modalNotificarEmpresa.show();
     }
 
@@ -679,7 +680,8 @@ document.addEventListener('DOMContentLoaded', function () {
             abrirModalNotificarEmpresa(
                 this.dataset.id,
                 this.dataset.nome,
-                this.dataset.empresa
+                this.dataset.empresa,
+                this.dataset.email
             );
         });
     });
@@ -717,7 +719,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 abrirModalNotificarEmpresa(
                     currentItemData.id,
                     currentItemData.nome_completo,
-                    currentItemData.empresa
+                    currentItemData.empresa,
+                    currentItemData.empresa_email
                 );
             }
         });

@@ -74,7 +74,7 @@ class DesfiliacaoAdminController extends Controller
             'cpf' => $desfiliacao->cpf_formatado,
             'matricula' => $desfiliacao->matricula ?: 'Não informado',
             'empresa' => $desfiliacao->empresa,
-            'empresa_email' => $desfiliacao->empresa_email,
+            'empresa_email' => $desfiliacao->empresa_email ?: $desfiliacao->obterEmailEmpresaSugerido(),
             'empresa_aronline_id' => $desfiliacao->empresa_aronline_id,
             'empresa_envio_status' => $desfiliacao->empresa_envio_status,
             'empresa_notificada_em' => $desfiliacao->empresa_notificada_em?->format('d/m/Y H:i:s'),
@@ -167,6 +167,14 @@ class DesfiliacaoAdminController extends Controller
             'empresa_status' => 'nao_aplicavel',
         ];
 
+        // Sincroniza contato da empresa (tabelas empresa_contatos e empresas) caso ainda não possua e-mail associado
+        if (empty($desfiliacao->empresa_email)) {
+            $contatoEmp = EmpresaContato::obterOuSincronizarContatoEmpresa($desfiliacao->empresa);
+            if ($contatoEmp && !empty($contatoEmp->email_rh)) {
+                $desfiliacao->update(['empresa_email' => $contatoEmp->email_rh]);
+            }
+        }
+
         // Despacha notificação por e-mail ao trabalhador e via AR-Online para a empresa
         try {
             $despachoAction = app(DespacharTermoDesfiliacaoAction::class);
@@ -253,11 +261,18 @@ class DesfiliacaoAdminController extends Controller
         $emailRh = strtolower(trim((string) $request->input('email_rh')));
 
         if ($request->boolean('salvar_contato')) {
+            $empresaCadastrada = \App\Models\Empresa::where('razao_social', 'like', "%{$desfiliacao->empresa}%")
+                ->orWhere('nome_fantasia', 'like', "%{$desfiliacao->empresa}%")
+                ->first();
+
             EmpresaContato::updateOrCreate(
                 ['razao_social' => $desfiliacao->empresa],
                 [
+                    'cnpj' => $empresaCadastrada?->cnpj,
+                    'nome_fantasia' => $empresaCadastrada?->nome_fantasia ?? $desfiliacao->empresa,
                     'email_rh' => $emailRh,
-                    'nome_fantasia' => $desfiliacao->empresa,
+                    'telefone_rh' => $empresaCadastrada?->telefone,
+                    'responsavel_rh' => 'Recursos Humanos / DP',
                 ]
             );
         }

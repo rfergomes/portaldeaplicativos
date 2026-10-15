@@ -153,4 +153,73 @@ class DesfiliacaoDespachoEmailTest extends TestCase
             'email_rh' => 'rh@metalurgicagama.com.br',
         ]);
     }
+
+    public function test_recepcao_sincroniza_contato_da_tabela_empresas_para_empresa_contatos(): void
+    {
+        Mail::fake();
+
+        $cnpjTeste = '04.728.464/0001-70';
+        $razaoTeste = 'COT CENTRO ORGANIZ DOS TRABALHADORES';
+
+        \App\Models\Empresa::where('cnpj', $cnpjTeste)->orWhere('razao_social', $razaoTeste)->delete();
+        EmpresaContato::where('cnpj', $cnpjTeste)->orWhere('razao_social', $razaoTeste)->delete();
+
+        // 1. Cadastra empresa na tabela oficial empresas (ex: dados do SIS Ábaco) SEM registro em empresa_contatos
+        $empresa = \App\Models\Empresa::create([
+            'razao_social' => $razaoTeste,
+            'nome_fantasia' => 'COT X',
+            'cnpj' => $cnpjTeste,
+            'email' => 'rizeldaquimicps@terra.com.br',
+            'telefone' => '(19) 3735-4903',
+            'cidade' => 'CAMPINAS',
+            'estado' => 'SP',
+            'categoria' => 'QUIMICAS',
+            'ativo' => true,
+        ]);
+
+        $desfiliacao = Desfiliacao::create([
+            'nome_completo' => 'MARA CISLEY DA SILVA',
+            'cpf' => '12345678901',
+            'empresa' => $razaoTeste,
+            'email' => 'mara@teste.com',
+            'telefone' => '19988887777',
+            'status' => 'confirmada',
+        ]);
+
+        $this->assertDatabaseMissing('empresa_contatos', [
+            'razao_social' => 'COT CENTRO ORGANIZ DOS TRABALHADORES',
+        ]);
+
+        // Mock do AR-Online para aceitar envio
+        $arOnlineMock = Mockery::mock(ArOnlineClient::class);
+        $arOnlineMock->shouldReceive('send')
+            ->once()
+            ->withArgs(function (ArOnlineSendPayload $payload) {
+                return $payload->emailTo === 'rizeldaquimicps@terra.com.br';
+            })
+            ->andReturn('AR-SINCRONIZADO-777');
+
+        $this->app->instance(ArOnlineClient::class, $arOnlineMock);
+
+        // Operador dá o aceite / recepção formal
+        $response = $this->actingAs($this->operador)
+            ->post(route('admin.desfiliacoes.recepcionar', $desfiliacao->id));
+
+        $response->assertRedirect(route('admin.desfiliacoes.index'));
+
+        // Verifica que o contato foi salvo automaticamente na tabela empresa_contatos
+        $this->assertDatabaseHas('empresa_contatos', [
+            'razao_social' => 'COT CENTRO ORGANIZ DOS TRABALHADORES',
+            'email_rh' => 'rizeldaquimicps@terra.com.br',
+            'cnpj' => '04.728.464/0001-70',
+        ]);
+
+        // Verifica que a desfiliação recebeu o e-mail e foi notificada
+        $desfiliacao->refresh();
+        $this->assertEquals('recepcionada', $desfiliacao->status);
+        $this->assertEquals('rizeldaquimicps@terra.com.br', $desfiliacao->empresa_email);
+        $this->assertEquals('enviado', $desfiliacao->empresa_envio_status);
+        $this->assertEquals('AR-SINCRONIZADO-777', $desfiliacao->empresa_aronline_id);
+    }
 }
+
