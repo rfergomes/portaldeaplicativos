@@ -141,6 +141,9 @@
                 <i class="fa-solid fa-list-check me-2"></i>Registros de Desfiliação
             </h3>
             <div class="d-flex align-items-center gap-2 ms-auto">
+                <a href="{{ route('admin.desfiliacoes.guia_pdf') }}" target="_blank" class="btn btn-sm btn-outline-info shadow-sm fw-semibold" title="Visualizar Guia Ilustrado e Colorido em PDF">
+                    <i class="fa-solid fa-file-pdf text-danger me-1"></i> Guia do Fluxo (PDF)
+                </a>
                 @can('desfiliacoes.links.gerar')
                     <a href="{{ route('admin.desfiliacao.links.index') }}" class="btn btn-sm btn-primary shadow-sm fw-semibold">
                         <i class="fa-solid fa-link me-1"></i> Links Exclusivos

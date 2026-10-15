@@ -440,6 +440,28 @@ Route::middleware(['auth', 'can:desfiliacoes.links.gerar.proprios'])->prefix('re
         ->name('representante.desfiliacao.links.store');
 });
 
+// Guia Orientativo Ilustrado em PDF do Módulo de Desfiliação
+Route::get('/desfiliacao/guia-orientativo-pdf', function () {
+    $caminho = public_path('documentos/Guia_Fluxo_Desfiliacao_Sindical_Digital.pdf');
+    if (!file_exists($caminho)) {
+        abort(404, 'Guia não encontrado.');
+    }
+    return response()->file($caminho, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="Guia_Fluxo_Desfiliacao_Sindical_Digital.pdf"',
+    ]);
+})->name('desfiliacao.guia_pdf');
+
+Route::middleware(['auth'])->get('/admin/desfiliacoes/guia-orientativo-pdf', function () {
+    $caminho = public_path('documentos/Guia_Fluxo_Desfiliacao_Sindical_Digital.pdf');
+    if (!file_exists($caminho)) {
+        abort(404, 'Guia não encontrado.');
+    }
+    return response()->file($caminho, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="Guia_Fluxo_Desfiliacao_Sindical_Digital.pdf"',
+    ]);
+})->name('admin.desfiliacoes.guia_pdf');
 
 Route::post('/_deploy/opcache-reset', function () {
 
