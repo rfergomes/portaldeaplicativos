@@ -26,26 +26,8 @@ class AppServiceProvider extends ServiceProvider
     {
         \Illuminate\Pagination\Paginator::useBootstrapFive();
 
-        // Tenta ler a versão na ordem: Config (Config + ENV) > Arquivo .version > Git
-        $appVersion = config('app.version', 'v1.1.0');
-        $versionFile = base_path('.version');
-
-        if (file_exists($versionFile)) {
-            $appVersion = trim(file_get_contents($versionFile));
-        } elseif ($appVersion === 'v1.1.0' || empty($appVersion)) {
-            // Se ainda for o padrão ou estiver vazio, tenta Git
-            try {
-                $hash = trim(@shell_exec('git log -1 --format=%h'));
-                $date = trim(@shell_exec('git log -1 --format=%cd --date=format:"%d/%m %H:%M"'));
-                if ($hash) {
-                    $appVersion = "rev.{$hash} ({$date})";
-                }
-            } catch (\Exception $e) {
-                // Silencioso
-            }
-        }
-
-        view()->share('appVersion', $appVersion);
+        // Compartilha a versão oficial ou revisão do último commit do Git com as views
+        view()->share('appVersion', $this->resolverVersaoApp());
 
         RateLimiter::for('aronline-api', function (object $job) {
             // 0.5 req/s = 30 req/minute
@@ -185,5 +167,71 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             }
         });
+    }
+
+    /**
+     * Resolve a versão da aplicação ou revisão do último commit do Git para o footer.
+     */
+    private function resolverVersaoApp(): string
+    {
+        $versionFile = base_path('.version');
+        if (file_exists($versionFile)) {
+            $conteudo = trim((string) file_get_contents($versionFile));
+            if (!empty($conteudo)) {
+                return $conteudo;
+            }
+        }
+
+        // 1. Tenta obter diretamente via comando do Git
+        try {
+            $gitOutput = trim((string) @shell_exec('git log -1 --format="rev.%h (%cd)" --date=format:"%d/%m %H:%M"'));
+            if (!empty($gitOutput) && str_starts_with($gitOutput, 'rev.')) {
+                return $gitOutput;
+            }
+        } catch (\Throwable $e) {
+            // Silencioso
+        }
+
+        // 2. Fallback: Leitura direta dos arquivos do repositório .git (funciona mesmo com shell_exec bloqueado no PHP)
+        try {
+            $headFile = base_path('.git/HEAD');
+            if (file_exists($headFile)) {
+                $headContent = trim((string) file_get_contents($headFile));
+                if (str_starts_with($headContent, 'ref: ')) {
+                    $ref = trim(substr($headContent, 5));
+                    $refPath = base_path('.git/' . $ref);
+                    if (file_exists($refPath)) {
+                        $hash = substr(trim((string) file_get_contents($refPath)), 0, 7);
+                        $data = date('d/m H:i', filemtime($refPath));
+                        return "rev.{$hash} ({$data})";
+                    }
+
+                    // Tenta em packed-refs
+                    $packedRefsPath = base_path('.git/packed-refs');
+                    if (file_exists($packedRefsPath)) {
+                        $packed = file_get_contents($packedRefsPath);
+                        if (preg_match('/^([a-f0-9]{40})\s+' . preg_quote($ref, '/') . '$/m', $packed, $m)) {
+                            $hash = substr($m[1], 0, 7);
+                            $data = date('d/m H:i', filemtime($packedRefsPath));
+                            return "rev.{$hash} ({$data})";
+                        }
+                    }
+                } elseif (preg_match('/^[a-f0-9]{40}$/i', $headContent)) {
+                    $hash = substr($headContent, 0, 7);
+                    $data = date('d/m H:i', filemtime($headFile));
+                    return "rev.{$hash} ({$data})";
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silencioso
+        }
+
+        // 3. Fallback de configuração caso seja uma versão personalizada no .env
+        $configVersion = config('app.version');
+        if (!empty($configVersion) && !in_array($configVersion, ['1.1.0', 'v1.1.0', '1.0.0', 'v1.0.0'], true)) {
+            return $configVersion;
+        }
+
+        return 'rev.' . substr(md5_file(base_path('composer.json')) ?: '1.1.0', 0, 7);
     }
 }
