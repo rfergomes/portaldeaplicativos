@@ -53,11 +53,24 @@ class DesfiliacaoFluxoCompletoTest extends TestCase
     {
         Mail::fake();
 
-        // 0. Cadastra e-mail de RH da empresa
-        EmpresaContato::create([
-            'razao_social' => 'Petroquímica Paulínia S/A',
-            'email_rh' => 'dp@petroquimica.com.br',
-        ]);
+        // 0. Cadastra empresa e contato corporativo na tabela clientes
+        $empresa = \App\Models\Empresa::firstOrCreate(
+            ['cnpj' => '11.222.333/0001-44'],
+            [
+                'razao_social' => 'Petroquímica Paulínia S/A',
+                'ativo' => true,
+            ]
+        );
+        $empresa->update(['razao_social' => 'Petroquímica Paulínia S/A', 'ativo' => true]);
+
+        \App\Models\Cliente::firstOrCreate(
+            ['empresa_id' => $empresa->id, 'email' => 'dp@petroquimica.com.br'],
+            [
+                'nome' => 'Departamento Pessoal',
+                'ativo' => true,
+                'email_valido' => true,
+            ]
+        )->update(['ativo' => true, 'email_valido' => true]);
 
         // Mock do AR-Online para validade jurídica
         $arOnlineMock = Mockery::mock(ArOnlineClient::class);

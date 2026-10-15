@@ -422,6 +422,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         ->name('admin.desfiliacoes.notificar_empresa')
         ->middleware('can:desfiliacoes.recepcionar');
 
+    Route::post('/desfiliacoes/{id}/despachar-empresa', [DesfiliacaoAdminController::class, 'notificarEmpresa'])
+        ->name('admin.desfiliacoes.despachar-empresa')
+        ->middleware('can:desfiliacoes.recepcionar');
+
     Route::post('/desfiliacoes/{id}/efetivar', [DesfiliacaoAdminController::class, 'efetivar'])
         ->name('admin.desfiliacoes.efetivar')
         ->middleware('can:desfiliacoes.baixar_abaco');

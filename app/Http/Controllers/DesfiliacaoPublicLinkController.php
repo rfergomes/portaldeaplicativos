@@ -75,9 +75,9 @@ class DesfiliacaoPublicLinkController extends Controller
             $validated = $request->validated();
             $nomeEmpresa = trim($validated['empresa']);
 
-            // Sincroniza contatos da empresa (tabelas empresas e empresa_contatos)
-            $contatoEmpresa = \App\Models\EmpresaContato::obterOuSincronizarContatoEmpresa($nomeEmpresa);
-            $emailEmpresa = $contatoEmpresa?->email_rh;
+            // Obtém e-mail corporativo institucional da tabela clientes
+            $resContatos = \App\Services\EmpresaContatoResolver::obterContatosValidosParaNotificacao(null, $nomeEmpresa);
+            $emailEmpresa = !empty($resContatos['emails']) ? $resContatos['emails'][0] : ($resContatos['empresa']?->email);
 
             $desfiliacao = Desfiliacao::create([
                 'desfiliacao_link_id' => $link->id,

@@ -37,17 +37,32 @@ class DesfiliacaoDespachoEmailTest extends TestCase
 
         $this->operador = User::factory()->create();
         $this->operador->perfis()->attach($perfil);
+
+        EmpresaContato::truncate();
     }
 
     public function test_despacho_automatico_com_empresa_cadastrada_envia_via_aronline(): void
     {
         Mail::fake();
 
-        // Cadastra contato da empresa
-        EmpresaContato::create([
-            'razao_social' => 'Química Integrada do Brasil S/A',
-            'email_rh' => 'rh@quimicaintegrada.com.br',
-        ]);
+        // Cadastra empresa e contato corporativo na tabela clientes
+        $empresa = \App\Models\Empresa::firstOrCreate(
+            ['cnpj' => '22.333.444/0001-55'],
+            [
+                'razao_social' => 'Química Integrada do Brasil S/A',
+                'ativo' => true,
+            ]
+        );
+        $empresa->update(['razao_social' => 'Química Integrada do Brasil S/A', 'ativo' => true]);
+
+        \App\Models\Cliente::firstOrCreate(
+            ['empresa_id' => $empresa->id, 'email' => 'rh@quimicaintegrada.com.br'],
+            [
+                'nome' => 'Recursos Humanos',
+                'ativo' => true,
+                'email_valido' => true,
+            ]
+        )->update(['ativo' => true, 'email_valido' => true]);
 
         $desfiliacao = Desfiliacao::create([
             'nome_completo' => 'Renato Barros',
@@ -116,6 +131,18 @@ class DesfiliacaoDespachoEmailTest extends TestCase
 
     public function test_operador_pode_informar_email_rh_e_disparar_via_aronline(): void
     {
+        $empresa = \App\Models\Empresa::firstOrCreate(
+            ['cnpj' => '33.444.555/0001-66'],
+            [
+                'razao_social' => 'Metalúrgica Gama',
+                'ativo' => true,
+            ]
+        );
+        $empresa->update(['razao_social' => 'Metalúrgica Gama', 'ativo' => true]);
+
+        // Garante que não existem contatos prévios
+        \App\Models\Cliente::where('empresa_id', $empresa->id)->delete();
+
         $desfiliacao = Desfiliacao::create([
             'nome_completo' => 'Marcos Dias',
             'cpf' => '77788899900',
@@ -147,35 +174,50 @@ class DesfiliacaoDespachoEmailTest extends TestCase
         $this->assertEquals('AR-MANUAL-12345', $desfiliacao->empresa_aronline_id);
         $this->assertEquals('rh@metalurgicagama.com.br', $desfiliacao->empresa_email);
 
-        // Verifica que o contato foi salvo no catálogo
-        $this->assertDatabaseHas('empresa_contatos', [
-            'razao_social' => 'Metalúrgica Gama',
+        // Verifica que o contato foi salvo na tabela clientes e não em empresa_contatos
+        $this->assertDatabaseHas('clientes', [
+            'empresa_id' => $empresa->id,
+            'email' => 'rh@metalurgicagama.com.br',
+            'ativo' => 1,
+            'email_valido' => 1,
+        ]);
+
+        $this->assertDatabaseMissing('empresa_contatos', [
             'email_rh' => 'rh@metalurgicagama.com.br',
         ]);
     }
 
-    public function test_recepcao_sincroniza_contato_da_tabela_empresas_para_empresa_contatos(): void
+    public function test_recepcao_utiliza_contatos_da_tabela_clientes_e_nao_grava_em_empresa_contatos(): void
     {
         Mail::fake();
 
         $cnpjTeste = '04.728.464/0001-70';
         $razaoTeste = 'COT CENTRO ORGANIZ DOS TRABALHADORES';
 
-        \App\Models\Empresa::where('cnpj', $cnpjTeste)->orWhere('razao_social', $razaoTeste)->delete();
-        EmpresaContato::where('cnpj', $cnpjTeste)->orWhere('razao_social', $razaoTeste)->delete();
+        // 1. Cadastra empresa na tabela oficial empresas
+        $empresa = \App\Models\Empresa::firstOrCreate(
+            ['cnpj' => $cnpjTeste],
+            [
+                'razao_social' => $razaoTeste,
+                'nome_fantasia' => 'COT X',
+                'telefone' => '(19) 3735-4903',
+                'cidade' => 'CAMPINAS',
+                'estado' => 'SP',
+                'categoria' => 'QUIMICAS',
+                'ativo' => true,
+            ]
+        );
+        $empresa->update(['razao_social' => $razaoTeste, 'ativo' => true]);
 
-        // 1. Cadastra empresa na tabela oficial empresas (ex: dados do SIS Ábaco) SEM registro em empresa_contatos
-        $empresa = \App\Models\Empresa::create([
-            'razao_social' => $razaoTeste,
-            'nome_fantasia' => 'COT X',
-            'cnpj' => $cnpjTeste,
-            'email' => 'rizeldaquimicps@terra.com.br',
-            'telefone' => '(19) 3735-4903',
-            'cidade' => 'CAMPINAS',
-            'estado' => 'SP',
-            'categoria' => 'QUIMICAS',
-            'ativo' => true,
-        ]);
+        // 2. Cadastra contato corporativo vinculado na tabela clientes
+        \App\Models\Cliente::firstOrCreate(
+            ['empresa_id' => $empresa->id, 'email' => 'rizeldaquimicps@terra.com.br'],
+            [
+                'nome' => 'Rizelda RH',
+                'ativo' => true,
+                'email_valido' => true,
+            ]
+        )->update(['ativo' => true, 'email_valido' => true]);
 
         $desfiliacao = Desfiliacao::create([
             'nome_completo' => 'MARA CISLEY DA SILVA',
@@ -184,10 +226,6 @@ class DesfiliacaoDespachoEmailTest extends TestCase
             'email' => 'mara@teste.com',
             'telefone' => '19988887777',
             'status' => 'confirmada',
-        ]);
-
-        $this->assertDatabaseMissing('empresa_contatos', [
-            'razao_social' => 'COT CENTRO ORGANIZ DOS TRABALHADORES',
         ]);
 
         // Mock do AR-Online para aceitar envio
@@ -207,14 +245,12 @@ class DesfiliacaoDespachoEmailTest extends TestCase
 
         $response->assertRedirect(route('admin.desfiliacoes.index'));
 
-        // Verifica que o contato foi salvo automaticamente na tabela empresa_contatos
-        $this->assertDatabaseHas('empresa_contatos', [
-            'razao_social' => 'COT CENTRO ORGANIZ DOS TRABALHADORES',
-            'email_rh' => 'rizeldaquimicps@terra.com.br',
-            'cnpj' => '04.728.464/0001-70',
+        // Verifica que NENHUM contato foi gravado na tabela empresa_contatos
+        $this->assertDatabaseMissing('empresa_contatos', [
+            'razao_social' => $razaoTeste,
         ]);
 
-        // Verifica que a desfiliação recebeu o e-mail e foi notificada
+        // Verifica que a desfiliação recebeu o e-mail da tabela clientes e foi notificada
         $desfiliacao->refresh();
         $this->assertEquals('recepcionada', $desfiliacao->status);
         $this->assertEquals('rizeldaquimicps@terra.com.br', $desfiliacao->empresa_email);
