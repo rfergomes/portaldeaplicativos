@@ -51,6 +51,12 @@ class DesfiliacaoAdminController extends Controller
 
         $desfiliacoes = $query->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
 
+        try {
+            $pendentesEmpresa = Desfiliacao::where('empresa_envio_status', 'pendente_contato')->count();
+        } catch (\Throwable $e) {
+            $pendentesEmpresa = 0;
+        }
+
         $totais = [
             'total' => Desfiliacao::count(),
             'pendentes' => Desfiliacao::where('status', 'pendente')->count(),
@@ -58,7 +64,7 @@ class DesfiliacaoAdminController extends Controller
             'recepcionadas' => Desfiliacao::where('status', 'recepcionada')->count(), // Pendente Baixa no Ábaco
             'efetivadas' => Desfiliacao::where('status', 'efetivada')->count(), // Baixa Concluída
             'recusadas' => Desfiliacao::where('status', 'recusada')->count(), // Recusadas com Justificativa
-            'pendentes_empresa' => Desfiliacao::where('empresa_envio_status', 'pendente_contato')->count(),
+            'pendentes_empresa' => $pendentesEmpresa,
         ];
 
         return view('admin.desfiliacoes.index', compact('desfiliacoes', 'totais'));

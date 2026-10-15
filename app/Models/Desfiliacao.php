@@ -211,7 +211,49 @@ class Desfiliacao extends Model
             return $this->empresa_email;
         }
 
-        $contato = EmpresaContato::obterOuSincronizarContatoEmpresa($this->empresa);
-        return $contato?->email_rh;
+        try {
+            if (empty($this->empresa)) {
+                return null;
+            }
+
+            // 1. Busca em empresa_contatos
+            $contatoExistente = EmpresaContato::encontrarPorCnpjOuNome(null, $this->empresa);
+            if ($contatoExistente && !empty($contatoExistente->email_rh)) {
+                return $contatoExistente->email_rh;
+            }
+
+            // 2. Busca na tabela empresas
+            $empresa = Empresa::where('razao_social', 'like', "%{$this->empresa}%")
+                ->orWhere('nome_fantasia', 'like', "%{$this->empresa}%")
+                ->with(['clientes' => fn ($q) => $q->where('ativo', true)])
+                ->first();
+
+            if ($empresa) {
+                if ($empresa->clientes->isNotEmpty()) {
+                    $clienteComEmail = $empresa->clientes->first(function ($c) {
+                        $cargo = mb_strtoupper($c->tipo->nome ?? '');
+                        return !empty($c->email) && ($c->email_valido !== false) && (
+                            str_contains($cargo, 'RH') || 
+                            str_contains($cargo, 'RECURSO') || 
+                            str_contains($cargo, 'PESSOAL') || 
+                            str_contains($cargo, 'DP')
+                        );
+                    }) ?? $empresa->clientes->first(fn ($c) => !empty($c->email) && ($c->email_valido !== false));
+
+                    if ($clienteComEmail && !empty($clienteComEmail->email)) {
+                        return $clienteComEmail->email;
+                    }
+                }
+
+                if (!empty($empresa->email)) {
+                    return $empresa->email;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Em caso de tabela inexistente ou migração pendente, não derruba a view
+            return null;
+        }
+
+        return null;
     }
 }
