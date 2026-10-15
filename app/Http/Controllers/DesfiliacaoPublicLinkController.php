@@ -27,9 +27,13 @@ class DesfiliacaoPublicLinkController extends Controller
             ]);
         }
 
-        if ($link->utilizado) {
+        if ($link->isEsgotado() || $link->utilizado) {
+            $motivo = $link->isCompartilhado()
+                ? 'Este link compartilhado atingiu o limite máximo de ' . $link->limite_usos . ' utilizações permitidas. Por favor, solicite um novo link ao sindicato.'
+                : 'Este link exclusivo já foi utilizado em ' . ($link->utilizado_em ? $link->utilizado_em->format('d/m/Y \à\s H:i') : '') . ' e não permite novo envio.';
+
             return view('desfiliacoes.public.link-invalido', [
-                'motivo' => 'Este link exclusivo já foi utilizado em ' . ($link->utilizado_em ? $link->utilizado_em->format('d/m/Y \à\s H:i') : '') . ' e não permite novo envio.',
+                'motivo' => $motivo,
             ]);
         }
 
@@ -56,12 +60,16 @@ class DesfiliacaoPublicLinkController extends Controller
     public function store(SubmitDesfiliacaoExclusivaRequest $request, string $token): RedirectResponse
     {
         return DB::transaction(function () use ($request, $token) {
-            // Lock pessimista para garantir uso único atômico
+            // Lock pessimista para garantir consumo atômico seguro da cota
             $link = DesfiliacaoLink::where('token', $token)->lockForUpdate()->first();
 
             if (!$link || !$link->isValido()) {
+                $erroMsg = ($link && $link->isEsgotado())
+                    ? 'Este link de atendimento acabou de atingir o limite máximo de utilizações.'
+                    : 'Este link não é mais válido ou expirou.';
+
                 return redirect()->route('desfiliacao.solicitar.token', $token)
-                    ->with('error', 'Este link não é mais válido ou acabou de ser utilizado.');
+                    ->with('error', $erroMsg);
             }
 
             $validated = $request->validated();
@@ -94,9 +102,11 @@ class DesfiliacaoPublicLinkController extends Controller
             $desfiliacao->termo_hash = $desfiliacao->gerarHashUnico();
             $desfiliacao->save();
 
-            // Invalida atomicamente o link exclusivo
+            // Incrementa utilizações e esgota o link se atingir a cota
+            $novosUsos = $link->usos_atuais + 1;
             $link->update([
-                'utilizado' => true,
+                'usos_atuais' => $novosUsos,
+                'utilizado' => $novosUsos >= $link->limite_usos,
                 'utilizado_em' => now(),
                 'desfiliacao_id' => $desfiliacao->id,
             ]);

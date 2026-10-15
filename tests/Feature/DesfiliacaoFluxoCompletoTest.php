@@ -100,7 +100,7 @@ class DesfiliacaoFluxoCompletoTest extends TestCase
             'assinatura_base64' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
         ]);
 
-        $desfiliacao = Desfiliacao::where('email', 'guilherme.mendes@teste.com')->first();
+        $desfiliacao = Desfiliacao::where('desfiliacao_link_id', $link->id)->latest('id')->first();
         $this->assertNotNull($desfiliacao);
         $resSubmit->assertRedirect(route('desfiliacao.solicitada.sucesso', $desfiliacao->id));
 

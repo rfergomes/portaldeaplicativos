@@ -27,11 +27,13 @@ class GerarDesfiliacaoLinkRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'tipo_link' => ['nullable', 'in:individual,compartilhado,lote'],
             'destinatario_nome' => ['nullable', 'string', 'max:191'],
             'destinatario_contato' => ['nullable', 'string', 'max:50'],
             'canal_envio' => ['nullable', 'in:manual,whatsapp,email,kwik'],
             'horas_validade' => ['required', 'integer', 'min:1', 'max:720'],
-            'quantidade' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'limite_usos' => ['nullable', 'integer', 'min:1', 'max:50'],
+            'quantidade' => ['nullable', 'integer', 'min:1', 'max:50'],
         ];
     }
 
@@ -41,10 +43,12 @@ class GerarDesfiliacaoLinkRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'tipo_link' => 'modalidade do link',
             'destinatario_nome' => 'nome do trabalhador',
             'destinatario_contato' => 'contato (WhatsApp/E-mail)',
             'canal_envio' => 'canal de envio',
             'horas_validade' => 'validade em horas',
+            'limite_usos' => 'limite de utilizações',
             'quantidade' => 'quantidade de links',
         ];
     }

@@ -50,10 +50,22 @@
                         </div>
                     </div>
 
-                    <div class="mb-2">
-                        <label for="quantidade" class="form-label fw-semibold">Quantidade de Links</label>
-                        <input type="number" class="form-control" id="quantidade" name="quantidade" value="1" min="1" max="50">
-                        <div class="form-text">Para emissão em lote avulso sem destinatário pré-fixado.</div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="tipo_link_admin" class="form-label fw-semibold">Tipo do Link</label>
+                            <select class="form-select" id="tipo_link_admin" name="tipo_link">
+                                <option value="individual" selected>Individual (Uso Único)</option>
+                                <option value="compartilhado">Compartilhado (Cota N Usos)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="colLimiteUsosAdmin" style="display: none;">
+                            <label for="limite_usos_admin" class="form-label fw-semibold">Cota de Utilizações</label>
+                            <input type="number" class="form-control" id="limite_usos_admin" name="limite_usos" value="5" min="2" max="50">
+                        </div>
+                        <div class="col-md-6" id="colQuantidadeAdmin">
+                            <label for="quantidade" class="form-label fw-semibold">Quantidade de Links</label>
+                            <input type="number" class="form-control" id="quantidade" name="quantidade" value="1" min="1" max="50">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer bg-light">
@@ -66,3 +78,22 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const selTipo = document.getElementById('tipo_link_admin');
+    const colLimite = document.getElementById('colLimiteUsosAdmin');
+    const colQtd = document.getElementById('colQuantidadeAdmin');
+    if (selTipo && colLimite && colQtd) {
+        selTipo.addEventListener('change', function () {
+            if (this.value === 'compartilhado') {
+                colLimite.style.display = 'block';
+                colQtd.style.display = 'none';
+            } else {
+                colLimite.style.display = 'none';
+                colQtd.style.display = 'block';
+            }
+        });
+    }
+});
+</script>

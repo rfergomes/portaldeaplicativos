@@ -49,7 +49,7 @@
 
         <div class="alert alert-light border small text-muted text-start mb-4">
             <i class="fa-solid fa-circle-info text-primary me-2"></i>
-            Os links emitidos pelo sindicato são de <strong>uso único</strong> e possuem prazo de validade determinado. Caso você precise de um novo link, entre em contato diretamente com a nossa equipe de atendimento.
+            Os links emitidos pelo sindicato possuem <strong>limite controlado de utilizações</strong> e prazo de validade determinado. Caso você precise de um novo link, entre em contato diretamente com a nossa equipe de atendimento.
         </div>
 
         <div class="d-grid gap-2">
