@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RecusarDesfiliacaoRequest;
 use App\Mail\RecusaDesfiliacaoMail;
 use App\Models\Desfiliacao;
-use App\Models\EmpresaContato;
+use App\Services\EmpresaContatoResolver;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -173,11 +173,13 @@ class DesfiliacaoAdminController extends Controller
             'empresa_status' => 'nao_aplicavel',
         ];
 
-        // Sincroniza contato da empresa (tabelas empresa_contatos e empresas) caso ainda não possua e-mail associado
+        // Obtém contato da empresa a partir da tabela clientes caso ainda não possua e-mail associado
         if (empty($desfiliacao->empresa_email)) {
-            $contatoEmp = EmpresaContato::obterOuSincronizarContatoEmpresa($desfiliacao->empresa);
-            if ($contatoEmp && !empty($contatoEmp->email_rh)) {
-                $desfiliacao->update(['empresa_email' => $contatoEmp->email_rh]);
+            $contatosInfo = EmpresaContatoResolver::obterContatosValidosParaNotificacao(null, $desfiliacao->empresa);
+            if (!empty($contatosInfo['emails'])) {
+                $desfiliacao->update(['empresa_email' => $contatosInfo['emails'][0]]);
+            } elseif ($contatosInfo['empresa'] && !empty($contatosInfo['empresa']->email)) {
+                $desfiliacao->update(['empresa_email' => $contatosInfo['empresa']->email]);
             }
         }
 
@@ -259,28 +261,18 @@ class DesfiliacaoAdminController extends Controller
     {
         $desfiliacao = Desfiliacao::findOrFail($id);
 
+        $emailInput = $request->input('email_rh') ?? $request->input('empresa_email');
+        $request->merge(['email_validado' => $emailInput]);
         $request->validate([
-            'email_rh' => ['required', 'email', 'max:191'],
+            'email_validado' => ['required', 'email', 'max:191'],
             'salvar_contato' => ['nullable', 'boolean'],
         ]);
 
-        $emailRh = strtolower(trim((string) $request->input('email_rh')));
+        $emailRh = strtolower(trim((string) $emailInput));
 
-        if ($request->boolean('salvar_contato')) {
-            $empresaCadastrada = \App\Models\Empresa::where('razao_social', 'like', "%{$desfiliacao->empresa}%")
-                ->orWhere('nome_fantasia', 'like', "%{$desfiliacao->empresa}%")
-                ->first();
-
-            EmpresaContato::updateOrCreate(
-                ['razao_social' => $desfiliacao->empresa],
-                [
-                    'cnpj' => $empresaCadastrada?->cnpj,
-                    'nome_fantasia' => $empresaCadastrada?->nome_fantasia ?? $desfiliacao->empresa,
-                    'email_rh' => $emailRh,
-                    'telefone_rh' => $empresaCadastrada?->telefone,
-                    'responsavel_rh' => 'Recursos Humanos / DP',
-                ]
-            );
+        $empresaCadastrada = EmpresaContatoResolver::encontrarEmpresa(null, $desfiliacao->empresa);
+        if ($empresaCadastrada) {
+            EmpresaContatoResolver::registrarContatoRh($empresaCadastrada, $emailRh);
         }
 
         $despachoAction = app(DespacharTermoDesfiliacaoAction::class);

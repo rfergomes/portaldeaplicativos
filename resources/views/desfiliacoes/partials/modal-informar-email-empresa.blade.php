@@ -34,7 +34,7 @@
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="checkbox" name="salvar_contato" value="1" id="salvar_contato" checked>
                         <label class="form-check-label small" for="salvar_contato">
-                            Salvar este e-mail no catálogo da empresa para que futuras desfiliações sejam enviadas automaticamente.
+                            Vincular este e-mail aos contatos da empresa (tabela de clientes) para que futuras notificações sejam enviadas automaticamente.
                         </label>
                     </div>
                 </div>

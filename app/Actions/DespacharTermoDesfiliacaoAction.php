@@ -7,8 +7,8 @@ namespace App\Actions;
 use App\Domain\Protocolos\Contracts\ArOnlineClient;
 use App\Mail\TermoDesfiliacaoTrabalhadorMail;
 use App\Models\Desfiliacao;
-use App\Models\EmpresaContato;
 use App\Services\DesfiliacaoArOnlineService;
+use App\Services\EmpresaContatoResolver;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -85,17 +85,26 @@ class DespacharTermoDesfiliacaoAction
             }
         }
 
-        // 2. Determinação do e-mail do RH da Empresa (tabelas empresa_contatos e empresas)
+        // 2. Determinação do e-mail do RH da Empresa a partir da tabela clientes
         $emailRh = $emailEmpresaManual;
         if (empty($emailRh) && !empty($desfiliacao->empresa_email)) {
             $emailRh = $desfiliacao->empresa_email;
         }
 
         if (empty($emailRh)) {
-            $contatoEmpresa = EmpresaContato::obterOuSincronizarContatoEmpresa($desfiliacao->empresa);
-            if ($contatoEmpresa && !empty($contatoEmpresa->email_rh)) {
-                $emailRh = $contatoEmpresa->email_rh;
+            $contatosInfo = EmpresaContatoResolver::obterContatosValidosParaNotificacao(null, $desfiliacao->empresa);
+            if (!empty($contatosInfo['emails'])) {
+                $emailRh = $contatosInfo['emails'][0];
                 $desfiliacao->update(['empresa_email' => $emailRh]);
+            } elseif ($contatosInfo['empresa'] && !empty($contatosInfo['empresa']->email)) {
+                $emailRh = $contatosInfo['empresa']->email;
+                $desfiliacao->update(['empresa_email' => $emailRh]);
+            }
+        } elseif (!empty($emailEmpresaManual)) {
+            // Se o e-mail foi fornecido manualmente, registra na tabela clientes
+            $empresa = EmpresaContatoResolver::encontrarEmpresa(null, $desfiliacao->empresa);
+            if ($empresa) {
+                EmpresaContatoResolver::registrarContatoRh($empresa, $emailEmpresaManual);
             }
         }
 

@@ -433,6 +433,8 @@
     </div>
 </div>
 
+@include('desfiliacoes.partials.modal-informar-email-empresa')
+
 <!-- Modal 3: Detalhes de Auditoria e Trilha Probatória -->
 <div class="modal fade" id="modalAuditoria" tabindex="-1" aria-labelledby="modalAuditoriaLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">

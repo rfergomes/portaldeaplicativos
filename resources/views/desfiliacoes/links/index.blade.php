@@ -111,9 +111,24 @@
                                     </div>
                                 </td>
                                 <td>
+                                    @if($link->isCompartilhado())
+                                        <div class="d-flex align-items-center gap-1 mb-1">
+                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                                                <i class="fa-solid fa-users me-1"></i> Compartilhado
+                                            </span>
+                                            <span class="badge bg-secondary-subtle text-secondary">
+                                                {{ $link->usos_atuais }}/{{ $link->limite_usos }} usos
+                                            </span>
+                                        </div>
+                                    @elseif($link->tipo_link === 'lote')
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle mb-1">
+                                            <i class="fa-solid fa-boxes-stacked me-1"></i> Lote
+                                        </span>
+                                    @endif
+
                                     @if($link->destinatario_nome)
                                         <div class="fw-semibold text-dark">{{ $link->destinatario_nome }}</div>
-                                    @else
+                                    @elseif(!$link->isCompartilhado())
                                         <span class="text-muted fst-italic">Não especificado (avulso)</span>
                                     @endif
 
@@ -155,8 +170,13 @@
                                 <td>
                                     @if($link->isValido())
                                         <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> Disponível</span>
-                                    @elseif($link->utilizado)
-                                        <span class="badge bg-info text-white"><i class="fa-solid fa-check-double me-1"></i> Utilizado</span>
+                                        @if($link->isCompartilhado())
+                                            <div class="small text-success mt-1" style="font-size: 11px;">
+                                                <i class="fa-solid fa-user-check me-1"></i> {{ $link->vagas_restantes }} {{ $link->vagas_restantes === 1 ? 'vaga' : 'vagas' }}
+                                            </div>
+                                        @endif
+                                    @elseif($link->isEsgotado() || $link->utilizado)
+                                        <span class="badge bg-info text-white"><i class="fa-solid fa-check-double me-1"></i> {{ $link->isCompartilhado() ? 'Cota Esgotada' : 'Utilizado' }}</span>
                                     @elseif($link->isCancelado())
                                         <span class="badge bg-danger"><i class="fa-solid fa-ban me-1"></i> Cancelado</span>
                                     @else

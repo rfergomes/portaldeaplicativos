@@ -54,15 +54,33 @@ class DesfiliacaoLinkAdminController extends Controller
     {
         $validated = $request->validated();
         $horas = (int) ($validated['horas_validade'] ?? 48);
+        $tipoLink = $validated['tipo_link'] ?? 'individual';
+        $limiteUsos = (int) ($validated['limite_usos'] ?? 1);
         $quantidade = (int) ($validated['quantidade'] ?? 1);
-        $expiraEm = now()->addHours($horas);
 
+        if ($tipoLink === 'compartilhado' || $limiteUsos > 1) {
+            $tipoLink = 'compartilhado';
+            $limiteUsos = max(2, $limiteUsos);
+            $quantidade = 1;
+        } elseif ($quantidade > 1 || $tipoLink === 'lote') {
+            $tipoLink = 'lote';
+            $limiteUsos = 1;
+        } else {
+            $tipoLink = 'individual';
+            $limiteUsos = 1;
+            $quantidade = 1;
+        }
+
+        $expiraEm = now()->addHours($horas);
         $linksGerados = [];
 
         for ($i = 0; $i < $quantidade; $i++) {
             $link = DesfiliacaoLink::create([
                 'token' => DesfiliacaoLink::gerarToken(),
                 'user_id' => auth()->id(),
+                'tipo_link' => $tipoLink,
+                'limite_usos' => $limiteUsos,
+                'usos_atuais' => 0,
                 'destinatario_nome' => $quantidade === 1 ? ($validated['destinatario_nome'] ?? null) : null,
                 'destinatario_contato' => $quantidade === 1 ? ($validated['destinatario_contato'] ?? null) : null,
                 'canal_envio' => $validated['canal_envio'] ?? 'manual',
@@ -99,6 +117,10 @@ class DesfiliacaoLinkAdminController extends Controller
                 'links' => collect($linksGerados)->map(fn ($l) => [
                     'id' => $l->id,
                     'token' => $l->token,
+                    'tipo_link' => $l->tipo_link,
+                    'limite_usos' => $l->limite_usos,
+                    'usos_atuais' => $l->usos_atuais,
+                    'vagas_restantes' => $l->vagas_restantes,
                     'url' => $l->url,
                     'whatsapp_url' => $l->whatsapp_url,
                     'expira_em' => $l->expira_em->format('d/m/Y H:i'),

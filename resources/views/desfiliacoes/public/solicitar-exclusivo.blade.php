@@ -105,16 +105,32 @@
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
             <!-- Hero Header Institucional -->
             <div class="bg-gradient-to-r from-red-700 via-red-800 to-slate-900 p-6 md:p-8 text-white relative">
-                <span class="inline-flex items-center gap-1.5 bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full border border-white/25 backdrop-blur-xs mb-3">
-                    <i class="fa-solid fa-link"></i> Atendimento Individualizado
-                </span>
+                @if($link->isCompartilhado())
+                    <span class="inline-flex items-center gap-1.5 bg-amber-500/30 text-amber-100 text-xs font-semibold px-3 py-1 rounded-full border border-amber-400/40 backdrop-blur-xs mb-3">
+                        <i class="fa-solid fa-users"></i> Link Compartilhado &bull; {{ $link->vagas_restantes }} de {{ $link->limite_usos }} {{ $link->limite_usos === 1 ? 'utilização' : 'utilizações' }}
+                    </span>
+                @elseif($link->isAnonimo())
+                    <span class="inline-flex items-center gap-1.5 bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full border border-white/25 backdrop-blur-xs mb-3">
+                        <i class="fa-solid fa-shield-halved"></i> Atendimento Digital
+                    </span>
+                @else
+                    <span class="inline-flex items-center gap-1.5 bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full border border-white/25 backdrop-blur-xs mb-3">
+                        <i class="fa-solid fa-link"></i> Atendimento Individualizado
+                    </span>
+                @endif
                 <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Requerimento de Desfiliação Sindical</h2>
                 <p class="mt-2 text-red-50 text-sm md:text-base leading-relaxed opacity-95">
                     Preencha os dados abaixo, declare a ciência dos termos da LGPD e assine digitalmente sua solicitação. O processo é unificado e rápido.
                 </p>
                 <div class="mt-4 pt-3 border-t border-white/20 flex flex-wrap items-center justify-between text-xs text-red-100 gap-2">
                     <span><i class="fa-solid fa-clock me-1"></i> Válido até: <strong>{{ $link->expira_em->format('d/m/Y \à\s H:i') }}</strong></span>
-                    <span><i class="fa-solid fa-fingerprint me-1"></i> Uso Único e Nominal</span>
+                    @if($link->isCompartilhado())
+                        <span><i class="fa-solid fa-user-check me-1"></i> {{ $link->vagas_restantes }} {{ $link->vagas_restantes === 1 ? 'vaga restante' : 'vagas restantes' }}</span>
+                    @elseif($link->isAnonimo())
+                        <span><i class="fa-solid fa-fingerprint me-1"></i> Uso Único</span>
+                    @else
+                        <span><i class="fa-solid fa-fingerprint me-1"></i> Uso Único e Nominal</span>
+                    @endif
                 </div>
             </div>
 

@@ -100,6 +100,9 @@ class DesfiliacaoTest extends TestCase
 
     protected function criarUsuarioAdmin(array $attributes = []): User
     {
+        if (!isset($attributes['email'])) {
+            $attributes['email'] = 'admin_' . uniqid() . '_' . mt_rand(1000, 9999) . '@teste.com';
+        }
         $user = User::factory()->create($attributes);
         $perfil = \App\Models\Perfil::firstOrCreate(
             ['nome' => 'Administrador'],
@@ -263,7 +266,10 @@ class DesfiliacaoTest extends TestCase
 
     public function test_usuario_sem_permissao_recebe_403_e_com_permissao_acessa(): void
     {
-        $user = User::factory()->create(['name' => 'Usuario Sem Permissao']);
+        $user = User::factory()->create([
+            'name' => 'Usuario Sem Permissao',
+            'email' => 'semperm_' . uniqid() . '_' . mt_rand(1000, 9999) . '@teste.com',
+        ]);
 
         // Sem permissão: deve receber 403
         $response = $this->actingAs($user)->get(route('admin.desfiliacoes.index'));

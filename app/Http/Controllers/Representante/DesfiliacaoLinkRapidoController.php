@@ -35,20 +35,59 @@ class DesfiliacaoLinkRapidoController extends Controller
     {
         $validated = $request->validated();
         $horas = (int) ($validated['horas_validade'] ?? 48);
+        $tipoLink = $validated['tipo_link'] ?? 'individual';
+        $limiteUsos = (int) ($validated['limite_usos'] ?? 1);
+        $quantidade = (int) ($validated['quantidade'] ?? 1);
+        $expiraEm = now()->addHours($horas);
 
-        $link = DesfiliacaoLink::create([
-            'token' => DesfiliacaoLink::gerarToken(),
-            'user_id' => auth()->id(),
-            'destinatario_nome' => $validated['destinatario_nome'] ?? null,
-            'destinatario_contato' => $validated['destinatario_contato'] ?? null,
-            'canal_envio' => 'whatsapp',
-            'horas_validade' => $horas,
-            'expira_em' => now()->addHours($horas),
-        ]);
+        if ($tipoLink === 'compartilhado' || $limiteUsos > 1) {
+            $tipoLink = 'compartilhado';
+            $limiteUsos = max(2, $limiteUsos);
+            $quantidade = 1;
+        } elseif ($quantidade > 1 || $tipoLink === 'lote') {
+            $tipoLink = 'lote';
+            $limiteUsos = 1;
+        } else {
+            $tipoLink = 'individual';
+            $limiteUsos = 1;
+            $quantidade = 1;
+        }
 
-        return redirect()->route('representante.desfiliacao.links')
-            ->with('status', 'Link gerado com sucesso!')
-            ->with('whatsapp_url', $link->whatsapp_url)
-            ->with('ultimo_link_id', $link->id);
+        $linksGerados = [];
+
+        for ($i = 0; $i < $quantidade; $i++) {
+            $linksGerados[] = DesfiliacaoLink::create([
+                'token' => DesfiliacaoLink::gerarToken(),
+                'user_id' => auth()->id(),
+                'tipo_link' => $tipoLink,
+                'limite_usos' => $limiteUsos,
+                'usos_atuais' => 0,
+                'destinatario_nome' => $quantidade === 1 ? ($validated['destinatario_nome'] ?? null) : null,
+                'destinatario_contato' => $quantidade === 1 ? ($validated['destinatario_contato'] ?? null) : null,
+                'canal_envio' => 'whatsapp',
+                'horas_validade' => $horas,
+                'expira_em' => $expiraEm,
+            ]);
+        }
+
+        $primeiroLink = $linksGerados[0];
+
+        $redirect = redirect()->route('representante.desfiliacao.links')
+            ->with('status', $quantidade > 1 
+                ? "Lote de {$quantidade} links exclusivos gerado com sucesso!" 
+                : ($tipoLink === 'compartilhado' 
+                    ? "Link compartilhado (válido para até {$limiteUsos} usos) gerado com sucesso!" 
+                    : 'Link gerado com sucesso!'))
+            ->with('whatsapp_url', $primeiroLink->whatsapp_url)
+            ->with('ultimo_link_id', $primeiroLink->id);
+
+        if ($quantidade > 1) {
+            $redirect->with('links_lote', collect($linksGerados)->map(fn ($l) => [
+                'token' => $l->token,
+                'url' => $l->url,
+            ])->toArray());
+        }
+
+        return $redirect;
     }
 }

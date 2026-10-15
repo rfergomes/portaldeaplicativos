@@ -45,5 +45,17 @@ class Cliente extends Model
     {
         return $this->email_valido === false || !empty($this->email_bounce_code);
     }
+
+    /**
+     * Scope para contatos aptos ao recebimento de e-mails institucionais e notificações.
+     */
+    public function scopeValidosParaEnvio($query)
+    {
+        return $query->where('ativo', true)
+            ->where('email_valido', true)
+            ->whereNotNull('email')
+            ->where('email', '!=', '')
+            ->whereNull('email_bounce_code');
+    }
 }
 
