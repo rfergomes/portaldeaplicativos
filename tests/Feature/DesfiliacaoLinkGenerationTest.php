@@ -75,6 +75,39 @@ class DesfiliacaoLinkGenerationTest extends TestCase
         $response->assertForbidden();
     }
 
+    public function test_link_individual_gera_estritamente_com_cota_um_mesmo_com_parametro_limite_usos_presente(): void
+    {
+        // Simula o envio do formulário HTML onde limite_usos=5 vinha presente no payload
+        $response = $this->actingAs($this->adminUser)->post(route('admin.desfiliacao.links.store'), [
+            'tipo_link' => 'individual',
+            'quantidade' => 1,
+            'limite_usos' => 5, // Valor oculto no form anterior
+            'destinatario_nome' => 'Carlos Eduardo',
+            'destinatario_contato' => '19987654321',
+            'destinatario_email' => 'carlos@empresa.com.br',
+            'canal_envio' => 'whatsapp',
+            'horas_validade' => 48,
+        ]);
+
+        $response->assertRedirect(route('admin.desfiliacao.links.index'));
+
+        $this->assertDatabaseHas('desfiliacao_links', [
+            'user_id' => $this->adminUser->id,
+            'destinatario_nome' => 'Carlos Eduardo',
+            'destinatario_email' => 'carlos@empresa.com.br',
+            'tipo_link' => 'individual',
+            'limite_usos' => 1,
+        ]);
+
+        $link = DesfiliacaoLink::where('user_id', $this->adminUser->id)->latest('id')->first();
+        $this->assertNotNull($link);
+        $this->assertEquals('individual', $link->tipo_link);
+        $this->assertEquals(1, $link->limite_usos, 'Link individual deve ter cota estrita de 1 uso.');
+        $this->assertEquals(0, $link->usos_atuais);
+        $this->assertEquals('carlos@empresa.com.br', $link->destinatario_email);
+        $this->assertFalse($link->isCompartilhado());
+    }
+
     public function test_operador_pode_cancelar_link_nao_utilizado(): void
     {
         $link = DesfiliacaoLink::create([

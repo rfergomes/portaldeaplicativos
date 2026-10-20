@@ -22,6 +22,7 @@ class DesfiliacaoLink extends Model
         'tipo_link',
         'destinatario_nome',
         'destinatario_contato',
+        'destinatario_email',
         'canal_envio',
         'horas_validade',
         'limite_usos',

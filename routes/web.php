@@ -397,6 +397,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         ->name('admin.desfiliacao.links.cancelar')
         ->middleware('can:desfiliacoes.links.gerar');
 
+    Route::post('/desfiliacao/links/{id}/enviar-kwik', [DesfiliacaoLinkAdminController::class, 'enviarKwik'])
+        ->name('admin.desfiliacao.links.enviar_kwik')
+        ->middleware('can:desfiliacoes.links.gerar');
+
     // Fila de Triagem e Solicitações de Desfiliação
     Route::get('/desfiliacoes', [DesfiliacaoAdminController::class, 'index'])
         ->name('admin.desfiliacoes.index')

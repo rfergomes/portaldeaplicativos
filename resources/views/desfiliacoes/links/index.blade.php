@@ -137,6 +137,14 @@
                                             <i class="fa-brands fa-whatsapp text-success me-1"></i> {{ $link->destinatario_contato }}
                                         </div>
                                     @endif
+
+                                    @if($link->destinatario_email)
+                                        <div class="small text-muted">
+                                            <a href="mailto:{{ $link->destinatario_email }}" class="text-decoration-none text-muted" title="Enviar e-mail para o trabalhador">
+                                                <i class="fa-solid fa-envelope text-primary me-1"></i> {{ $link->destinatario_email }}
+                                            </a>
+                                        </div>
+                                    @endif
                                 </td>
                                 <td>
                                     <div class="small fw-semibold text-dark">{{ $link->user->name ?? 'Sistema' }}</div>

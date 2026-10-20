@@ -29,6 +29,15 @@
                         <div class="form-text">Facilita o compartilhamento direto pelo WhatsApp Web ao emitir o link.</div>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="destinatario_email" class="form-label fw-semibold">E-mail do Trabalhador <span class="text-muted fw-normal">(opcional)</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-solid fa-envelope text-primary"></i></span>
+                            <input type="email" class="form-control" id="destinatario_email" name="destinatario_email" placeholder="trabalhador@empresa.com.br">
+                        </div>
+                        <div class="form-text">Facilita o envio por correio eletrônico ou registro cadastral.</div>
+                    </div>
+
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label for="horas_validade" class="form-label fw-semibold">Validade do Link</label>
@@ -50,6 +59,24 @@
                         </div>
                     </div>
 
+                    {{-- Bloco de Template KWIK --}}
+                    <div class="mb-3" id="blocoKwikTemplate" style="display: none;">
+                        <label for="kwik_template" class="form-label fw-semibold">
+                            <i class="fa-solid fa-robot text-primary me-1"></i> Template Oficial KWIK
+                        </label>
+                        <select class="form-select" id="kwik_template" name="kwik_template">
+                            <option value="desfiliacao_link_exclusivo" selected>Padrão (desfiliacao_link_exclusivo)</option>
+                            @if(isset($templates) && $templates->count() > 0)
+                                @foreach($templates as $tmpl)
+                                    @if($tmpl->nome !== 'desfiliacao_link_exclusivo')
+                                        <option value="{{ $tmpl->nome }}">{{ $tmpl->nome }} ({{ $tmpl->categoria ?? 'UTILITY' }})</option>
+                                    @endif
+                                @endforeach
+                            @endif
+                        </select>
+                        <div class="form-text">Selecione o modelo de mensagem aprovado no KWIK/Meta para disparo oficial.</div>
+                    </div>
+
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label for="tipo_link_admin" class="form-label fw-semibold">Tipo do Link</label>
@@ -60,7 +87,7 @@
                         </div>
                         <div class="col-md-6" id="colLimiteUsosAdmin" style="display: none;">
                             <label for="limite_usos_admin" class="form-label fw-semibold">Cota de Utilizações</label>
-                            <input type="number" class="form-control" id="limite_usos_admin" name="limite_usos" value="5" min="2" max="50">
+                            <input type="number" class="form-control" id="limite_usos_admin" name="limite_usos" value="3" min="2" max="50" disabled>
                         </div>
                         <div class="col-md-6" id="colQuantidadeAdmin">
                             <label for="quantidade" class="form-label fw-semibold">Quantidade de Links</label>
@@ -80,20 +107,78 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const selTipo = document.getElementById('tipo_link_admin');
-    const colLimite = document.getElementById('colLimiteUsosAdmin');
-    const colQtd = document.getElementById('colQuantidadeAdmin');
-    if (selTipo && colLimite && colQtd) {
-        selTipo.addEventListener('change', function () {
-            if (this.value === 'compartilhado') {
-                colLimite.style.display = 'block';
-                colQtd.style.display = 'none';
+(function () {
+    function sincronizarModalLink() {
+        const $tipo = $('#tipo_link_admin');
+        const $canal = $('#canal_envio');
+        const $colLimite = $('#colLimiteUsosAdmin');
+        const $colQtd = $('#colQuantidadeAdmin');
+        const $inputLimite = $('#limite_usos_admin');
+        const $inputQtd = $('#quantidade');
+        const $blocoKwik = $('#blocoKwikTemplate');
+
+        function alternarTipo(valor) {
+            if (valor === 'compartilhado') {
+                $colLimite.show();
+                $inputLimite.prop('disabled', false);
+                $colQtd.hide();
+                $inputQtd.prop('disabled', true);
             } else {
-                colLimite.style.display = 'none';
-                colQtd.style.display = 'block';
+                $colLimite.hide();
+                $inputLimite.prop('disabled', true);
+                $colQtd.show();
+                $inputQtd.prop('disabled', false);
             }
+        }
+
+        function alternarCanal(valor) {
+            if (valor === 'kwik') {
+                $blocoKwik.show();
+            } else {
+                $blocoKwik.hide();
+            }
+        }
+
+        // Suporte unificado a jQuery e Select2
+        $tipo.off('change select2:select').on('change select2:select', function () {
+            alternarTipo($(this).val());
+        });
+
+        $canal.off('change select2:select').on('change select2:select', function () {
+            alternarCanal($(this).val());
+        });
+
+        // Suporte vanilla fallback caso jQuery Select2 não esteja presente
+        const elTipo = document.getElementById('tipo_link_admin');
+        if (elTipo) {
+            elTipo.addEventListener('change', function () {
+                alternarTipo(this.value);
+            });
+        }
+        const elCanal = document.getElementById('canal_envio');
+        if (elCanal) {
+            elCanal.addEventListener('change', function () {
+                alternarCanal(this.value);
+            });
+        }
+
+        // Estado inicial
+        alternarTipo($tipo.val() || 'individual');
+        alternarCanal($canal.val() || 'whatsapp');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', sincronizarModalLink);
+    } else {
+        sincronizarModalLink();
+    }
+
+    // Re-sincronizar sempre que o modal for aberto
+    const modalEl = document.getElementById('modalGerarLink');
+    if (modalEl) {
+        modalEl.addEventListener('show.bs.modal', function () {
+            setTimeout(sincronizarModalLink, 100);
         });
     }
-});
+})();
 </script>

@@ -38,13 +38,15 @@ class DesfiliacaoLinkAdminController extends Controller
             $query->where(function ($q) use ($busca) {
                 $q->where('destinatario_nome', 'like', "%{$busca}%")
                     ->orWhere('destinatario_contato', 'like', "%{$busca}%")
+                    ->orWhere('destinatario_email', 'like', "%{$busca}%")
                     ->orWhere('token', 'like', "%{$busca}%");
             });
         }
 
         $links = $query->paginate(20)->withQueryString();
+        $templates = \App\Models\WhatsappTemplate::ativos()->orderBy('nome')->get();
 
-        return view('desfiliacoes.links.index', compact('links', 'status', 'busca'));
+        return view('desfiliacoes.links.index', compact('links', 'status', 'busca', 'templates'));
     }
 
     /**
@@ -58,13 +60,14 @@ class DesfiliacaoLinkAdminController extends Controller
         $limiteUsos = (int) ($validated['limite_usos'] ?? 1);
         $quantidade = (int) ($validated['quantidade'] ?? 1);
 
-        if ($tipoLink === 'compartilhado' || $limiteUsos > 1) {
+        if ($tipoLink === 'compartilhado') {
             $tipoLink = 'compartilhado';
             $limiteUsos = max(2, $limiteUsos);
             $quantidade = 1;
-        } elseif ($quantidade > 1 || $tipoLink === 'lote') {
+        } elseif ($tipoLink === 'lote' || $quantidade > 1) {
             $tipoLink = 'lote';
             $limiteUsos = 1;
+            $quantidade = max(1, $quantidade);
         } else {
             $tipoLink = 'individual';
             $limiteUsos = 1;
@@ -83,6 +86,7 @@ class DesfiliacaoLinkAdminController extends Controller
                 'usos_atuais' => 0,
                 'destinatario_nome' => $quantidade === 1 ? ($validated['destinatario_nome'] ?? null) : null,
                 'destinatario_contato' => $quantidade === 1 ? ($validated['destinatario_contato'] ?? null) : null,
+                'destinatario_email' => $quantidade === 1 ? ($validated['destinatario_email'] ?? null) : null,
                 'canal_envio' => $validated['canal_envio'] ?? 'manual',
                 'horas_validade' => $horas,
                 'expira_em' => $expiraEm,
@@ -94,14 +98,15 @@ class DesfiliacaoLinkAdminController extends Controller
                     $nome = $link->destinatario_nome ?: 'Trabalhador(a)';
                     $url = $link->url;
                     $validade = $link->expira_em->format('d/m/Y \à\s H:i');
+                    $template = !empty($validated['kwik_template']) ? $validated['kwik_template'] : 'desfiliacao_link_exclusivo';
 
                     dispatch(new \App\Jobs\SendKwikNotificationJob(
                         $link->destinatario_contato,
-                        'desfiliacao_link_exclusivo',
+                        $template,
                         [$nome, $url, $validade],
                         auth()->id()
                     ));
-                    \Illuminate\Support\Facades\Log::info("KWIK: Disparo do link de desfiliação #{$link->id} enviado para {$link->destinatario_contato}");
+                    \Illuminate\Support\Facades\Log::info("KWIK: Disparo do link de desfiliação #{$link->id} enviado para {$link->destinatario_contato} com template {$template}");
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\Log::error("KWIK: Falha ao despachar link #{$link->id} para {$link->destinatario_contato}: " . $e->getMessage());
                 }
@@ -147,5 +152,42 @@ class DesfiliacaoLinkAdminController extends Controller
         $link->update(['cancelado_em' => now()]);
 
         return back()->with('status', 'Link cancelado com sucesso.');
+    }
+
+    /**
+     * Disparo avulso via API KWIK com template oficial.
+     */
+    public function enviarKwik(Request $request, int $id): RedirectResponse
+    {
+        $link = DesfiliacaoLink::findOrFail($id);
+
+        if (!$link->isValido()) {
+            return back()->with('error', 'Este link não está disponível ou já expirou.');
+        }
+
+        if (empty($link->destinatario_contato)) {
+            return back()->with('error', 'O link não possui WhatsApp/telefone cadastrado para envio.');
+        }
+
+        $templateNome = (string) $request->input('template_nome', 'desfiliacao_link_exclusivo');
+        $nome = $link->destinatario_nome ?: 'Trabalhador(a)';
+        $url = $link->url;
+        $validade = $link->expira_em->format('d/m/Y \à\s H:i');
+
+        try {
+            dispatch(new \App\Jobs\SendKwikNotificationJob(
+                $link->destinatario_contato,
+                $templateNome,
+                [$nome, $url, $validade],
+                auth()->id()
+            ));
+
+            \Illuminate\Support\Facades\Log::info("KWIK: Disparo manual do link de desfiliação #{$link->id} enviado para {$link->destinatario_contato} com template {$templateNome}");
+
+            return back()->with('status', "Link de desfiliação despachado com sucesso via API KWIK (Template: {$templateNome})!");
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("KWIK: Erro ao despachar link #{$link->id}: " . $e->getMessage());
+            return back()->with('error', 'Falha ao despachar link via API KWIK: ' . $e->getMessage());
+        }
     }
 }

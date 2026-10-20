@@ -56,6 +56,33 @@ class DesfiliacaoLinkMultiploTest extends TestCase
         ]);
     }
 
+    public function test_geracao_de_link_compartilhado_adota_fielmente_cota_de_3_utilizacoes(): void
+    {
+        $response = $this->actingAs($this->representante)
+            ->post(route('representante.desfiliacao.links.store'), [
+                'tipo_link' => 'compartilhado',
+                'limite_usos' => 3,
+                'horas_validade' => 48,
+            ]);
+
+        $response->assertRedirect(route('representante.desfiliacao.links'));
+
+        $this->assertDatabaseHas('desfiliacao_links', [
+            'user_id' => $this->representante->id,
+            'tipo_link' => 'compartilhado',
+            'limite_usos' => 3,
+            'usos_atuais' => 0,
+        ]);
+
+        $link = DesfiliacaoLink::where('user_id', $this->representante->id)->latest('id')->first();
+        $this->assertNotNull($link);
+        $this->assertEquals('compartilhado', $link->tipo_link);
+        $this->assertEquals(3, $link->limite_usos, 'A cota informada (3) deve ser respeitada com exatidão.');
+        $this->assertEquals(0, $link->usos_atuais);
+        $this->assertEquals(3, $link->vagas_restantes);
+        $this->assertTrue($link->isCompartilhado());
+    }
+
     private function gerarCpfValido(): string
     {
         $n = [rand(1, 9)];

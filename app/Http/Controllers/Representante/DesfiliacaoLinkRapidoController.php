@@ -40,13 +40,14 @@ class DesfiliacaoLinkRapidoController extends Controller
         $quantidade = (int) ($validated['quantidade'] ?? 1);
         $expiraEm = now()->addHours($horas);
 
-        if ($tipoLink === 'compartilhado' || $limiteUsos > 1) {
+        if ($tipoLink === 'compartilhado') {
             $tipoLink = 'compartilhado';
             $limiteUsos = max(2, $limiteUsos);
             $quantidade = 1;
-        } elseif ($quantidade > 1 || $tipoLink === 'lote') {
+        } elseif ($tipoLink === 'lote' || $quantidade > 1) {
             $tipoLink = 'lote';
             $limiteUsos = 1;
+            $quantidade = max(1, $quantidade);
         } else {
             $tipoLink = 'individual';
             $limiteUsos = 1;
@@ -64,6 +65,7 @@ class DesfiliacaoLinkRapidoController extends Controller
                 'usos_atuais' => 0,
                 'destinatario_nome' => $quantidade === 1 ? ($validated['destinatario_nome'] ?? null) : null,
                 'destinatario_contato' => $quantidade === 1 ? ($validated['destinatario_contato'] ?? null) : null,
+                'destinatario_email' => $quantidade === 1 ? ($validated['destinatario_email'] ?? null) : null,
                 'canal_envio' => 'whatsapp',
                 'horas_validade' => $horas,
                 'expira_em' => $expiraEm,
