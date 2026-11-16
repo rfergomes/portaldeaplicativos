@@ -5,86 +5,93 @@
 @section('content')
 <div class="container-fluid">
     <!-- Header e Métricas -->
-    <div class="row mb-3">
-        <div class="col-xl-2 col-md-4 col-sm-6 mb-2">
+    <div class="row g-2 mb-3 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-3 row-cols-xl-5">
+        <!-- 1. Total -->
+        <div class="col">
             <div class="card card-outline card-primary shadow-sm h-100">
-                <div class="card-body p-3 d-flex align-items-center">
-                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-3 me-3">
-                        <i class="fa-solid fa-file-signature fa-2x"></i>
+                <div class="card-body p-2 p-md-3 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="text-muted text-xs text-uppercase fw-bold text-truncate" title="Total">Total</span>
+                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-2 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; min-width: 34px;">
+                            <i class="fa-solid fa-file-signature"></i>
+                        </div>
                     </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-bold">Total</div>
-                        <div class="fs-4 fw-bold text-dark">{{ $totais['total'] }}</div>
-                    </div>
+                    <div class="fs-3 fw-bold text-dark lh-1 mb-1">{{ $totais['total'] }}</div>
+                    <small class="text-muted text-xs text-truncate">Geral registradas</small>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-2 col-md-4 col-sm-6 mb-2">
+        <!-- 2. Pendente Assinatura -->
+        <div class="col">
             <div class="card card-outline card-secondary shadow-sm h-100">
-                <div class="card-body p-3 d-flex align-items-center">
-                    <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary p-3 me-3">
-                        <i class="fa-solid fa-hourglass-half fa-2x"></i>
+                <div class="card-body p-2 p-md-3 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="text-muted text-xs text-uppercase fw-bold text-truncate" title="Pendente Assinatura">Pend. Assinatura</span>
+                        <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary p-2 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; min-width: 34px;">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                        </div>
                     </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-bold">Pendente Assinatura</div>
-                        <div class="fs-4 fw-bold text-dark">{{ $totais['pendentes'] }}</div>
-                    </div>
+                    <div class="fs-3 fw-bold text-dark lh-1 mb-1">{{ $totais['pendentes'] }}</div>
+                    <small class="text-muted text-xs text-truncate">Aguardando trabalhador</small>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-4 col-sm-6 mb-2">
+        <!-- 3. 1ª Etapa: Pendente Recepção -->
+        <div class="col">
             <div class="card card-outline card-warning shadow-sm h-100 border-warning">
-                <div class="card-body p-3 d-flex align-items-center">
-                    <div class="rounded-circle bg-warning bg-opacity-25 text-warning-emphasis p-3 me-3">
-                        <i class="fa-solid fa-envelope-open-text fa-2x text-warning"></i>
-                    </div>
-                    <div>
-                        <div class="text-warning-emphasis small text-uppercase fw-bold">
-                            1ª Etapa: Pendente Recepção
+                <div class="card-body p-2 p-md-3 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="text-warning-emphasis text-xs text-uppercase fw-bold text-truncate" title="1ª Etapa: Pendente Recepção">
+                            1ª Etapa: Recepção
                             @if($totais['confirmadas'] > 0)
-                                <span class="badge bg-danger rounded-pill ms-1">Novo</span>
+                                <span class="badge bg-danger rounded-pill ms-1" style="font-size: 0.65rem;">Novo</span>
                             @endif
+                        </span>
+                        <div class="rounded-circle bg-warning bg-opacity-25 text-warning-emphasis p-2 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; min-width: 34px;">
+                            <i class="fa-solid fa-envelope-open-text text-warning"></i>
                         </div>
-                        <div class="fs-4 fw-bold text-dark">{{ $totais['confirmadas'] }}</div>
-                        <small class="text-muted text-xs">Aguardando conferência/ciência</small>
                     </div>
+                    <div class="fs-3 fw-bold text-dark lh-1 mb-1">{{ $totais['confirmadas'] }}</div>
+                    <small class="text-muted text-xs text-truncate">Aguardando conferência</small>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6 col-sm-6 mb-2">
+        <!-- 4. 2ª Etapa: Pendente Baixa Ábaco -->
+        <div class="col">
             <div class="card card-outline card-info shadow-sm h-100 border-info">
-                <div class="card-body p-3 d-flex align-items-center">
-                    <div class="rounded-circle bg-info bg-opacity-15 text-info p-3 me-3">
-                        <i class="fa-solid fa-clipboard-check fa-2x text-info"></i>
-                    </div>
-                    <div>
-                        <div class="text-info-emphasis small text-uppercase fw-bold">
-                            2ª Etapa: Pendente Baixa Ábaco
+                <div class="card-body p-2 p-md-3 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="text-info-emphasis text-xs text-uppercase fw-bold text-truncate" title="2ª Etapa: Pendente Baixa Ábaco">
+                            2ª Etapa: Ábaco
                             @if($totais['recepcionadas'] > 0)
-                                <span class="badge bg-warning text-dark rounded-pill ms-1">Ação</span>
+                                <span class="badge bg-warning text-dark rounded-pill ms-1" style="font-size: 0.65rem;">Ação</span>
                             @endif
+                        </span>
+                        <div class="rounded-circle bg-info bg-opacity-15 text-info p-2 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; min-width: 34px;">
+                            <i class="fa-solid fa-clipboard-check text-info"></i>
                         </div>
-                        <div class="fs-4 fw-bold text-dark">{{ $totais['recepcionadas'] }}</div>
-                        <small class="text-muted text-xs">Recepcionadas prontas para baixa</small>
                     </div>
+                    <div class="fs-3 fw-bold text-dark lh-1 mb-1">{{ $totais['recepcionadas'] }}</div>
+                    <small class="text-muted text-xs text-truncate">Prontas para baixa</small>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-2 col-md-6 col-sm-6 mb-2">
+        <!-- 5. Efetivadas -->
+        <div class="col">
             <div class="card card-outline card-success shadow-sm h-100">
-                <div class="card-body p-3 d-flex align-items-center">
-                    <div class="rounded-circle bg-success bg-opacity-10 text-success p-3 me-3">
-                        <i class="fa-solid fa-check-double fa-2x"></i>
+                <div class="card-body p-2 p-md-3 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="text-muted text-xs text-uppercase fw-bold text-truncate" title="Efetivadas">Efetivadas</span>
+                        <div class="rounded-circle bg-success bg-opacity-10 text-success p-2 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; min-width: 34px;">
+                            <i class="fa-solid fa-check-double"></i>
+                        </div>
                     </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-bold">Efetivadas</div>
-                        <div class="fs-4 fw-bold text-success">{{ $totais['efetivadas'] }}</div>
-                        <small class="text-muted text-xs">Processo concluído</small>
-                    </div>
+                    <div class="fs-3 fw-bold text-success lh-1 mb-1">{{ $totais['efetivadas'] }}</div>
+                    <small class="text-muted text-xs text-truncate">Processo concluído</small>
                 </div>
             </div>
         </div>
@@ -92,17 +99,17 @@
 
     <!-- Filtros de Busca -->
     <div class="card card-outline card-secondary shadow-sm mb-4">
-        <div class="card-body">
+        <div class="card-body p-3">
             <form action="{{ route('admin.desfiliacoes.index') }}" method="GET" class="row g-2 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label small fw-bold">Buscar por Nome, CPF, Empresa ou E-mail</label>
+                <div class="col-xl-4 col-lg-4 col-md-12">
+                    <label class="form-label small fw-bold mb-1">Buscar por Nome, CPF, Empresa ou E-mail</label>
                     <div class="input-group input-group-sm">
-                        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
                         <input type="text" name="busca" class="form-control" value="{{ request('busca') }}" placeholder="Digite para filtrar...">
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold">Status / Etapa</label>
+                <div class="col-xl-3 col-lg-3 col-md-5 col-sm-12">
+                    <label class="form-label small fw-bold mb-1">Status / Etapa</label>
                     <select name="status" class="form-select form-select-sm">
                         <option value="">Todos os status</option>
                         <option value="confirmada" {{ request('status') === 'confirmada' ? 'selected' : '' }}>1ª Etapa: Pendente Recepção/Ciência</option>
@@ -114,16 +121,16 @@
                         <option value="cancelada" {{ request('status') === 'cancelada' ? 'selected' : '' }}>Cancelada</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold">Data Início</label>
+                <div class="col-xl-2 col-lg-2 col-md-3 col-6">
+                    <label class="form-label small fw-bold mb-1">Data Início</label>
                     <input type="date" name="data_inicio" class="form-control form-control-sm" value="{{ request('data_inicio') }}">
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold">Data Fim</label>
+                <div class="col-xl-2 col-lg-2 col-md-2 col-6">
+                    <label class="form-label small fw-bold mb-1">Data Fim</label>
                     <input type="date" name="data_fim" class="form-control form-control-sm" value="{{ request('data_fim') }}">
                 </div>
-                <div class="col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary btn-sm w-100 shadow-sm">
+                <div class="col-xl-1 col-lg-1 col-md-2 col-12 d-flex gap-1">
+                    <button type="submit" class="btn btn-primary btn-sm w-100 shadow-sm" title="Filtrar">
                         <i class="fa-solid fa-filter me-1"></i> Filtrar
                     </button>
                     <a href="{{ route('admin.desfiliacoes.index') }}" class="btn btn-outline-secondary btn-sm" title="Limpar Filtros">

@@ -4,17 +4,17 @@
 
 @section('content')
 <div class="container-fluid">
-    <!-- Cabeçalho -->
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <div>
-            <h1 class="h3 text-gray-800 mb-0">Detalhes do Ofício Coletivo #{{ $protocolo->id }}</h1>
-            <p class="text-muted small mb-0">Referência: <strong>{{ $protocolo->referencia_documento ?? 'N/A' }}</strong></p>
+    <!-- Barra Superior de Ações -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-muted small fw-semibold">Referência Oficial:</span>
+            <span class="badge bg-white text-dark border px-2 py-1 shadow-sm fs-6">{{ $protocolo->referencia_documento ?? 'Não informada' }}</span>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('protocolos.oficios.index') }}" class="btn btn-outline-secondary">
+        <div class="d-flex gap-2 ms-auto">
+            <a href="{{ route('protocolos.oficios.index') }}" class="btn btn-sm btn-outline-secondary shadow-sm">
                 <i class="fa-solid fa-arrow-left me-1"></i> Voltar
             </a>
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modal-novo-lote">
+            <button type="button" class="btn btn-sm btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#modal-novo-lote">
                 <i class="fa-solid fa-paper-plane me-1"></i> Disparar Novo Lote de Empresas
             </button>
         </div>
@@ -96,9 +96,9 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-3">
         <!-- Dados Principais do Ofício -->
-        <div class="col-lg-4 mb-4">
+        <div class="col-xxl-3 col-xl-4 col-12 mb-3">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-white py-3">
                     <h6 class="m-0 font-weight-bold text-primary">
@@ -106,10 +106,10 @@
                     </h6>
                 </div>
                 <div class="card-body">
-                    <p class="mb-2"><strong>Assunto:</strong><br>{{ $protocolo->assunto }}</p>
-                    <p class="mb-2"><strong>Referência:</strong><br>{{ $protocolo->referencia_documento ?? 'Não informada' }}</p>
-                    <p class="mb-2"><strong>Criado em:</strong><br>{{ $protocolo->created_at->format('d/m/Y H:i:s') }}</p>
-                    <p class="mb-2"><strong>Criado por:</strong><br>{{ $protocolo->usuario->name ?? 'Sistema' }}</p>
+                    <p class="mb-2"><strong>Assunto:</strong><br><span class="text-secondary small">{{ $protocolo->assunto }}</span></p>
+                    <p class="mb-2"><strong>Referência:</strong><br><span class="text-secondary small">{{ $protocolo->referencia_documento ?? 'Não informada' }}</span></p>
+                    <p class="mb-2"><strong>Criado em:</strong><br><span class="text-secondary small">{{ $protocolo->created_at->format('d/m/Y H:i:s') }}</span></p>
+                    <p class="mb-2"><strong>Criado por:</strong><br><span class="text-secondary small">{{ $protocolo->usuario->name ?? 'Sistema' }}</span></p>
                     <p class="mb-3">
                         <strong>Status Geral:</strong><br>
                         @switch($protocolo->status)
@@ -134,7 +134,7 @@
                             @foreach($protocolo->anexos as $anexo)
                                 <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
                                     <span class="text-truncate me-2" style="max-width: 200px;" title="{{ $anexo->nome_original }}">{{ $anexo->nome_original }}</span>
-                                    <a href="{{ route('protocolos.anexos.download', [$protocolo->id, $anexo->id]) }}" class="btn btn-sm btn-outline-secondary">
+                                    <a href="{{ route('protocolos.anexos.download', [$protocolo->id, $anexo->id]) }}" class="btn btn-sm btn-outline-secondary shadow-sm">
                                         <i class="fa-solid fa-download"></i>
                                     </a>
                                 </li>
@@ -146,7 +146,7 @@
         </div>
 
         <!-- Timeline de Destinatários e Envios -->
-        <div class="col-lg-8 mb-4">
+        <div class="col-xxl-9 col-xl-8 col-12 mb-3">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">
@@ -155,13 +155,13 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.88rem;">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Empresa</th>
-                                    <th>Contato Destinatário</th>
-                                    <th>Status Envio AR-Online</th>
-                                    <th class="text-end">Comprovantes</th>
+                                    <th style="min-width: 170px;">Empresa</th>
+                                    <th style="min-width: 150px;">Contato Destinatário</th>
+                                    <th style="min-width: 120px; width: 130px;">Status AR-Online</th>
+                                    <th class="text-end" style="min-width: 140px; width: 160px;">Comprovantes</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -170,13 +170,13 @@
                                         $envio = $dest->envios->first();
                                     @endphp
                                     <tr>
-                                        <td>
+                                        <td style="max-width: 250px; word-break: break-word;">
                                             <strong>{{ $dest->empresa->razao_social ?? 'Sem Empresa' }}</strong>
                                             @if($dest->empresa?->cidade)
                                                 <br><small class="text-muted">{{ $dest->empresa->cidade }} - {{ $dest->empresa->estado }}</small>
                                             @endif
                                         </td>
-                                        <td>
+                                        <td style="max-width: 220px; word-break: break-word;">
                                             <strong>{{ $dest->nome }}</strong>
                                             <br><small class="text-muted"><i class="fa-regular fa-envelope me-1"></i>{{ $dest->email }}</small>
                                         </td>
@@ -198,19 +198,29 @@
                                                     @default
                                                         <span class="badge bg-secondary">{{ ucfirst($envio->status) }}</span>
                                                 @endswitch
-                                                <br><small class="text-muted">ID: {{ substr($envio->id_email_externo, 0, 18) }}...</small>
+                                                @if($envio->id_email_externo)
+                                                    <br><small class="text-muted" title="{{ $envio->id_email_externo }}">ID: {{ substr($envio->id_email_externo, 0, 14) }}...</small>
+                                                @endif
                                             @else
                                                 <span class="badge bg-secondary">Pendente</span>
                                             @endif
                                         </td>
                                         <td class="text-end">
                                             @if($envio && $envio->id_email_externo)
-                                                <a href="{{ route('protocolos.comprovante', [$protocolo->id, $envio->id]) }}" class="btn btn-sm btn-outline-danger me-1" title="Baixar Comprovante PDF">
-                                                    <i class="fa-solid fa-file-pdf"></i> Comprovante
-                                                </a>
-                                                <a href="{{ route('protocolos.laudo', [$protocolo->id, $envio->id]) }}" class="btn btn-sm btn-outline-info" title="Laudo Pericial">
-                                                    <i class="fa-solid fa-certificate"></i> Laudo
-                                                </a>
+                                                <div class="d-inline-flex flex-wrap gap-1 justify-content-end">
+                                                    <a href="{{ route('protocolos.comprovante', [$protocolo->id, $envio->id]) }}" 
+                                                       class="btn btn-sm btn-outline-danger px-2 py-1 text-nowrap shadow-sm" 
+                                                       style="font-size: 0.75rem;" 
+                                                       title="Baixar Comprovante PDF">
+                                                        <i class="fa-solid fa-file-pdf me-1"></i>Comprovante
+                                                    </a>
+                                                    <a href="{{ route('protocolos.laudo', [$protocolo->id, $envio->id]) }}" 
+                                                       class="btn btn-sm btn-outline-info px-2 py-1 text-nowrap shadow-sm" 
+                                                       style="font-size: 0.75rem;" 
+                                                       title="Baixar Laudo Pericial">
+                                                        <i class="fa-solid fa-certificate me-1"></i>Laudo
+                                                    </a>
+                                                </div>
                                             @else
                                                 <span class="text-muted small">-</span>
                                             @endif
