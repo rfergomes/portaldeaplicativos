@@ -145,6 +145,8 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::post('/protocolos/oficios', [OficioColetivoController::class, 'store'])->name('protocolos.oficios.store')->middleware('can:protocolos.criar');
     Route::get('/protocolos/oficios/api/empresas-filtradas', [OficioColetivoController::class, 'getEmpresasFiltradas'])->name('protocolos.oficios.api.empresas')->middleware('can:protocolos.visualizar');
     Route::get('/protocolos/oficios/{protocolo}', [OficioColetivoController::class, 'show'])->name('protocolos.oficios.show')->middleware('can:protocolos.visualizar');
+    Route::get('/protocolos/oficios/{protocolo}/progresso', [OficioColetivoController::class, 'statusProgresso'])->name('protocolos.oficios.progresso')->middleware('can:protocolos.visualizar');
+    Route::post('/protocolos/oficios/{protocolo}/processar-fila', [OficioColetivoController::class, 'processarFilaAgora'])->name('protocolos.oficios.processarFila')->middleware('can:protocolos.criar');
     Route::post('/protocolos/oficios/{protocolo}/disparar-lote', [OficioColetivoController::class, 'dispararLote'])->name('protocolos.oficios.dispararLote')->middleware('can:protocolos.criar');
 
     // Protocolos e AR-Online

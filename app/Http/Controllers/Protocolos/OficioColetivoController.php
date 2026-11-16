@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Protocolos;
 
 use App\Domain\Protocolos\Services\ProtocoloDispatcher;
 use App\Http\Controllers\Controller;
+use App\Jobs\EnviarOficioColetivoJob;
 use App\Models\Cliente;
 use App\Models\Empresa;
 use App\Models\Protocolo;
 use App\Models\ProtocoloAnexo;
 use App\Models\ProtocoloDestinatario;
+use App\Models\ProtocoloEnvio;
 use App\Models\Regiao;
 use App\Models\TipoProtocolo;
 use Carbon\Carbon;
@@ -232,6 +234,7 @@ class OficioColetivoController extends Controller
             return back()->withInput()->withErrors(['contatos' => 'Nenhum contato válido selecionado.']);
         }
 
+        $protocoloId = null;
         DB::beginTransaction();
 
         try {
@@ -247,8 +250,10 @@ class OficioColetivoController extends Controller
                 'referencia_documento' => $data['referencia_documento'] ?? null,
             ]);
 
+            $protocoloId = $protocolo->id;
+
             foreach ($clientes as $cliente) {
-                ProtocoloDestinatario::create([
+                $dest = ProtocoloDestinatario::create([
                     'protocolo_id' => $protocolo->id,
                     'empresa_id' => $cliente->empresa_id,
                     'cliente_id' => $cliente->id,
@@ -256,6 +261,13 @@ class OficioColetivoController extends Controller
                     'email' => strtolower(trim($cliente->email)),
                     'telefone' => $cliente->telefone ?? null,
                     'cpf_cnpj' => $cliente->documento ?? null,
+                ]);
+
+                ProtocoloEnvio::create([
+                    'protocolo_id' => $protocolo->id,
+                    'destinatario_id' => $dest->id,
+                    'canal' => 'email',
+                    'status' => 'pendente',
                 ]);
             }
 
@@ -274,21 +286,20 @@ class OficioColetivoController extends Controller
                 }
             }
 
-            $protocolo->load(['destinatarios', 'anexos']);
-
-            $this->dispatcher->dispatch($protocolo);
-
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
 
             return back()
                 ->withInput()
-                ->withErrors(['geral' => 'Falha ao disparar Ofício Coletivo: ' . $e->getMessage()]);
+                ->withErrors(['geral' => 'Falha ao registrar Ofício Coletivo: ' . $e->getMessage()]);
         }
 
-        return redirect()->route('protocolos.oficios.show', $protocolo->id)
-            ->with('success', "Ofício Coletivo disparado com sucesso para {$clientes->count()} destinatários.");
+        // Despacha o Job para a fila após o commit no banco
+        EnviarOficioColetivoJob::dispatch($protocoloId);
+
+        return redirect()->route('protocolos.oficios.show', $protocoloId)
+            ->with('success', "Ofício Coletivo registrado com sucesso! O envio para os {$clientes->count()} destinatários foi enfileirado e está sendo processado em segundo plano.");
     }
 
     public function show(Protocolo $protocolo): View|RedirectResponse
@@ -337,10 +348,10 @@ class OficioColetivoController extends Controller
 
         $clientes = Cliente::with('empresa')->whereIn('id', $novosIds)->get();
 
+        $destinatarioIds = [];
         DB::beginTransaction();
 
         try {
-            $novosDestinatarios = [];
             foreach ($clientes as $cliente) {
                 $dest = ProtocoloDestinatario::create([
                     'protocolo_id' => $protocolo->id,
@@ -351,22 +362,67 @@ class OficioColetivoController extends Controller
                     'telefone' => $cliente->telefone ?? null,
                     'cpf_cnpj' => $cliente->documento ?? null,
                 ]);
-                $novosDestinatarios[] = $dest;
+
+                ProtocoloEnvio::create([
+                    'protocolo_id' => $protocolo->id,
+                    'destinatario_id' => $dest->id,
+                    'canal' => 'email',
+                    'status' => 'pendente',
+                ]);
+
+                $destinatarioIds[] = $dest->id;
             }
-
-            // Recarrega destinatários e anexos para o dispatcher
-            $protocolo->load(['anexos']);
-            $protocolo->setRelation('destinatarios', collect($novosDestinatarios));
-
-            $this->dispatcher->dispatch($protocolo);
 
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Falha ao disparar novo lote do Ofício: ' . $e->getMessage());
+            return back()->with('error', 'Falha ao adicionar novo lote do Ofício: ' . $e->getMessage());
         }
 
-        return back()->with('success', "Novo lote disparado com sucesso para " . count($novosDestinatarios) . " destinatário(s).");
+        // Despacha o Job para a fila
+        EnviarOficioColetivoJob::dispatch($protocolo->id, $destinatarioIds);
+
+        return back()->with('success', "Novo lote com " . count($destinatarioIds) . " destinatário(s) enfileirado para envio em segundo plano.");
+    }
+
+    /**
+     * Retorna o progresso atual dos envios do ofício em JSON.
+     */
+    public function statusProgresso(Protocolo $protocolo): JsonResponse
+    {
+        $total = $protocolo->destinatarios()->count();
+        $envios = $protocolo->envios()->get();
+
+        $enviados = $envios->whereIn('status', ['enviado', 'entregue', 'lido', 'concluido'])->count();
+        $falhas = $envios->where('status', 'falha')->count();
+        $pendentes = $envios->where('status', 'pendente')->count() + max(0, $total - $envios->count());
+
+        $processados = $enviados + $falhas;
+        $porcentagem = $total > 0 ? (int) round(($processados / $total) * 100) : 100;
+
+        return response()->json([
+            'total' => $total,
+            'enviados' => $enviados,
+            'falhas' => $falhas,
+            'pendentes' => $pendentes,
+            'porcentagem' => min(100, $porcentagem),
+            'concluido' => ($pendentes === 0),
+            'status_geral' => $protocolo->status,
+        ]);
+    }
+
+    /**
+     * Dispara manualmente o processamento síncrono caso o worker não esteja rodando.
+     */
+    public function processarFilaAgora(Protocolo $protocolo): RedirectResponse
+    {
+        try {
+            EnviarOficioColetivoJob::dispatchSync($protocolo->id);
+
+            return back()->with('success', 'Fila de envios processada com sucesso.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Erro ao processar fila: ' . $e->getMessage());
+        }
     }
 }

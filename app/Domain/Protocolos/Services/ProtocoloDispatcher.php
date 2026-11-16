@@ -19,6 +19,35 @@ class ProtocoloDispatcher
     ) {
     }
 
+    public function getHttpClient(): ArOnlineHttpClient
+    {
+        return $this->httpClient;
+    }
+
+    /**
+     * Pré-carrega e codifica anexos em Base64 uma única vez.
+     * Retorna array no formato esperado pela API AR-Online ou null.
+     */
+    public function prepararAnexosPayload(Protocolo $protocolo): ?array
+    {
+        if (!$protocolo->anexos || $protocolo->anexos->isEmpty()) {
+            return null;
+        }
+
+        $attachmentsPayload = [];
+        foreach ($protocolo->anexos as $anexo) {
+            $content = \Illuminate\Support\Facades\Storage::disk('local')->get($anexo->caminho_armazenado);
+            if ($content !== null) {
+                $attachmentsPayload[] = [
+                    'name' => $anexo->nome_original,
+                    'base64' => base64_encode($content),
+                ];
+            }
+        }
+
+        return !empty($attachmentsPayload) ? $attachmentsPayload : null;
+    }
+
     /**
      * Envia o protocolo para TODOS os destinatários (e-mail e, se válido, WhatsApp).
      * Retorna o número de envios realizados com sucesso.
@@ -28,10 +57,12 @@ class ProtocoloDispatcher
         $token = $this->resolveToken($protocolo);
         $this->httpClient->setToken($token);
 
+        $attachmentsPayload = $this->prepararAnexosPayload($protocolo);
+
         $enviados = 0;
 
         foreach ($protocolo->destinatarios as $destinatario) {
-            $enviados += $this->enviarParaDestinatario($protocolo, $destinatario, $token);
+            $enviados += $this->enviarParaDestinatario($protocolo, $destinatario, $token, $attachmentsPayload);
         }
 
         // Atualiza status geral do protocolo
@@ -44,8 +75,12 @@ class ProtocoloDispatcher
         return $enviados;
     }
 
-    private function enviarParaDestinatario(Protocolo $protocolo, ProtocoloDestinatario $destinatario, ?string $token): int
-    {
+    public function enviarParaDestinatario(
+        Protocolo $protocolo,
+        ProtocoloDestinatario $destinatario,
+        ?string $token = null,
+        ?array $attachmentsPayload = null
+    ): int {
         $enviados = 0;
 
         // ---- Verificação de Bounce Prévia ----
@@ -57,42 +92,26 @@ class ProtocoloDispatcher
             $bounceInfo = $cliente->email_bounce_code ? " (Código: {$cliente->email_bounce_code})" : "";
             Log::warning("ProtocoloDispatcher: Envio cancelado para {$destinatario->email} devido a bounce prévio{$bounceInfo}");
 
-            ProtocoloEnvio::create([
-                'protocolo_id' => $protocolo->id,
-                'destinatario_id' => $destinatario->id,
-                'canal' => 'email',
-                'status' => 'falha',
-                'ultima_resposta' => "Envio cancelado: E-mail marcado como bounce prévio{$bounceInfo}",
-                'token_usado' => $token,
-            ]);
+            ProtocoloEnvio::updateOrCreate(
+                [
+                    'protocolo_id' => $protocolo->id,
+                    'destinatario_id' => $destinatario->id,
+                ],
+                [
+                    'canal' => 'email',
+                    'status' => 'falha',
+                    'ultima_resposta' => "Envio cancelado: E-mail marcado como bounce prévio{$bounceInfo}",
+                    'token_usado' => $token,
+                ]
+            );
 
             return 0;
         }
 
         // ---- Envio por E-mail ----
         try {
-            $whatsappPayload = null;
-
-            // TODO: API da AR-Online está com bug ao receber array de whatsapp/sms em nulo/branco
-            // Adiciona whatsapp ao payload se o número for válido
-            // if ($destinatario->isCelularValido()) {
-            //     $whatsappPayload = [
-            //         'number' => $destinatario->telefoneSanitizado(),
-            //     ];
-            // }
-
-            $attachmentsPayload = null;
-            if ($protocolo->anexos && $protocolo->anexos->isNotEmpty()) {
-                $attachmentsPayload = [];
-                foreach ($protocolo->anexos as $anexo) {
-                    $content = \Illuminate\Support\Facades\Storage::disk('local')->get($anexo->caminho_armazenado);
-                    if ($content !== null) {
-                        $attachmentsPayload[] = [
-                            'name' => $anexo->nome_original,
-                            'base64' => base64_encode($content)
-                        ];
-                    }
-                }
+            if ($attachmentsPayload === null) {
+                $attachmentsPayload = $this->prepararAnexosPayload($protocolo);
             }
 
             $assuntoMsg = $protocolo->assunto;
@@ -117,20 +136,24 @@ class ProtocoloDispatcher
                 emailTo: $destinatario->email,
                 attachments: $attachmentsPayload,
                 customId: (string) $protocolo->id,
-                // whatsapp: $whatsappPayload, // Disabled due to API bug
             );
 
             $idEmail = $this->httpClient->send($payload);
 
-            ProtocoloEnvio::create([
-                'protocolo_id' => $protocolo->id,
-                'destinatario_id' => $destinatario->id,
-                'canal' => 'email',
-                'id_email_externo' => $idEmail,
-                'status' => 'enviado',
-                'enviado_em' => now(),
-                'token_usado' => $token,
-            ]);
+            ProtocoloEnvio::updateOrCreate(
+                [
+                    'protocolo_id' => $protocolo->id,
+                    'destinatario_id' => $destinatario->id,
+                ],
+                [
+                    'canal' => 'email',
+                    'id_email_externo' => $idEmail,
+                    'status' => 'enviado',
+                    'enviado_em' => now(),
+                    'token_usado' => $token,
+                    'ultima_resposta' => 'Enviado com sucesso.',
+                ]
+            );
 
             $enviados++;
         } catch (\Throwable $e) {
@@ -140,14 +163,18 @@ class ProtocoloDispatcher
                 'erro' => $e->getMessage(),
             ]);
 
-            ProtocoloEnvio::create([
-                'protocolo_id' => $protocolo->id,
-                'destinatario_id' => $destinatario->id,
-                'canal' => 'email',
-                'status' => 'falha',
-                'ultima_resposta' => $e->getMessage(),
-                'token_usado' => $token,
-            ]);
+            ProtocoloEnvio::updateOrCreate(
+                [
+                    'protocolo_id' => $protocolo->id,
+                    'destinatario_id' => $destinatario->id,
+                ],
+                [
+                    'canal' => 'email',
+                    'status' => 'falha',
+                    'ultima_resposta' => $e->getMessage(),
+                    'token_usado' => $token,
+                ]
+            );
         }
 
         return $enviados;
@@ -305,7 +332,7 @@ class ProtocoloDispatcher
      * 2. Token do usuário autenticado no momento
      * 3. Token do .env como fallback
      */
-    private function resolveToken(Protocolo $protocolo): ?string
+    public function resolveToken(Protocolo $protocolo): ?string
     {
         // Prioridade 1: O Token do Usuário Rementente (dono do protocolo)
         // Se a FK `token_depto_id` estiver cheia, ele pucha o token do Departamento.

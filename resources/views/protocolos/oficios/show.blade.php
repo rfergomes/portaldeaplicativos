@@ -34,6 +34,68 @@
         </div>
     @endif
 
+    @php
+        $totalDestinatarios = $protocolo->destinatarios->count();
+        $enviosColecao = $protocolo->envios;
+        $totalSucessoEnvio = $enviosColecao->whereIn('status', ['enviado', 'entregue', 'lido', 'concluido'])->count();
+        $totalFalhaEnvio = $enviosColecao->where('status', 'falha')->count();
+        $totalPendenteEnvio = $enviosColecao->where('status', 'pendente')->count() + max(0, $totalDestinatarios - $enviosColecao->count());
+        $totalProcessados = $totalSucessoEnvio + $totalFalhaEnvio;
+        $porcentagemInicial = $totalDestinatarios > 0 ? (int) round(($totalProcessados / $totalDestinatarios) * 100) : 100;
+    @endphp
+
+    <!-- Card de Progresso do Envio Coletivo -->
+    <div class="card shadow-sm border-0 mb-4" id="card-progresso-envio">
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div>
+                    <h6 class="font-weight-bold text-dark mb-0">
+                        <i class="fa-solid fa-paper-plane me-2 text-primary"></i> Progresso do Envio em Massa
+                        <span id="badge-status-fila" class="badge {{ $totalPendenteEnvio > 0 ? 'bg-warning text-dark' : 'bg-success' }} ms-2">
+                            {{ $totalPendenteEnvio > 0 ? 'Processando Fila em Segundo Plano' : 'Todos os Envios Processados' }}
+                        </span>
+                    </h6>
+                    <small class="text-muted" id="texto-status-fila">
+                        @if($totalPendenteEnvio > 0)
+                            Os e-mails estão sendo enviados gradualmente em segundo plano para evitar bloqueios. A página atualiza o status automaticamente.
+                        @else
+                            Disparo em massa concluído com sucesso.
+                        @endif
+                    </small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    @if($totalPendenteEnvio > 0)
+                        <form action="{{ route('protocolos.oficios.processarFila', $protocolo->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Deseja forçar o envio imediato agora? Pode levar alguns instantes.');">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Processar pendentes agora">
+                                <i class="fa-solid fa-bolt me-1"></i> Forçar Disparo Imediato
+                            </button>
+                        </form>
+                    @endif
+                    <span class="fs-5 fw-bold text-primary" id="progresso-percentual">{{ $porcentagemInicial }}%</span>
+                </div>
+            </div>
+
+            <!-- Barra de Progresso -->
+            <div class="progress mb-3" style="height: 14px;">
+                <div class="progress-bar {{ $totalPendenteEnvio > 0 ? 'progress-bar-striped progress-bar-animated bg-primary' : 'bg-success' }}" 
+                     role="progressbar" 
+                     id="barra-progresso" 
+                     style="width: {{ $porcentagemInicial }}%;" 
+                     aria-valuenow="{{ $porcentagemInicial }}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100"></div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-4 small">
+                <div><i class="fa-solid fa-users text-muted me-1"></i> Total: <strong id="contador-total">{{ $totalDestinatarios }}</strong></div>
+                <div><i class="fa-solid fa-circle-check text-success me-1"></i> Enviados com Sucesso: <strong id="contador-enviados" class="text-success">{{ $totalSucessoEnvio }}</strong></div>
+                <div><i class="fa-solid fa-circle-xmark text-danger me-1"></i> Falhas: <strong id="contador-falhas" class="text-danger">{{ $totalFalhaEnvio }}</strong></div>
+                <div><i class="fa-solid fa-clock text-warning me-1"></i> Pendentes na Fila: <strong id="contador-pendentes" class="text-warning">{{ $totalPendenteEnvio }}</strong></div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Dados Principais do Ofício -->
         <div class="col-lg-4 mb-4">
@@ -322,6 +384,54 @@ document.addEventListener('DOMContentLoaded', function () {
     filtroTermo.addEventListener('input', carregarEmpresasModal);
 
     carregarEmpresasModal();
+
+    // Polling do Progresso da Fila em Segundo Plano
+    const pendentesIniciais = {{ $totalPendenteEnvio }};
+    if (pendentesIniciais > 0) {
+        const urlProgresso = "{{ route('protocolos.oficios.progresso', $protocolo->id) }}";
+        const intervalId = setInterval(function () {
+            fetch(urlProgresso)
+                .then(res => res.json())
+                .then(data => {
+                    const elPercentual = document.getElementById('progresso-percentual');
+                    const barra = document.getElementById('barra-progresso');
+                    const elTotal = document.getElementById('contador-total');
+                    const elEnviados = document.getElementById('contador-enviados');
+                    const elFalhas = document.getElementById('contador-falhas');
+                    const elPendentes = document.getElementById('contador-pendentes');
+
+                    if (elPercentual) elPercentual.textContent = `${data.porcentagem}%`;
+                    if (barra) {
+                        barra.style.width = `${data.porcentagem}%`;
+                        barra.setAttribute('aria-valuenow', data.porcentagem);
+                    }
+                    if (elTotal) elTotal.textContent = data.total;
+                    if (elEnviados) elEnviados.textContent = data.enviados;
+                    if (elFalhas) elFalhas.textContent = data.falhas;
+                    if (elPendentes) elPendentes.textContent = data.pendentes;
+
+                    if (data.concluido) {
+                        clearInterval(intervalId);
+                        if (barra) {
+                            barra.classList.remove('progress-bar-striped', 'progress-bar-animated', 'bg-primary');
+                            barra.classList.add('bg-success');
+                        }
+                        const badgeStatus = document.getElementById('badge-status-fila');
+                        if (badgeStatus) {
+                            badgeStatus.classList.remove('bg-warning', 'text-dark');
+                            badgeStatus.classList.add('bg-success');
+                            badgeStatus.textContent = 'Todos os Envios Processados';
+                        }
+                        const textoStatus = document.getElementById('texto-status-fila');
+                        if (textoStatus) {
+                            textoStatus.textContent = 'Disparo concluído! Recarregando lista em instantes...';
+                        }
+                        setTimeout(() => window.location.reload(), 2500);
+                    }
+                })
+                .catch(err => console.error('Erro ao verificar status da fila:', err));
+        }, 3000);
+    }
 });
 </script>
 @endpush

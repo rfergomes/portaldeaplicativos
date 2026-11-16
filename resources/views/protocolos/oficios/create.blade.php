@@ -282,6 +282,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    const formOficio = document.getElementById('form-oficio-coletivo');
+    const btnDisparar = document.getElementById('btn-disparar');
+    if (formOficio && btnDisparar) {
+        formOficio.addEventListener('submit', function () {
+            btnDisparar.disabled = true;
+            btnDisparar.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> Enfileirando Ofício...';
+        });
+    }
+
     carregarEmpresas();
 });
 </script>

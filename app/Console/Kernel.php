@@ -20,6 +20,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('socios-folha:enviar-lembretes')->dailyAt('09:00');
         $schedule->command('convencoes:enviar-lembretes-lista-nominal')->dailyAt('09:15');
         $schedule->command('desfiliacao:limpar-links-expirados --dias=30')->weeklyOn(0, '03:00');
+
+        // Processamento contínuo de filas em segundo plano a cada minuto (fallback caso Supervisor não esteja ativo)
+        $schedule->command('queue:work --stop-when-empty --max-time=55')->everyMinute()->withoutOverlapping();
     }
 
     /**
