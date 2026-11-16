@@ -65,12 +65,12 @@
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     @if($totalPendenteEnvio > 0)
-                        <form action="{{ route('protocolos.oficios.processarFila', $protocolo->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Deseja forçar o envio imediato agora? Pode levar alguns instantes.');">
-                            @csrf
-                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Processar pendentes agora">
-                                <i class="fa-solid fa-bolt me-1"></i> Forçar Disparo Imediato
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-sm btn-primary" id="btn-iniciar-fracionado">
+                            <i class="fa-solid fa-play me-1"></i> Disparar em Lotes
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary d-none" id="btn-pausar-fracionado">
+                            <i class="fa-solid fa-pause me-1"></i> Pausar
+                        </button>
                     @endif
                     <span class="fs-5 fw-bold text-primary" id="progresso-percentual">{{ $porcentagemInicial }}%</span>
                 </div>
@@ -385,52 +385,121 @@ document.addEventListener('DOMContentLoaded', function () {
 
     carregarEmpresasModal();
 
-    // Polling do Progresso da Fila em Segundo Plano
+    // Disparador Fracionado em Micro-Lotes (Totalmente imune a erro 504 no Nginx)
     const pendentesIniciais = {{ $totalPendenteEnvio }};
+    const urlFracionado = "{{ route('protocolos.oficios.dispararFracionado', $protocolo->id) }}";
+    const csrfToken = "{{ csrf_token() }}";
+    let isPausado = false;
+    let isProcessando = false;
+
+    const btnIniciar = document.getElementById('btn-iniciar-fracionado');
+    const btnPausar = document.getElementById('btn-pausar-fracionado');
+    const badgeStatus = document.getElementById('badge-status-fila');
+    const textoStatus = document.getElementById('texto-status-fila');
+    const barra = document.getElementById('barra-progresso');
+
+    function executarProximoLote() {
+        if (isPausado) {
+            isProcessando = false;
+            if (textoStatus) textoStatus.textContent = 'Disparo pausado. Clique em Continuar Disparo quando desejar.';
+            if (badgeStatus) {
+                badgeStatus.className = 'badge bg-secondary ms-2';
+                badgeStatus.textContent = 'Pausado';
+            }
+            if (btnIniciar) {
+                btnIniciar.classList.remove('d-none');
+                btnIniciar.innerHTML = '<i class="fa-solid fa-play me-1"></i> Continuar Disparo';
+            }
+            if (btnPausar) btnPausar.classList.add('d-none');
+            return;
+        }
+
+        isProcessando = true;
+        if (btnIniciar) btnIniciar.classList.add('d-none');
+        if (btnPausar) btnPausar.classList.remove('d-none');
+
+        if (badgeStatus) {
+            badgeStatus.className = 'badge bg-warning text-dark ms-2';
+            badgeStatus.textContent = 'Enviando Lote...';
+        }
+
+        if (textoStatus) {
+            textoStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1 text-primary"></i> Disparando lote de 10 contatos pela AR-Online... (Aguarde, não feche esta página)';
+        }
+
+        fetch(urlFracionado, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ limite: 10 })
+        })
+        .then(res => res.json())
+        .then(data => {
+            const elPercentual = document.getElementById('progresso-percentual');
+            const elTotal = document.getElementById('contador-total');
+            const elEnviados = document.getElementById('contador-enviados');
+            const elFalhas = document.getElementById('contador-falhas');
+            const elPendentes = document.getElementById('contador-pendentes');
+
+            if (elPercentual) elPercentual.textContent = `${data.porcentagem}%`;
+            if (barra) {
+                barra.style.width = `${data.porcentagem}%`;
+                barra.setAttribute('aria-valuenow', data.porcentagem);
+            }
+            if (elTotal) elTotal.textContent = data.total;
+            if (elEnviados) elEnviados.textContent = data.enviados;
+            if (elFalhas) elFalhas.textContent = data.falhas;
+            if (elPendentes) elPendentes.textContent = data.restantes;
+
+            if (data.concluido || data.restantes === 0) {
+                isProcessando = false;
+                if (barra) {
+                    barra.classList.remove('progress-bar-striped', 'progress-bar-animated', 'bg-primary');
+                    barra.classList.add('bg-success');
+                }
+                if (badgeStatus) {
+                    badgeStatus.className = 'badge bg-success ms-2';
+                    badgeStatus.textContent = 'Envios Concluídos';
+                }
+                if (textoStatus) {
+                    textoStatus.textContent = 'Disparo finalizado com sucesso! Recarregando a página...';
+                }
+                if (btnIniciar) btnIniciar.classList.add('d-none');
+                if (btnPausar) btnPausar.classList.add('d-none');
+                setTimeout(() => window.location.reload(), 2000);
+            } else {
+                // Executa o próximo lote com 300ms de intervalo
+                setTimeout(executarProximoLote, 300);
+            }
+        })
+        .catch(err => {
+            console.error('Instabilidade temporária no lote:', err);
+            if (textoStatus) {
+                textoStatus.textContent = 'Pausa momentânea de rede. Retomando próximo lote em 3 segundos...';
+            }
+            setTimeout(executarProximoLote, 3000);
+        });
+    }
+
+    if (btnIniciar) {
+        btnIniciar.addEventListener('click', function () {
+            isPausado = false;
+            executarProximoLote();
+        });
+    }
+
+    if (btnPausar) {
+        btnPausar.addEventListener('click', function () {
+            isPausado = true;
+        });
+    }
+
+    // Se houver contatos pendentes ao carregar a tela, dispara automaticamente em lotes
     if (pendentesIniciais > 0) {
-        const urlProgresso = "{{ route('protocolos.oficios.progresso', $protocolo->id) }}";
-        const intervalId = setInterval(function () {
-            fetch(urlProgresso)
-                .then(res => res.json())
-                .then(data => {
-                    const elPercentual = document.getElementById('progresso-percentual');
-                    const barra = document.getElementById('barra-progresso');
-                    const elTotal = document.getElementById('contador-total');
-                    const elEnviados = document.getElementById('contador-enviados');
-                    const elFalhas = document.getElementById('contador-falhas');
-                    const elPendentes = document.getElementById('contador-pendentes');
-
-                    if (elPercentual) elPercentual.textContent = `${data.porcentagem}%`;
-                    if (barra) {
-                        barra.style.width = `${data.porcentagem}%`;
-                        barra.setAttribute('aria-valuenow', data.porcentagem);
-                    }
-                    if (elTotal) elTotal.textContent = data.total;
-                    if (elEnviados) elEnviados.textContent = data.enviados;
-                    if (elFalhas) elFalhas.textContent = data.falhas;
-                    if (elPendentes) elPendentes.textContent = data.pendentes;
-
-                    if (data.concluido) {
-                        clearInterval(intervalId);
-                        if (barra) {
-                            barra.classList.remove('progress-bar-striped', 'progress-bar-animated', 'bg-primary');
-                            barra.classList.add('bg-success');
-                        }
-                        const badgeStatus = document.getElementById('badge-status-fila');
-                        if (badgeStatus) {
-                            badgeStatus.classList.remove('bg-warning', 'text-dark');
-                            badgeStatus.classList.add('bg-success');
-                            badgeStatus.textContent = 'Todos os Envios Processados';
-                        }
-                        const textoStatus = document.getElementById('texto-status-fila');
-                        if (textoStatus) {
-                            textoStatus.textContent = 'Disparo concluído! Recarregando lista em instantes...';
-                        }
-                        setTimeout(() => window.location.reload(), 2500);
-                    }
-                })
-                .catch(err => console.error('Erro ao verificar status da fila:', err));
-        }, 3000);
+        executarProximoLote();
     }
 });
 </script>

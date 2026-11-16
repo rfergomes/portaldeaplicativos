@@ -295,11 +295,13 @@ class OficioColetivoController extends Controller
                 ->withErrors(['geral' => 'Falha ao registrar Ofício Coletivo: ' . $e->getMessage()]);
         }
 
-        // Despacha o Job para a fila após o commit no banco
-        EnviarOficioColetivoJob::dispatch($protocoloId);
+        // Despacha o Job para a fila apenas se a fila não for 'sync' (evita travar requisição HTTP caso worker não esteja ativo)
+        if (config('queue.default') !== 'sync') {
+            EnviarOficioColetivoJob::dispatch($protocoloId);
+        }
 
         return redirect()->route('protocolos.oficios.show', $protocoloId)
-            ->with('success', "Ofício Coletivo registrado com sucesso! O envio para os {$clientes->count()} destinatários foi enfileirado e está sendo processado em segundo plano.");
+            ->with('success', "Ofício Coletivo registrado com sucesso! O envio para os {$clientes->count()} destinatários foi preparado.");
     }
 
     public function show(Protocolo $protocolo): View|RedirectResponse
@@ -380,10 +382,97 @@ class OficioColetivoController extends Controller
             return back()->with('error', 'Falha ao adicionar novo lote do Ofício: ' . $e->getMessage());
         }
 
-        // Despacha o Job para a fila
-        EnviarOficioColetivoJob::dispatch($protocolo->id, $destinatarioIds);
+        // Despacha o Job para a fila apenas se a fila não for 'sync'
+        if (config('queue.default') !== 'sync') {
+            EnviarOficioColetivoJob::dispatch($protocolo->id, $destinatarioIds);
+        }
 
-        return back()->with('success', "Novo lote com " . count($destinatarioIds) . " destinatário(s) enfileirado para envio em segundo plano.");
+        return back()->with('success', "Novo lote com " . count($destinatarioIds) . " destinatário(s) adicionado com sucesso.");
+    }
+
+    /**
+     * Processa um micro-lote de destinatários pendentes (ex: 10 contatos) via chamada HTTP/AJAX.
+     * Isso garante que cada requisição dure poucos segundos, evitando 504 Gateway Timeout.
+     */
+    public function dispararFracionado(Request $request, Protocolo $protocolo): JsonResponse
+    {
+        $limite = (int) $request->input('limite', 10);
+        $limite = max(1, min($limite, 20));
+
+        // Busca destinatários pendentes
+        $destinatarios = $protocolo->destinatarios()
+            ->with('empresa')
+            ->where(function ($q) {
+                $q->whereDoesntHave('envios')
+                    ->orWhereHas('envios', function ($qEnvio) {
+                        $qEnvio->where('status', 'pendente');
+                    });
+            })
+            ->limit($limite)
+            ->get();
+
+        if ($destinatarios->isEmpty()) {
+            $protocolo->atualizarStatusGeral();
+            return response()->json([
+                'concluido' => true,
+                'processados_nesta_etapa' => 0,
+                'restantes' => 0,
+                'porcentagem' => 100,
+                'status_geral' => $protocolo->status,
+            ]);
+        }
+
+        $token = $this->dispatcher->resolveToken($protocolo);
+        $this->dispatcher->getHttpClient()->setToken($token);
+        $attachmentsPayload = $this->dispatcher->prepararAnexosPayload($protocolo);
+
+        $sucessos = 0;
+        $falhas = 0;
+
+        foreach ($destinatarios as $destinatario) {
+            try {
+                $res = $this->dispatcher->enviarParaDestinatario(
+                    $protocolo,
+                    $destinatario,
+                    $token,
+                    $attachmentsPayload
+                );
+
+                if ($res > 0) {
+                    $sucessos++;
+                } else {
+                    $falhas++;
+                }
+            } catch (\Throwable $e) {
+                $falhas++;
+                \Illuminate\Support\Facades\Log::error("Erro no disparo fracionado para destinatário #{$destinatario->id}: " . $e->getMessage());
+            }
+
+            usleep(50000); // 50ms
+        }
+
+        $protocolo->atualizarStatusGeral();
+
+        $total = $protocolo->destinatarios()->count();
+        $envios = $protocolo->envios()->get();
+        $totalEnviados = $envios->whereIn('status', ['enviado', 'entregue', 'lido', 'concluido'])->count();
+        $totalFalhas = $envios->where('status', 'falha')->count();
+        $restantes = $envios->where('status', 'pendente')->count() + max(0, $total - $envios->count());
+
+        $porcentagem = $total > 0 ? (int) round((($totalEnviados + $totalFalhas) / $total) * 100) : 100;
+
+        return response()->json([
+            'concluido' => ($restantes === 0),
+            'processados_nesta_etapa' => $destinatarios->count(),
+            'sucessos_nesta_etapa' => $sucessos,
+            'falhas_nesta_etapa' => $falhas,
+            'total' => $total,
+            'enviados' => $totalEnviados,
+            'falhas' => $totalFalhas,
+            'restantes' => $restantes,
+            'porcentagem' => min(100, $porcentagem),
+            'status_geral' => $protocolo->status,
+        ]);
     }
 
     /**

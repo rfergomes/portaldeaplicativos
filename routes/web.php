@@ -148,6 +148,7 @@ Route::middleware(['auth', 'force_password_change'])->group(function () {
     Route::get('/protocolos/oficios/{protocolo}/progresso', [OficioColetivoController::class, 'statusProgresso'])->name('protocolos.oficios.progresso')->middleware('can:protocolos.visualizar');
     Route::post('/protocolos/oficios/{protocolo}/processar-fila', [OficioColetivoController::class, 'processarFilaAgora'])->name('protocolos.oficios.processarFila')->middleware('can:protocolos.criar');
     Route::post('/protocolos/oficios/{protocolo}/disparar-lote', [OficioColetivoController::class, 'dispararLote'])->name('protocolos.oficios.dispararLote')->middleware('can:protocolos.criar');
+    Route::post('/protocolos/oficios/{protocolo}/disparar-fracionado', [OficioColetivoController::class, 'dispararFracionado'])->name('protocolos.oficios.dispararFracionado')->middleware('can:protocolos.criar');
 
     // Protocolos e AR-Online
     Route::get('/protocolos/pdf/falhas', [ProtocoloController::class, 'relatorioFalhas'])->name('protocolos.pdf.falhas')->middleware('can:protocolos.visualizar');
