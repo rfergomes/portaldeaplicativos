@@ -473,19 +473,31 @@
                     </div>
 
                     <!-- Bloco de Notificação à Empresa (AR-Online) -->
-                    <div id="blocoNotificacaoEmpresa" class="alert alert-secondary align-items-center mb-3 d-none">
-                        <i class="fa-solid fa-paper-plane fs-3 me-3 text-primary"></i>
-                        <div class="small w-100">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <strong class="text-primary-emphasis">Notificação Oficial à Empresa (AR-Online)</strong>
-                                <button type="button" id="btnNotificarEmpresaModal" class="btn btn-warning btn-sm py-0 px-2 fw-bold d-none" style="font-size: 11px;">
-                                    <i class="fa-solid fa-building-circle-arrow-right me-1"></i>Informar E-mail do RH e Notificar
-                                </button>
+                    <div id="blocoNotificacaoEmpresa" class="alert alert-secondary mb-3 d-none">
+                        <div class="d-flex align-items-start w-100">
+                            <i class="fa-solid fa-paper-plane fs-3 me-3 text-primary mt-1"></i>
+                            <div class="small w-100">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <strong class="text-primary-emphasis">Notificação Oficial à Empresa (AR-Online)</strong>
+                                        <span id="badgeQtdEnviosEmpresa" class="badge bg-primary-subtle text-primary border border-primary-subtle d-none"></span>
+                                    </div>
+                                    <button type="button" id="btnNotificarEmpresaModal" class="btn btn-warning btn-sm py-0 px-2 fw-bold d-none" style="font-size: 11px;">
+                                        <i class="fa-solid fa-building-circle-arrow-right me-1"></i>Informar E-mail do RH e Notificar
+                                    </button>
+                                </div>
+
+                                <!-- Container para Múltiplos Envios Individuais -->
+                                <div id="listaEnviosEmpresa" class="d-none mt-2"></div>
+
+                                <!-- Formato Legado / Destinatário Único -->
+                                <div id="containerEnvioUnicoEmpresa">
+                                    <div><strong>E-mail Destinatário:</strong> <span id="detEmpresaEmail"></span></div>
+                                    <div><strong>Status AR-Online:</strong> <span id="detEmpresaStatus" class="badge"></span></div>
+                                    <div id="detLinhaArOnlineId"><strong>ID AR-Online:</strong> <span id="detEmpresaArOnlineId" class="font-monospace"></span></div>
+                                    <div id="detLinhaNotificadaEm"><strong>Data de Despacho:</strong> <span id="detEmpresaNotificadaEm"></span></div>
+                                </div>
                             </div>
-                            <div><strong>E-mail Destinatário:</strong> <span id="detEmpresaEmail"></span></div>
-                            <div><strong>Status AR-Online:</strong> <span id="detEmpresaStatus" class="badge"></span></div>
-                            <div id="detLinhaArOnlineId"><strong>ID AR-Online:</strong> <span id="detEmpresaArOnlineId" class="font-monospace"></span></div>
-                            <div id="detLinhaNotificadaEm"><strong>Data de Despacho:</strong> <span id="detEmpresaNotificadaEm"></span></div>
                         </div>
                     </div>
 
@@ -797,38 +809,115 @@ document.addEventListener('DOMContentLoaded', function () {
                     // 2. Dados de Notificação AR-Online à Empresa
                     const blocoNotificacaoEmpresa = document.getElementById('blocoNotificacaoEmpresa');
                     const btnNotificarEmpresaModal = document.getElementById('btnNotificarEmpresaModal');
-                    if (data.recepcionado_em || data.empresa_notificada_em || data.empresa_aronline_id || data.empresa_envio_status === 'pendente_contato') {
-                        toggleBloco(blocoNotificacaoEmpresa, true);
-                        document.getElementById('detEmpresaEmail').innerText = data.empresa_email || 'Não informado / Pendente';
-                        const statusBadge = document.getElementById('detEmpresaStatus');
-                        if (data.empresa_envio_status === 'lido') {
-                            statusBadge.className = 'badge bg-success';
-                            statusBadge.innerText = 'Lido pelo RH (AR-Online)';
-                            if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
-                        } else if (data.empresa_envio_status === 'entregue') {
-                            statusBadge.className = 'badge bg-info text-dark';
-                            statusBadge.innerText = 'Entregue no RH (AR-Online)';
-                            if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
-                        } else if (data.empresa_envio_status === 'enviado') {
-                            statusBadge.className = 'badge bg-primary';
-                            statusBadge.innerText = 'Enviado via AR-Online';
-                            if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
-                        } else if (data.empresa_envio_status === 'falha') {
-                            statusBadge.className = 'badge bg-danger';
-                            statusBadge.innerText = 'Falha na Entrega';
-                            if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.remove('d-none');
-                        } else if (data.empresa_envio_status === 'pendente_contato' || !data.empresa_email) {
-                            statusBadge.className = 'badge bg-warning text-dark';
-                            statusBadge.innerText = 'Pendente (Empresa sem E-mail)';
-                            if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.remove('d-none');
-                        } else {
-                            statusBadge.className = 'badge bg-secondary';
-                            statusBadge.innerText = data.empresa_envio_status || 'Pendente';
-                            if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
-                        }
+                    const listaEnviosEmpresa = document.getElementById('listaEnviosEmpresa');
+                    const containerEnvioUnicoEmpresa = document.getElementById('containerEnvioUnicoEmpresa');
+                    const badgeQtdEnviosEmpresa = document.getElementById('badgeQtdEnviosEmpresa');
 
-                        document.getElementById('detEmpresaArOnlineId').innerText = data.empresa_aronline_id || 'Pendente';
-                        document.getElementById('detEmpresaNotificadaEm').innerText = data.empresa_notificada_em || 'Pendente';
+                    const temEnvios = Array.isArray(data.empresa_envios) && data.empresa_envios.length > 0;
+                    const deveExibirBloco = data.recepcionado_em || data.empresa_notificada_em || data.empresa_aronline_id || data.empresa_envio_status === 'pendente_contato' || temEnvios;
+
+                    if (deveExibirBloco) {
+                        toggleBloco(blocoNotificacaoEmpresa, true);
+
+                        // Se possui envios individuais registrados
+                        if (temEnvios) {
+                            if (containerEnvioUnicoEmpresa) containerEnvioUnicoEmpresa.classList.add('d-none');
+                            if (listaEnviosEmpresa) listaEnviosEmpresa.classList.remove('d-none');
+                            if (badgeQtdEnviosEmpresa) {
+                                badgeQtdEnviosEmpresa.classList.remove('d-none');
+                                badgeQtdEnviosEmpresa.innerText = `${data.empresa_envios.length} contato(s)`;
+                            }
+
+                            let htmlEnvios = '';
+                            let temFalha = false;
+
+                            data.empresa_envios.forEach(envio => {
+                                let badgeHtml = '';
+                                if (envio.status === 'lido') {
+                                    badgeHtml = '<span class="badge bg-success"><i class="fa-solid fa-envelope-open me-1"></i>Lido pelo RH</span>';
+                                } else if (envio.status === 'entregue') {
+                                    badgeHtml = '<span class="badge bg-info text-dark"><i class="fa-solid fa-check-double me-1"></i>Entregue no RH</span>';
+                                } else if (envio.status === 'enviado') {
+                                    badgeHtml = '<span class="badge bg-primary"><i class="fa-solid fa-paper-plane me-1"></i>Enviado AR-Online</span>';
+                                } else if (envio.status === 'falha') {
+                                    temFalha = true;
+                                    badgeHtml = '<span class="badge bg-danger"><i class="fa-solid fa-circle-exclamation me-1"></i>Falha no Envio</span>';
+                                } else {
+                                    badgeHtml = `<span class="badge bg-secondary">${envio.status}</span>`;
+                                }
+
+                                const nomeDisplay = envio.nome_contato ? `<strong>${envio.nome_contato}</strong> &bull; ` : '';
+                                const arIdDisplay = envio.aronline_id ? `<span class="font-monospace text-primary">${envio.aronline_id}</span>` : '<span class="text-muted">Pendente</span>';
+                                const despachoDisplay = envio.notificada_em ? `<div><strong>Despacho:</strong> ${envio.notificada_em}</div>` : '';
+                                const entregaDisplay = envio.entregue_em ? `<div class="text-info-emphasis"><strong>Entrega:</strong> ${envio.entregue_em}</div>` : '';
+                                const leituraDisplay = envio.lido_em ? `<div class="text-success fw-bold"><strong>Leitura:</strong> ${envio.lido_em}</div>` : '';
+
+                                htmlEnvios += `
+                                    <div class="card mb-2 border border-secondary-subtle bg-white shadow-sm">
+                                        <div class="card-body p-2">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div>
+                                                    ${nomeDisplay}<span class="text-body-secondary font-monospace">${envio.email}</span>
+                                                </div>
+                                                <div>${badgeHtml}</div>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-3 text-muted" style="font-size: 11px;">
+                                                <div><strong>ID AR:</strong> ${arIdDisplay}</div>
+                                                ${despachoDisplay}
+                                                ${entregaDisplay}
+                                                ${leituraDisplay}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+
+                            if (listaEnviosEmpresa) listaEnviosEmpresa.innerHTML = htmlEnvios;
+
+                            if (btnNotificarEmpresaModal) {
+                                if (temFalha || data.empresa_envio_status === 'falha' || data.empresa_envio_status === 'pendente_contato') {
+                                    btnNotificarEmpresaModal.classList.remove('d-none');
+                                } else {
+                                    btnNotificarEmpresaModal.classList.add('d-none');
+                                }
+                            }
+                        } else {
+                            // Fallback para envio legado
+                            if (listaEnviosEmpresa) listaEnviosEmpresa.classList.add('d-none');
+                            if (badgeQtdEnviosEmpresa) badgeQtdEnviosEmpresa.classList.add('d-none');
+                            if (containerEnvioUnicoEmpresa) containerEnvioUnicoEmpresa.classList.remove('d-none');
+
+                            document.getElementById('detEmpresaEmail').innerText = data.empresa_email || 'Não informado / Pendente';
+                            const statusBadge = document.getElementById('detEmpresaStatus');
+                            if (data.empresa_envio_status === 'lido') {
+                                statusBadge.className = 'badge bg-success';
+                                statusBadge.innerText = 'Lido pelo RH (AR-Online)';
+                                if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
+                            } else if (data.empresa_envio_status === 'entregue') {
+                                statusBadge.className = 'badge bg-info text-dark';
+                                statusBadge.innerText = 'Entregue no RH (AR-Online)';
+                                if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
+                            } else if (data.empresa_envio_status === 'enviado') {
+                                statusBadge.className = 'badge bg-primary';
+                                statusBadge.innerText = 'Enviado via AR-Online';
+                                if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
+                            } else if (data.empresa_envio_status === 'falha') {
+                                statusBadge.className = 'badge bg-danger';
+                                statusBadge.innerText = 'Falha na Entrega';
+                                if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.remove('d-none');
+                            } else if (data.empresa_envio_status === 'pendente_contato' || !data.empresa_email) {
+                                statusBadge.className = 'badge bg-warning text-dark';
+                                statusBadge.innerText = 'Pendente (Empresa sem E-mail)';
+                                if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.remove('d-none');
+                            } else {
+                                statusBadge.className = 'badge bg-secondary';
+                                statusBadge.innerText = data.empresa_envio_status || 'Pendente';
+                                if (btnNotificarEmpresaModal) btnNotificarEmpresaModal.classList.add('d-none');
+                            }
+
+                            document.getElementById('detEmpresaArOnlineId').innerText = data.empresa_aronline_id || 'Pendente';
+                            document.getElementById('detEmpresaNotificadaEm').innerText = data.empresa_notificada_em || 'Pendente';
+                        }
                     } else {
                         toggleBloco(blocoNotificacaoEmpresa, false);
                     }

@@ -6,7 +6,9 @@ namespace App\Actions;
 
 use App\Domain\Protocolos\Contracts\ArOnlineClient;
 use App\Mail\TermoDesfiliacaoTrabalhadorMail;
+use App\Models\Cliente;
 use App\Models\Desfiliacao;
+use App\Models\DesfiliacaoEmpresaEnvio;
 use App\Services\DesfiliacaoArOnlineService;
 use App\Services\EmpresaContatoResolver;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -85,75 +87,188 @@ class DespacharTermoDesfiliacaoAction
             }
         }
 
-        // 2. Determinação do e-mail do RH da Empresa a partir da tabela clientes
-        $emailRh = $emailEmpresaManual;
-        if (empty($emailRh) && !empty($desfiliacao->empresa_email)) {
-            $emailRh = $desfiliacao->empresa_email;
-        }
+        // 2. Determinação de todos os contatos válidos de RH da Empresa (com filtro rigoroso de bounces)
+        $empresa = EmpresaContatoResolver::encontrarEmpresa(null, $desfiliacao->empresa);
+        $contatoManualCliente = null;
 
-        if (empty($emailRh)) {
-            $contatosInfo = EmpresaContatoResolver::obterContatosValidosParaNotificacao(null, $desfiliacao->empresa);
-            if (!empty($contatosInfo['emails'])) {
-                $emailRh = $contatosInfo['emails'][0];
-                $desfiliacao->update(['empresa_email' => $emailRh]);
-            } elseif ($contatosInfo['empresa'] && !empty($contatosInfo['empresa']->email)) {
-                $emailRh = $contatosInfo['empresa']->email;
-                $desfiliacao->update(['empresa_email' => $emailRh]);
-            }
-        } elseif (!empty($emailEmpresaManual)) {
-            // Se o e-mail foi fornecido manualmente, registra na tabela clientes
-            $empresa = EmpresaContatoResolver::encontrarEmpresa(null, $desfiliacao->empresa);
+        if (!empty($emailEmpresaManual)) {
+            $emailManualNormalizado = strtolower(trim($emailEmpresaManual));
             if ($empresa) {
-                EmpresaContatoResolver::registrarContatoRh($empresa, $emailEmpresaManual);
+                $contatoManualCliente = EmpresaContatoResolver::registrarContatoRh($empresa, $emailManualNormalizado);
             }
         }
 
-        // 3. Despacho Oficial via API AR-Online com Carimbo de Tempo e Validade Jurídica
-        if (!empty($emailRh)) {
-            try {
-                // Configura o Token AR-Online (prioriza departamento do usuário logado/recebedor)
-                $tokenArOnline = Auth::user()?->tokenDepto?->token 
-                    ?? $desfiliacao->recepcionadoPor?->tokenDepto?->token 
-                    ?? config('services.ar_online.token');
+        /** @var array<string, array{email: string, nome: ?string, cliente: ?Cliente}> $destinatarios */
+        $destinatarios = [];
 
-                if ($tokenArOnline) {
-                    try {
-                        $this->arOnlineClient->setToken($tokenArOnline);
-                    } catch (\Throwable $e) {
-                        // Tolera mocks de teste sem expectativa prévia de setToken
-                    }
+        if ($empresa) {
+            $contatosValidos = $empresa->clientes()
+                ->validosParaEnvio()
+                ->get();
+
+            foreach ($contatosValidos as $contato) {
+                if ($contato->temBounce()) {
+                    Log::info("Desfiliação #{$desfiliacao->id}: Contato ID {$contato->id} ({$contato->email}) descartado por bounce ativo.");
+                    continue;
                 }
 
-                $payload = $this->arOnlineService->criarPayloadNotificacaoEmpresa($desfiliacao, $emailRh);
-                $idEmailArOnline = $this->arOnlineClient->send($payload);
+                $emailKey = strtolower(trim((string) $contato->email));
+                if (!empty($emailKey) && !isset($destinatarios[$emailKey])) {
+                    $destinatarios[$emailKey] = [
+                        'email' => $emailKey,
+                        'nome' => $contato->nome,
+                        'cliente' => $contato,
+                    ];
+                }
+            }
 
-                $desfiliacao->update([
-                    'empresa_email' => $emailRh,
-                    'empresa_aronline_id' => $idEmailArOnline,
-                    'empresa_aronline_resposta' => 'Notificação enviada com sucesso via AR-Online.',
-                    'empresa_notificada_em' => now(),
-                    'empresa_envio_status' => 'enviado',
-                ]);
+            // Fallback para o e-mail geral da empresa se nenhum contato específico tiver sido encontrado
+            if (empty($destinatarios) && !empty($empresa->email)) {
+                $emailEmpresaKey = strtolower(trim((string) $empresa->email));
+                $temBounce = Cliente::where('email', $emailEmpresaKey)
+                    ->where(function ($q) {
+                        $q->where('email_valido', false)->orWhereNotNull('email_bounce_code');
+                    })
+                    ->exists();
 
+                if (!$temBounce) {
+                    $destinatarios[$emailEmpresaKey] = [
+                        'email' => $emailEmpresaKey,
+                        'nome' => $empresa->razao_social,
+                        'cliente' => null,
+                    ];
+                }
+            }
+        }
+
+        // Se foi fornecido e-mail manual, assegura sua inclusão (respeitando bounces)
+        if (!empty($emailEmpresaManual)) {
+            $emailManualKey = strtolower(trim($emailEmpresaManual));
+            $temBounceManual = $contatoManualCliente?->temBounce() ?? Cliente::where('email', $emailManualKey)
+                ->where(function ($q) {
+                    $q->where('email_valido', false)->orWhereNotNull('email_bounce_code');
+                })
+                ->exists();
+
+            if ($temBounceManual) {
+                Log::warning("Desfiliação #{$desfiliacao->id}: E-mail manual ({$emailManualKey}) descartado por histórico de bounce.");
+            } else {
+                $destinatarios[$emailManualKey] = [
+                    'email' => $emailManualKey,
+                    'nome' => $contatoManualCliente?->nome ?? $desfiliacao->empresa,
+                    'cliente' => $contatoManualCliente,
+                ];
+            }
+        }
+
+        // Fallback legado caso a empresa não esteja no catálogo mas desfiliacao já guardasse empresa_email
+        if (empty($destinatarios) && !empty($desfiliacao->empresa_email)) {
+            $emailLegado = strtolower(trim((string) $desfiliacao->empresa_email));
+            $temBounceLegado = Cliente::where('email', $emailLegado)
+                ->where(function ($q) {
+                    $q->where('email_valido', false)->orWhereNotNull('email_bounce_code');
+                })
+                ->exists();
+
+            if (!$temBounceLegado) {
+                $destinatarios[$emailLegado] = [
+                    'email' => $emailLegado,
+                    'nome' => $desfiliacao->empresa,
+                    'cliente' => null,
+                ];
+            }
+        }
+
+        // 3. Despacho Oficial via API AR-Online para todos os contatos válidos
+        if (!empty($destinatarios)) {
+            // Configura o Token AR-Online (prioriza departamento do usuário logado/recebedor)
+            $tokenArOnline = Auth::user()?->tokenDepto?->token 
+                ?? $desfiliacao->recepcionadoPor?->tokenDepto?->token 
+                ?? config('services.ar_online.token');
+
+            if ($tokenArOnline) {
+                try {
+                    $this->arOnlineClient->setToken($tokenArOnline);
+                } catch (\Throwable $e) {
+                    // Tolera mocks de teste sem expectativa prévia de setToken
+                }
+            }
+
+            $enviadosSucesso = [];
+            $falhas = [];
+            $aronlineIds = [];
+            $emailsSucesso = [];
+
+            foreach ($destinatarios as $dest) {
+                $emailDest = $dest['email'];
+                $nomeDest = $dest['nome'];
+                $clienteDest = $dest['cliente'];
+
+                try {
+                    $payload = $this->arOnlineService->criarPayloadNotificacaoEmpresa($desfiliacao, $emailDest, $nomeDest);
+                    $idEmailArOnline = $this->arOnlineClient->send($payload);
+
+                    $envio = DesfiliacaoEmpresaEnvio::create([
+                        'desfiliacao_id' => $desfiliacao->id,
+                        'cliente_id' => $clienteDest?->id,
+                        'email' => $emailDest,
+                        'nome_contato' => $nomeDest,
+                        'aronline_id' => $idEmailArOnline,
+                        'status' => 'enviado',
+                        'resposta_webhook' => 'Notificação despachada com sucesso via AR-Online.',
+                        'notificada_em' => now(),
+                    ]);
+
+                    $enviadosSucesso[] = $envio;
+                    $aronlineIds[] = $idEmailArOnline;
+                    $emailsSucesso[] = $emailDest;
+
+                    Log::info("Desfiliação #{$desfiliacao->id}: Notificação AR-Online despachada para {$emailDest} (AR ID: {$idEmailArOnline}).");
+                } catch (\Throwable $e) {
+                    Log::error("Falha no envio via AR-Online para empresa ({$emailDest}) em desfiliação #{$desfiliacao->id}: " . $e->getMessage());
+
+                    DesfiliacaoEmpresaEnvio::create([
+                        'desfiliacao_id' => $desfiliacao->id,
+                        'cliente_id' => $clienteDest?->id,
+                        'email' => $emailDest,
+                        'nome_contato' => $nomeDest,
+                        'status' => 'falha',
+                        'resposta_webhook' => $e->getMessage(),
+                        'notificada_em' => now(),
+                    ]);
+
+                    $falhas[] = "{$emailDest} (" . $e->getMessage() . ")";
+                }
+            }
+
+            $todosEmails = array_keys($destinatarios);
+            $desfiliacao->empresa_email = !empty($emailsSucesso) 
+                ? substr(implode(', ', $emailsSucesso), 0, 191) 
+                : substr(implode(', ', $todosEmails), 0, 191);
+            $desfiliacao->empresa_aronline_id = !empty($aronlineIds) 
+                ? substr(implode(', ', $aronlineIds), 0, 100) 
+                : null;
+            $desfiliacao->empresa_notificada_em = !empty($enviadosSucesso) ? now() : null;
+
+            if (!empty($enviadosSucesso)) {
+                $desfiliacao->empresa_envio_status = 'enviado';
+                $desfiliacao->empresa_aronline_resposta = 'Notificação despachada para ' . count($enviadosSucesso) . ' contato(s) da empresa via AR-Online.';
                 $resultados['empresa'] = true;
                 $resultados['empresa_status'] = 'enviado';
-                $resultados['empresa_aronline_id'] = $idEmailArOnline;
-            } catch (\Throwable $e) {
-                Log::error("Falha no envio via AR-Online para empresa de desfiliação #{$desfiliacao->id}: " . $e->getMessage());
-
-                $desfiliacao->update([
-                    'empresa_email' => $emailRh,
-                    'empresa_envio_status' => 'falha',
-                    'empresa_aronline_resposta' => $e->getMessage(),
-                ]);
-
+                $resultados['empresa_aronline_id'] = implode(', ', $aronlineIds);
+            } else {
+                $desfiliacao->empresa_envio_status = 'falha';
+                $desfiliacao->empresa_aronline_resposta = 'Falha no envio para os destinatários: ' . implode('; ', $falhas);
                 $resultados['empresa_status'] = 'falha';
             }
+
+            $desfiliacao->save();
+            $desfiliacao->consolidarStatusEnvioEmpresa();
         } else {
-            // Empresa não possui e-mail cadastrado: retém em pendência na tela administrativa
+            // Empresa não possui nenhum contato válido (sem bounce)
             $desfiliacao->update([
                 'empresa_envio_status' => 'pendente_contato',
-                'empresa_aronline_resposta' => 'Nenhum e-mail de RH cadastrado para a empresa no catálogo corporativo.',
+                'empresa_aronline_resposta' => 'Nenhum e-mail de RH válido (sem bounce) cadastrado para a empresa no catálogo corporativo.',
             ]);
 
             $resultados['empresa_status'] = 'pendente_contato';

@@ -29,13 +29,19 @@ class DesfiliacaoDespachoEmailTest extends TestCase
             ['chave' => 'desfiliacoes.recepcionar'],
             ['nome' => 'Recepcionar Desfiliacao', 'descricao' => 'Permite recepcionar']
         );
+        $permVisualizar = Permissao::firstOrCreate(
+            ['chave' => 'desfiliacoes.visualizar'],
+            ['nome' => 'Visualizar Desfiliacao', 'descricao' => 'Permite visualizar']
+        );
         $perfil = Perfil::firstOrCreate(
             ['nome' => 'Operador Despacho Teste'],
             ['descricao' => 'Operador de Despacho']
         );
-        $perfil->permissoes()->syncWithoutDetaching([$permRecepcao->id]);
+        $perfil->permissoes()->syncWithoutDetaching([$permRecepcao->id, $permVisualizar->id]);
 
-        $this->operador = User::factory()->create();
+        $this->operador = User::factory()->create([
+            'email' => 'operador_despacho_' . uniqid() . '@teste.com',
+        ]);
         $this->operador->perfis()->attach($perfil);
 
         EmpresaContato::truncate();
@@ -256,6 +262,150 @@ class DesfiliacaoDespachoEmailTest extends TestCase
         $this->assertEquals('rizeldaquimicps@terra.com.br', $desfiliacao->empresa_email);
         $this->assertEquals('enviado', $desfiliacao->empresa_envio_status);
         $this->assertEquals('AR-SINCRONIZADO-777', $desfiliacao->empresa_aronline_id);
+    }
+
+    public function test_despacho_para_multiplos_contatos_respeitando_bounces_e_webhook_aronline(): void
+    {
+        Mail::fake();
+
+        $empresa = \App\Models\Empresa::firstOrCreate(
+            ['cnpj' => '44.555.666/0001-77'],
+            [
+                'razao_social' => 'Indústrias Químicas Reunidas SA',
+                'ativo' => true,
+            ]
+        );
+        $empresa->update(['razao_social' => 'Indústrias Químicas Reunidas SA', 'ativo' => true]);
+
+        // Limpa contatos anteriores desta empresa
+        \App\Models\Cliente::where('empresa_id', $empresa->id)->delete();
+
+        // Contato 1: Válido
+        $contato1 = \App\Models\Cliente::create([
+            'empresa_id' => $empresa->id,
+            'nome' => 'Ana RH',
+            'email' => 'ana.rh@quimicasreunidas.com.br',
+            'ativo' => true,
+            'email_valido' => true,
+            'email_bounce_code' => null,
+        ]);
+
+        // Contato 2: Inválido / Com Bounce registrado
+        $contatoBounce = \App\Models\Cliente::create([
+            'empresa_id' => $empresa->id,
+            'nome' => 'Contato Antigo Bounce',
+            'email' => 'bounce@quimicasreunidas.com.br',
+            'ativo' => true,
+            'email_valido' => false,
+            'email_bounce_code' => '550',
+            'email_bounce_description' => 'User unknown / mailbox not found',
+        ]);
+
+        // Contato 3: Válido
+        $contato2 = \App\Models\Cliente::create([
+            'empresa_id' => $empresa->id,
+            'nome' => 'Carlos DP',
+            'email' => 'carlos.dp@quimicasreunidas.com.br',
+            'ativo' => true,
+            'email_valido' => true,
+            'email_bounce_code' => null,
+        ]);
+
+        $desfiliacao = Desfiliacao::create([
+            'nome_completo' => 'Lucas Silveira',
+            'cpf' => '88899900011',
+            'empresa' => 'Indústrias Químicas Reunidas SA',
+            'email' => 'lucas@teste.com',
+            'telefone' => '19922221111',
+            'status' => 'confirmada',
+        ]);
+
+        // Mock do AR-Online: deve ser chamado APENAS para os 2 contatos válidos (NUNCA para o bounce)
+        $emailsRecebidos = [];
+        $arOnlineMock = Mockery::mock(ArOnlineClient::class);
+        $arOnlineMock->shouldReceive('send')
+            ->twice()
+            ->andReturnUsing(function (ArOnlineSendPayload $payload) use (&$emailsRecebidos) {
+                $emailsRecebidos[] = $payload->emailTo;
+                return 'AR-MULTI-' . uniqid() . '-' . md5((string) $payload->emailTo);
+            });
+
+        $this->app->instance(ArOnlineClient::class, $arOnlineMock);
+
+        /** @var DespacharTermoDesfiliacaoAction $action */
+        $action = $this->app->make(DespacharTermoDesfiliacaoAction::class);
+        $resultado = $action->execute($desfiliacao);
+
+        $this->assertTrue($resultado['empresa']);
+        $this->assertEquals('enviado', $resultado['empresa_status']);
+
+        // Garante que o contato com bounce foi estritamente descartado
+        $this->assertCount(2, $emailsRecebidos);
+        $this->assertContains('ana.rh@quimicasreunidas.com.br', $emailsRecebidos);
+        $this->assertContains('carlos.dp@quimicasreunidas.com.br', $emailsRecebidos);
+        $this->assertNotContains('bounce@quimicasreunidas.com.br', $emailsRecebidos);
+
+        // Verifica os registros individuais em desfiliacao_empresa_envios
+        $this->assertDatabaseHas('desfiliacao_empresa_envios', [
+            'desfiliacao_id' => $desfiliacao->id,
+            'email' => 'ana.rh@quimicasreunidas.com.br',
+            'status' => 'enviado',
+        ]);
+        $this->assertDatabaseHas('desfiliacao_empresa_envios', [
+            'desfiliacao_id' => $desfiliacao->id,
+            'email' => 'carlos.dp@quimicasreunidas.com.br',
+            'status' => 'enviado',
+        ]);
+        $this->assertDatabaseMissing('desfiliacao_empresa_envios', [
+            'desfiliacao_id' => $desfiliacao->id,
+            'email' => 'bounce@quimicasreunidas.com.br',
+        ]);
+
+        // Simula recebimento de webhook AR-Online para o envio da Ana (Lido)
+        $envioAna = \App\Models\DesfiliacaoEmpresaEnvio::where('desfiliacao_id', $desfiliacao->id)
+            ->where('email', 'ana.rh@quimicasreunidas.com.br')
+            ->firstOrFail();
+
+        $idAna = $envioAna->aronline_id;
+        $webhookResponse = $this->postJson('/api/webhooks/aronline', [
+            'notificationID' => $idAna,
+            'status' => 'Lido pelo destinatário no cliente de e-mail',
+            'metadata' => ['webhookVersion' => 'v2'],
+        ]);
+        $webhookResponse->assertStatus(200);
+
+        // Verifica que o envio específico foi atualizado para "lido"
+        $this->assertDatabaseHas('desfiliacao_empresa_envios', [
+            'aronline_id' => $idAna,
+            'status' => 'lido',
+        ]);
+
+        // Verifica que a desfiliação consolidou o status geral para "lido"
+        $desfiliacao->refresh();
+        $this->assertEquals('lido', $desfiliacao->empresa_envio_status);
+
+        // Testa a rota show da auditoria administrativa
+        $showResponse = $this->actingAs($this->operador)
+            ->getJson(route('admin.desfiliacoes.show', $desfiliacao->id));
+
+        $showResponse->assertStatus(200)
+            ->assertJsonStructure([
+                'id',
+                'empresa_envio_status',
+                'empresa_envios' => [
+                    '*' => [
+                        'id',
+                        'email',
+                        'nome_contato',
+                        'aronline_id',
+                        'status',
+                        'notificada_em',
+                    ],
+                ],
+            ]);
+
+        $enviosJson = $showResponse->json('empresa_envios');
+        $this->assertCount(2, $enviosJson);
     }
 }
 

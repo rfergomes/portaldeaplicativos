@@ -81,6 +81,45 @@ class Desfiliacao extends Model
         return $this->belongsTo(User::class, 'efetivado_por_user_id');
     }
 
+    public function empresaEnvios()
+    {
+        return $this->hasMany(DesfiliacaoEmpresaEnvio::class, 'desfiliacao_id');
+    }
+
+    /**
+     * Atualiza o status geral de notificação da empresa baseando-se no estágio mais avançado dos envios.
+     * Hierarquia: lido > entregue > enviado > falha.
+     */
+    public function consolidarStatusEnvioEmpresa(): void
+    {
+        $envios = $this->empresaEnvios()->get();
+        if ($envios->isEmpty()) {
+            return;
+        }
+
+        $weights = [
+            'lido' => 40,
+            'entregue' => 30,
+            'enviado' => 20,
+            'falha' => 10,
+        ];
+
+        $maxWeight = -1;
+        $bestStatus = null;
+
+        foreach ($envios as $envio) {
+            $peso = $weights[$envio->status] ?? 0;
+            if ($peso > $maxWeight) {
+                $maxWeight = $peso;
+                $bestStatus = $envio->status;
+            }
+        }
+
+        if ($bestStatus && $this->empresa_envio_status !== $bestStatus) {
+            $this->update(['empresa_envio_status' => $bestStatus]);
+        }
+    }
+
     public function isPendente(): bool
     {
         return $this->status === 'pendente';

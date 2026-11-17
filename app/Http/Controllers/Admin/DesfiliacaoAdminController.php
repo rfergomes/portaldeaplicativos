@@ -72,7 +72,7 @@ class DesfiliacaoAdminController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $desfiliacao = Desfiliacao::with(['recepcionadoPor', 'efetivadoPor', 'recusadoPor', 'desfiliacaoLink'])->findOrFail($id);
+        $desfiliacao = Desfiliacao::with(['recepcionadoPor', 'efetivadoPor', 'recusadoPor', 'desfiliacaoLink', 'empresaEnvios'])->findOrFail($id);
 
         return response()->json([
             'id' => $desfiliacao->id,
@@ -84,6 +84,19 @@ class DesfiliacaoAdminController extends Controller
             'empresa_aronline_id' => $desfiliacao->empresa_aronline_id,
             'empresa_envio_status' => $desfiliacao->empresa_envio_status,
             'empresa_notificada_em' => $desfiliacao->empresa_notificada_em?->format('d/m/Y H:i:s'),
+            'empresa_envios' => $desfiliacao->empresaEnvios->map(function ($envio) {
+                return [
+                    'id' => $envio->id,
+                    'email' => $envio->email,
+                    'nome_contato' => $envio->nome_contato,
+                    'aronline_id' => $envio->aronline_id,
+                    'status' => $envio->status,
+                    'notificada_em' => $envio->notificada_em?->format('d/m/Y H:i:s'),
+                    'entregue_em' => $envio->entregue_em?->format('d/m/Y H:i:s'),
+                    'lido_em' => $envio->lido_em?->format('d/m/Y H:i:s'),
+                    'resposta_webhook' => $envio->resposta_webhook,
+                ];
+            })->values()->all(),
             'email' => $desfiliacao->email,
             'telefone' => $desfiliacao->telefone_formatado,
             'motivo' => $desfiliacao->motivo ?: 'Não informado',

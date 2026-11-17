@@ -13,9 +13,13 @@ class DesfiliacaoArOnlineService
     /**
      * Monta o payload padronizado da API AR-Online para notificação oficial ao RH da empresa empregadora.
      */
-    public function criarPayloadNotificacaoEmpresa(Desfiliacao $desfiliacao, string $emailRh): ArOnlineSendPayload
+    public function criarPayloadNotificacaoEmpresa(Desfiliacao $desfiliacao, string $emailRh, ?string $nomeDestinatario = null): ArOnlineSendPayload
     {
         $assunto = "Notificação Oficial: Desfiliação Sindical - {$desfiliacao->nome_completo} (CPF: {$desfiliacao->cpf_formatado})";
+
+        $destinatarioNome = !empty($nomeDestinatario) 
+            ? "{$nomeDestinatario} ({$desfiliacao->empresa})" 
+            : $desfiliacao->empresa;
 
         $corpoHtml = <<<HTML
 <div style="font-family: Arial, sans-serif; color: #1e293b; line-height: 1.6; max-width: 600px;">
@@ -67,7 +71,7 @@ HTML;
         }
 
         return new ArOnlineSendPayload(
-            nameTo: $desfiliacao->empresa,
+            nameTo: $destinatarioNome,
             subject: $assunto,
             contentHtml: $corpoHtml,
             emailTo: $emailRh,
