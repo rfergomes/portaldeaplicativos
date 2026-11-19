@@ -10,20 +10,55 @@
             <div class="col-md-5">
                 <div class="card card-outline card-primary shadow-sm h-100 border-0">
                     <div class="card-header border-0 pb-0">
-                        <h3 class="card-title fw-bold text-primary"><i class="fas fa-file-import me-2"></i>Importar Planilha</h3>
-                    </div>
-                    <form id="importForm" action="{{ route('socios-caixa.import') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="card-body">
-                            <div class="bg-light p-3 rounded mb-3 border border-primary-subtle">
-                                <small class="text-muted d-block mb-3">O sistema sincroniza automaticamente registros baseados em Matrícula, Ano e Mês (Upsert).</small>
-                                <div class="input-group">
-                                    <input type="file" name="file" id="file" class="form-control" required>
-                                    <button type="submit" id="btnImportar" class="btn btn-primary px-4 fw-bold"><i class="fas fa-upload me-2"></i>Importar</button>
-                                </div>
-                            </div>
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <h3 class="card-title fw-bold text-primary mb-0"><i class="fas fa-file-import me-2"></i>Importar</h3>
+                            <ul class="nav nav-pills card-header-pills small fw-bold" id="importTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active py-1 px-3" id="tab-mensalidades" data-bs-toggle="pill" data-bs-target="#pane-mensalidades" type="button" role="tab" aria-selected="true">
+                                        <i class="fas fa-receipt me-1"></i>Mensalidades
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link py-1 px-3" id="tab-contatos" data-bs-toggle="pill" data-bs-target="#pane-contatos" type="button" role="tab" aria-selected="false">
+                                        <i class="fas fa-address-book me-1"></i>Contatos (Celulares)
+                                    </button>
+                                </li>
+                            </ul>
                         </div>
-                    </form>
+                    </div>
+                    <div class="tab-content">
+                        <!-- Painel 1: Mensalidades (Original) -->
+                        <div class="tab-pane fade show active" id="pane-mensalidades" role="tabpanel">
+                            <form id="importForm" action="{{ route('socios-caixa.import') }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="card-body">
+                                    <div class="bg-light p-3 rounded mb-3 border border-primary-subtle">
+                                        <small class="text-muted d-block mb-3">O sistema sincroniza automaticamente registros baseados em Matrícula, Ano e Mês (Upsert).</small>
+                                        <div class="input-group">
+                                            <input type="file" name="file" id="file" class="form-control" required>
+                                            <button type="submit" id="btnImportar" class="btn btn-primary px-4 fw-bold"><i class="fas fa-upload me-2"></i>Importar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Painel 2: Contatos (Novo) -->
+                        <div class="tab-pane fade" id="pane-contatos" role="tabpanel">
+                            <form id="importContatosForm" action="{{ route('socios-caixa.import-contatos') }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="card-body">
+                                    <div class="bg-light p-3 rounded mb-3 border border-success-subtle">
+                                        <small class="text-muted d-block mb-3">Atualiza Telefone Celular e E-mail a partir do relatório CSV/Excel pela Matrícula (Código).</small>
+                                        <div class="input-group">
+                                            <input type="file" name="file" id="fileContatos" class="form-control" accept=".csv,.txt,.xlsx,.xls" required>
+                                            <button type="submit" id="btnImportarContatos" class="btn btn-success px-4 fw-bold"><i class="fas fa-upload me-2"></i>Importar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         @endif
@@ -154,6 +189,16 @@
                                 <span class="fw-bold text-dark">{{ $socio->nome }}</span>
                                 @if($socio->inativado_abaco)
                                     <span class="badge bg-danger-subtle text-danger border border-danger ms-1" style="font-size: 0.7rem;"><i class="fas fa-user-slash me-1"></i>Inativado Ábaco</span>
+                                @endif
+                                @if(!empty($socio->telefone) || !empty($socio->email))
+                                    <div class="small text-muted mt-1" style="font-size: 0.78rem;">
+                                        @if(!empty($socio->telefone))
+                                            <span class="me-2 text-nowrap"><i class="fas fa-phone-alt me-1 text-success"></i>{{ $socio->telefone }}</span>
+                                        @endif
+                                        @if(!empty($socio->email))
+                                            <span class="text-nowrap"><i class="fas fa-envelope me-1 text-primary"></i>{{ $socio->email }}</span>
+                                        @endif
+                                    </div>
                                 @endif
                             </td>
                             <td class="text-center"><span class="small text-muted text-uppercase">{{ $socio->tipo_socio }}</span></td>
@@ -388,13 +433,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalTitle = document.getElementById('modalTitle');
     const modalDescription = document.getElementById('modalDescription');
 
-    // Spinner para Importação
+    // Spinner para Importação de Mensalidades
     const importForm = document.getElementById('importForm');
     const btnImportar = document.getElementById('btnImportar');
     if (importForm) {
         importForm.addEventListener('submit', function() {
             btnImportar.disabled = true;
             btnImportar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processando...';
+        });
+    }
+
+    // Spinner para Importação de Contatos
+    const importContatosForm = document.getElementById('importContatosForm');
+    const btnImportarContatos = document.getElementById('btnImportarContatos');
+    if (importContatosForm) {
+        importContatosForm.addEventListener('submit', function() {
+            btnImportarContatos.disabled = true;
+            btnImportarContatos.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Atualizando...';
         });
     }
 

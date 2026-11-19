@@ -310,6 +310,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [SocioCaixaController::class, 'index'])->name('index')->middleware('can:socio_caixa.visualizar');
         Route::get('/dashboard', [SocioCaixaController::class, 'dashboard'])->name('dashboard')->middleware('can:socio_caixa.visualizar');
         Route::post('/import', [SocioCaixaController::class, 'import'])->name('import')->middleware('can:socio_caixa.importar');
+        Route::post('/import-contatos', [SocioCaixaController::class, 'importContatos'])->name('import-contatos')->middleware('can:socio_caixa.importar');
         Route::patch('/{socio}/toggle-payment', [SocioCaixaController::class, 'togglePayment'])->name('toggle-payment')->middleware('can:socio_caixa.gerenciar');
         Route::patch('/{socio}/postpone', [SocioCaixaController::class, 'postpone'])->name('postpone')->middleware('can:socio_caixa.gerenciar');
         Route::patch('/{socio}/inativar-abaco', [SocioCaixaController::class, 'inativarAbaco'])->name('inativar-abaco')->middleware('can:socio_caixa.gerenciar');

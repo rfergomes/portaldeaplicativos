@@ -50,6 +50,8 @@ class SocioCaixaController extends Controller
             ->selectRaw('COUNT(CASE WHEN (pago = 0 AND postergado_ate > NOW()) THEN 1 END) as total_postergados')
             ->selectRaw('MAX(inativado_abaco) as inativado_abaco')
             ->selectRaw('MIN(id) as id') 
+            ->selectRaw('MAX(telefone) as telefone')
+            ->selectRaw('MAX(email) as email')
             ->selectSub(\App\Models\SocioCaixaOcorrencia::whereColumn('matricula', 'socio_caixas.matricula')->where('mensagem', 'LIKE', '[WHATSAPP]%')->selectRaw('COUNT(*)'), 'qtde_contatos')
             ->groupBy('matricula', 'nome', 'tipo_socio');
 
@@ -257,6 +259,31 @@ class SocioCaixaController extends Controller
             return redirect()->back()->with('success', 'Importação concluída com sucesso!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Erro na importação: ' . $e->getMessage());
+        }
+    }
+
+    public function importContatos(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt,xlsx,xls'
+        ], [
+            'file.required' => 'Selecione um arquivo CSV ou Excel para importar.',
+            'file.mimes' => 'O arquivo deve estar no formato CSV ou Excel (.xlsx, .xls).',
+        ]);
+
+        try {
+            $import = new \App\Imports\SocioCaixaContatosImport();
+            Excel::import($import, $request->file('file'));
+
+            $resumo = $import->getResumo();
+            $msg = "Importação de contatos concluída com sucesso! {$resumo['atualizados']} associado(s) atualizados com dados de contato.";
+            if ($resumo['nao_encontrados'] > 0) {
+                $msg .= " ({$resumo['nao_encontrados']} matrícula(s) da planilha não constam na base de Sócio Caixa).";
+            }
+
+            return redirect()->back()->with('success', $msg);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erro na importação de contatos: ' . $e->getMessage());
         }
     }
 

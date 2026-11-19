@@ -18,6 +18,7 @@ class SocioCaixa extends Model
         'cod_emp',
         'cpf',
         'telefone',
+        'email',
         'valor',
         'data_vencimento',
         'pago',

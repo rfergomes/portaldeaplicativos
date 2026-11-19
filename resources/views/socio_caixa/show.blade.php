@@ -44,6 +44,12 @@
                                 @endif
                             </div>
                         </div>
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom align-items-center">
+                            <span class="text-muted"><i class="fas fa-envelope me-2"></i>E-mail:</span>
+                            <div class="text-end">
+                                <span class="fw-bold d-block" id="displayEmail">{{ $socio->email ?: 'Não cadastrado' }}</span>
+                            </div>
+                        </div>
                         <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
                             <span class="text-muted"><i class="fas fa-calendar-alt me-2"></i>Lançamentos:</span>
                             <span class="badge bg-light text-dark border">{{ $lancamentos->count() }} meses</span>
